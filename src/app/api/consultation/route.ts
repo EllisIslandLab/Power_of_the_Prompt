@@ -20,14 +20,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Prepare record for Airtable
-    const record = {
+    // Prepare record for Airtable - using flexible typing for dynamic fields
+    const record: any = {
       fields: {
         'Name': fullName,
         'Email': email,
         'Phone': phone,
-        'Business Name': body.businessName || 'None provided',
-        'Status': body.justSendInfo ? 'Email Only' : 'New'
+        'Business Name': body.businessName || 'Not provided',
+        'Status': body.justSendInfo ? 'Email Only' : (body.bookingType === 'calendar' ? 'Calendar Booking' : 'Call Back Request')
       }
     }
 

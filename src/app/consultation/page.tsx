@@ -3,11 +3,21 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { TimeSlotPicker } from "@/components/calendar/TimeSlotPicker"
 import { Zap, Calendar, Phone, Mail, Clock, CheckCircle, ArrowRight } from "lucide-react"
+
+interface TimeSlot {
+  timestamp: string
+  formatted: string
+  date: string
+  time: string
+  period: 'morning' | 'afternoon'
+}
 
 export default function ConsultationPage() {
   const [selectedOption, setSelectedOption] = useState<'calendar' | 'form' | null>(null)
   const [nextAvailable, setNextAvailable] = useState("Loading...")
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -31,7 +41,7 @@ export default function ConsultationPage() {
   useEffect(() => {
     const fetchAvailability = async () => {
       try {
-        const response = await fetch('/api/calendly/availability')
+        const response = await fetch('/api/calendar/availability')
         if (response.ok) {
           const data = await response.json()
           setNextAvailable(data.next_available)
@@ -64,14 +74,26 @@ export default function ConsultationPage() {
     setError("")
     
     try {
-      const response = await fetch("/api/consultation", {
+      let endpoint = "/api/consultation"
+      let submitData: any = {
+        ...formData,
+        bookingType: selectedOption,
+        submittedAt: new Date().toISOString()
+      }
+
+      // For calendar bookings, use the calendar booking endpoint
+      if (selectedOption === 'calendar') {
+        endpoint = "/api/calendar/book"
+        submitData = {
+          ...submitData,
+          selectedSlot: selectedSlot
+        }
+      }
+      
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          bookingType: selectedOption,
-          submittedAt: new Date().toISOString()
-        })
+        body: JSON.stringify(submitData)
       })
       
       const result = await response.json()
@@ -101,14 +123,21 @@ export default function ConsultationPage() {
           <div className="bg-card rounded-lg shadow-lg p-8 border">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-6" />
             <h1 className="text-3xl font-bold mb-4">
-              {selectedOption === 'calendar' ? 'Consultation Confirmed!' : 'Request Received!'}
+              {selectedOption === 'calendar' ? 'Appointment Confirmed!' : 'Request Received!'}
             </h1>
             <p className="text-muted-foreground mb-6">
               {selectedOption === 'calendar' 
-                ? "Check your email for the Zoom link and calendar invite. I'm looking forward to talking with you!"
+                ? "Your appointment is confirmed! Check your email for meeting details and calendar invite."
                 : "I'll reach out within your preferred timeline. Keep an eye on your email and phone!"
               }
             </p>
+            {selectedOption === 'calendar' && selectedSlot && (
+              <div className="bg-green-50 rounded-lg p-4 mb-6 border border-green-200">
+                <h3 className="font-semibold text-green-800 mb-2">Your Appointment:</h3>
+                <p className="text-green-700">{selectedSlot.formatted}</p>
+                <p className="text-sm text-green-600 mt-1">Meeting details sent to your email</p>
+              </div>
+            )}
             <Button asChild>
               <a href="/">Return to Homepage</a>
             </Button>
@@ -143,9 +172,9 @@ export default function ConsultationPage() {
                   <div className="flex items-center gap-3">
                     <Calendar className="h-8 w-8" />
                     <div>
-                      <CardTitle className="text-2xl">🗓️ Schedule Your Call Now</CardTitle>
+                      <CardTitle className="text-2xl">🎯 Schedule Your Call Now</CardTitle>
                       <CardDescription className="text-primary-foreground/90 text-base">
-                        Pick a time that works for you - I'll call you then
+                        Pick a time that works for you - completely custom booking system
                       </CardDescription>
                     </div>
                   </div>
@@ -165,15 +194,15 @@ export default function ConsultationPage() {
                       <ul className="space-y-2">
                         <li className="flex items-center gap-2 text-sm">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          Instant confirmation with calendar invite
+                          Instant confirmation with Zoom meeting
                         </li>
                         <li className="flex items-center gap-2 text-sm">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          Automatic Zoom meeting link
+                          No third-party platforms - we own our system
                         </li>
                         <li className="flex items-center gap-2 text-sm">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          Email reminders before your call
+                          Email confirmation and calendar invite
                         </li>
                       </ul>
                     </div>
@@ -278,7 +307,7 @@ export default function ConsultationPage() {
     )
   }
 
-  // Calendar Integration View
+  // Custom Calendar Integration View
   if (selectedOption === 'calendar') {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-20 px-4 sm:px-6 lg:px-8">
@@ -293,94 +322,122 @@ export default function ConsultationPage() {
             </Button>
             <h1 className="text-3xl font-bold mb-4">Schedule Your Consultation</h1>
             <p className="text-muted-foreground">
-              Choose a time that works best for you. You'll receive an instant confirmation with meeting details.
+              Choose a time that works best for you. You'll receive instant confirmation with meeting details.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Calendar Widget */}
+            {/* Calendar Component */}
             <div className="lg:col-span-2">
-              <Card>
-                <CardContent className="p-8">
-                  {/* Calendly Embed Placeholder */}
-                  <div className="bg-muted/30 rounded-lg p-8 text-center min-h-[500px] flex items-center justify-center">
-                    <div>
-                      <Calendar className="h-16 w-16 text-primary mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Calendar Integration</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Calendly widget will be embedded here
-                      </p>
-                      <div className="text-sm text-muted-foreground space-y-1 mb-4">
-                        <div>Available: 6:00-10:00 AM & 2:00-6:00 PM EST</div>
-                        <div>30-minute sessions</div>
-                        <div>3+ hour minimum notice</div>
-                        <div>Automatic Zoom meeting generation</div>
+              <TimeSlotPicker 
+                onSlotSelect={setSelectedSlot}
+                selectedSlot={selectedSlot}
+              />
+              
+              {/* Booking Form */}
+              {selectedSlot && (
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>Complete Your Booking</CardTitle>
+                    <CardDescription>
+                      Just a few details to confirm your {selectedSlot.formatted} appointment
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {error && (
+                      <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-red-700 text-sm">{error}</p>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Full Name *
+                          </label>
+                          <input
+                            type="text"
+                            name="fullName"
+                            required
+                            value={formData.fullName}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="Your full name"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Email Address *
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            required
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="your@email.com"
+                          />
+                        </div>
                       </div>
                       
-                      {/* Quick Form for Calendar Booking */}
-                      <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4 text-left">
-                        <h4 className="font-semibold text-center mb-4">Required for Booking:</h4>
-                        <input
-                          type="text"
-                          name="fullName"
-                          placeholder="Full Name"
-                          required
-                          value={formData.fullName}
-                          onChange={handleChange}
-                          className="w-full p-3 border rounded-lg text-sm"
-                        />
-                        <input
-                          type="email"
-                          name="email"
-                          placeholder="Email Address"
-                          required
-                          value={formData.email}
-                          onChange={handleChange}
-                          className="w-full p-3 border rounded-lg text-sm"
-                        />
-                        <input
-                          type="tel"
-                          name="phone"
-                          placeholder="Phone Number"
-                          required
-                          value={formData.phone}
-                          onChange={handleChange}
-                          className="w-full p-3 border rounded-lg text-sm"
-                        />
-                        <input
-                          type="text"
-                          name="businessName"
-                          placeholder="Business Name"
-                          required
-                          value={formData.businessName}
-                          onChange={handleChange}
-                          className="w-full p-3 border rounded-lg text-sm"
-                        />
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Phone Number *
+                          </label>
+                          <input
+                            type="tel"
+                            name="phone"
+                            required
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="(555) 123-4567"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Business Name
+                          </label>
+                          <input
+                            type="text"
+                            name="businessName"
+                            value={formData.businessName}
+                            onChange={handleChange}
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                            placeholder="Your business name (if you have one)"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          What type of website are you considering?
+                        </label>
                         <textarea
                           name="websiteDescription"
-                          placeholder="What type of website are you considering?"
                           rows={3}
                           value={formData.websiteDescription}
                           onChange={handleChange}
-                          className="w-full p-3 border rounded-lg text-sm"
+                          className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                          placeholder="Brief description of your website needs..."
                         />
-                        <Button type="submit" className="w-full" disabled={isSubmitting}>
-                          {isSubmitting ? "Booking..." : "Simulate Booking (Demo)"}
-                        </Button>
-                      </form>
-                    </div>
-                  </div>
-                  {/* 
-                  To implement Calendly, replace the above div with:
-                  <div dangerouslySetInnerHTML={{
-                    __html: '<div class="calendly-inline-widget" data-url="https://calendly.com/your-calendar-link?hide_gdpr_banner=1" style="min-width:320px;height:500px;"></div>'
-                  }} />
-                  
-                  And add this script tag to your layout:
-                  <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-                  */}
-                </CardContent>
-              </Card>
+                      </div>
+
+                      <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isSubmitting}
+                        size="lg"
+                      >
+                        {isSubmitting ? "Booking Your Appointment..." : `Confirm Appointment for ${selectedSlot.formatted}`}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar Info */}
@@ -399,7 +456,7 @@ export default function ConsultationPage() {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="h-4 w-4 text-primary" />
-                    Calendar invite with Zoom link
+                    Calendar invite with Zoom meeting link
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Clock className="h-4 w-4 text-primary" />
@@ -425,7 +482,7 @@ export default function ConsultationPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    No problem! You can reschedule or cancel up to 2 hours before your appointment using the link in your confirmation email.
+                    No problem! You can reschedule or cancel up to 2 hours before your appointment by emailing us or calling directly.
                   </p>
                 </CardContent>
               </Card>
@@ -436,7 +493,7 @@ export default function ConsultationPage() {
     )
   }
 
-  // Form-based Scheduling View
+  // Form-based Scheduling View (unchanged from original)
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-20 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-4xl">
@@ -514,16 +571,15 @@ export default function ConsultationPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Business Name *
+                      Business Name
                     </label>
                     <input
                       type="text"
                       name="businessName"
-                      required
                       value={formData.businessName}
                       onChange={handleChange}
                       className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                      placeholder="Your business name"
+                      placeholder="Your business name (if you have one)"
                     />
                   </div>
                 </div>
