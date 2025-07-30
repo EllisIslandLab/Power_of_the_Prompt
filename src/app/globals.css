@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ededed;
+  --foreground: #11296b;
+  --primary: #11296b;
+  --primary-foreground: #ededed;
+  --secondary: #00509d;
+  --secondary-foreground: #ededed;
+  --accent: #ffdb57;
+  --accent-foreground: #11296b;
+  --muted: #f4f4f4;
+  --muted-foreground: #0d2055;
+  --border: #bccbf5;
+  --input: #f8f8f8;
+  --ring: #11296b;
+  --card: #ffffff;
+  --card-foreground: #11296b;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  /* Custom Color Palette */
+  --color-royal-blue-50: #fbfcfe;
+  --color-royal-blue-100: #bccbf5;
+  --color-royal-blue-200: #7997ea;
+  --color-royal-blue-300: #3663e0;
+  --color-royal-blue-400: #1b42ad;
+  --color-royal-blue-500: #11296b;
+  --color-royal-blue-600: #0d2055;
+  --color-royal-blue-700: #0a1840;
+  --color-royal-blue-800: #07102a;
+  --color-royal-blue-900: #030815;
+  
+  --color-polynesian-blue-50: #f0f9ff;
+  --color-polynesian-blue-100: #b9ddff;
+  --color-polynesian-blue-200: #72bbff;
+  --color-polynesian-blue-300: #2c99ff;
+  --color-polynesian-blue-400: #0076e4;
+  --color-polynesian-blue-500: #00509d;
+  --color-polynesian-blue-600: #00417e;
+  --color-polynesian-blue-700: #00315f;
+  --color-polynesian-blue-800: #00213f;
+  --color-polynesian-blue-900: #001020;
+  
+  --color-anti-flash-white-50: #ffffff;
+  --color-anti-flash-white-100: #fbfbfb;
+  --color-anti-flash-white-200: #f8f8f8;
+  --color-anti-flash-white-300: #f4f4f4;
+  --color-anti-flash-white-400: #f1f1f1;
+  --color-anti-flash-white-500: #ededed;
+  --color-anti-flash-white-600: #bebebe;
+  --color-anti-flash-white-700: #8e8e8e;
+  --color-anti-flash-white-800: #5f5f5f;
+  --color-anti-flash-white-900: #2f2f2f;
+  
+  --color-mustard-50: #fffef7;
+  --color-mustard-100: #fff8dd;
+  --color-mustard-200: #fff0bc;
+  --color-mustard-300: #ffe99a;
+  --color-mustard-400: #ffe278;
+  --color-mustard-500: #ffdb57;
+  --color-mustard-600: #ffcc12;
+  --color-mustard-700: #cda100;
+  --color-mustard-800: #896b00;
+  --color-mustard-900: #443600;
+  
+  --color-jonquil-50: #fffef2;
+  --color-jonquil-100: #fff5cd;
+  --color-jonquil-200: #ffeb9b;
+  --color-jonquil-300: #ffe169;
+  --color-jonquil-400: #ffd737;
+  --color-jonquil-500: #ffcb05;
+  --color-jonquil-600: #d0a600;
+  --color-jonquil-700: #9c7d00;
+  --color-jonquil-800: #685300;
+  --color-jonquil-900: #342a00;
+  
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #030815;
     --foreground: #ededed;
+    --card: #0a1840;
+    --card-foreground: #ededed;
+    --secondary: #00213f;
+    --muted: #0a1840;
+    --border: #1b42ad;
+    --input: #0a1840;
+    --primary: #3663e0;
+    --accent: #ffcb05;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
 }
