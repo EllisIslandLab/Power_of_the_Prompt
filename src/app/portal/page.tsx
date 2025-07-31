@@ -92,6 +92,38 @@ export default function PortalPage() {
           </Card>
         </div>
 
+        {/* Student Resources */}
+        <div className="mb-8">
+          <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" />
+                WebLaunchCoach Student Textbook
+              </CardTitle>
+              <CardDescription>
+                Complete guide to professional web development - &quot;Build Once, Own Forever&quot;
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">
+                    📖 8 comprehensive chapters covering everything from setup to long-term success
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    🔐 Student-exclusive content with progress tracking
+                  </p>
+                </div>
+                <Button asChild className="shrink-0">
+                  <Link href="/portal/textbook">
+                    Access Textbook
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6">
           <Card>
@@ -106,8 +138,8 @@ export default function PortalPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <Button className="w-full" asChild>
-                <Link href="/courses">
-                  Start Learning and Building
+                <Link href="/portal/textbook">
+                  📚 Student Textbook
                 </Link>
               </Button>
               <Button variant="outline" className="w-full" asChild>

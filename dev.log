@@ -1,0 +1,28 @@
+
+> power-of-the-prompt@0.1.0 dev
+> next dev --turbopack
+
+   ▲ Next.js 15.4.4 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://172.24.40.220:3000
+   - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 1596ms
+ ○ Compiling / ...
+ ✓ Compiled / in 6.6s
+ GET / 200 in 7524ms
+ ✓ Compiled /favicon.ico in 423ms
+ GET /favicon.ico?favicon.45db1c09.ico 200 in 816ms
+ ○ Compiling /api/portfolio ...
+ ✓ Compiled /api/portfolio in 1704ms
+ GET /api/auth/session 200 in 2930ms
+ GET /api/portfolio 200 in 3352ms
+ ○ Compiling /api/textbook/content ...
+ ✓ Compiled /api/textbook/content in 1817ms
+FilePath received: /textbook/01-accounts-and-installations
+Chapter name: 01-accounts-and-installations
+Full path: /home/ellisisland/weblaunchcoach/src/content/textbook/01-accounts-and-installations.md
+File exists: true
+ GET /api/textbook/content?path=%2Ftextbook%2F01-accounts-and-installations 200 in 2205ms
+[?25h
