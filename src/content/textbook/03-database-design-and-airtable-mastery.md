@@ -269,6 +269,156 @@ const airtableConfig = {
 }
 ```
 
+### Documentation Best Practices with docs/ Folder
+
+**Why Use Structured Documentation for Airtable Integration?**
+When integrating Airtable with your website, maintaining accurate documentation of form fields and their corresponding Airtable fields is crucial for:
+- Team collaboration and onboarding
+- Debugging integration issues
+- Future development and maintenance
+- Ensuring data consistency across your application
+- Tracking changes over time
+
+**Creating a Comprehensive CHANGELOG.md:**
+
+**1. Create docs/ Folder Structure:**
+Organize your documentation in a structured way:
+
+```
+docs/
+├── README.md              # Documentation overview
+├── api/                   # API documentation
+├── architecture/          # System design docs
+├── deployment/           # Setup and deployment guides
+├── guides/               # Step-by-step tutorials
+└── changelog/            # Database and API changes
+    └── CHANGELOG.md      # Airtable integration changes
+```
+
+**2. Create CHANGELOG.md for Airtable:**
+This file should contain all Airtable table structures and field mappings:
+
+```markdown
+# Airtable Integration Changelog
+
+## Current Airtable Tables and Field Mappings
+
+### [Table Name] Table
+**Files:** `path/to/api/file.ts`
+**Last Updated:** [Date]
+
+**Required Form Fields → Airtable Fields:**
+- `formFieldName` → `Airtable Field Name` (field type)
+- `email` → `Email` (email)
+- `phone` → `Phone Number` (phone number)
+
+**Optional Form Fields → Airtable Fields:**
+- `businessType` → `Business Type` (single select)
+- `description` → `Description` (long text)
+
+**System-Generated Fields:**
+- `Status` (single select) - automatically set based on form type
+- `Created Date` (date) - timestamp of submission
+
+**Form Value Mappings:**
+- Business Type: `service`→"Service-based", `product`→"Product-based"
+
+**Special Handling:**
+- Records without required fields are filtered out
+- Arrays stored as comma-separated strings
+```
+
+**3. Update Your README.md:**
+Reference the comprehensive documentation from your README:
+
+```markdown
+## Documentation
+
+📖 **[Complete Documentation](./docs/README.md)** - Comprehensive guides
+
+### Quick Links
+- **[API Documentation](./docs/api/README.md)** - Complete API reference
+- **[Airtable Integration](./docs/changelog/CHANGELOG.md)** - Database field mappings
+```
+
+**4. Maintain Change History:**
+Always document changes with dates and descriptions:
+
+```markdown
+## Change History
+
+### 2025-07-31 - Added Customer Portal Fields
+- **Added:** `subscriptionStatus` field to Customer table
+- **Modified:** `timeline` field options updated
+- **Removed:** Deprecated `oldField` from Contact form
+
+### 2025-07-15 - Initial Documentation
+- **Added:** Complete documentation of all current tables
+```
+
+**5. Establish Maintenance Process:**
+Create a workflow for keeping documentation current:
+
+**When Adding New Fields:**
+1. Update the API route code
+2. Immediately update CHANGELOG.md with new field mappings
+3. Add entry to Change History section
+4. Test the integration thoroughly
+5. Verify Airtable field configuration matches documentation
+
+**When Modifying Existing Fields:**
+1. Update API route code
+2. Update CHANGELOG.md field mappings
+3. Document the change in Change History with reason
+4. Update any related form validation
+5. Test thoroughly with existing data
+
+**6. Include Maintenance Guidelines:**
+Add a section to help future developers:
+
+```markdown
+## Maintenance Guidelines
+
+When making changes to Airtable field mappings:
+
+1. **Update the code** in the appropriate API route file
+2. **Update this CHANGELOG.md** with the new field mappings
+3. **Add an entry** to the Change History section
+4. **Test thoroughly** to ensure integration works
+5. **Verify Airtable** field configuration matches documentation
+
+**Important:** Always maintain backwards compatibility when possible.
+```
+
+**7. Benefits of This Approach:**
+- **Centralized Documentation:** All Airtable information in one place
+- **Change Tracking:** Historical record of all modifications
+- **Team Onboarding:** New developers can quickly understand data flow
+- **Debug Support:** Easy to identify when and why changes were made
+- **Clean README:** Keeps main documentation focused and uncluttered
+
+**Template for New Tables:**
+```markdown
+### [Table Name] Table
+**Files:** `src/app/api/[endpoint]/route.ts`
+**Last Updated:** [Date]
+**Purpose:** [Brief description of what this table stores]
+
+**Required Fields:**
+- `fieldName` → `Airtable Field` (type) - [description]
+
+**Optional Fields:**
+- `fieldName` → `Airtable Field` (type) - [description]
+
+**Form Value Mappings:**
+- [Field]: `form_value`→"Display Value"
+
+**Special Handling:**
+- [Any unique processing or validation rules]
+```
+
+This approach ensures your Airtable integration documentation stays organized, current, and useful for your entire team throughout the project lifecycle.
+
 ## 3.4 Environment Variables and Token Management
 
 ### Understanding Environment Variables

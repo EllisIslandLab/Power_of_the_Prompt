@@ -238,12 +238,111 @@ export const textbookChapters: Chapter[] = [
     ]
   },
   {
+    id: "06",
+    title: "Professional Development Workflows",
+    filePath: "/textbook/06-professional-development-workflows",
+    sections: [
+      {
+        id: "6.1",
+        title: "Advanced Git and GitHub Workflows",
+        subsections: [
+          "Professional Git Workflow Strategy",
+          "Branch Management Strategy", 
+          "Professional Commit Message Standards"
+        ]
+      },
+      {
+        id: "6.2",
+        title: "Repository Organization and Security",
+        subsections: [
+          "Professional Repository Structure",
+          "Essential Repository Documentation",
+          "Repository Security Configuration"
+        ]
+      },
+      {
+        id: "6.3",
+        title: "Automated Deployment and CI/CD",
+        subsections: [
+          "GitHub Actions for Professional Deployment",
+          "Vercel Deployment Configuration",
+          "Deploy Preview and Testing Strategy"
+        ]
+      },
+      {
+        id: "6.4",
+        title: "Professional Development Practices",
+        subsections: [
+          "Code Review Process",
+          "Performance and Quality Monitoring",
+          "Team Collaboration Standards"
+        ]
+      }
+    ]
+  },
+  {
     id: "07",
-    title: "Monthly Security and Maintenance",
-    filePath: "/textbook/07-monthly-security-and-maintenance",
+    title: "Payment Services and E-commerce Integration",
+    filePath: "/textbook/07-payment-services-and-ecommerce-integration",
     sections: [
       {
         id: "7.1",
+        title: "Understanding Modern Payment Processing",
+        subsections: [
+          "Why Payment Integration Matters for Business",
+          "Stripe vs Traditional Payment Processors",
+          "Security and PCI Compliance"
+        ]
+      },
+      {
+        id: "7.2",
+        title: "Airtable Services Database Design",
+        subsections: [
+          "Services Table Architecture",
+          "Pricing Field Configuration Best Practices",
+          "Managing Service Types and Categories",
+          "Inventory and Availability Management"
+        ]
+      },
+      {
+        id: "7.3",
+        title: "Stripe Integration and Synchronization",
+        subsections: [
+          "Automatic Product and Price Sync",
+          "Webhook Configuration and Processing",
+          "Payment Intent Creation and Handling",
+          "Error Handling and Recovery"
+        ]
+      },
+      {
+        id: "7.4",
+        title: "Advanced Pricing and Discount Strategies",
+        subsections: [
+          "Dynamic Pricing Models",
+          "Discount and Coupon Systems",
+          "Promotional Pricing Strategies",
+          "Tax and Multi-Currency Considerations"
+        ]
+      },
+      {
+        id: "7.5",
+        title: "Customer Experience and Conversion Optimization",
+        subsections: [
+          "Payment Flow User Experience",
+          "Trust Signals and Security Display",
+          "Mobile Payment Optimization",
+          "Cart Abandonment Recovery"
+        ]
+      }
+    ]
+  },
+  {
+    id: "08",
+    title: "Security, Maintenance, and Long-term Success",
+    filePath: "/textbook/08-security-maintenance-and-long-term-success",
+    sections: [
+      {
+        id: "8.1",
         title: "Monthly Security Practices",
         subsections: [
           "Security Key Rotation Schedule",
@@ -253,7 +352,7 @@ export const textbookChapters: Chapter[] = [
         ]
       },
       {
-        id: "7.2",
+        id: "8.2",
         title: "Website Maintenance Practices",
         subsections: [
           "Monthly Content and Performance Review",
@@ -262,7 +361,7 @@ export const textbookChapters: Chapter[] = [
         ]
       },
       {
-        id: "7.3",
+        id: "8.3",
         title: "User Experience Updates Without Sacrificing Familiarity",
         subsections: [
           "Strategic Website Updates",
@@ -272,7 +371,7 @@ export const textbookChapters: Chapter[] = [
         ]
       },
       {
-        id: "7.4",
+        id: "8.4",
         title: "Site Updates and Feature Enhancement",
         subsections: [
           "Feature Addition Strategy",
@@ -281,16 +380,9 @@ export const textbookChapters: Chapter[] = [
           "Analytics and Performance Monitoring",
           "Backup and Recovery Procedures"
         ]
-      }
-    ]
-  },
-  {
-    id: "08",
-    title: "Long-term Success and Maintenance",
-    filePath: "/textbook/08-long-term-success-and-maintenance",
-    sections: [
+      },
       {
-        id: "8.1",
+        id: "8.5",
         title: "Building Sustainable Business Systems",
         subsections: [
           "The 'Build Once, Own Forever' Philosophy",
@@ -299,7 +391,7 @@ export const textbookChapters: Chapter[] = [
         ]
       },
       {
-        id: "8.2",
+        id: "8.6",
         title: "Advanced Feature Development",
         subsections: [
           "Progressive Enhancement Strategy",
@@ -308,7 +400,7 @@ export const textbookChapters: Chapter[] = [
         ]
       },
       {
-        id: "8.3",
+        id: "8.7",
         title: "Scaling Your Business Operations",
         subsections: [
           "Revenue Optimization Systems",
@@ -317,7 +409,7 @@ export const textbookChapters: Chapter[] = [
         ]
       },
       {
-        id: "8.4",
+        id: "8.8",
         title: "Future-Proofing Your Technology Stack",
         subsections: [
           "Staying Current with Web Technologies",
@@ -326,7 +418,7 @@ export const textbookChapters: Chapter[] = [
         ]
       },
       {
-        id: "8.5",
+        id: "8.9",
         title: "Building a Sustainable Maintenance Routine",
         subsections: [
           "Quarterly Business Reviews",
@@ -335,7 +427,7 @@ export const textbookChapters: Chapter[] = [
         ]
       },
       {
-        id: "8.6",
+        id: "8.10",
         title: "Measuring Long-term Success",
         subsections: [
           "Key Performance Indicators (KPIs)",

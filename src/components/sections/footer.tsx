@@ -10,23 +10,26 @@ export function Footer() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
         {/* Main CTA Section */}
         <div className="text-center mb-12">
-          <div className="bg-card rounded-lg shadow-lg p-8 border max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold mb-4">Ready to Get Started?</h3>
-            <p className="text-muted-foreground mb-6">
-              Whether you want to learn or have us build it, let's discuss the best option for your business.
+          <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg p-8 border border-primary/20 max-w-3xl mx-auto">
+            <h3 className="text-3xl font-bold mb-4 text-primary">Get Your Free Consultation Today</h3>
+            <p className="text-lg text-muted-foreground mb-6">
+              Discover the perfect solution for your business. Whether you want to learn web development or have us build your professional website, we'll help you choose the best path forward.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild>
+              <Button size="lg" className="text-lg px-8 py-3" asChild>
                 <Link href="/consultation">
-                  Get Free Consultation <ArrowRight className="ml-2 h-4 w-4" />
+                  Schedule Free Consultation <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" className="border-primary/40 hover:bg-primary/5" asChild>
                 <Link href="/#portfolio">
-                  View Website Examples
+                  View Our Work
                 </Link>
               </Button>
             </div>
+            <p className="text-sm text-muted-foreground mt-4">
+              💯 <strong>100% Free</strong> • No obligations • 30-minute strategy session • Available nationwide
+            </p>
           </div>
         </div>
 

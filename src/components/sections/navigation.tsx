@@ -4,12 +4,13 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { usePathname } from "next/navigation"
-import { MessageCircle, BookOpen, Video, FileText, HelpCircle } from "lucide-react"
+import { MessageCircle, BookOpen, Video, FileText, HelpCircle, Settings, Crown } from "lucide-react"
 
 export function Navigation() {
   const { data: session } = useSession()
   const pathname = usePathname()
   const isInPortal = pathname?.startsWith('/portal')
+  const isAdmin = session?.user?.role === 'ADMIN'
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -45,6 +46,12 @@ export function Navigation() {
                   <HelpCircle className="h-4 w-4" />
                   Support
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin/services" className="flex items-center gap-2 text-orange-600 hover:text-orange-700 transition-colors font-medium">
+                    <Settings className="h-4 w-4" />
+                    Admin
+                  </Link>
+                )}
               </>
             ) : (
               // Public Marketing Navigation
@@ -73,9 +80,20 @@ export function Navigation() {
                     Portal
                   </Link>
                 )}
-                <Button variant="outline" onClick={() => signOut()}>
-                  Sign Out
-                </Button>
+                {isAdmin && (
+                  <div className="flex items-center gap-2 px-3 py-1 bg-orange-100 border border-orange-200 rounded-full">
+                    <Crown className="h-4 w-4 text-orange-600" />
+                    <span className="text-sm font-medium text-orange-700">Admin</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    {session.user?.name || session.user?.email}
+                  </span>
+                  <Button variant="outline" onClick={() => signOut()}>
+                    Sign Out
+                  </Button>
+                </div>
               </>
             ) : (
               <>
