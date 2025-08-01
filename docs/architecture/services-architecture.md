@@ -123,22 +123,60 @@ STRIPE_WEBHOOK_SECRET=your_webhook_secret
 
 ### Airtable Table Setup
 
+**Step-by-Step Services Table Creation:**
+
+1. **Create New Base** in Airtable called "WebLaunchCoach Services"
+2. **Rename first table** to "Services"
+3. **Add fields** with exact specifications below:
+
 **Services Table Fields:**
 ```
 Service Name (Single line text) - Required
 Service Type (Single select: Course, Build, Audit, Consultation) - Required
-Price (Number) - Required
+Price (Number) - Required, 2 decimal places, no negative numbers
 Description (Long text)
 Duration Estimate (Single line text)
-Features (Multiple select)
-Category (Single select)
-Order (Number)
+Features (Multiple select) - Custom values based on your services
+Category (Single select: Beginner, Intermediate, Advanced, Business)
+Order (Number) - For display ordering
 Is Active (Checkbox) - Required
-Stripe Product ID (Single line text)
-Stripe Price ID (Single line text)
-Created At (Date)
-Updated At (Date)
+Stripe Product ID (Single line text) - Auto-populated by sync
+Stripe Price ID (Single line text) - Auto-populated by sync
+Created At (Date) - Auto-populated
+Updated At (Date) - Auto-populated
+
+// Discount and Promotional Fields
+Sale Price (Number) - Optional, reduced price for sales
+Discount Percentage (Number) - Optional, percentage off (e.g., 25 for 25% off)
+Discount Amount (Number) - Optional, fixed amount off (e.g., 50 for $50 off)
+Sale Start Date (Date) - Optional, when sale pricing begins
+Sale End Date (Date) - Optional, when sale pricing ends
+Coupon Code (Single line text) - Optional, code required for discount
 ```
+
+**Critical Field Setup Notes:**
+
+**Service Type Single Select Options:**
+- Course
+- Build  
+- Audit
+- Consultation
+
+**Category Single Select Options:**
+- Beginner
+- Intermediate  
+- Advanced
+- Business
+
+**Features Multiple Select:**
+- Create custom options based on your specific services
+- Examples: "1-on-1 Support", "Lifetime Updates", "Source Code Included", "30-Day Money Back"
+
+**Pricing Field Configuration:**
+- **Field Type**: Number (NOT Currency)
+- **Precision**: 2 decimal places
+- **Allow negative numbers**: No
+- **Why Number vs Currency**: Better API compatibility and calculation accuracy
 
 **Purchases Table Fields:**
 ```
@@ -263,14 +301,31 @@ All API endpoints return consistent error responses:
 - Minimal API calls through batching
 - Optimized webhook processing
 
+## Implemented Features
+
+### Discount and Pricing System ✅
+- **Sale Pricing**: Direct reduced pricing for promotional periods
+- **Percentage Discounts**: Configurable percentage off regular price
+- **Fixed Amount Discounts**: Dollar amount reductions
+- **Coupon Codes**: Code-based discount activation
+- **Time-Limited Sales**: Automatic start/end date enforcement
+- **Visual Indicators**: Crossed-out prices and discount badges
+
+### Admin Management System ✅
+- **Service Sync Dashboard**: Real-time Stripe synchronization
+- **Role-Based Access**: Admin authentication and permissions
+- **Service Status Monitoring**: Active/inactive service management
+- **Bulk Operations**: Sync all services or individual items
+- **Error Reporting**: Detailed sync results and troubleshooting
+
 ## Future Enhancements
 
 ### Planned Features
 - Subscription service support
-- Advanced pricing models (tiers, discounts)
 - Service bundling capabilities
-- Automated email marketing integration
 - Advanced analytics and reporting
+- Automated email marketing integration
+- Multi-currency support
 
 ### Scalability Considerations
 - Migration to dedicated database for high volume
