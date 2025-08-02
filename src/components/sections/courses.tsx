@@ -148,8 +148,8 @@ export function Courses() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="#pricing">
-                View Pricing Options
+              <Link href="/services">
+                View All Services
               </Link>
             </Button>
           </div>

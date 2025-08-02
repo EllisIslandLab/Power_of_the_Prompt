@@ -59,10 +59,10 @@ export function Navigation() {
                 <Link href="/#portfolio" className="text-foreground hover:text-primary transition-colors">
                   Portfolio
                 </Link>
-                <Link href="/#pricing" className="text-foreground hover:text-primary transition-colors">
+                <Link href="/services" className="text-foreground hover:text-primary transition-colors">
                   Services
                 </Link>
-                <Link href="/#pricing" className="text-foreground hover:text-primary transition-colors">
+                <Link href="/services" className="text-foreground hover:text-primary transition-colors">
                   Pricing
                 </Link>
                 <Link href="/consultation" className="text-foreground hover:text-primary transition-colors">

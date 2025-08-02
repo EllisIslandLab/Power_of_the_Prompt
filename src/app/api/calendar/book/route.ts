@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Airtable from 'airtable'
+import { prisma } from '@/lib/prisma'
+import { VideoSessionType, VideoSessionStatus } from '@prisma/client'
 
 // Initialize Airtable
 const base = new Airtable({
@@ -43,12 +45,13 @@ export async function POST(request: NextRequest) {
     // TODO: Check Airtable for conflicts - ensure this slot isn't already booked
     // This will be implemented when we add booking conflict checking
 
-    // Create Zoom meeting (placeholder for now)
-    const zoomMeetingData = await createZoomMeeting({
-      topic: `Consultation with ${fullName}`,
-      start_time: selectedSlot.timestamp,
+    // Create video session in database and Jitsi room
+    const videoSession = await createVideoSession({
+      sessionName: `Free Consultation with ${fullName}`,
+      scheduledStart: selectedSlot.timestamp,
       duration: 30,
-      timezone: 'America/New_York'
+      userEmail: email,
+      userName: fullName
     })
 
     // Prepare record for Airtable - using flexible typing for dynamic fields
@@ -62,8 +65,9 @@ export async function POST(request: NextRequest) {
         'Appointment Date': slotDate.toISOString(),
         'Appointment Time': selectedSlot.formatted,
         'Meeting Type': 'Calendar Booking',
-        'Zoom Meeting ID': zoomMeetingData.id || 'TBD',
-        'Zoom Join URL': zoomMeetingData.join_url || 'TBD',
+        'Jitsi Room ID': videoSession.jitsiRoomId,
+        'Jitsi Join URL': videoSession.joinUrl,
+        'Video Session ID': videoSession.id,
         'Notes': `Website Type: ${websiteDescription || 'Not specified'} | Booked: ${new Date().toISOString()}`
       }
     }
@@ -95,7 +99,7 @@ export async function POST(request: NextRequest) {
       booking: {
         id: createdRecord[0].id,
         appointment_time: selectedSlot.formatted,
-        zoom_join_url: zoomMeetingData.join_url || 'Will be sent via email',
+        jitsi_join_url: videoSession.joinUrl,
         confirmation_sent: true
       }
     })
@@ -113,62 +117,117 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Zoom meeting creation function (placeholder)
-async function createZoomMeeting(meetingData: {
-  topic: string
-  start_time: string
+// Video session creation function
+async function createVideoSession(sessionData: {
+  sessionName: string
+  scheduledStart: string
   duration: number
-  timezone: string
+  userEmail: string
+  userName: string
 }) {
-  // TODO: Implement actual Zoom API integration
-  // For now, return placeholder data
-  
-  if (process.env.ZOOM_API_KEY && process.env.ZOOM_API_SECRET) {
-    try {
-      // Real Zoom API implementation would go here
-      // const response = await fetch('https://api.zoom.us/v2/users/me/meetings', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${zoomAccessToken}`,
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify({
-      //     topic: meetingData.topic,
-      //     type: 2, // Scheduled meeting
-      //     start_time: meetingData.start_time,
-      //     duration: meetingData.duration,
-      //     timezone: meetingData.timezone,
-      //     settings: {
-      //       host_video: true,
-      //       participant_video: true,
-      //       join_before_host: false,
-      //       mute_upon_entry: true,
-      //       waiting_room: true
-      //     }
-      //   })
-      // })
-      // const data = await response.json()
-      // return data
-      
-      return {
-        id: `placeholder-${Date.now()}`,
-        join_url: 'https://zoom.us/j/placeholder-meeting-id',
-        start_url: 'https://zoom.us/s/placeholder-meeting-id'
-      }
-    } catch (error) {
-      console.error('Zoom API error:', error)
-      return {
-        id: `fallback-${Date.now()}`,
-        join_url: 'Zoom link will be sent via email',
-        start_url: 'Host link will be sent via email'
-      }
-    }
-  }
+  try {
+    // First, try to find or create a user for the guest
+    let user = await prisma.user.findUnique({
+      where: { email: sessionData.userEmail }
+    })
 
-  // Fallback when Zoom API is not configured
-  return {
-    id: `manual-${Date.now()}`,
-    join_url: 'Zoom link will be sent via email',
-    start_url: 'Host link will be sent via email'
+    if (!user) {
+      // Create a basic user record for the guest
+      user = await prisma.user.create({
+        data: {
+          name: sessionData.userName,
+          email: sessionData.userEmail,
+          role: 'STUDENT' // Default role for calendar bookings
+        }
+      })
+    }
+
+    // Generate unique room ID based on session data
+    const timestamp = new Date(sessionData.scheduledStart).getTime()
+    const roomId = `consultation-${timestamp}-${Math.random().toString(36).substr(2, 9)}`
+    
+    // Calculate end time
+    const startTime = new Date(sessionData.scheduledStart)
+    const endTime = new Date(startTime.getTime() + (sessionData.duration * 60 * 1000))
+
+    // Get the admin/host user (you might want to make this configurable)
+    const hostUser = await prisma.user.findFirst({
+      where: { role: 'ADMIN' }
+    })
+
+    if (!hostUser) {
+      throw new Error('No admin user found to host the session')
+    }
+
+    // Create video session
+    const videoSession = await prisma.videoSession.create({
+      data: {
+        sessionName: sessionData.sessionName,
+        jitsiRoomId: roomId,
+        hostUserId: hostUser.id,
+        participantUserIds: [user.id],
+        sessionType: VideoSessionType.FREE_CONSULTATION,
+        scheduledStart: startTime,
+        scheduledEnd: endTime,
+        sessionStatus: VideoSessionStatus.SCHEDULED,
+        waitingRoomEnabled: true,
+        maxParticipants: 2, // Host + 1 participant for consultation
+        participants: {
+          connect: { id: user.id }
+        }
+      },
+      include: {
+        host: true,
+        participants: true
+      }
+    })
+
+    // Create associated consultation record
+    const consultation = await prisma.consultation.create({
+      data: {
+        userId: user.id,
+        scheduledTime: startTime,
+        status: 'SCHEDULED',
+        type: 'FREE',
+        videoSession: {
+          connect: { id: videoSession.id }
+        }
+      }
+    })
+
+    // Get Jitsi domain from environment
+    const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
+    
+    return {
+      id: videoSession.id,
+      jitsiRoomId: roomId,
+      joinUrl: `https://${jitsiDomain}/${roomId}`,
+      sessionName: sessionData.sessionName,
+      scheduledStart: sessionData.scheduledStart,
+      duration: sessionData.duration,
+      consultationId: consultation.id,
+      userId: user.id,
+      hostId: hostUser.id
+    }
+
+  } catch (error) {
+    console.error('Error creating video session:', error)
+    
+    // Fallback to basic room creation if database fails
+    const timestamp = new Date(sessionData.scheduledStart).getTime()
+    const roomId = `consultation-fallback-${timestamp}-${Math.random().toString(36).substr(2, 9)}`
+    const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
+    
+    return {
+      id: 'fallback',
+      jitsiRoomId: roomId,
+      joinUrl: `https://${jitsiDomain}/${roomId}`,
+      sessionName: sessionData.sessionName,
+      scheduledStart: sessionData.scheduledStart,
+      duration: sessionData.duration,
+      consultationId: null,
+      userId: null,
+      hostId: null
+    }
   }
 }

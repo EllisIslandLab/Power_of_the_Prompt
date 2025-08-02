@@ -2,14 +2,16 @@
 
 import { ServicePayment } from "@/components/services/ServicePayment"
 import { useRouter } from "next/navigation"
+import { use } from "react"
 
 interface ServicePurchasePageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function ServicePurchasePage({ params }: ServicePurchasePageProps) {
+  const resolvedParams = use(params)
   const router = useRouter()
 
   const handleSuccess = (paymentIntentId: string) => {
@@ -33,7 +35,7 @@ export default function ServicePurchasePage({ params }: ServicePurchasePageProps
         </div>
 
         <ServicePayment
-          serviceId={params.id}
+          serviceId={resolvedParams.id}
           onSuccess={handleSuccess}
           onError={handleError}
         />

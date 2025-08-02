@@ -23,7 +23,7 @@ export function Hero() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
-              <Link href="#pricing">View Course Details</Link>
+              <Link href="/services">View All Services</Link>
             </Button>
           </div>
 

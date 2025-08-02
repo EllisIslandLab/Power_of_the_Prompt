@@ -4,12 +4,14 @@ A comprehensive web development coaching platform built with Next.js, featuring 
 
 ## Features
 
-- 🎓 **Student Portal** - Secure access to textbook content, resources, and collaboration tools
-- 📅 **Smart Booking System** - Custom calendar integration with Zoom meeting generation
-- 💳 **Payment Processing** - Stripe integration for subscriptions and one-time payments
+- 🎓 **Student Portal** - Secure access to textbook content, resources, and collaboration tools  
+- 📅 **Smart Booking System** - Custom calendar integration with Jitsi Meet video sessions
+- 🎥 **Video Conferencing** - Integrated Jitsi Meet for seamless, browser-based meetings
+- 💳 **Payment Processing** - Stripe integration for subscriptions and session payments
 - 📱 **Responsive Design** - Mobile-first approach with modern UI components
 - 🔒 **Secure Authentication** - NextAuth.js with role-based access control
 - 📊 **Business Intelligence** - Airtable integration for customer and portfolio data
+- ⚡ **Real-time Sessions** - Live video coaching with recording capabilities
 
 ## Quick Start
 
@@ -46,8 +48,37 @@ Visit `http://localhost:3000` to see the application.
 - **Frontend:** Next.js 15, React 19, Tailwind CSS, Radix UI
 - **Backend:** Next.js API Routes, PostgreSQL, Prisma ORM
 - **Authentication:** NextAuth.js
-- **Integrations:** Airtable, Stripe, Zoom, Resend
+- **Video:** Jitsi Meet integration for browser-based conferencing
+- **Integrations:** Airtable, Stripe, Resend
 - **Hosting:** Vercel (recommended) or Netlify
+
+## Video Conferencing with Jitsi Meet
+
+This platform features a comprehensive video conferencing system built on Jitsi Meet:
+
+### ✨ Key Features
+- **Browser-Based** - No downloads required for participants
+- **Secure & Private** - End-to-end encrypted communication
+- **Session Management** - Full booking, payment, and access control
+- **Recording Support** - Automatic recording for paid sessions
+- **Multi-Session Types** - Free consultations, paid coaching, group sessions, workshops
+
+### 🎯 Session Types
+- **Free Consultations** (30 min) - Open to all visitors
+- **1-on-1 Coaching** (60 min) - Paid premium sessions with recording
+- **Group Coaching** - Multi-participant collaborative sessions
+- **Workshops** - Educational sessions with up to 50 participants
+- **Office Hours** - Drop-in support sessions
+
+### 🔧 Configuration
+The system uses environment variables for customization:
+```bash
+NEXT_PUBLIC_JITSI_DOMAIN=meet.jit.si
+SESSION_RECORDING_ENABLED=false
+FREE_SESSION_DURATION_MINUTES=30
+PAID_SESSION_DURATION_MINUTES=60
+MAX_PARTICIPANTS_PER_SESSION=10
+```
 
 ## Project Structure
 
@@ -56,9 +87,12 @@ weblaunchcoach/
 ├── docs/                   # 📖 Comprehensive documentation
 ├── src/
 │   ├── app/               # Next.js app directory (pages & API routes)
+│   │   └── api/sessions/  # Video session management APIs
 │   ├── components/        # React components
+│   │   └── video/         # Jitsi Meet integration components
 │   ├── content/          # Static content (textbook chapters)
 │   └── lib/              # Utility functions
+│       └── jitsi-config.ts # Jitsi configuration
 ├── prisma/               # Database schema and migrations
 └── public/               # Static assets
 ```

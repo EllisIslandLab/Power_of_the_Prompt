@@ -1,13 +1,13 @@
 import { Hero } from "@/components/sections/hero"
 import { Portfolio } from "@/components/sections/portfolio"
-import { SimplePricing } from "@/components/sections/simple-pricing"
+import { ServicesHomepage } from "@/components/sections/services-homepage"
 
 export default function Home() {
   return (
     <main>
       <Hero />
       <Portfolio />
-      <SimplePricing />
+      <ServicesHomepage />
     </main>
   )
 }
