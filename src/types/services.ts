@@ -12,6 +12,7 @@ export interface Service {
   stripe_product_id?: string
   features: string[]
   category: string
+  subcategory?: string
   order: number
   created_at: string
   updated_at: string
@@ -37,6 +38,7 @@ export interface AirtableService {
     'Stripe Product ID'?: string
     'Features': string[]
     'Category': string
+    'Subcategory'?: string
     'Order': number
     'Created At': string
     'Updated At': string

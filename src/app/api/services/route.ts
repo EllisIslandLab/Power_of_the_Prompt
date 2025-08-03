@@ -69,6 +69,7 @@ export async function GET(request: NextRequest) {
             ? fields['Features'] 
             : (fields['Features'] ? fields['Features'].split(',').map(f => f.trim()) : []),
           category: fields['Category'] || 'General',
+          subcategory: fields['Subcategory'] || undefined,
           order: fields['Order'] || 999,
           created_at: fields['Created At'] || new Date().toISOString(),
           updated_at: fields['Updated At'] || new Date().toISOString(),

@@ -56,17 +56,23 @@ export function Navigation() {
             ) : (
               // Public Marketing Navigation
               <>
+                <Link href="/#top" className="text-foreground hover:text-primary transition-colors">
+                  Why Choose Us
+                </Link>
                 <Link href="/#portfolio" className="text-foreground hover:text-primary transition-colors">
                   Portfolio
                 </Link>
-                <Link href="/services" className="text-foreground hover:text-primary transition-colors">
-                  Services
-                </Link>
-                <Link href="/services" className="text-foreground hover:text-primary transition-colors">
-                  Pricing
-                </Link>
-                <Link href="/consultation" className="text-foreground hover:text-primary transition-colors">
+                <Link href="/#consultation" className="text-foreground hover:text-primary transition-colors">
                   Free Consultation
+                </Link>
+                <Link href="/#courses" className="text-foreground hover:text-primary transition-colors">
+                  Courses
+                </Link>
+                <Link href="/#built-for-you" className="text-foreground hover:text-primary transition-colors">
+                  Built for You
+                </Link>
+                <Link href="/#general-services" className="text-foreground hover:text-primary transition-colors">
+                  General Services
                 </Link>
               </>
             )}
@@ -101,7 +107,7 @@ export function Navigation() {
                   Sign In
                 </Button>
                 <Button asChild>
-                  <Link href="/consultation">Get Started</Link>
+                  <Link href="/#consultation">Get Started</Link>
                 </Button>
               </>
             )}

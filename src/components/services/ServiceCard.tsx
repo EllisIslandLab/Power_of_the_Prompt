@@ -15,7 +15,9 @@ import {
   Zap,
   Timer,
   DollarSign,
-  Users
+  Users,
+  ShoppingCart,
+  Building
 } from "lucide-react"
 
 interface ServiceCardProps {
@@ -27,7 +29,25 @@ export function ServiceCard({ service, onPurchase }: ServiceCardProps) {
   const pricing = calculateServicePrice(service)
   const timeRemaining = pricing.saleEndDate ? getTimeUntilSaleEnds(pricing.saleEndDate) : null
 
-  const getServiceIcon = (type: string) => {
+  const getServiceIcon = (type: string, subcategory?: string) => {
+    // First check if there's a subcategory-specific icon
+    if (subcategory) {
+      switch (subcategory.toLowerCase()) {
+        case 'simple portfolio':
+          return <Code className="h-8 w-8 text-blue-500" />
+        case 'business website':
+        case 'business':
+          return <Globe className="h-8 w-8 text-green-500" />
+        case 'e-commerce store':
+        case 'ecommerce':
+          return <ShoppingCart className="h-8 w-8 text-purple-500" />
+        case 'enterprise solution':
+        case 'enterprise':
+          return <Building className="h-8 w-8 text-orange-500" />
+      }
+    }
+    
+    // Fall back to service type icons
     switch (type) {
       case 'course':
         return <Star className="h-8 w-8" />
@@ -75,18 +95,35 @@ export function ServiceCard({ service, onPurchase }: ServiceCardProps) {
   const isPremium = service.service_name.toLowerCase().includes('team walkthrough') || 
                    service.service_name.toLowerCase().includes('premium')
   const isFree = service.price === 0
+  const isFreeConsultation = service.category.toLowerCase() === 'free consultation'
 
   return (
     <Card className={`
-      text-center transition-all duration-300 hover:shadow-xl hover:scale-105 h-full flex flex-col
-      ${isPremium ? 'ring-2 ring-accent relative' : ''}
-      ${isFree ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200' : ''}
+      text-center transition-all duration-300 hover:shadow-xl hover:scale-105 h-full flex flex-col relative overflow-visible
+      ${isPremium ? 'ring-2 ring-accent' : ''}
+      ${isFreeConsultation ? 'ring-2 ring-accent' : 
+        isFree ? 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200' : ''}
     `}>
       {isPremium && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <Badge className="bg-gradient-to-r from-accent to-primary text-white px-4 py-1">
-            Most Popular
+            Guarantee Enabled
           </Badge>
+        </div>
+      )}
+      
+      {isFreeConsultation && (
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+          <Badge className="bg-gradient-to-r from-accent to-primary text-white px-4 py-1">
+            FREE
+          </Badge>
+        </div>
+      )}
+
+      {/* Savings Badge */}
+      {pricing.hasDiscount && pricing.discountAmount && pricing.isOnSale && (
+        <div className="absolute top-16 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold z-50 shadow-lg">
+          💰 Save ${pricing.discountAmount}
         </div>
       )}
       
@@ -95,15 +132,18 @@ export function ServiceCard({ service, onPurchase }: ServiceCardProps) {
           {/* Service Icon */}
           <div className={`
             mb-4 p-3 rounded-full 
-            ${isFree ? 'bg-green-100' : 'bg-primary/10'}
+            ${isFreeConsultation ? 'bg-primary/10' : 
+              isFree ? 'bg-yellow-100' : 'bg-primary/10'}
           `}>
-            {getServiceIcon(service.service_type)}
+            {getServiceIcon(service.service_type, service.subcategory)}
           </div>
           
           {/* Service Type Badge */}
-          <Badge className={`mb-3 ${getServiceTypeColor(service.service_type)}`}>
-            {getServiceTypeLabel(service.service_type)}
-          </Badge>
+          {!isFreeConsultation && (
+            <Badge className={`mb-3 ${getServiceTypeColor(service.service_type)}`}>
+              {getServiceTypeLabel(service.service_type)}
+            </Badge>
+          )}
 
           {/* Service Name */}
           <CardTitle className="text-xl mb-2 min-h-[3rem] flex items-center">
@@ -117,25 +157,24 @@ export function ServiceCard({ service, onPurchase }: ServiceCardProps) {
                 <div className="text-sm text-muted-foreground line-through">
                   {formatPrice(pricing.originalPrice)}
                 </div>
-                <div className={`text-3xl font-bold ${isFree ? 'text-green-600' : 'text-primary'}`}>
+                <div className={`text-3xl font-bold ${isFreeConsultation ? 'text-primary' : isFree ? 'text-yellow-600' : 'text-primary'}`}>
                   {formatPrice(pricing.finalPrice)}
                 </div>
-                <Badge className={getDiscountBadgeColor(pricing.discountType)}>
-                  {formatDiscount(pricing)}
-                </Badge>
               </div>
             ) : (
-              <div className={`text-3xl font-bold ${isFree ? 'text-green-600' : 'text-primary'}`}>
+              <div className={`text-3xl font-bold ${isFreeConsultation ? 'text-primary' : isFree ? 'text-yellow-600' : 'text-primary'}`}>
                 {isFree ? 'FREE' : formatPrice(service.price)}
               </div>
             )}
           </div>
 
           {/* Duration */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="h-4 w-4" />
-            <span>{service.duration_estimate}</span>
-          </div>
+          {service.duration_estimate && !isFreeConsultation && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              <span>{service.duration_estimate}</span>
+            </div>
+          )}
         </div>
       </CardHeader>
       
@@ -150,24 +189,21 @@ export function ServiceCard({ service, onPurchase }: ServiceCardProps) {
           </div>
         )}
         
-        {/* Description */}
-        <p className="text-sm text-muted-foreground mb-6 flex-grow">
-          {service.description}
-        </p>
         
         {/* Features */}
         {service.features.length > 0 && (
           <div className="mb-6">
-            <ul className="space-y-3">
-              {service.features.slice(0, 6).map((feature, index) => (
+            <ul className={`${isFreeConsultation ? 'grid grid-cols-2 gap-x-4 gap-y-3' : 'space-y-3'}`}>
+              {service.features.slice(0, isFreeConsultation ? 4 : 3).map((feature, index) => (
                 <li key={index} className="flex items-center gap-3 text-sm">
                   <Zap className="h-4 w-4 text-accent flex-shrink-0" />
                   <span>{feature}</span>
                 </li>
               ))}
-              {service.features.length > 6 && (
-                <li className="text-xs text-muted-foreground">
-                  +{service.features.length - 6} more features...
+              {service.features.length > (isFreeConsultation ? 4 : 3) && (
+                <li className={`flex items-center gap-3 text-sm text-muted-foreground ${isFreeConsultation ? 'col-span-2' : ''}`}>
+                  <Zap className="h-4 w-4 text-accent flex-shrink-0" />
+                  <span>+{service.features.length - (isFreeConsultation ? 4 : 3)} more features...</span>
                 </li>
               )}
             </ul>
@@ -199,7 +235,7 @@ export function ServiceCard({ service, onPurchase }: ServiceCardProps) {
               You own the code completely
             </p>
           )}
-          {isFree && (
+          {isFree && !isFreeConsultation && (
             <p className="text-xs text-muted-foreground mt-2">
               No obligation • 30 minutes
             </p>

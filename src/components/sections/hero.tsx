@@ -11,19 +11,30 @@ export function Hero() {
             Build Once, <span className="text-primary">Own Forever</span>
           </h1>
           
-          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            Learn to create professional websites with AI assistance - no hidden monthly/annual fees, complete ownership. 
-            Join the growing number of small business owners who are tired of subscription-based models.
-          </p>
+          <div className="space-y-4 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground leading-relaxed">
+              Create your professional website with <span className="text-primary font-semibold">AI assistance</span> and me as your personal coach.
+            </p>
+            
+            <div className="bg-gradient-to-r from-accent/10 to-primary/10 rounded-lg p-4 border border-accent/20">
+              <p className="text-lg font-medium text-foreground">
+                <span className="text-red-600 font-bold">ZERO</span> monthly fees • 
+                <span className="text-red-600 font-bold"> ZERO</span> hidden costs • 
+                <span className="text-primary font-bold"> 100%</span> ownership
+              </p>
+            </div>
+            
+            <p className="text-lg text-muted-foreground">
+              Join hundreds of business owners who've escaped subscription traps. 
+              <span className="text-foreground font-semibold"> Own your code, own your future.</span>
+            </p>
+          </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+          <div className="flex justify-center items-center mb-12">
             <Button size="lg" asChild className="w-full sm:w-auto">
-              <Link href="/consultation">
-                Get A Free Consultation <ArrowRight className="ml-2 h-5 w-5" />
+              <Link href="/#consultation">
+                Get Started <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
-              <Link href="/services">View All Services</Link>
             </Button>
           </div>
 

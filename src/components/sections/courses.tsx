@@ -141,15 +141,10 @@ export function Courses() {
         </div>
 
         <div className="text-center mt-12">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <Button size="lg" asChild>
               <Link href="/consultation">
                 Get Free Consultation
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/services">
-                View All Services
               </Link>
             </Button>
           </div>

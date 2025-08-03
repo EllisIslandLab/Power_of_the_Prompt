@@ -153,23 +153,25 @@ export function ServicesDisplay({
       )}
 
       {/* Services Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className={`${
+        services.length === 1 ? 'flex justify-center' :
+        services.length === 2 ? 'flex justify-center gap-6' :
+        'grid md:grid-cols-2 lg:grid-cols-3 gap-6'
+      }`}>
         {services.map((service) => (
-          <ServiceCard 
-            key={service.id} 
-            service={service} 
-            onPurchase={handlePurchase}
-          />
+          <div key={service.id} className={
+            services.length === 1 ? 'w-full max-w-2xl' :
+            services.length === 2 ? 'w-full max-w-sm' : 
+            'w-full'
+          }>
+            <ServiceCard 
+              service={service} 
+              onPurchase={handlePurchase}
+            />
+          </div>
         ))}
       </div>
 
-      {maxItems && services.length >= maxItems && (
-        <div className="text-center">
-          <Button variant="outline" onClick={() => window.location.href = '/services'}>
-            View All Services
-          </Button>
-        </div>
-      )}
     </div>
   )
 }

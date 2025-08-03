@@ -8,30 +8,6 @@ export function Footer() {
   return (
     <footer className="bg-muted/30 border-t">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        {/* Main CTA Section */}
-        <div className="text-center mb-12">
-          <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg p-8 border border-primary/20 max-w-3xl mx-auto">
-            <h3 className="text-3xl font-bold mb-4 text-primary">Get Your Free Consultation Today</h3>
-            <p className="text-lg text-muted-foreground mb-6">
-              Discover the perfect solution for your business. Whether you want to learn web development or have us build your professional website, we'll help you choose the best path forward.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="text-lg px-8 py-3" asChild>
-                <Link href="/consultation">
-                  Schedule Free Consultation <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-primary/40 hover:bg-primary/5" asChild>
-                <Link href="/#portfolio">
-                  View Our Work
-                </Link>
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground mt-4">
-              💯 <strong>100% Free</strong> • No obligations • 30-minute strategy session • Available nationwide
-            </p>
-          </div>
-        </div>
 
         {/* Footer Content */}
         <div className="grid md:grid-cols-3 gap-8 mb-8">
@@ -64,17 +40,23 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
             <div className="space-y-2">
-              <Link href="/" className="block text-muted-foreground hover:text-primary transition-colors">
-                Home
-              </Link>
-              <Link href="/pricing" className="block text-muted-foreground hover:text-primary transition-colors">
-                Pricing
+              <Link href="/#top" className="block text-muted-foreground hover:text-primary transition-colors">
+                Why Choose Us
               </Link>
               <Link href="/#portfolio" className="block text-muted-foreground hover:text-primary transition-colors">
                 Portfolio
               </Link>
-              <Link href="/consultation" className="block text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/#consultation" className="block text-muted-foreground hover:text-primary transition-colors">
                 Free Consultation
+              </Link>
+              <Link href="/#courses" className="block text-muted-foreground hover:text-primary transition-colors">
+                Courses
+              </Link>
+              <Link href="/#built-for-you" className="block text-muted-foreground hover:text-primary transition-colors">
+                Built for You
+              </Link>
+              <Link href="/#general-services" className="block text-muted-foreground hover:text-primary transition-colors">
+                General Services
               </Link>
             </div>
           </div>

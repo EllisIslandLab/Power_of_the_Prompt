@@ -140,6 +140,10 @@ export function getTimeUntilSaleEnds(saleEndDate: string): string | null {
   if (timeDiff <= 0) return null
 
   const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+  
+  // Only show timer if less than 7 days remaining
+  if (days >= 7) return null
+  
   const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
   const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))
 
