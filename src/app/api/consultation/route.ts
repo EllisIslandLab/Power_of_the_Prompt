@@ -81,14 +81,14 @@ export async function POST(request: NextRequest) {
     
     if (body.monthlyCosts) {
       // Store in notes - create mapping for readability
-      const costsMap = {
+      const costsMap: Record<string, string> = {
         '0': '$0',
         '1-50': '$1-50',
         '51-100': '$51-100',
         '100+': '$100+',
         'not-sure': 'Not sure'
       }
-      const readableCosts = costsMap[body.monthlyCosts] || body.monthlyCosts
+      const readableCosts = costsMap[body.monthlyCosts as string] || body.monthlyCosts
       
       const existingNotes = record.fields['Notes'] || ''
       record.fields['Notes'] = existingNotes + (existingNotes ? ' | ' : '') + `Monthly Costs: ${readableCosts}`
