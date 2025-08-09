@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Failed to submit consultation request',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        details: process.env.NODE_ENV === 'development' ? (error as Error)?.message : undefined,
         config: process.env.NODE_ENV === 'development' ? {
           hasApiKey: !!process.env.AIRTABLE_API_KEY,
           hasBaseId: !!process.env.AIRTABLE_BASE_ID,
