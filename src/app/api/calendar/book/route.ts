@@ -74,13 +74,13 @@ export async function POST(request: NextRequest) {
 
     // Add optional fields
     if (body.businessType) {
-      const businessTypeMap = {
+      const businessTypeMap: Record<string, string> = {
         'service': 'Service-based',
         'product': 'Product-based', 
         'nonprofit': 'Non-profit',
         'other': 'Other'
       }
-      record.fields['Business Type'] = businessTypeMap[body.businessType] || 'Other'
+      record.fields['Business Type'] = businessTypeMap[body.businessType as string] || 'Other'
     }
     
     if (body.currentWebsite) {
