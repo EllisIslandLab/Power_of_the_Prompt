@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
             []
         }
       })
-      .filter(item => item.title && item.title.trim() !== '') // Filter out records with empty titles
+      .filter(item => item.title && typeof item.title === 'string' && item.title.trim() !== '') // Filter out records with empty titles
 
     return NextResponse.json({
       success: true,
