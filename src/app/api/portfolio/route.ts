@@ -28,14 +28,14 @@ export async function GET(request: NextRequest) {
           category: fields['Category'] || '',
           demoUrl: fields['Demo URL'] || '#',
           technologies: fields['Technologies'] ? 
-            (Array.isArray(fields['Technologies']) ? fields['Technologies'] : fields['Technologies'].split(',').map(t => t.trim())) : 
+            (Array.isArray(fields['Technologies']) ? fields['Technologies'] : (fields['Technologies'] as string).split(',').map(t => t.trim())) : 
             [],
           features: fields['Features'] ? 
-            (Array.isArray(fields['Features']) ? fields['Features'] : fields['Features'].split(',').map(f => f.trim())) : 
+            (Array.isArray(fields['Features']) ? fields['Features'] : (fields['Features'] as string).split(',').map(f => f.trim())) : 
             [],
           imageUrl: fields['Image'] && fields['Image'][0] ? fields['Image'][0].url : '/api/placeholder/600/400',
           backupUrls: fields['Backup URLs'] ? 
-            (Array.isArray(fields['Backup URLs']) ? fields['Backup URLs'] : fields['Backup URLs'].split(',').map(u => u.trim())) : 
+            (Array.isArray(fields['Backup URLs']) ? fields['Backup URLs'] : (fields['Backup URLs'] as string).split(',').map(u => u.trim())) : 
             []
         }
       })
