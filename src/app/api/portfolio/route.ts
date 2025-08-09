@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
           features: fields['Features'] ? 
             (Array.isArray(fields['Features']) ? fields['Features'] : (fields['Features'] as string).split(',').map(f => f.trim())) : 
             [],
-          imageUrl: fields['Image'] && fields['Image'][0] ? fields['Image'][0].url : '/api/placeholder/600/400',
+          imageUrl: fields['Image'] && Array.isArray(fields['Image']) && fields['Image'][0] ? (fields['Image'][0] as any).url : '/api/placeholder/600/400',
           backupUrls: fields['Backup URLs'] ? 
             (Array.isArray(fields['Backup URLs']) ? fields['Backup URLs'] : (fields['Backup URLs'] as string).split(',').map(u => u.trim())) : 
             []
