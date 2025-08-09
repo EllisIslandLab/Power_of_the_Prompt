@@ -103,12 +103,12 @@ export async function POST(request: NextRequest) {
     }
     
     if (body.timeline) {
-      const timelineMap = {
+      const timelineMap: Record<string, string> = {
         'asap': 'ASAP',
         'this-week': 'This week', 
         'exploring': 'Just exploring'
       }
-      record.fields['Timeline'] = timelineMap[body.timeline] || body.timeline
+      record.fields['Timeline'] = timelineMap[body.timeline as string] || body.timeline
     }
 
     // Create record in Airtable
