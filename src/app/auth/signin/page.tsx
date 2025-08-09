@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function SignInPage() {
   const [email, setEmail] = useState("")
@@ -13,6 +13,7 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+  const { signIn } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,22 +21,10 @@ export default function SignInPage() {
     setError("")
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      })
-
-      if (result?.error) {
-        setError("Invalid email or password")
-      } else {
-        const session = await getSession()
-        if (session) {
-          router.push("/portal")
-        }
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again.")
+      await signIn(email, password)
+      router.push("/portal")
+    } catch (error: any) {
+      setError(error.message || "Invalid email or password")
     } finally {
       setIsLoading(false)
     }

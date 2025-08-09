@@ -1,24 +1,24 @@
 "use client"
 
-import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
+import { useAuth } from "@/hooks/useAuth"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { Zap, BookOpen, MessageSquare, Settings } from "lucide-react"
+import { Zap, BookOpen, MessageSquare, Settings, Users, Plus } from "lucide-react"
 
 export default function PortalPage() {
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (status === "loading") return // Still loading
-    if (!session) router.push("/auth/signin")
-  }, [session, status, router])
+    if (loading) return // Still loading
+    if (!user) router.push("/auth/signin")
+  }, [user, loading, router])
 
-  if (status === "loading") {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
         <div className="text-center">
@@ -29,7 +29,7 @@ export default function PortalPage() {
     )
   }
 
-  if (!session) {
+  if (!user) {
     return null // Will redirect to signin
   }
 
@@ -39,7 +39,7 @@ export default function PortalPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {session.user?.name}!
+            Welcome back, {user.profile?.name || user.email}!
           </h1>
           <p className="text-muted-foreground">
             Your Power of the Prompt dashboard
@@ -54,12 +54,13 @@ export default function PortalPage() {
               <Zap className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <Badge variant={session.user?.subscriptionStatus === 'ACTIVE' ? 'default' : 'secondary'}>
-                {session.user?.subscriptionStatus === 'ACTIVE' ? 'Premium' : 'Free Account'}
+              <Badge variant={user.profile?.role === 'ADMIN' ? 'default' : 'secondary'}>
+                {user.profile?.role === 'ADMIN' ? 'Admin' : 
+                 user.profile?.role === 'COACH' ? 'Coach' : 'Student'}
               </Badge>
               <p className="text-xs text-muted-foreground mt-2">
-                {session.user?.role === 'STUDENT' ? 'Student Access' : 
-                 session.user?.role === 'PREMIUM' ? 'Premium Access' : 
+                {user.profile?.role === 'STUDENT' ? 'Student Access' : 
+                 user.profile?.role === 'COACH' ? 'Coach Access' : 
                  'Admin Access'}
               </p>
             </CardContent>
@@ -124,6 +125,65 @@ export default function PortalPage() {
           </Card>
         </div>
 
+        {/* Cohort Management */}
+        {(user.profile?.role === 'COACH' || user.profile?.role === 'ADMIN') && (
+          <div className="mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  Cohort Management
+                </CardTitle>
+                <CardDescription>
+                  Manage your student cohorts and track progress
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-4">
+                  <Button asChild>
+                    <Link href="/portal/cohorts">
+                      View All Cohorts
+                    </Link>
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link href="/portal/cohorts/new">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create New Cohort
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Student Cohort View */}
+        {user.profile?.role === 'STUDENT' && (
+          <div className="mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  My Cohort
+                </CardTitle>
+                <CardDescription>
+                  Connect with your learning group
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-sm text-muted-foreground mb-4">
+                  Join a cohort to learn alongside other students
+                </div>
+                <Button variant="outline" asChild>
+                  <Link href="/portal/cohorts">
+                    View Available Cohorts
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6">
           <Card>
@@ -142,6 +202,14 @@ export default function PortalPage() {
                   📚 Student Textbook
                 </Link>
               </Button>
+              {user.profile?.role !== 'STUDENT' && (
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/portal/cohorts">
+                    <Users className="h-4 w-4 mr-2" />
+                    Manage Cohorts
+                  </Link>
+                </Button>
+              )}
               <Button variant="outline" className="w-full" asChild>
                 <Link href="/consultation">
                   Schedule Strategy Call
@@ -162,10 +230,10 @@ export default function PortalPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="text-sm">
-                <strong>Email:</strong> {session.user?.email}
+                <strong>Email:</strong> {user.email}
               </div>
               <div className="text-sm">
-                <strong>Member since:</strong> Recently joined
+                <strong>Role:</strong> {user.profile?.role || 'Student'}
               </div>
               <Button variant="outline" size="sm" className="mt-4">
                 Update Profile

@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -17,6 +17,7 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+  const { signUp } = useAuth()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -43,38 +44,13 @@ export default function SignUpPage() {
     }
 
     try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password
-        })
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        setError(result.error || "Failed to create account")
-        return
-      }
-
-      // Auto sign in after successful registration
-      const signInResult = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      })
-
-      if (signInResult?.error) {
-        setError("Account created but failed to sign in. Please try signing in manually.")
-      } else {
-        router.push("/portal")
-      }
-
-    } catch (error) {
-      setError("An error occurred. Please try again.")
+      await signUp(formData.email, formData.password, formData.name)
+      // Show success message or redirect
+      setError("")
+      // Note: User will need to confirm email before they can sign in
+      router.push("/auth/signin?message=Please check your email to confirm your account")
+    } catch (error: any) {
+      setError(error.message || "An error occurred. Please try again.")
     } finally {
       setIsLoading(false)
     }

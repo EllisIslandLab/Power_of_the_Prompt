@@ -6,7 +6,7 @@ import { VideoSessionType, VideoSessionStatus } from '@prisma/client'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { userId } = params
+    const { userId } = await params
     const { searchParams } = new URL(request.url)
     const viewMode = searchParams.get('viewMode') || 'all'
     const includePast = searchParams.get('includePast') === 'true'

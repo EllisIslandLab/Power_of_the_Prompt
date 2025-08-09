@@ -6,7 +6,7 @@ import { VideoSessionStatus } from '@prisma/client'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,7 +15,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { sessionId } = params
+    const { sessionId } = await params
     const body = await request.json()
     const { userId } = body
 
