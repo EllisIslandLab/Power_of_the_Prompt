@@ -66,14 +66,14 @@ export async function POST(request: NextRequest) {
     
     if (body.currentHost) {
       // Store in notes to be safe
-      const hostMap = {
+      const hostMap: Record<string, string> = {
         'none': 'None',
         'squarespace': 'Squarespace',
         'wix': 'Wix',
         'wordpress': 'WordPress',
         'other': 'Other'
       }
-      const readableHost = hostMap[body.currentHost] || body.currentHost
+      const readableHost = hostMap[body.currentHost as string] || body.currentHost
       
       const existingNotes = record.fields['Notes'] || ''
       record.fields['Notes'] = existingNotes + (existingNotes ? ' | ' : '') + `Current Host: ${readableHost}`
