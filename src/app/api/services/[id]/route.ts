@@ -35,7 +35,7 @@ export async function GET(
       return NextResponse.json(response, { status: 404 })
     }
 
-    const airtableRecord = record as AirtableService
+    const airtableRecord = record as unknown as AirtableService
     const fields = airtableRecord.fields
     
     // Validate required fields
