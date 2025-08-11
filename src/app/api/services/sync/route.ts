@@ -81,7 +81,7 @@ async function syncAllServices(): Promise<SyncResponse> {
 
     for (const record of records) {
       try {
-        const result = await syncServiceToStripe(record as AirtableService)
+        const result = await syncServiceToStripe(record as unknown as AirtableService)
         if (result.productSynced) syncedProducts++
         if (result.priceSynced) syncedPrices++
         if (result.errors.length > 0) {
