@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     }).all()
 
     // Transform Airtable records to Service objects
-    const services: Service[] = records
+    const services = records
       .map((record) => {
         const airtableRecord = record as unknown as AirtableService
         const fields = airtableRecord.fields
