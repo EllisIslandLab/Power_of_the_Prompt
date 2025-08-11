@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
 
     // Store purchase record in Airtable (Purchases table)
     try {
-      await base('Purchases').create({
+      await base('Purchases').create([{
         fields: {
           'Service ID': paymentData.service_id,
           'Service Name': service.service_name,
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
           'Service Type': service.service_type,
           'Metadata': JSON.stringify(paymentData.metadata || {})
         }
-      })
+      }])
     } catch (error) {
       console.error('Failed to create purchase record:', error)
       // Continue anyway - payment intent was created successfully
