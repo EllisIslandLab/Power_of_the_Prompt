@@ -91,11 +91,9 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 
     if (purchaseRecords.length > 0) {
       await base('Purchases').update(purchaseRecords[0].id, {
-        fields: {
-          'Payment Status': 'succeeded',
-          'Completed At': new Date().toISOString(),
-          'Amount Paid': paymentIntent.amount / 100
-        }
+        'Payment Status': 'succeeded',
+        'Completed At': new Date().toISOString(),
+        'Amount Paid': paymentIntent.amount / 100
       })
     } else {
       // Create new purchase record if it doesn't exist
@@ -141,10 +139,8 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
 
     if (purchaseRecords.length > 0) {
       await base('Purchases').update(purchaseRecords[0].id, {
-        fields: {
-          'Payment Status': 'failed',
-          'Failed At': new Date().toISOString()
-        }
+        'Payment Status': 'failed',
+        'Failed At': new Date().toISOString()
       })
     }
 
