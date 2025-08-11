@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
           coupon_code: fields['Coupon Code'] || undefined
         }
       })
-      .filter((service): service is Service => service !== null)
+      .filter((service) => service !== null)
       .sort((a, b) => a.order - b.order)
 
     const response: ServicesResponse = {
