@@ -31,8 +31,9 @@ export async function GET(request: NextRequest) {
     // Transform and group by category
     const servicesByCategory: Record<string, Service[]> = {}
 
-    records.forEach((record: AirtableService) => {
-      const fields = record.fields
+    records.forEach((record) => {
+      const airtableRecord = record as unknown as AirtableService
+      const fields = airtableRecord.fields
       
       // Skip records without required fields
       if (!fields['Service Name'] || !fields['Service Type'] || fields['Price'] === undefined) {
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
       }
 
       const service: Service = {
-        id: record.id,
+        id: airtableRecord.id,
         service_name: fields['Service Name'],
         service_type: mapServiceType(fields['Service Type']),
         price: fields['Price'],
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
         stripe_product_id: fields['Stripe Product ID'] || '',
         features: Array.isArray(fields['Features']) 
           ? fields['Features'] 
-          : (fields['Features'] ? fields['Features'].split(',').map(f => f.trim()) : []),
+          : (fields['Features'] ? (fields['Features'] as string).split(',').map(f => f.trim()) : []),
         category: fields['Category'] || 'General',
         order: fields['Order'] || 999,
         created_at: fields['Created At'] || new Date().toISOString(),
