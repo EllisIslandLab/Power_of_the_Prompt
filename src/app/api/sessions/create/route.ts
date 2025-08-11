@@ -154,11 +154,11 @@ export async function GET(request: NextRequest) {
 
     // Add join URLs and user role
     const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
-    const sessionsWithUrls = sessions.map(session => ({
-      ...session,
-      joinUrl: `https://${jitsiDomain}/${session.jitsiRoomId}`,
-      isHost: session.hostUserId === session.user.id,
-      isParticipant: session.participants.some(p => p.id === session.user.id)
+    const sessionsWithUrls = sessions.map(videoSession => ({
+      ...videoSession,
+      joinUrl: `https://${jitsiDomain}/${videoSession.jitsiRoomId}`,
+      isHost: videoSession.hostUserId === session.user.id,
+      isParticipant: videoSession.participants.some(p => p.id === session.user.id)
     }))
 
     return NextResponse.json(sessionsWithUrls)
