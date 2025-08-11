@@ -61,7 +61,7 @@ export async function GET(
       stripe_product_id: fields['Stripe Product ID'] || '',
       features: Array.isArray(fields['Features']) 
         ? fields['Features'] 
-        : (fields['Features'] ? fields['Features'].split(',').map(f => f.trim()) : []),
+        : (fields['Features'] ? (fields['Features'] as string).split(',').map(f => f.trim()) : []),
       category: fields['Category'] || 'General',
       order: fields['Order'] || 999,
       created_at: fields['Created At'] || new Date().toISOString(),
