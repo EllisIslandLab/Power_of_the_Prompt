@@ -117,7 +117,7 @@ async function syncAllServices(): Promise<SyncResponse> {
 async function syncSingleService(serviceId: string): Promise<SyncResponse> {
   try {
     const record = await base('Services').find(serviceId)
-    const result = await syncServiceToStripe(record as AirtableService)
+    const result = await syncServiceToStripe(record as unknown as AirtableService)
 
     return {
       success: result.errors.length === 0,
