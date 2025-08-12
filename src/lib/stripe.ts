@@ -1,8 +1,15 @@
 import Stripe from 'stripe'
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-06-30.basil',
-})
+// Lazy Stripe initialization to avoid build-time errors
+export function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is required but not configured')
+  }
+  
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-06-30.basil',
+  })
+}
 
 // Product configuration - replace with your actual Stripe price IDs
 export const STRIPE_PRODUCTS = {

@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import Stripe from 'stripe'
-import Airtable from 'airtable'
-
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-06-30.basil'
-})
-
-// Initialize Airtable
-const base = new Airtable({
-  apiKey: process.env.AIRTABLE_API_KEY
-}).base(process.env.AIRTABLE_BASE_ID!)
+import { getStripe } from '@/lib/stripe'
+import { getAirtableBase } from '@/lib/airtable'
 
 export async function POST(request: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
@@ -26,6 +17,7 @@ export async function POST(request: NextRequest) {
     const headersList = await headers()
     const signature = headersList.get('stripe-signature')!
 
+    const stripe = getStripe()
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
@@ -84,6 +76,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
     const customerName = paymentIntent.metadata.customer_name
 
     // Update purchase record in Airtable
+    const base = getAirtableBase()
     const purchaseRecords = await base('Purchases').select({
       filterByFormula: `{Stripe Payment Intent ID} = '${paymentIntent.id}'`,
       maxRecords: 1
