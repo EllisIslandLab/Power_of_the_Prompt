@@ -118,6 +118,7 @@ export async function updatePurchaseStatus(
   paymentStatus: 'succeeded' | 'failed' | 'refunded'
 ): Promise<void> {
   try {
+    const base = getAirtableBase()
     await base('Service Purchases').update([
       {
         id: purchaseId,
@@ -138,6 +139,7 @@ export async function updatePurchaseStatus(
  */
 export async function getEnrollmentStats(serviceId: string) {
   try {
+    const base = getAirtableBase()
     const service = await base('Services').find(serviceId)
     const fields = service.fields as any
 
@@ -171,6 +173,7 @@ export async function getEnrollmentStats(serviceId: string) {
  */
 export async function getUrgentServices() {
   try {
+    const base = getAirtableBase()
     const services = await base('Services').select({
       filterByFormula: `AND({Is Active} = TRUE(), {Max Seats} > 0)`,
       fields: ['Service Name', 'Max Seats', 'Seats Taken', 'Price', 'Service Type']

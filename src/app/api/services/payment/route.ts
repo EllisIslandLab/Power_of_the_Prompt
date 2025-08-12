@@ -81,10 +81,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 404 })
     }
 
+    // Initialize Stripe client
+    const stripe = getStripe()
+    
     // Create Stripe customer if needed
     let customer
     try {
-      const stripe = getStripe()
       const customers = await stripe.customers.list({
         email: paymentData.customer_email,
         limit: 1

@@ -3,11 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import Stripe from 'stripe'
-
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-06-30.basil'
-})
+import { getStripe } from '@/lib/stripe'
 
 export async function POST(
   request: NextRequest,
@@ -77,6 +73,7 @@ export async function POST(
     }
 
     // Create payment intent
+    const stripe = getStripe()
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount, // Amount in cents
       currency: currency,
@@ -207,6 +204,7 @@ export async function GET(
 
     if (videoSession.stripePaymentIntentId) {
       try {
+        const stripe = getStripe()
         stripePaymentIntent = await stripe.paymentIntents.retrieve(videoSession.stripePaymentIntentId)
         paymentStatus = stripePaymentIntent.status
       } catch (error) {
