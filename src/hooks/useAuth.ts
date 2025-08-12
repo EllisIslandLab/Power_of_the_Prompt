@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
 import type { Profile } from '@/lib/supabase'
 
@@ -14,6 +14,9 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Initialize Supabase client
+    const supabase = getSupabase()
+    
     // Get initial session
     const getInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -66,6 +69,7 @@ export function useAuth() {
   }, [])
 
   const getUserWithProfile = async (user: User): Promise<AuthUser> => {
+    const supabase = getSupabase()
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
@@ -76,6 +80,7 @@ export function useAuth() {
   }
 
   const signUp = async (email: string, password: string, name: string) => {
+    const supabase = getSupabase()
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -89,6 +94,7 @@ export function useAuth() {
   }
 
   const signIn = async (email: string, password: string) => {
+    const supabase = getSupabase()
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -99,6 +105,7 @@ export function useAuth() {
   }
 
   const signOut = async () => {
+    const supabase = getSupabase()
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
@@ -106,6 +113,7 @@ export function useAuth() {
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user?.id) throw new Error('No user logged in')
 
+    const supabase = getSupabase()
     const { data, error } = await supabase
       .from('profiles')
       .update(updates)
