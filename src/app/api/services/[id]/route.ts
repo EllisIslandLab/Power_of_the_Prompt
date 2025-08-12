@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Airtable from 'airtable'
 import { Service, AirtableService, ServiceResponse } from '@/types/services'
-
-// Initialize Airtable
-const base = new Airtable({
-  apiKey: process.env.AIRTABLE_API_KEY
-}).base(process.env.AIRTABLE_BASE_ID!)
+import { getAirtableBase } from '@/lib/airtable'
 
 export async function GET(
   request: NextRequest,
@@ -24,6 +19,7 @@ export async function GET(
     }
 
     // Fetch specific record from Airtable
+    const base = getAirtableBase()
     const record = await base('Services').find(id)
 
     if (!record) {
