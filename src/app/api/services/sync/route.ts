@@ -64,6 +64,7 @@ async function syncAllServices(): Promise<SyncResponse> {
 
   try {
     // Fetch all active services from Airtable
+    const base = getAirtableBase()
     const records = await base('Services').select({
       filterByFormula: '{Is Active} = TRUE()',
       sort: [{ field: 'Order', direction: 'asc' }]
@@ -106,6 +107,7 @@ async function syncAllServices(): Promise<SyncResponse> {
 
 async function syncSingleService(serviceId: string): Promise<SyncResponse> {
   try {
+    const base = getAirtableBase()
     const record = await base('Services').find(serviceId)
     const result = await syncServiceToStripe(record as unknown as AirtableService)
 
@@ -147,6 +149,10 @@ async function syncServiceToStripe(record: AirtableService): Promise<{
   }
 
   try {
+    // Initialize Stripe and Airtable
+    const stripe = getStripe()
+    const base = getAirtableBase()
+    
     // Create or update Stripe product
     let stripeProduct
     const existingProductId = fields['Stripe Product ID']

@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Stripe from 'stripe'
-import Airtable from 'airtable'
 import { PaymentIntent, PaymentResponse, Service } from '@/types/services'
 import { calculateServicePrice } from '@/lib/pricing'
-
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-06-30.basil'
-})
-
-// Initialize Airtable
-const base = new Airtable({
-  apiKey: process.env.AIRTABLE_API_KEY
-}).base(process.env.AIRTABLE_BASE_ID!)
+import { getStripe } from '@/lib/stripe'
+import { getAirtableBase } from '@/lib/airtable'
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +21,7 @@ export async function POST(request: NextRequest) {
     // Fetch service from Airtable to validate
     let service: Service
     try {
+      const base = getAirtableBase()
       const record = await base('Services').find(paymentData.service_id)
       const fields = record.fields as any
       
@@ -93,6 +84,7 @@ export async function POST(request: NextRequest) {
     // Create Stripe customer if needed
     let customer
     try {
+      const stripe = getStripe()
       const customers = await stripe.customers.list({
         email: paymentData.customer_email,
         limit: 1
@@ -135,6 +127,7 @@ export async function POST(request: NextRequest) {
 
     // Store purchase record in Airtable (Purchases table)
     try {
+      const base = getAirtableBase()
       await base('Purchases').create([{
         fields: {
           'Service ID': paymentData.service_id,
