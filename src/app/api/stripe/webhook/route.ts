@@ -125,6 +125,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
   try {
     // Update purchase record in Airtable
+    const base = getAirtableBase()
     const purchaseRecords = await base('Purchases').select({
       filterByFormula: `{Stripe Payment Intent ID} = '${paymentIntent.id}'`,
       maxRecords: 1
@@ -151,6 +152,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     
     if (session.payment_intent) {
       // Get the payment intent and handle it
+      const stripe = getStripe()
       const paymentIntent = await stripe.paymentIntents.retrieve(
         session.payment_intent as string
       )
@@ -216,6 +218,7 @@ async function handleConsultationPurchase(data: any) {
   
   // Example: Create consultation record
   try {
+    const base = getAirtableBase()
     await base('Consultations').create([{
       fields: {
         'Name': data.customerName,
@@ -235,6 +238,7 @@ async function handleAuditPurchase(data: any) {
   
   // Example: Create audit record
   try {
+    const base = getAirtableBase()
     await base('Audits').create([{
       fields: {
         'Customer Name': data.customerName,
@@ -257,6 +261,7 @@ async function handleBuildPurchase(data: any) {
   
   // Example: Create build project record
   try {
+    const base = getAirtableBase()
     await base('Build Projects').create([{
       fields: {
         'Client Name': data.customerName,
