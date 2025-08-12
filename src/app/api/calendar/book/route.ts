@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Airtable from 'airtable'
 import { prisma } from '@/lib/prisma'
 import { VideoSessionType, VideoSessionStatus } from '@prisma/client'
-
-// Initialize Airtable
-const base = new Airtable({
-  apiKey: process.env.AIRTABLE_API_KEY
-}).base(process.env.AIRTABLE_BASE_ID!)
+import { getAirtableBase } from '@/lib/airtable'
 
 export async function POST(request: NextRequest) {
   try {
@@ -88,6 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create record in Airtable
+    const base = getAirtableBase()
     const createdRecord = await base('Consultations').create([record])
     
     // TODO: Send confirmation email with calendar invite

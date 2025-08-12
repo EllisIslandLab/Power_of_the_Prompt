@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Airtable from 'airtable'
 import { Service, AirtableService, ServicesResponse } from '@/types/services'
-
-// Initialize Airtable
-const base = new Airtable({
-  apiKey: process.env.AIRTABLE_API_KEY
-}).base(process.env.AIRTABLE_BASE_ID!)
+import { getAirtableBase } from '@/lib/airtable'
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,6 +34,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch records from Airtable
+    const base = getAirtableBase()
     const records = await base('Services').select({
       view: 'Grid view',
       sort: [{ field: 'Order', direction: 'asc' }],
