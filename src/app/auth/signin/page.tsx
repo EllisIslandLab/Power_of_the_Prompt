@@ -23,8 +23,8 @@ export default function SignInPage() {
     try {
       await signIn(email, password)
       router.push("/portal")
-    } catch (error: any) {
-      setError(error.message || "Invalid email or password")
+    } catch (error) {
+      setError((error as Error)?.message || "Invalid email or password")
     } finally {
       setIsLoading(false)
     }

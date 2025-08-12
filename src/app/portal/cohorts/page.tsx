@@ -51,7 +51,7 @@ export default function CohortsPage() {
     } catch (error) {
       console.error('Error loading cohorts:', error)
       // Show error to user for debugging
-      alert(`Error loading cohorts: ${error.message || error}`)
+      alert(`Error loading cohorts: ${(error as Error)?.message || error}`)
     } finally {
       setLoadingCohorts(false)
     }

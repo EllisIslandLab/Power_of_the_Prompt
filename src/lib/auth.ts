@@ -54,6 +54,8 @@ providers.push(
           id: user.id,
           email: user.email,
           name: user.name,
+          role: user.role as "STUDENT" | "PREMIUM" | "ADMIN",
+          subscriptionStatus: "NONE" as "NONE" | "ACTIVE" | "CANCELLED" | "EXPIRED"
         }
       } catch (error) {
         console.error("Auth error:", error)
@@ -77,8 +79,8 @@ export const authOptions: NextAuthOptions = {
             where: { email: user.email! }
           })
           
-          token.role = dbUser?.role
-          token.subscriptionStatus = dbUser?.subscriptionStatus
+          token.role = dbUser?.role || "STUDENT"
+          token.subscriptionStatus = dbUser?.subscriptionStatus || "NONE"
         } catch (error) {
           console.error("JWT callback error:", error)
         }
@@ -96,6 +98,5 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup",
   }
 }

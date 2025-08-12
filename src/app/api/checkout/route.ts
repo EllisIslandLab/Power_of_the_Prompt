@@ -88,22 +88,22 @@ export async function POST(request: NextRequest) {
       sessionId: session.id 
     })
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Stripe checkout error:', error)
     
     // More specific error messages
     let errorMessage = 'Failed to create checkout session'
     
-    if (error.type === 'StripeInvalidRequestError') {
-      errorMessage = `Stripe error: ${error.message}`
-    } else if (error.message) {
-      errorMessage = error.message
+    if ((error as any).type === 'StripeInvalidRequestError') {
+      errorMessage = `Stripe error: ${(error as Error)?.message}`
+    } else if ((error as Error)?.message) {
+      errorMessage = (error as Error).message
     }
     
     return NextResponse.json(
       { 
         error: errorMessage,
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        details: process.env.NODE_ENV === 'development' ? (error as Error)?.stack : undefined
       },
       { status: 500 }
     )

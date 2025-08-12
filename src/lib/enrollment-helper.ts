@@ -153,9 +153,9 @@ export async function getEnrollmentStats(serviceId: string) {
       serviceName: fields['Service Name'],
       maxSeats: fields['Max Seats'] || null,
       seatsTaken: purchases.length,
-      seatsAvailable: fields['Max Seats'] ? fields['Max Seats'] - purchases.length : null,
+      seatsAvailable: fields['Max Seats'] ? Number(fields['Max Seats']) - purchases.length : null,
       isUnlimited: !fields['Max Seats'],
-      totalRevenue: purchases.reduce((sum, record) => sum + (record.fields['Amount Paid'] || 0), 0),
+      totalRevenue: purchases.reduce((sum, record) => sum + (Number(record.fields['Amount Paid']) || 0), 0),
       enrolledStudents: purchases.map(record => ({
         email: record.fields['Customer Email'],
         name: record.fields['Customer Name'],

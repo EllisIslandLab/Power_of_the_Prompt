@@ -70,10 +70,10 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error checking service availability:', error)
     return NextResponse.json(
-      { error: 'Failed to check service availability', details: error.message },
+      { error: 'Failed to check service availability', details: (error as Error)?.message },
       { status: 500 }
     )
   }

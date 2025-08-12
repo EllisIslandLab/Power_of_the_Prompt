@@ -120,12 +120,12 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error creating test session:', error)
     return NextResponse.json({
       error: 'Failed to create test session',
-      details: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: (error as Error)?.message,
+      stack: process.env.NODE_ENV === 'development' ? (error as Error)?.stack : undefined
     }, { status: 500 })
   }
 }

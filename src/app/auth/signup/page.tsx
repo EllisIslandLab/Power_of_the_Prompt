@@ -49,8 +49,8 @@ export default function SignUpPage() {
       setError("")
       // Note: User will need to confirm email before they can sign in
       router.push("/auth/signin?message=Please check your email to confirm your account")
-    } catch (error: any) {
-      setError(error.message || "An error occurred. Please try again.")
+    } catch (error) {
+      setError((error as Error)?.message || "An error occurred. Please try again.")
     } finally {
       setIsLoading(false)
     }

@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, Mail, Calendar, FileText, Zap } from "lucide-react"
 
-export default function ServiceSuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams()
   const paymentIntentId = searchParams.get('payment_intent')
   const [paymentDetails, setPaymentDetails] = useState<any>(null)
@@ -215,5 +215,30 @@ export default function ServiceSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ServiceSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-20 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-2xl">
+          <Card className="animate-pulse">
+            <CardHeader>
+              <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   )
 }

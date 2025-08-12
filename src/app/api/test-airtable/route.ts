@@ -50,11 +50,11 @@ export async function GET(request: NextRequest) {
         }
       })
 
-    } catch (tableError: any) {
+    } catch (tableError) {
       // Table might not exist or have different name
       return NextResponse.json({
         error: 'Airtable table access failed',
-        details: tableError.message,
+        details: (tableError as Error)?.message,
         suggestions: [
           'Check if "Consultations" table exists in your Airtable base',
           'Verify table permissions',
@@ -63,10 +63,10 @@ export async function GET(request: NextRequest) {
       }, { status: 500 })
     }
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json({
       error: 'Airtable connection failed',
-      details: error.message,
+      details: (error as Error)?.message,
       env_check: {
         AIRTABLE_API_KEY: !!process.env.AIRTABLE_API_KEY,
         AIRTABLE_BASE_ID: !!process.env.AIRTABLE_BASE_ID
