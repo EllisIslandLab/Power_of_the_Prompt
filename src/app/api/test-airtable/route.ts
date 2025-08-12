@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Airtable from 'airtable'
+import { getAirtableBase } from '@/lib/airtable'
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,14 +24,10 @@ export async function GET(request: NextRequest) {
       }, { status: 500 })
     }
 
-    // Initialize Airtable
-    const base = new Airtable({
-      apiKey: process.env.AIRTABLE_API_KEY
-    }).base(process.env.AIRTABLE_BASE_ID)
-
     // Try to list tables/records
     try {
-      // Try to access the 'Consultations' table
+      // Try to access the 'Consultations' table  
+      const base = getAirtableBase()
       const records = await base('Consultations').select({
         maxRecords: 3,
         view: 'Grid view' // Default view name

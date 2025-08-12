@@ -1,8 +1,4 @@
-import Airtable from 'airtable'
-
-const base = new Airtable({
-  apiKey: process.env.AIRTABLE_API_KEY
-}).base(process.env.AIRTABLE_BASE_ID!)
+import { getAirtableBase } from '@/lib/airtable'
 
 export interface EnrollmentCheck {
   canEnroll: boolean
@@ -26,6 +22,7 @@ export interface ServicePurchaseData {
  */
 export async function checkEnrollmentAvailability(serviceId: string): Promise<EnrollmentCheck> {
   try {
+    const base = getAirtableBase()
     const service = await base('Services').find(serviceId)
     const fields = service.fields as any
 
@@ -90,6 +87,7 @@ export async function recordServicePurchase(purchaseData: ServicePurchaseData): 
     }
 
     // Create purchase record in Service Purchases table
+    const base = getAirtableBase()
     const purchaseRecord = await base('Service Purchases').create([
       {
         fields: {

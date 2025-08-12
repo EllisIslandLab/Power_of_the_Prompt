@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Airtable from 'airtable'
-
-// Initialize Airtable
-const base = new Airtable({
-  apiKey: process.env.AIRTABLE_API_KEY
-}).base(process.env.AIRTABLE_BASE_ID!)
+import { getAirtableBase } from '@/lib/airtable'
 
 export async function GET(request: NextRequest) {
   try {
     // Fetch records from Airtable Portfolio table
+    const base = getAirtableBase()
     const records = await base('Portfolio').select({
       view: 'Grid view', // Use default view or specify a custom view
       sort: [{ field: 'Order', direction: 'asc' }] // Optional: sort by order field
