@@ -3,7 +3,7 @@
 import { useRouter, useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
-import { supabase } from "@/lib/supabase"
+import { getSupabase } from "@/lib/supabase"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -48,6 +48,8 @@ export default function CohortDetailsPage() {
 
   const loadCohortData = async () => {
     try {
+      const supabase = getSupabase()
+      
       // Load cohort details
       const { data: cohortData, error: cohortError } = await supabase
         .from('cohorts')
