@@ -97,7 +97,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
       })
     } else {
       // Create new purchase record if it doesn't exist
-      await base('Purchases').create({
+      await base('Purchases').create([{
         fields: {
           'Service ID': serviceId,
           'Service Name': serviceName,
@@ -111,7 +111,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
           'Service Type': serviceType,
           'Metadata': JSON.stringify(paymentIntent.metadata)
         }
-      })
+      }])
     }
 
     // Handle service-specific post-purchase actions
@@ -223,14 +223,14 @@ async function handleConsultationPurchase(data: any) {
   
   // Example: Create consultation record
   try {
-    await base('Consultations').create({
+    await base('Consultations').create([{
       fields: {
         'Name': data.customerName,
         'Email': data.customerEmail,
         'Status': 'Paid - Needs Scheduling',
         'Notes': `Purchased ${data.serviceName} - Payment ID: ${data.paymentIntentId}`
       }
-    })
+    }])
   } catch (error) {
     console.error('Error creating consultation record:', error)
   }
@@ -242,7 +242,7 @@ async function handleAuditPurchase(data: any) {
   
   // Example: Create audit record
   try {
-    await base('Audits').create({
+    await base('Audits').create([{
       fields: {
         'Customer Name': data.customerName,
         'Customer Email': data.customerEmail,
@@ -251,7 +251,7 @@ async function handleAuditPurchase(data: any) {
         'Payment Intent ID': data.paymentIntentId,
         'Created At': new Date().toISOString()
       }
-    })
+    }])
   } catch (error) {
     // Audits table might not exist yet
     console.log('Audits table not found, will need to be created')
@@ -264,7 +264,7 @@ async function handleBuildPurchase(data: any) {
   
   // Example: Create build project record
   try {
-    await base('Build Projects').create({
+    await base('Build Projects').create([{
       fields: {
         'Client Name': data.customerName,
         'Client Email': data.customerEmail,
@@ -273,7 +273,7 @@ async function handleBuildPurchase(data: any) {
         'Payment Intent ID': data.paymentIntentId,
         'Project Start': new Date().toISOString()
       }
-    })
+    }])
   } catch (error) {
     // Build Projects table might not exist yet
     console.log('Build Projects table not found, will need to be created')
