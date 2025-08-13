@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { Service, ServicesResponse } from "@/types/services"
 import { ServiceCard } from "@/components/services/ServiceCard"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 // Fallback services data for when Airtable is unavailable
