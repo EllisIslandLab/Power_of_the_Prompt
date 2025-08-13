@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navigation } from "@/components/sections/navigation";
 import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
+import { AnimatedBackground } from "@/components/effects/AnimatedBackground";
 // Environment variables updated - triggering redeploy
 
 const geistSans = Geist({
@@ -35,6 +36,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* ANIMATED BACKGROUND - Easy to remove by deleting these 3 lines */}
+        <AnimatedBackground particleCount={40} opacity={0.12} speed={0.8} />
+        
         <Providers>
           <Navigation />
           {children}
