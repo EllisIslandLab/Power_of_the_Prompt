@@ -42,7 +42,7 @@ export default function PortalPage() {
             Welcome back, {user.profile?.name || user.email}!
           </h1>
           <p className="text-muted-foreground">
-            Your Power of the Prompt dashboard
+            Your Web Launch Academy dashboard
           </p>
         </div>
 

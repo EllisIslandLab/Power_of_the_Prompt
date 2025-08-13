@@ -63,7 +63,7 @@ export function Footer() {
 
           {/* Business Info */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Power of the Prompt</h4>
+            <h4 className="font-semibold text-lg mb-4">Web Launch Academy</h4>
             <p className="text-muted-foreground mb-4">
               Innovative AI-assisted web development training and professional website services.
             </p>
@@ -84,7 +84,7 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <p className="text-sm text-muted-foreground">
-                © 2024 Power of the Prompt. All rights reserved.
+                © 2024 Web Launch Academy. All rights reserved.
               </p>
               <p className="text-xs text-muted-foreground">
                 Color schemes by{" "}

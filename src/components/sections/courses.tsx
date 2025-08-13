@@ -112,7 +112,7 @@ export function Courses() {
 
         <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg p-8">
           <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-2xl font-bold mb-4">Traditional Web Development vs Power of the Prompt</h3>
+            <h3 className="text-2xl font-bold mb-4">Traditional Web Development vs Web Launch Academy</h3>
             
             <div className="grid md:grid-cols-2 gap-8 mt-8">
               <div className="bg-background/80 rounded-lg p-6 border">
@@ -127,7 +127,7 @@ export function Courses() {
               </div>
               
               <div className="bg-background/80 rounded-lg p-6 border">
-                <h4 className="font-semibold mb-4 text-green-600">Power of the Prompt Way</h4>
+                <h4 className="font-semibold mb-4 text-green-600">Web Launch Academy Way</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li>• One-time learning investment</li>
                   <li>• Complete customization control</li>

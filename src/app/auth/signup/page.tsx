@@ -63,7 +63,7 @@ export default function SignUpPage() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
             <CardDescription>
-              Join Power of the Prompt today
+              Join Web Launch Academy today
             </CardDescription>
           </CardHeader>
           <CardContent>

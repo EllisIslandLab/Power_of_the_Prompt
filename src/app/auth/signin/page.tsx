@@ -37,7 +37,7 @@ export default function SignInPage() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
             <CardDescription>
-              Access your Power of the Prompt account
+              Access your Web Launch Academy account
             </CardDescription>
           </CardHeader>
           <CardContent>

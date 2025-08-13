@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Power of the Prompt - Build Once, Own Forever | AI Web Dev",
-  description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Harness the power of prompts to build your digital presence.",
-  metadataBase: new URL('https://power-of-the-prompt.vercel.app'),
+  title: "Web Launch Academy - Learn & Build Websites You Actually Own",
+  description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Build your digital presence with Web Launch Academy.",
+  metadataBase: new URL('https://weblaunchacademy.com'),
   alternates: {
     canonical: '/',
   },

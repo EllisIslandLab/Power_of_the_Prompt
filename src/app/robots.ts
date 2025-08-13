@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://power-of-the-prompt.vercel.app'
+  const baseUrl = 'https://weblaunchacademy.com'
   
   return {
     rules: {

@@ -61,7 +61,7 @@ export function Hero() {
         <div className="mt-16 text-center">
           <div className="bg-card rounded-lg shadow-lg p-8 max-w-2xl mx-auto border">
             <h3 className="text-2xl font-semibold mb-4 text-card-foreground">
-              Why Choose Power of the Prompt?
+              Why Choose Web Launch Academy?
             </h3>
             <p className="text-muted-foreground leading-relaxed mb-4">
               <strong className="text-card-foreground">Stop renting your website. Start owning it.</strong>

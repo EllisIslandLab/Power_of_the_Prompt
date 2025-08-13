@@ -18,7 +18,7 @@ export function Navigation() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href={session && isInPortal ? "/portal" : "/"} className="text-2xl font-bold text-primary">
-              {isInPortal ? "WebLaunchCoach Portal" : "Power of the Prompt"}
+              {isInPortal ? "Web Launch Academy Portal" : "Web Launch Academy"}
             </Link>
           </div>
 
