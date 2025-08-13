@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const filters: string[] = []
 
     if (activeOnly) {
-      filters.push('{Is Active} = TRUE()')
+      filters.push('OR({Is Active} = TRUE(), {Is Active} = BLANK())')
     }
 
     if (serviceType) {
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
           price: fields['Price'],
           description: fields['Description'] || '',
           duration_estimate: fields['Duration Estimate'] || '',
-          is_active: fields['Is Active'] || false,
+          is_active: fields['Is Active'] !== false, // Default to true unless explicitly false
           stripe_price_id: fields['Stripe Price ID'] || '',
           stripe_product_id: fields['Stripe Product ID'] || '',
           features: Array.isArray(fields['Features']) 
