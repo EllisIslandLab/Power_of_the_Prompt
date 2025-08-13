@@ -119,7 +119,7 @@ const fallbackPortfolioItems: PortfolioItem[] = [
 export function Portfolio() {
   const [selectedItem, setSelectedItem] = useState<string | number | null>(null)
   const [urlErrors, setUrlErrors] = useState<Record<string | number, number>>({}) // Track failed URL attempts
-  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([])
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(fallbackPortfolioItems)
   const [loading, setLoading] = useState(true)
   const [hoveredItem, setHoveredItem] = useState<string | number | null>(null)
 
@@ -131,14 +131,20 @@ export function Portfolio() {
         if (response.ok) {
           const result = await response.json()
           if (result.success && result.data.length > 0) {
-            // Use only Airtable data, no fallback samples
+            // Use Airtable data if available
             setPortfolioItems(result.data)
+          } else {
+            // Fallback to hardcoded data if Airtable returns no results
+            setPortfolioItems(fallbackPortfolioItems)
           }
+        } else {
+          // Fallback to hardcoded data if API fails
+          setPortfolioItems(fallbackPortfolioItems)
         }
       } catch (error) {
         console.error('Failed to fetch portfolio items:', error)
-        // Set empty array if fetch fails
-        setPortfolioItems([])
+        // Fallback to hardcoded data if fetch fails
+        setPortfolioItems(fallbackPortfolioItems)
       } finally {
         setLoading(false)
       }
