@@ -181,7 +181,6 @@ export function ServicesDisplay({
 }: ServicesDisplayProps) {
   const [services, setServices] = useState<Service[]>(fallbackServices)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
   const [selectedType, setSelectedType] = useState<string>(serviceType || 'all')
   const [selectedCategory, setSelectedCategory] = useState<string>(category || 'all')
 
@@ -259,16 +258,6 @@ export function ServicesDisplay({
     )
   }
 
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-600 mb-4">{error}</p>
-        <Button onClick={fetchServices} variant="outline">
-          Try Again
-        </Button>
-      </div>
-    )
-  }
 
   if (services.length === 0) {
     return (
