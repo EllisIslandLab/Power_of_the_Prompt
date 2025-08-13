@@ -98,6 +98,7 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* Dark mode disabled for consistent light theme across all devices
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #030815;
@@ -112,6 +113,7 @@
     --accent: #ffcb05;
   }
 }
+*/
 
 body {
   background: var(--background);

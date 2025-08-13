@@ -119,7 +119,7 @@ const fallbackPortfolioItems: PortfolioItem[] = [
 export function Portfolio() {
   const [selectedItem, setSelectedItem] = useState<string | number | null>(null)
   const [urlErrors, setUrlErrors] = useState<Record<string | number, number>>({}) // Track failed URL attempts
-  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(fallbackPortfolioItems)
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([])
   const [loading, setLoading] = useState(true)
   const [hoveredItem, setHoveredItem] = useState<string | number | null>(null)
 
@@ -131,18 +131,14 @@ export function Portfolio() {
         if (response.ok) {
           const result = await response.json()
           if (result.success && result.data.length > 0) {
-            // Combine Airtable data with fallback data, prioritizing Airtable data
-            const combinedItems = [...result.data, ...fallbackPortfolioItems]
-            // Remove duplicates by checking title and siteName (better than ID since IDs are different types)
-            const uniqueItems = combinedItems.filter((item, index, arr) => 
-              arr.findIndex(i => i.title === item.title && i.siteName === item.siteName) === index
-            )
-            setPortfolioItems(uniqueItems)
+            // Use only Airtable data, no fallback samples
+            setPortfolioItems(result.data)
           }
         }
       } catch (error) {
         console.error('Failed to fetch portfolio items:', error)
-        // Keep fallback data
+        // Set empty array if fetch fails
+        setPortfolioItems([])
       } finally {
         setLoading(false)
       }
