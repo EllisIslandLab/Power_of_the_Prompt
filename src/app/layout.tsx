@@ -37,7 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* ANIMATED BACKGROUND - Easy to remove by deleting these 3 lines */}
-        <AnimatedBackground particleCount={40} opacity={0.12} speed={0.8} />
+        <AnimatedBackground particleCount={30} enabled={true} />
         
         <Providers>
           <Navigation />
