@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navigation } from "@/components/sections/navigation";
 import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
+// Environment variables updated - triggering redeploy
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
