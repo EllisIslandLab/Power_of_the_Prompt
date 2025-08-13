@@ -6,6 +6,166 @@ import { ServiceCard } from "@/components/services/ServiceCard"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
+// Fallback services data for when Airtable is unavailable
+const fallbackServices: Service[] = [
+  {
+    id: "fallback-consultation",
+    service_name: "Free Consultation",
+    service_type: "consultation",
+    price: 0,
+    description: "30-minute strategy session to assess your website needs and provide custom recommendations",
+    duration_estimate: "30 minutes",
+    is_active: true,
+    stripe_price_id: "",
+    stripe_product_id: "",
+    features: [
+      "Website needs assessment",
+      "Technology recommendations", 
+      "Custom roadmap",
+      "Course curriculum overview",
+      "No obligation",
+      "FREE"
+    ],
+    category: "Free Consultation",
+    order: 1,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "fallback-foundation-course",
+    service_name: "Website Builders Manual",
+    service_type: "course",
+    price: 999,
+    sale_price: 799,
+    discount_amount: 200,
+    description: "Complete roadmap for building your own website with all course materials, recordings, and templates included",
+    duration_estimate: "4 weeks",
+    is_active: true,
+    stripe_price_id: "",
+    stripe_product_id: "",
+    features: [
+      "Course curriculum overview",
+      "Complete textbook",
+      "50% discount 1-on1 sessions",
+      "Community access",
+      "Templates included",
+      "Two 1-on-1 sessions included (1 hour)",
+      "Price conversion to Team Walkthrough",
+      "Recordings included",
+      "Own your own code"
+    ],
+    category: "Courses",
+    order: 1,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "fallback-team-walkthrough",
+    service_name: "Website Team Walkthrough",
+    service_type: "course", 
+    price: 2299,
+    sale_price: 2099,
+    discount_amount: 200,
+    description: "Guaranteed fully functional website with personal coaching every step of the way",
+    duration_estimate: "4 weeks",
+    is_active: true,
+    stripe_price_id: "",
+    stripe_product_id: "",
+    features: [
+      "Everything in Builders Manual",
+      "Nine 1-on1 sessions included (1 hour)",
+      "60-day post-course support",
+      "Priority 1-on-1 scheduling",
+      "Extra monitor, premium AI and color palette tools covered ($50 value)",
+      "Difficulty: Moderate",
+      "Working website guarantee OR 100% money back"
+    ],
+    category: "Courses",
+    order: 2,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "fallback-portfolio-site",
+    service_name: "Portfolio Site",
+    service_type: "build",
+    price: 499,
+    description: "Your foundational site built for you. Custom design with cutting-edge technology",
+    duration_estimate: "1 week",
+    is_active: true,
+    stripe_price_id: "",
+    stripe_product_id: "",
+    features: [
+      "Time saver",
+      "Own your own code",
+      "Custom design",
+      "Coding best practices",
+      "Built on reliable services",
+      "SEO best practices",
+      "Cutting edge technology"
+    ],
+    category: "Build For Me",
+    subcategory: "Simple Portfolio",
+    order: 1,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "fallback-hipaa-site",
+    service_name: "HIPAA Compliant Site",
+    service_type: "build",
+    price: 899,
+    description: "HIPAA compliant site for healthcare providers with secure forms and welcoming design",
+    duration_estimate: "1 week",
+    is_active: true,
+    stripe_price_id: "",
+    stripe_product_id: "",
+    features: [
+      "Time saver",
+      "Own your own code", 
+      "Custom design",
+      "Coding best practices",
+      "Built on reliable services",
+      "SEO best practices",
+      "Cutting edge technology",
+      "HIPAA Compliant",
+      "Data collection forms"
+    ],
+    category: "Build For Me",
+    subcategory: "Enterprise Solution", 
+    order: 2,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "fallback-ecommerce-store",
+    service_name: "E-commerce Store",
+    service_type: "build",
+    price: 1499,
+    description: "Complete online store that you actually OWN - no monthly fees to website hosts!",
+    duration_estimate: "2 weeks",
+    is_active: true,
+    stripe_price_id: "",
+    stripe_product_id: "",
+    features: [
+      "Time saver",
+      "Own your own code",
+      "Custom design", 
+      "Coding best practices",
+      "Built on reliable services",
+      "SEO best practices",
+      "Cutting edge technology",
+      "Shopping cart functionality",
+      "Payment processing"
+    ],
+    category: "Build For Me",
+    subcategory: "E-commerce Store",
+    order: 3,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+]
+
 interface ServicesDisplayProps {
   serviceType?: 'course' | 'build' | 'audit' | 'consultation'
   category?: string
@@ -19,7 +179,7 @@ export function ServicesDisplay({
   maxItems, 
   showFilters = false 
 }: ServicesDisplayProps) {
-  const [services, setServices] = useState<Service[]>([])
+  const [services, setServices] = useState<Service[]>(fallbackServices)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [selectedType, setSelectedType] = useState<string>(serviceType || 'all')
@@ -43,7 +203,7 @@ export function ServicesDisplay({
       const response = await fetch(`/api/services?${params}`)
       const data: ServicesResponse = await response.json()
 
-      if (data.success) {
+      if (data.success && data.data.length > 0) {
         let filteredServices = data.data
 
         // Filter by category if specified
@@ -60,10 +220,13 @@ export function ServicesDisplay({
 
         setServices(filteredServices)
       } else {
-        setError(data.error || 'Failed to load services')
+        // Fallback to hardcoded services if Airtable fails or returns no data
+        console.log('Using fallback services data')
+        setServices(fallbackServices)
       }
     } catch (error) {
-      setError('Network error loading services')
+      console.log('Airtable fetch failed, using fallback services data')
+      setServices(fallbackServices)
     } finally {
       setLoading(false)
     }
