@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import '../styles/animated-background.css'
+import './animated-background.css'
 
 export function AnimatedBackground({ 
   particleCount = 25, 
