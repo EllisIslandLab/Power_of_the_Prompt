@@ -155,11 +155,11 @@ export function ServicePayment({ serviceId, onSuccess, onError }: ServicePayment
                 {getServiceIcon(service.service_type)}
                 <div>
                   <CardTitle className="text-2xl">{service.service_name}</CardTitle>
-                  <CardDescription className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
                     <Badge variant="secondary">{service.service_type}</Badge>
                     <Clock className="h-4 w-4" />
                     {service.duration_estimate}
-                  </CardDescription>
+                  </div>
                 </div>
               </div>
               <div className="text-right">
