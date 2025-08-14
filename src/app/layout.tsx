@@ -5,6 +5,8 @@ import { Navigation } from "@/components/sections/navigation";
 import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
 import { AnimatedBackground } from "@/components/effects/AnimatedBackground";
+import { DarkModeProvider } from "@/contexts/DarkModeContext";
+import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
 // Environment variables updated - triggering redeploy
 
 const geistSans = Geist({
@@ -36,14 +38,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* ANIMATED BACKGROUND - Easy to remove by deleting these 3 lines */}
-        <AnimatedBackground particleCount={30} enabled={true} />
-        
-        <Providers>
-          <Navigation />
-          {children}
-          <Analytics />
-        </Providers>
+        <DarkModeProvider>
+          {/* ANIMATED BACKGROUND - Only shows in dark mode now */}
+          <AnimatedBackground />
+          
+          <Providers>
+            <Navigation />
+            {children}
+            <Analytics />
+          </Providers>
+          
+          {/* Dark mode toggle in bottom right */}
+          <DarkModeToggle />
+        </DarkModeProvider>
       </body>
     </html>
   );

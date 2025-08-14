@@ -98,22 +98,26 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Dark mode disabled for consistent light theme across all devices
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #030815;
-    --foreground: #ededed;
-    --card: #0a1840;
-    --card-foreground: #ededed;
-    --secondary: #00213f;
-    --muted: #0a1840;
-    --border: #1b42ad;
-    --input: #0a1840;
-    --primary: #3663e0;
-    --accent: #ffcb05;
-  }
+/* Dark mode - manually controlled with .dark class */
+.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --primary: #3b82f6;
+  --primary-foreground: #f1f5f9;
+  --secondary: #1e293b;
+  --secondary-foreground: #f1f5f9;
+  --accent: #fbbf24;
+  --accent-foreground: #0f172a;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --border: #334155;
+  --input: #1e293b;
+  --ring: #3b82f6;
+  --card: #1e293b;
+  --card-foreground: #f1f5f9;
+  --destructive: #ef4444;
+  --destructive-foreground: #f1f5f9;
 }
-*/
 
 body {
   background: var(--background);
