@@ -71,14 +71,25 @@ export function useAuth() {
   const getUserWithProfile = async (user: User): Promise<AuthUser> => {
     console.log("Getting profile for user:", user.id)
     const supabase = getSupabase()
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single()
+    
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
 
-    console.log("Profile query result:", { profile, error })
-    return { ...user, profile: profile || undefined }
+      console.log("Profile query result:", { profile, error })
+      
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+        console.error("Profile query error:", error)
+      }
+      
+      return { ...user, profile: profile || undefined }
+    } catch (err) {
+      console.error("Profile lookup failed:", err)
+      return { ...user, profile: undefined }
+    }
   }
 
   const signUp = async (email: string, password: string, name: string) => {
