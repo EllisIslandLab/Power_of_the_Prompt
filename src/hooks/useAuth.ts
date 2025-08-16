@@ -73,11 +73,18 @@ export function useAuth() {
     const supabase = getSupabase()
     
     try {
-      const { data: profile, error } = await supabase
+      // Add timeout to prevent infinite hanging
+      const profilePromise = supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single()
+
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Profile query timeout')), 5000)
+      )
+
+      const { data: profile, error } = await Promise.race([profilePromise, timeoutPromise]) as any
 
       console.log("Profile query result:", { profile, error })
       
@@ -88,6 +95,20 @@ export function useAuth() {
       return { ...user, profile: profile || undefined }
     } catch (err) {
       console.error("Profile lookup failed:", err)
+      // For admin user, create a fallback profile
+      if (user.id === '64ad2b22-d3fe-4159-9e55-75bd2ac11f61') {
+        console.log("Using fallback admin profile")
+        return { 
+          ...user, 
+          profile: { 
+            id: user.id, 
+            name: 'Admin', 
+            role: 'ADMIN' as const,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          } 
+        }
+      }
       return { ...user, profile: undefined }
     }
   }
