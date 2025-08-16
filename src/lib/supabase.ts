@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Lazy Supabase client initialization to avoid build-time errors
+// Singleton Supabase client to avoid multiple instances
+let supabaseClient: ReturnType<typeof createClient> | null = null
+
 export function getSupabase() {
+  if (supabaseClient) {
+    return supabaseClient
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   
@@ -9,7 +15,8 @@ export function getSupabase() {
     throw new Error('Supabase environment variables not configured')
   }
   
-  return createClient(supabaseUrl, supabaseAnonKey)
+  supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+  return supabaseClient
 }
 
 // Database types (we'll expand this as needed)

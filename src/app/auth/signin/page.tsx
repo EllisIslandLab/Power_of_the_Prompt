@@ -21,12 +21,9 @@ export default function SignInPage() {
     setError("")
 
     try {
-      console.log("Attempting to sign in...")
-      const result = await signIn(email, password)
-      console.log("Sign in successful:", result)
+      await signIn(email, password)
       router.push("/portal")
     } catch (error) {
-      console.error("Sign in error:", error)
       setError((error as Error)?.message || "Invalid email or password")
     } finally {
       setIsLoading(false)
