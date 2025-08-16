@@ -7,7 +7,7 @@ export function UniqueApproach() {
   const comparisons = [
     {
       feature: "Monthly Fees",
-      platforms: "Typically $29-299/month*",
+      platforms: "$18-40/month (Squarespace), $16-59/month (Wix)*",
       agencies: "Often $500-2000/month*",
       us: "$0 after training",
       highlight: true
@@ -20,10 +20,10 @@ export function UniqueApproach() {
       highlight: true
     },
     {
-      feature: "Technology Stack",
-      platforms: "Platform-specific tools",
-      agencies: "Varies by provider",
-      us: "Modern React/Next.js stack",
+      feature: "Technology Stack", 
+      platforms: "Proprietary platforms (limited flexibility)",
+      agencies: "Often WordPress or legacy systems",
+      us: "Fortune 500 modern stack (React/Next.js)",
       highlight: true
     },
     {
@@ -87,11 +87,11 @@ export function UniqueApproach() {
             <div className="p-4 text-sm font-medium text-muted-foreground"></div>
             <div className="p-4 text-center">
               <div className="text-lg font-semibold text-foreground">DIY Platform Builders</div>
-              <div className="text-sm text-muted-foreground">Template-based solutions</div>
+              <div className="text-sm text-muted-foreground">Squarespace, Wix, and similar</div>
             </div>
             <div className="p-4 text-center">
               <div className="text-lg font-semibold text-foreground">Traditional Agencies</div>
-              <div className="text-sm text-muted-foreground">Custom development services</div>
+              <div className="text-sm text-muted-foreground">WordPress developers and similar</div>
             </div>
             <div className="p-4 text-center border-l-2 border-primary/20 bg-primary/5">
               <div className="text-lg font-semibold text-primary">Our Method</div>
@@ -180,17 +180,17 @@ export function UniqueApproach() {
           
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="text-lg font-semibold text-foreground mb-2">DIY Platform Builders</div>
-              <div className="text-3xl font-bold text-orange-600 mb-2">$8,760+*</div>
-              <div className="text-sm text-muted-foreground">Typical monthly fees over 5 years</div>
-              <div className="text-xs text-muted-foreground mt-2">*Based on mid-tier plans</div>
+              <div className="text-lg font-semibold text-foreground mb-2">Squarespace/Wix</div>
+              <div className="text-3xl font-bold text-orange-600 mb-2">$1,080-$3,540</div>
+              <div className="text-sm text-muted-foreground">Per year in subscription fees alone</div>
+              <div className="text-xs text-muted-foreground mt-2">*Plus transaction fees and limitations</div>
             </div>
             
             <div className="text-center">
-              <div className="text-lg font-semibold text-foreground mb-2">Traditional Agencies</div>
-              <div className="text-3xl font-bold text-orange-600 mb-2">$15,000+*</div>
-              <div className="text-sm text-muted-foreground">Typical build + maintenance costs</div>
-              <div className="text-xs text-muted-foreground mt-2">*Varies significantly by scope</div>
+              <div className="text-lg font-semibold text-foreground mb-2">WordPress Agencies</div>
+              <div className="text-3xl font-bold text-orange-600 mb-2">$5,000-$15,000+</div>
+              <div className="text-sm text-muted-foreground">Initial build + ongoing maintenance</div>
+              <div className="text-xs text-muted-foreground mt-2">*Plus hosting and update dependencies</div>
             </div>
             
             <div className="text-center border-2 border-primary rounded-xl p-4 bg-primary/5">
@@ -212,7 +212,7 @@ export function UniqueApproach() {
           </Button>
           
           <div className="mt-8 text-xs text-muted-foreground max-w-2xl mx-auto">
-            <p>*Comparisons based on typical offerings as of 2024. Individual results may vary. Performance metrics depend on content, configuration, and hosting. Always consult current provider pricing and terms.</p>
+            <p>*Pricing based on published rates as of August 2024: Squarespace ($18-40/month), Wix ($16-59/month). Individual results may vary based on plan selection, add-ons, and usage. Performance metrics depend on site content, configuration, and hosting environment. WordPress agency costs vary significantly by project scope and location. Always verify current pricing and terms with providers.</p>
           </div>
         </div>
       </div>
