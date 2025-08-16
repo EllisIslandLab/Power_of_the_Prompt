@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react"
 
 export function SiteSamples() {
   const [activeCategory, setActiveCategory] = useState("All")
-  const [selectedSample, setSelectedSample] = useState(null)
+  const [selectedSample, setSelectedSample] = useState<any>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const samples = [
