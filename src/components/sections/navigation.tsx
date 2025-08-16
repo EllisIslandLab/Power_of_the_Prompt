@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { usePathname } from "next/navigation"
-import { MessageCircle, BookOpen, Video, FileText, HelpCircle, Settings, Crown } from "lucide-react"
+import { MessageCircle, BookOpen, Video, FileText, HelpCircle, Settings, Crown, Monitor } from "lucide-react"
 
 export function Navigation() {
   const { data: session } = useSession()
@@ -69,7 +69,7 @@ export function Navigation() {
                   Build With You
                 </Link>
                 <Link href="/#build-4-you" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
-                  <span>🪄</span>
+                  <Monitor className="h-4 w-4" />
                   Build 4 You
                 </Link>
                 <Link href="/#site-tlc" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
