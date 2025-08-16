@@ -247,7 +247,7 @@ export function SiteSamples() {
                   <div>
                     <h4 className="font-semibold text-foreground mb-3">Key Features</h4>
                     <ul className="space-y-2">
-                      {selectedSample.features.map((feature, index) => (
+                      {selectedSample.features.map((feature: string, index: number) => (
                         <li key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
                           <span className="text-green-500">✓</span>
                           {feature}
