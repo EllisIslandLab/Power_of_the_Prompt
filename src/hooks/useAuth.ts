@@ -94,12 +94,16 @@ export function useAuth() {
   }
 
   const signIn = async (email: string, password: string) => {
+    console.log("useAuth signIn called with email:", email)
     const supabase = getSupabase()
+    console.log("Supabase client created")
+    
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
+    console.log("Supabase signIn response:", { data, error })
     if (error) throw error
     return data
   }
