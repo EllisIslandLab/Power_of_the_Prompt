@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
 
 export function SiteSamples() {
+  // Force deployment refresh
   const [activeCategory, setActiveCategory] = useState("All")
   const [selectedSample, setSelectedSample] = useState<any>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
