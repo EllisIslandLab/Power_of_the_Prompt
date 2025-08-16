@@ -20,14 +20,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Web Launch Academy - Build Websites You Own",
+  title: "Own Your Code, Take Back Control - Web Launch Academy",
   description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Build your digital presence with Web Launch Academy.",
   metadataBase: new URL('https://weblaunchacademy.com'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: "Web Launch Academy - Build Websites You Own",
+    title: "Own Your Code, Take Back Control - Web Launch Academy",
     description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Build your digital presence with Web Launch Academy.",
     url: 'https://weblaunchacademy.com',
     siteName: 'Web Launch Academy',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Web Launch Academy - Build Websites You Own",
+    title: "Own Your Code, Take Back Control - Web Launch Academy",
     description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Build your digital presence with Web Launch Academy.",
   },
 };
