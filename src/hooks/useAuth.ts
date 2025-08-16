@@ -97,7 +97,7 @@ export function useAuth() {
       console.error("Profile lookup failed:", err)
       // For admin user, create a fallback profile
       if (user.id === '64ad2b22-d3fe-4159-9e55-75bd2ac11f61') {
-        console.log("Using fallback admin profile")
+        console.log("Using fallback admin profile due to timeout")
         return { 
           ...user, 
           profile: { 
@@ -109,7 +109,18 @@ export function useAuth() {
           } 
         }
       }
-      return { ...user, profile: undefined }
+      // For any other user, also create a basic profile to prevent hanging
+      console.log("Using fallback student profile due to timeout")
+      return { 
+        ...user, 
+        profile: { 
+          id: user.id, 
+          name: user.email?.split('@')[0] || 'User', 
+          role: 'STUDENT' as const,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        } 
+      }
     }
   }
 
