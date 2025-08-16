@@ -8,6 +8,24 @@ export function Footer() {
   return (
     <footer className="bg-muted/30 border-t">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+        
+        {/* Final CTA Section */}
+        <div className="text-center mb-16 py-12 bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl border border-border">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+            Ready to Own Your <span className="text-primary">Website?</span>
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            Stop paying monthly fees for limited control. Build a professional website with modern web technologies that you actually own.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8 py-6 h-auto">
+              <Link href="/#build-with-you">Start Learning & Building</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
+              <Link href="/audit">Get Free Website Audit</Link>
+            </Button>
+          </div>
+        </div>
 
         {/* Footer Content */}
         <div className="grid md:grid-cols-3 gap-8 mb-8">
@@ -40,23 +58,23 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
             <div className="space-y-2">
-              <Link href="/#top" className="block text-muted-foreground hover:text-primary transition-colors">
-                Why Choose Us
+              <Link href="/#unique-approach" className="block text-muted-foreground hover:text-primary transition-colors">
+                Unique Approach
               </Link>
-              <Link href="/#portfolio" className="block text-muted-foreground hover:text-primary transition-colors">
-                Portfolio
+              <Link href="/#site-samples" className="block text-muted-foreground hover:text-primary transition-colors">
+                Site Samples
               </Link>
-              <Link href="/#consultation" className="block text-muted-foreground hover:text-primary transition-colors">
-                Free Consultation
+              <Link href="/#build-with-you" className="block text-muted-foreground hover:text-primary transition-colors">
+                Learn to Build
               </Link>
-              <Link href="/#courses" className="block text-muted-foreground hover:text-primary transition-colors">
-                Courses
+              <Link href="/#build-4-you" className="block text-muted-foreground hover:text-primary transition-colors">
+                We Build for You
               </Link>
-              <Link href="/#built-for-you" className="block text-muted-foreground hover:text-primary transition-colors">
-                Built for You
+              <Link href="/#site-tlc" className="block text-muted-foreground hover:text-primary transition-colors">
+                Site Maintenance
               </Link>
-              <Link href="/#general-services" className="block text-muted-foreground hover:text-primary transition-colors">
-                General Services
+              <Link href="/#test-audit" className="block text-muted-foreground hover:text-primary transition-colors">
+                Free Website Audit
               </Link>
             </div>
           </div>
@@ -65,7 +83,7 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-lg mb-4">Web Launch Academy</h4>
             <p className="text-muted-foreground mb-4">
-              Innovative AI-assisted web development training and professional website services.
+              Learn to build professional websites with Fortune 500 technology. Complete ownership, no monthly fees, modern tech stack.
             </p>
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">
@@ -73,8 +91,12 @@ export function Footer() {
                 Monday - Friday: 9am - 6pm EST
               </p>
               <p className="text-sm text-muted-foreground">
-                Response time: Within 4 hours
+                Free consultation response: Within 4 hours
               </p>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-green-500">✓</span>
+                <span className="text-muted-foreground">Triple Guarantee Protection</span>
+              </div>
             </div>
           </div>
         </div>
@@ -104,6 +126,9 @@ export function Footer() {
               </Link>
               <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
                 Terms of Service
+              </Link>
+              <Link href="/guarantee" className="text-muted-foreground hover:text-primary transition-colors">
+                Guarantee Details
               </Link>
             </div>
           </div>

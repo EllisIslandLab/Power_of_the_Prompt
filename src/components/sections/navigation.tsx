@@ -56,23 +56,29 @@ export function Navigation() {
             ) : (
               // Public Marketing Navigation
               <>
-                <Link href="/#top" className="text-foreground hover:text-primary transition-colors">
-                  Why Choose Us
+                <Link href="/#unique-approach" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  <span>🥇</span>
+                  Unique Approach
                 </Link>
-                <Link href="/#portfolio" className="text-foreground hover:text-primary transition-colors">
-                  Portfolio
+                <Link href="/#site-samples" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  <span>🌐</span>
+                  Site Samples
                 </Link>
-                <Link href="/#consultation" className="text-foreground hover:text-primary transition-colors">
-                  Free Consultation
+                <Link href="/#build-with-you" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  <span>🎓</span>
+                  Build With You
                 </Link>
-                <Link href="/#courses" className="text-foreground hover:text-primary transition-colors">
-                  Courses
+                <Link href="/#build-4-you" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  <span>🪄</span>
+                  Build 4 You
                 </Link>
-                <Link href="/#built-for-you" className="text-foreground hover:text-primary transition-colors">
-                  Built for You
+                <Link href="/#site-tlc" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  <span>⚒️</span>
+                  Site TLC
                 </Link>
-                <Link href="/#general-services" className="text-foreground hover:text-primary transition-colors">
-                  General Services
+                <Link href="/#test-audit" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  <span>📃</span>
+                  Test & Audit
                 </Link>
               </>
             )}
@@ -102,14 +108,9 @@ export function Navigation() {
                 </div>
               </>
             ) : (
-              <>
-                <Button variant="outline" onClick={() => signIn()}>
-                  Sign In
-                </Button>
-                <Button asChild>
-                  <Link href="/#consultation">Get Started</Link>
-                </Button>
-              </>
+              <Button onClick={() => signIn()} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                Login/Sign Up
+              </Button>
             )}
           </div>
         </div>

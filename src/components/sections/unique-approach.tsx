@@ -1,0 +1,221 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Check, X } from "lucide-react"
+
+export function UniqueApproach() {
+  const comparisons = [
+    {
+      feature: "Monthly Fees",
+      platforms: "Typically $29-299/month*",
+      agencies: "Often $500-2000/month*",
+      us: "$0 after training",
+      highlight: true
+    },
+    {
+      feature: "Code Ownership",
+      platforms: "Platform-hosted solution",
+      agencies: "Agency-managed solution",
+      us: "Complete source code access",
+      highlight: true
+    },
+    {
+      feature: "Technology Stack",
+      platforms: "Platform-specific tools",
+      agencies: "Varies by provider",
+      us: "Modern React/Next.js stack",
+      highlight: true
+    },
+    {
+      feature: "Performance Focus",
+      platforms: "Variable performance*",
+      agencies: "Depends on implementation*",
+      us: "Optimized for speed",
+      highlight: false
+    },
+    {
+      feature: "Customization",
+      platforms: "Limited templates",
+      agencies: "Custom but locked-in",
+      us: "Unlimited flexibility",
+      highlight: false
+    },
+    {
+      feature: "Learning",
+      platforms: "No education provided",
+      agencies: "No knowledge transfer",
+      us: "Full training included",
+      highlight: false
+    },
+    {
+      feature: "Support",
+      platforms: "Basic ticket system",
+      agencies: "Ongoing dependency",
+      us: "Learn to be independent",
+      highlight: false
+    },
+    {
+      feature: "Portability",
+      platforms: "Platform-dependent",
+      agencies: "May require recreation",
+      us: "Fully portable codebase",
+      highlight: false
+    }
+  ]
+
+  const performanceMetrics = [
+    { label: "Page Load Speed", platform: "Variable*", agency: "Variable*", us: "Optimized", color: "bg-green-500" },
+    { label: "SEO Foundation", platform: "Basic*", agency: "Variable*", us: "Built-in", color: "bg-blue-500" },
+    { label: "Mobile Performance", platform: "Template-based*", agency: "Custom*", us: "Responsive design", color: "bg-purple-500" }
+  ]
+
+  return (
+    <section className="py-24 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            Why Our Method Is <span className="text-primary">Different</span>
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Compare our approach with traditional website building methods. See the difference in ownership, technology, and long-term value.
+          </p>
+        </div>
+        
+        {/* Comparison Table */}
+        <div className="bg-background border border-border rounded-2xl overflow-hidden mb-16">
+          <div className="grid grid-cols-4 bg-muted/50">
+            <div className="p-4 text-sm font-medium text-muted-foreground"></div>
+            <div className="p-4 text-center">
+              <div className="text-lg font-semibold text-foreground">DIY Platform Builders</div>
+              <div className="text-sm text-muted-foreground">Template-based solutions</div>
+            </div>
+            <div className="p-4 text-center">
+              <div className="text-lg font-semibold text-foreground">Traditional Agencies</div>
+              <div className="text-sm text-muted-foreground">Custom development services</div>
+            </div>
+            <div className="p-4 text-center border-l-2 border-primary/20 bg-primary/5">
+              <div className="text-lg font-semibold text-primary">Our Method</div>
+              <div className="text-sm text-primary/80">Web Launch Academy</div>
+            </div>
+          </div>
+          
+          {comparisons.map((comparison, index) => (
+            <div key={index} className={`grid grid-cols-4 border-t border-border ${comparison.highlight ? 'bg-primary/5' : ''}`}>
+              <div className="p-4 font-medium text-foreground border-r border-border">
+                {comparison.feature}
+              </div>
+              <div className="p-4 text-center text-muted-foreground">
+                {comparison.feature === "Monthly Fees" || comparison.feature === "Code Ownership" || comparison.feature === "Technology Stack" ? (
+                  <div className="flex items-center justify-center gap-2 text-orange-600">
+                    <span>{comparison.platforms}</span>
+                  </div>
+                ) : (
+                  comparison.platforms
+                )}
+              </div>
+              <div className="p-4 text-center text-muted-foreground">
+                {comparison.feature === "Monthly Fees" || comparison.feature === "Code Ownership" || comparison.feature === "Technology Stack" ? (
+                  <div className="flex items-center justify-center gap-2 text-orange-600">
+                    <span>{comparison.agencies}</span>
+                  </div>
+                ) : (
+                  comparison.agencies
+                )}
+              </div>
+              <div className="p-4 text-center border-l-2 border-primary/20 bg-primary/5">
+                <div className="flex items-center justify-center gap-2 text-green-600">
+                  <Check className="h-4 w-4" />
+                  <span className="font-medium">{comparison.us}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Performance Comparison */}
+        <div className="mb-16">
+          <h3 className="text-2xl font-bold text-foreground text-center mb-8">
+            Performance Comparison
+          </h3>
+          <div className="grid md:grid-cols-3 gap-6">
+            {performanceMetrics.map((metric, index) => (
+              <div key={index} className="bg-background border border-border rounded-xl p-6">
+                <h4 className="font-semibold text-foreground mb-4">{metric.label}</h4>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Platform Builders</span>
+                    <span className="text-sm font-medium text-red-600">{metric.platform}</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-red-500 h-2 rounded-full" style={{width: '30%'}}></div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Agencies</span>
+                    <span className="text-sm font-medium text-orange-600">{metric.agency}</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className="bg-orange-500 h-2 rounded-full" style={{width: '60%'}}></div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground font-medium">Our Method</span>
+                    <span className="text-sm font-bold text-green-600">{metric.us}</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div className={`${metric.color} h-2 rounded-full`} style={{width: '95%'}}></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Cost Over Time Comparison */}
+        <div className="bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl border border-border p-8 mb-8">
+          <h3 className="text-2xl font-bold text-foreground text-center mb-8">
+            5-Year Cost Comparison
+          </h3>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="text-lg font-semibold text-foreground mb-2">DIY Platform Builders</div>
+              <div className="text-3xl font-bold text-orange-600 mb-2">$8,760+*</div>
+              <div className="text-sm text-muted-foreground">Typical monthly fees over 5 years</div>
+              <div className="text-xs text-muted-foreground mt-2">*Based on mid-tier plans</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="text-lg font-semibold text-foreground mb-2">Traditional Agencies</div>
+              <div className="text-3xl font-bold text-orange-600 mb-2">$15,000+*</div>
+              <div className="text-sm text-muted-foreground">Typical build + maintenance costs</div>
+              <div className="text-xs text-muted-foreground mt-2">*Varies significantly by scope</div>
+            </div>
+            
+            <div className="text-center border-2 border-primary rounded-xl p-4 bg-primary/5">
+              <div className="text-lg font-semibold text-primary mb-2">Our Method</div>
+              <div className="text-3xl font-bold text-green-600 mb-2">$497</div>
+              <div className="text-sm text-muted-foreground">One-time training cost</div>
+              <div className="text-xs text-green-600 mt-2">+ Complete ownership</div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-center">
+          <Button 
+            size="lg" 
+            onClick={() => document.getElementById('test-audit')?.scrollIntoView({ behavior: 'smooth' })}
+            className="bg-accent hover:bg-accent/90 text-accent-foreground"
+          >
+            See The Difference in Your Site
+          </Button>
+          
+          <div className="mt-8 text-xs text-muted-foreground max-w-2xl mx-auto">
+            <p>*Comparisons based on typical offerings as of 2024. Individual results may vary. Performance metrics depend on content, configuration, and hosting. Always consult current provider pricing and terms.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
