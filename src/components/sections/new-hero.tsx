@@ -13,8 +13,8 @@ export function NewHero() {
       <div className="text-center max-w-4xl mx-auto space-y-8">
         {/* Main Headline */}
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-          Build Professional Websites That{" "}
-          <span className="text-primary">You Actually Own</span>
+          Own Your Code,{" "}
+          <span className="text-primary">Take Back Control</span>
         </h1>
         
         {/* Subheading */}
