@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Shield, Clock, Award } from "lucide-react"
-import { TripleGuarantee } from "@/components/triple-guarantee"
 
 export function BuildWithYou() {
   const features = [
@@ -207,10 +206,6 @@ export function BuildWithYou() {
           </div>
         </div>
         
-        {/* Triple Guarantee */}
-        <div className="mt-16">
-          <TripleGuarantee />
-        </div>
         
         {/* Detailed Curriculum Expansion */}
         <div className="mt-16 bg-background border border-border rounded-2xl p-8">

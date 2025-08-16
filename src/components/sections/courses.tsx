@@ -12,6 +12,7 @@ const courseFeatures = [
   "Website templates included",
   "SEO optimization guide",
   "Deployment assistance",
+  "Triple Guarantee included",
   "30-day email support"
 ]
 
