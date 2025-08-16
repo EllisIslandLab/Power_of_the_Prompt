@@ -20,11 +20,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Web Launch Academy - Learn & Build Websites You Actually Own",
+  title: "Web Launch Academy - Build Websites You Own",
   description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Build your digital presence with Web Launch Academy.",
   metadataBase: new URL('https://weblaunchacademy.com'),
   alternates: {
     canonical: '/',
+  },
+  openGraph: {
+    title: "Web Launch Academy - Build Websites You Own",
+    description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Build your digital presence with Web Launch Academy.",
+    url: 'https://weblaunchacademy.com',
+    siteName: 'Web Launch Academy',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Web Launch Academy - Build Websites You Own",
+    description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Build your digital presence with Web Launch Academy.",
   },
 };
 
@@ -35,6 +47,36 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "EducationalOrganization",
+              "name": "Web Launch Academy",
+              "description": "Learn to create professional websites with AI assistance - no monthly fees, complete ownership.",
+              "url": "https://weblaunchacademy.com",
+              "telephone": "+1-555-123-4567",
+              "email": "hello@poweroftheprompt.com",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "123 Business St, Suite 100",
+                "addressLocality": "Austin",
+                "addressRegion": "TX",
+                "postalCode": "78701",
+                "addressCountry": "US"
+              },
+              "sameAs": [],
+              "offers": {
+                "@type": "EducationalOccupationalProgram",
+                "name": "Web Development Training",
+                "description": "4-week comprehensive web development course"
+              }
+            })
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

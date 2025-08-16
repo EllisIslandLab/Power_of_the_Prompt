@@ -36,7 +36,7 @@ export function Footer() {
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-primary flex-shrink-0" />
                 <a href="mailto:hello@poweroftheprompt.com" className="text-muted-foreground hover:text-primary transition-colors">
-                  hello@poweroftheprompt.com
+                  Send us an email
                 </a>
               </div>
               <div className="flex items-center gap-3">
@@ -48,6 +48,8 @@ export function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
                 <span className="text-muted-foreground">
+                  123 Business St, Suite 100<br />
+                  Austin, TX 78701<br />
                   Available nationwide via video call
                 </span>
               </div>
