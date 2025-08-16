@@ -69,13 +69,15 @@ export function useAuth() {
   }, [])
 
   const getUserWithProfile = async (user: User): Promise<AuthUser> => {
+    console.log("Getting profile for user:", user.id)
     const supabase = getSupabase()
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single()
 
+    console.log("Profile query result:", { profile, error })
     return { ...user, profile: profile || undefined }
   }
 
@@ -94,12 +96,14 @@ export function useAuth() {
   }
 
   const signIn = async (email: string, password: string) => {
+    console.log("Calling Supabase signInWithPassword...")
     const supabase = getSupabase()
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
+    console.log("Supabase auth response:", { data, error })
     if (error) throw error
     return data
   }
