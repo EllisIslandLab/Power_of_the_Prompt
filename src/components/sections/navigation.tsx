@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { useSession, signIn, signOut } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { usePathname } from "next/navigation"
 import { MessageCircle, BookOpen, Video, FileText, HelpCircle, Settings, Crown, Monitor } from "lucide-react"
 
@@ -108,8 +108,8 @@ export function Navigation() {
                 </div>
               </>
             ) : (
-              <Button onClick={() => signIn()} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                Login/Sign Up
+              <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Link href="/auth/signin">Login/Sign Up</Link>
               </Button>
             )}
           </div>
