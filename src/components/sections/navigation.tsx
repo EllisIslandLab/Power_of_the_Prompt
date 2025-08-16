@@ -2,28 +2,28 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { useSession, signOut } from "next-auth/react"
+import { useAuth } from "@/hooks/useAuth"
 import { usePathname } from "next/navigation"
 import { MessageCircle, BookOpen, Video, FileText, HelpCircle, Settings, Crown, Monitor } from "lucide-react"
 
 export function Navigation() {
-  const { data: session } = useSession()
+  const { user, signOut } = useAuth()
   const pathname = usePathname()
   const isInPortal = pathname?.startsWith('/portal')
-  const isAdmin = session?.user?.role === 'ADMIN'
+  const isAdmin = user?.profile?.role === 'ADMIN'
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link href={session && isInPortal ? "/portal" : "/"} className="text-2xl font-bold text-primary">
+            <Link href={user && isInPortal ? "/portal" : "/"} className="text-2xl font-bold text-primary">
               {isInPortal ? "Web Launch Academy Portal" : "Web Launch Academy"}
             </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-6">
-            {session && isInPortal ? (
+            {user && isInPortal ? (
               // Student Portal Navigation
               <>
                 <Link href="/portal/textbook" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
@@ -85,7 +85,7 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {session ? (
+            {user ? (
               <>
                 {!isInPortal && (
                   <Link href="/portal" className="text-foreground hover:text-primary transition-colors">
@@ -100,7 +100,7 @@ export function Navigation() {
                 )}
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    {session.user?.name || session.user?.email}
+                    {user.profile?.name || user.email}
                   </span>
                   <Button variant="outline" onClick={() => signOut()}>
                     Sign Out
