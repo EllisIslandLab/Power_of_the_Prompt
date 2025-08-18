@@ -3,14 +3,15 @@ import puppeteer from 'puppeteer'
 import { Resend } from 'resend'
 import { createClient } from '@supabase/supabase-js'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function POST(request: NextRequest) {
   try {
+    // Initialize clients inside the function to avoid build-time issues
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    
     const { url, email, name, sessionId } = await request.json()
     
     if (!url || !email || !sessionId) {
@@ -21,13 +22,13 @@ export async function POST(request: NextRequest) {
     const analysisResults = await performDeepAnalysis(url)
     
     // Store results in Supabase
-    await storeAnalysisResults(sessionId, url, analysisResults)
+    await storeAnalysisResults(supabase, sessionId, url, analysisResults)
     
     // Generate PDF report
     const pdfBuffer = await generatePDFReport(url, analysisResults, name)
     
     // Send email with PDF
-    await sendEmailWithPDF(email, name, url, Buffer.from(pdfBuffer))
+    await sendEmailWithPDF(resend, email, name, url, Buffer.from(pdfBuffer))
     
     return NextResponse.json({ success: true, message: 'Report sent successfully' })
   } catch (error) {
@@ -414,7 +415,7 @@ function generateRecommendations(performance: any, seo: any, security: any, mobi
   return recommendations
 }
 
-async function storeAnalysisResults(sessionId: string, url: string, results: any) {
+async function storeAnalysisResults(supabase: any, sessionId: string, url: string, results: any) {
   const { error } = await supabase
     .from('website_analysis_results')
     .insert({
@@ -551,7 +552,7 @@ function generateReportHTML(url: string, results: any, name?: string) {
   `
 }
 
-async function sendEmailWithPDF(email: string, name: string | undefined, url: string, pdfBuffer: Buffer) {
+async function sendEmailWithPDF(resend: any, email: string, name: string | undefined, url: string, pdfBuffer: Buffer) {
   const { error } = await resend.emails.send({
     from: 'Web Launch Academy <reports@weblaunchacademy.com>',
     to: [email],
