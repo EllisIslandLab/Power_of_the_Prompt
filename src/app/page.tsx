@@ -1,6 +1,6 @@
 import { NewHero } from "@/components/sections/new-hero"
 import { SiteSamples } from "@/components/sections/site-samples"
-import { UniqueApproach } from "@/components/sections/unique-approach"
+import { ResponsiveComparison } from "@/components/sections/responsive-comparison"
 import { BuildWithYou } from "@/components/sections/build-with-you"
 import { Build4You } from "@/components/sections/build-4-you"
 import { SiteTLC } from "@/components/sections/site-tlc"
@@ -16,11 +16,11 @@ export default function Home() {
         <div id="new-hero">
           <NewHero />
         </div>
+        <div id="unique-approach">
+          <ResponsiveComparison />
+        </div>
         <div id="site-samples">
           <SiteSamples />
-        </div>
-        <div id="unique-approach">
-          <UniqueApproach />
         </div>
         <div id="build-with-you">
           <BuildWithYou />
