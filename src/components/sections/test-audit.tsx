@@ -348,7 +348,7 @@ export function TestAudit() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="name">Name (optional - for personalization)</Label>
+                      <Label htmlFor="name">Name (optional - only to welcome you properly by your name. We value privacy)</Label>
                       <Input
                         id="name"
                         type="text"

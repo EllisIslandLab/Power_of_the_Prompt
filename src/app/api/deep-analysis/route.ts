@@ -33,6 +33,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, message: 'Report sent successfully' })
   } catch (error) {
     console.error('Deep analysis error:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    })
     return NextResponse.json(
       { error: 'Failed to generate report. Please try again.' },
       { status: 500 }
@@ -434,7 +439,15 @@ async function storeAnalysisResults(supabase: any, sessionId: string, url: strin
 async function generatePDFReport(url: string, results: any, name?: string) {
   const browser = await puppeteer.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: [
+      '--no-sandbox', 
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--disable-web-security',
+      '--no-first-run'
+    ],
+    executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined
   })
   
   const page = await browser.newPage()
