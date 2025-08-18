@@ -45,7 +45,7 @@ export default function CollaborationPage() {
   }
   
   const [isClient, setIsClient] = useState(false)
-  const { data: session, status } = useSession() || { data: null, status: 'loading' }
+  const { data: session, status } = useSession()
   const [selectedTab, setSelectedTab] = useState<'sessions' | 'resources'>('sessions')
   const [quickJoinRoom, setQuickJoinRoom] = useState('')
 

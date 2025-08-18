@@ -45,7 +45,7 @@ export default function SupportPage() {
   }
   
   const [isClient, setIsClient] = useState(false)
-  const { data: session, status } = useSession() || { data: null, status: 'loading' }
+  const { data: session, status } = useSession()
   const [selectedTab, setSelectedTab] = useState<'faq' | 'contact' | 'tickets'>('faq')
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null)
