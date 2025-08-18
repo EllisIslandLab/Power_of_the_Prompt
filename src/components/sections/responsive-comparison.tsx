@@ -9,7 +9,7 @@ export function ResponsiveComparison() {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768)
+      setIsMobile(window.innerWidth < 768) // Match md: breakpoint for better mobile experience
     }
 
     checkScreenSize()
@@ -102,7 +102,7 @@ export function ResponsiveComparison() {
 
   // Desktop Version - matching your current styling
   const DesktopTable = () => (
-    <div className="hidden lg:block bg-background border border-border rounded-2xl overflow-hidden mb-16">
+    <div className="hidden md:block bg-background border border-border rounded-2xl overflow-hidden mb-16">
       <div className="grid grid-cols-4 bg-muted/50">
         <div className="p-4 text-sm font-medium text-muted-foreground"></div>
         <div className="p-4 text-center">
@@ -155,7 +155,7 @@ export function ResponsiveComparison() {
 
   // Mobile Version - Condensed with Icons matching your design
   const MobileTable = () => (
-    <div className="lg:hidden mb-16 space-y-6">
+    <div className="md:hidden mb-16 space-y-6">
       {comparisonData.map((comparison, index) => (
         <div key={index} className={`bg-background border border-border rounded-xl overflow-hidden ${comparison.highlight ? 'ring-2 ring-primary/20' : ''}`}>
           <div className="bg-muted/50 p-4">
