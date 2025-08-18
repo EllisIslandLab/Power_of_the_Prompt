@@ -11,85 +11,121 @@ export function SiteTLC() {
   const maintenancePackages = [
     {
       id: "essential",
-      name: "Essential Care",
-      price: "$150",
+      name: "Basic Care",
+      price: "$75",
       period: "/month",
       icon: <Shield className="h-6 w-6" />,
-      description: "Perfect for small business websites that need regular maintenance",
+      description: "Simple maintenance for small business websites - honest, basic care",
       features: [
-        "Weekly security updates",
-        "Daily automated backups",
         "Monthly performance reports",
-        "Content updates (2 hours/month)",
-        "Plugin/dependency updates",
-        "Basic SEO monitoring",
-        "Email support (24h response)"
+        "Content updates (1 hour/month)", 
+        "Basic website monitoring",
+        "Email support (48h response)",
+        "Simple bug fixes and updates"
       ],
-      popular: true
+      popular: false // I'm new, nothing is "popular" yet
     },
+    // TODO: Offer this when I have more experience and systems in place
+    // {
+    //   id: "growth",
+    //   name: "Growth Accelerator", 
+    //   price: "$150",
+    //   period: "/month",
+    //   icon: <TrendingUp className="h-6 w-6" />,
+    //   description: "For when I'm more experienced - coming soon!",
+    //   features: [
+    //     "Everything in Basic Care",
+    //     "Bi-weekly performance optimization", // Need to learn this first
+    //     "Advanced SEO improvements", // Need to learn SEO properly
+    //     "Content updates (3 hours/month)", // More realistic time
+    //     "Monthly strategy consultation", // When I have more experience
+    //     "Priority support (24h response)"
+    //   ]
+    // },
     {
-      id: "growth",
-      name: "Growth Accelerator",
-      price: "$250",
-      period: "/month",
+      id: "growth", 
+      name: "Coming Soon",
+      price: "TBD",
+      period: "",
       icon: <TrendingUp className="h-6 w-6" />,
-      description: "For growing businesses that need active optimization and improvements",
+      description: "More advanced packages coming as I gain experience and build systems",
       features: [
-        "Everything in Essential Care",
-        "Bi-weekly performance optimization",
-        "Advanced SEO improvements",
-        "Content updates (5 hours/month)",
-        "Conversion rate optimization",
-        "Monthly strategy consultation",
-        "Priority support (4h response)"
+        "Will include automated backups",
+        "Security update management", 
+        "Advanced SEO monitoring",
+        "Performance optimization",
+        "Priority support",
+        "More content update hours"
       ]
     },
+    // TODO: Way too advanced for me right now - maybe in a year or two
+    // {
+    //   id: "enterprise", 
+    //   name: "Enterprise Support",
+    //   price: "$500",
+    //   period: "/month",
+    //   icon: <Zap className="h-6 w-6" />,
+    //   description: "Maybe someday when I'm a real company!",
+    //   features: [
+    //     "Everything in Growth Accelerator",
+    //     "Weekly performance audits", // Need team for this
+    //     "Custom feature development", // Need senior dev skills
+    //     "Unlimited content updates", // Can't promise unlimited
+    //     "24/7 monitoring & alerts", // Don't have 24/7 capabilities
+    //     "Dedicated account manager", // I'm the only person!
+    //     "Same-day support response" // Unrealistic for one person
+    //   ]
+    // }
     {
       id: "enterprise",
-      name: "Enterprise Support",
-      price: "$500",
-      period: "/month",
+      name: "Future Plans",
+      price: "N/A",
+      period: "",
       icon: <Zap className="h-6 w-6" />,
-      description: "Comprehensive support for high-traffic websites and complex needs",
+      description: "Enterprise-level services planned for when the business grows",
       features: [
-        "Everything in Growth Accelerator",
-        "Weekly performance audits",
-        "Custom feature development",
-        "Unlimited content updates",
-        "24/7 monitoring & alerts",
-        "Dedicated account manager",
-        "Same-day support response"
+        "24/7 monitoring (when I have a team)",
+        "Custom development (when I'm more skilled)",
+        "Dedicated account management",
+        "Same-day response times",
+        "Weekly audits and reports",
+        "This will take time to build!"
       ]
     }
   ]
   
   const oneTimeServices = [
-    { service: "Website Audit", price: "$350", description: "Comprehensive site analysis" },
-    { service: "SEO Optimization", price: "$600", description: "Full SEO setup and optimization" },
-    { service: "Performance Boost", price: "$400", description: "Speed and performance improvements" },
-    { service: "Security Hardening", price: "$300", description: "Advanced security implementation" },
-    { service: "Content Migration", price: "$250", description: "Move content from old site" },
-    { service: "Custom Feature", price: "Quote", description: "New functionality development" }
+    { service: "Basic Website Review", price: "$150", description: "Simple site check and recommendations" },
+    { service: "Performance Report", price: "$100", description: "Site speed analysis and basic recommendations" },
+    { service: "Content Updates", price: "$50/hour", description: "Text and image updates (what I can do!)" },
+    { service: "Simple Feature Add", price: "Quote", description: "Basic functionality - depending on complexity" },
+    { service: "Coming Soon", price: "TBD", description: "More advanced services as I learn new skills" }
   ]
+  
+  // TODO: Add more services as I learn:
+  // - Automated backups setup  
+  // - Security implementations
+  // - Advanced SEO optimization
+  // - Performance optimization
   
   const performanceMetrics = [
     {
       metric: "Page Load Speed",
-      before: "4.2s",
-      after: "0.9s",
-      improvement: "78% faster"
+      before: "3.2s",
+      after: "2.1s", // More realistic improvement I can achieve
+      improvement: "34% faster"
     },
     {
-      metric: "SEO Score",
-      before: "72/100",
-      after: "94/100",
-      improvement: "+22 points"
+      metric: "Basic SEO Check",
+      before: "Basic setup",
+      after: "Improved", // Can't promise specific scores yet
+      improvement: "Better structure"
     },
     {
-      metric: "Uptime",
-      before: "97.2%",
-      after: "99.9%",
-      improvement: "+2.7%"
+      metric: "Site Monitoring",
+      before: "No monitoring",
+      after: "Monthly checks", // What I can actually do
+      improvement: "Peace of mind"
     }
   ]
   
@@ -100,17 +136,17 @@ export function SiteTLC() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Website Maintenance & <span className="text-primary">Optimization Services</span>
+            Basic Website <span className="text-primary">Care & Monitoring</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Keep your website running perfectly with our comprehensive maintenance packages. Choose monthly care or one-time services as needed.
+            Simple, honest website maintenance for small businesses. I'm new to this, so I'm starting with basic services I can actually deliver while I learn more advanced techniques.
           </p>
         </div>
         
         {/* Monthly Maintenance Packages */}
         <div className="mb-16">
           <h3 className="text-2xl font-bold text-foreground text-center mb-8">
-            Monthly Maintenance Packages
+            Simple Care Options (Growing as I Learn!)
           </h3>
           
           <div className="flex justify-center mb-8">
@@ -251,48 +287,48 @@ export function SiteTLC() {
           
           <div className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl p-8 border border-border">
             <h4 className="text-xl font-semibold text-foreground text-center mb-6">
-              Why Choose Our Maintenance?
+              Why Choose My Basic Care?
             </h4>
             
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="font-medium text-foreground">No Platform Lock-in</div>
-                  <div className="text-sm text-muted-foreground">You own your website completely</div>
+                  <div className="font-medium text-foreground">You Own Everything</div>
+                  <div className="text-sm text-muted-foreground">Complete code ownership, no platform lock-in</div>
                 </div>
               </div>
               
               <div className="flex items-start gap-3">
                 <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="font-medium text-foreground">Transparent Pricing</div>
-                  <div className="text-sm text-muted-foreground">No hidden fees or surprise charges</div>
+                  <div className="font-medium text-foreground">Honest Pricing</div>
+                  <div className="text-sm text-muted-foreground">No hidden fees - I tell you exactly what I can do</div>
                 </div>
               </div>
               
               <div className="flex items-start gap-3">
                 <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="font-medium text-foreground">Expert Team</div>
-                  <div className="text-sm text-muted-foreground">Same developers who built your site</div>
+                  <div className="font-medium text-foreground">Personal Service</div>
+                  <div className="text-sm text-muted-foreground">You work directly with me - no big agency overhead</div>
                 </div>
               </div>
               
               <div className="flex items-start gap-3">
                 <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="font-medium text-foreground">Modern Technology</div>
-                  <div className="text-sm text-muted-foreground">Always up-to-date with latest standards</div>
+                  <div className="font-medium text-foreground">Growing With You</div>
+                  <div className="text-sm text-muted-foreground">As I learn more, you'll get better services</div>
                 </div>
               </div>
             </div>
             
             <div className="mt-6 p-4 bg-background rounded-lg border border-border">
               <div className="text-center">
-                <div className="text-sm text-muted-foreground mb-1">Starting at just</div>
-                <div className="text-2xl font-bold text-primary">$150/month</div>
-                <div className="text-xs text-muted-foreground">vs $200-500/month on other platforms</div>
+                <div className="text-sm text-muted-foreground mb-1">Honest pricing - starting at</div>
+                <div className="text-2xl font-bold text-primary">$75/month</div>
+                <div className="text-xs text-muted-foreground">Simple care while I learn more advanced services</div>
               </div>
             </div>
           </div>
