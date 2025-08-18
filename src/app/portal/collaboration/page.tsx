@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+export const dynamic = 'force-dynamic'
+
+import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -38,9 +40,18 @@ interface SharedResource {
 }
 
 export default function CollaborationPage() {
-  const { data: session } = useSession()
+  if (typeof window === 'undefined') {
+    return null
+  }
+  
+  const [isClient, setIsClient] = useState(false)
+  const { data: session, status } = useSession() || { data: null, status: 'loading' }
   const [selectedTab, setSelectedTab] = useState<'sessions' | 'resources'>('sessions')
   const [quickJoinRoom, setQuickJoinRoom] = useState('')
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // Mock shared resources (this would come from your API)
   const sharedResources: SharedResource[] = [
@@ -109,6 +120,10 @@ export default function CollaborationPage() {
       const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
       window.open(`https://${jitsiDomain}/${roomId}`, '_blank')
     }
+  }
+
+  if (!isClient || status === 'loading') {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>
   }
 
   return (
@@ -227,7 +242,7 @@ export default function CollaborationPage() {
               </CardHeader>
               <CardContent>
                 <VideoSessionManager
-                  userId={session?.user?.id}
+                  userId={session?.user?.id || undefined}
                   viewMode="all"
                   showPastSessions={true}
                   embedded={false}

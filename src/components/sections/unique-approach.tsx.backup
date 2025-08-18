@@ -70,8 +70,8 @@ export function UniqueApproach() {
   ]
 
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="max-w-6xl mx-auto w-full">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Why Our Method Is <span className="text-primary">Different</span>
@@ -81,8 +81,8 @@ export function UniqueApproach() {
           </p>
         </div>
         
-        {/* Comparison Table */}
-        <div className="bg-background border border-border rounded-2xl overflow-hidden mb-16">
+        {/* Comparison Table - Desktop */}
+        <div className="hidden lg:block bg-background border border-border rounded-2xl overflow-hidden mb-16">
           <div className="grid grid-cols-4 bg-muted/50">
             <div className="p-4 text-sm font-medium text-muted-foreground"></div>
             <div className="p-4 text-center">
@@ -107,25 +107,56 @@ export function UniqueApproach() {
               <div className="p-4 text-center text-muted-foreground">
                 {comparison.feature === "Monthly Fees" || comparison.feature === "Code Ownership" || comparison.feature === "Technology Stack" ? (
                   <div className="flex items-center justify-center gap-2 text-orange-600">
-                    <span>{comparison.platforms}</span>
+                    <span className="text-sm">{comparison.platforms}</span>
                   </div>
                 ) : (
-                  comparison.platforms
+                  <span className="text-sm">{comparison.platforms}</span>
                 )}
               </div>
               <div className="p-4 text-center text-muted-foreground">
                 {comparison.feature === "Monthly Fees" || comparison.feature === "Code Ownership" || comparison.feature === "Technology Stack" ? (
                   <div className="flex items-center justify-center gap-2 text-orange-600">
-                    <span>{comparison.agencies}</span>
+                    <span className="text-sm">{comparison.agencies}</span>
                   </div>
                 ) : (
-                  comparison.agencies
+                  <span className="text-sm">{comparison.agencies}</span>
                 )}
               </div>
               <div className="p-4 text-center border-l-2 border-primary/20 bg-primary/5">
                 <div className="flex items-center justify-center gap-2 text-green-600">
                   <Check className="h-4 w-4" />
-                  <span className="font-medium">{comparison.us}</span>
+                  <span className="font-medium text-sm">{comparison.us}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Comparison Cards - Mobile/Tablet */}
+        <div className="lg:hidden mb-16 space-y-6">
+          {comparisons.map((comparison, index) => (
+            <div key={index} className={`bg-background border border-border rounded-xl overflow-hidden ${comparison.highlight ? 'ring-2 ring-primary/20' : ''}`}>
+              <div className="bg-muted/50 p-4">
+                <h3 className="font-semibold text-foreground text-lg">{comparison.feature}</h3>
+              </div>
+              
+              <div className="space-y-4 p-4">
+                <div className="border-l-4 border-orange-200 pl-4">
+                  <div className="font-medium text-sm text-muted-foreground mb-1">DIY Platform Builders</div>
+                  <div className="text-sm text-orange-600">{comparison.platforms}</div>
+                </div>
+                
+                <div className="border-l-4 border-orange-200 pl-4">
+                  <div className="font-medium text-sm text-muted-foreground mb-1">Traditional Agencies</div>
+                  <div className="text-sm text-orange-600">{comparison.agencies}</div>
+                </div>
+                
+                <div className="border-l-4 border-primary pl-4 bg-primary/5 -m-4 p-4">
+                  <div className="font-medium text-sm text-primary mb-1">Our Method</div>
+                  <div className="flex items-center gap-2 text-green-600">
+                    <Check className="h-4 w-4" />
+                    <span className="font-medium text-sm">{comparison.us}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -178,24 +209,24 @@ export function UniqueApproach() {
             5-Year Cost Comparison
           </h3>
           
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center">
+          <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center bg-background border border-border rounded-xl p-6">
               <div className="text-lg font-semibold text-foreground mb-2">Squarespace/Wix</div>
-              <div className="text-3xl font-bold text-orange-600 mb-2">$1,080-$3,540</div>
+              <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-2">$1,080-$3,540</div>
               <div className="text-sm text-muted-foreground">Per year in subscription fees alone</div>
               <div className="text-xs text-muted-foreground mt-2">*Plus transaction fees and limitations</div>
             </div>
             
-            <div className="text-center">
+            <div className="text-center bg-background border border-border rounded-xl p-6">
               <div className="text-lg font-semibold text-foreground mb-2">WordPress Agencies</div>
-              <div className="text-3xl font-bold text-orange-600 mb-2">$5,000-$15,000+</div>
+              <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-2">$5,000-$15,000+</div>
               <div className="text-sm text-muted-foreground">Initial build + ongoing maintenance</div>
               <div className="text-xs text-muted-foreground mt-2">*Plus hosting and update dependencies</div>
             </div>
             
-            <div className="text-center border-2 border-primary rounded-xl p-4 bg-primary/5">
+            <div className="text-center border-2 border-primary rounded-xl p-6 bg-primary/5">
               <div className="text-lg font-semibold text-primary mb-2">Our Method</div>
-              <div className="text-3xl font-bold text-green-600 mb-2">$497</div>
+              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">$497</div>
               <div className="text-sm text-muted-foreground">One-time training cost</div>
               <div className="text-xs text-green-600 mt-2">+ Complete ownership</div>
             </div>

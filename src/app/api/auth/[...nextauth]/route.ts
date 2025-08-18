@@ -1,6 +1,10 @@
-import NextAuth from "next-auth"
-import { authOptions } from "@/lib/auth"
+// NextAuth temporarily disabled - using Supabase auth instead
+import { NextRequest, NextResponse } from 'next/server'
 
-const handler = NextAuth(authOptions)
+export async function GET(request: NextRequest) {
+  return NextResponse.json({ message: 'NextAuth disabled - using Supabase auth' }, { status: 200 })
+}
 
-export { handler as GET, handler as POST }
+export async function POST(request: NextRequest) {
+  return NextResponse.json({ message: 'NextAuth disabled - using Supabase auth' }, { status: 200 })
+}

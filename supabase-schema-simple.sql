@@ -1,4 +1,4 @@
--- Clean slate schema for Web Launch Coach portal
+-- Simple schema without trigger - manually create profiles
 -- Run this in Supabase SQL Editor to create the tables
 
 -- First, drop existing tables if they exist to start fresh
@@ -6,6 +6,10 @@ DROP TABLE IF EXISTS students CASCADE;
 DROP TABLE IF EXISTS admin_users CASCADE;
 DROP TABLE IF EXISTS jitsi_sessions CASCADE;
 DROP TABLE IF EXISTS student_enrollments CASCADE;
+
+-- Drop the trigger and function if they exist
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS create_student_profile();
 
 -- Create students table
 CREATE TABLE students (
@@ -178,145 +182,6 @@ VALUES (
     'admin@weblaunchcoach.com', -- Replace with your actual email
     'Super Admin'
 ) ON CONFLICT (user_id) DO NOTHING;
-
--- Create a function to automatically create student profiles for new users
-CREATE OR REPLACE FUNCTION create_student_profile()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Only create student profile if not already an admin
-    IF NOT EXISTS (SELECT 1 FROM admin_users WHERE user_id = NEW.id) THEN
-        INSERT INTO students (user_id, full_name, email)
-        VALUES (
-            NEW.id,
-            COALESCE(NEW.raw_user_meta_data->>'name', NEW.email),
-            NEW.email
-        );
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Create trigger to auto-create student profiles
-CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION create_student_profile();
-
--- Create website analysis results table
-CREATE TABLE website_analysis_results (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID NOT NULL,
-  url TEXT NOT NULL,
-  analysis_data JSONB NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '90 days')
-);
-
--- Create index for faster queries
-CREATE INDEX idx_website_analysis_session_id ON website_analysis_results(session_id);
-CREATE INDEX idx_website_analysis_created_at ON website_analysis_results(created_at);
-CREATE INDEX idx_website_analysis_expires_at ON website_analysis_results(expires_at);
-
--- Enable RLS for website analysis results
-ALTER TABLE website_analysis_results ENABLE ROW LEVEL SECURITY;
-
--- Allow anonymous access to website analysis results (since these are public tools)
-CREATE POLICY "Anyone can view website analysis results" ON website_analysis_results
-    FOR SELECT USING (true);
-
--- Only the system can insert analysis results
-CREATE POLICY "System can insert analysis results" ON website_analysis_results
-    FOR INSERT WITH CHECK (true);
-
--- Cleanup function for expired analysis results
-CREATE OR REPLACE FUNCTION cleanup_expired_analysis()
-RETURNS void AS $$
-BEGIN
-    DELETE FROM website_analysis_results 
-    WHERE expires_at < NOW();
-END;
-$$ LANGUAGE plpgsql;
-
--- Create cohorts table
-CREATE TABLE cohorts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  description TEXT,
-  status TEXT DEFAULT 'DRAFT' CHECK (status IN ('DRAFT', 'ACTIVE', 'COMPLETED', 'CANCELLED')),
-  start_date TIMESTAMPTZ,
-  end_date TIMESTAMPTZ,
-  max_students INTEGER DEFAULT 10 CHECK (max_students > 0),
-  current_students INTEGER DEFAULT 0 CHECK (current_students >= 0),
-  coach_id UUID REFERENCES auth.users(id),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Create cohort_memberships table
-CREATE TABLE cohort_memberships (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  cohort_id UUID REFERENCES cohorts(id) ON DELETE CASCADE,
-  student_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  joined_at TIMESTAMPTZ DEFAULT NOW(),
-  status TEXT DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE', 'COMPLETED')),
-  progress INTEGER DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
-  notes TEXT,
-  UNIQUE(cohort_id, student_id)
-);
-
--- Create indexes for cohorts
-CREATE INDEX idx_cohorts_coach_id ON cohorts(coach_id);
-CREATE INDEX idx_cohorts_status ON cohorts(status);
-CREATE INDEX idx_cohorts_start_date ON cohorts(start_date);
-
--- Create indexes for cohort_memberships
-CREATE INDEX idx_cohort_memberships_cohort_id ON cohort_memberships(cohort_id);
-CREATE INDEX idx_cohort_memberships_student_id ON cohort_memberships(student_id);
-CREATE INDEX idx_cohort_memberships_status ON cohort_memberships(status);
-
--- Add updated_at triggers for cohorts
-CREATE TRIGGER update_cohorts_updated_at BEFORE UPDATE ON cohorts
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Enable RLS for cohorts
-ALTER TABLE cohorts ENABLE ROW LEVEL SECURITY;
-
--- Cohorts policies
-CREATE POLICY "Everyone can view active cohorts" ON cohorts
-    FOR SELECT USING (status = 'ACTIVE' OR status = 'DRAFT');
-
--- Only admins and coaches can manage cohorts
-CREATE POLICY "Admins can manage all cohorts" ON cohorts
-    FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM admin_users 
-            WHERE user_id = auth.uid()
-        )
-    );
-
--- Coaches can manage their own cohorts
-CREATE POLICY "Coaches can manage own cohorts" ON cohorts
-    FOR ALL USING (coach_id = auth.uid());
-
--- Enable RLS for cohort_memberships
-ALTER TABLE cohort_memberships ENABLE ROW LEVEL SECURITY;
-
--- Students can see their own memberships
-CREATE POLICY "Students can view own memberships" ON cohort_memberships
-    FOR SELECT USING (student_id = auth.uid());
-
--- Admins and coaches can see all memberships for their cohorts
-CREATE POLICY "Admins can view all memberships" ON cohort_memberships
-    FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM admin_users 
-            WHERE user_id = auth.uid()
-        ) OR
-        EXISTS (
-            SELECT 1 FROM cohorts 
-            WHERE id = cohort_memberships.cohort_id 
-            AND coach_id = auth.uid()
-        )
-    );
 
 -- Grant necessary permissions
 GRANT USAGE ON SCHEMA public TO anon, authenticated;

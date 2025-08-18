@@ -21,9 +21,7 @@ export default function SignInPage() {
     setError("")
 
     try {
-      console.log("Starting signin process...")
-      const result = await signIn(email, password)
-      console.log("Signin completed, redirecting to portal...")
+      await signIn(email, password)
       router.push("/portal")
     } catch (error) {
       console.error("Signin failed:", error)
@@ -36,6 +34,11 @@ export default function SignInPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
+        <div className="text-center mb-6">
+          <Link href="/" className="text-primary hover:underline font-medium">
+            ← Back to Homepage
+          </Link>
+        </div>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">Sign In</CardTitle>

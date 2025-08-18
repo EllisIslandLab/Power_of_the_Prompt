@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/hooks/useAuth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,7 +35,7 @@ interface ChatRoom {
 }
 
 export default function ChatPage() {
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const [selectedRoom, setSelectedRoom] = useState<string>('general')
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
@@ -156,14 +156,14 @@ export default function ChatPage() {
   }, [messages])
 
   const sendMessage = () => {
-    if (!newMessage.trim() || !session) return
+    if (!newMessage.trim() || !user) return
 
     const message: Message = {
       id: Date.now().toString(),
       content: newMessage,
-      userId: session.user?.id || 'current-user',
-      userName: session.user?.name || 'You',
-      userRole: session.user?.role === 'PREMIUM' ? 'INSTRUCTOR' : (session.user?.role || 'STUDENT') as 'STUDENT' | 'INSTRUCTOR' | 'ADMIN',
+      userId: user.id || 'current-user',
+      userName: user.studentProfile?.full_name || user.adminProfile?.full_name || 'You',
+      userRole: user.userType === 'admin' ? 'ADMIN' : 'STUDENT',
       timestamp: new Date(),
       isRead: false
     }
@@ -328,7 +328,7 @@ export default function ChatPage() {
                         )}
                         
                         <div className={`flex gap-3 ${
-                          message.userId === session?.user?.id ? 'flex-row-reverse' : ''
+                          message.userId === user?.id ? 'flex-row-reverse' : ''
                         }`}>
                           <div className="flex-shrink-0">
                             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -337,7 +337,7 @@ export default function ChatPage() {
                           </div>
                           
                           <div className={`flex-1 max-w-[80%] ${
-                            message.userId === session?.user?.id ? 'text-right' : ''
+                            message.userId === user?.id ? 'text-right' : ''
                           }`}>
                             <div className="flex items-center gap-2 mb-1">
                               <span className="font-medium text-sm">{message.userName}</span>
@@ -348,7 +348,7 @@ export default function ChatPage() {
                             </div>
                             
                             <div className={`inline-block p-3 rounded-lg text-sm ${
-                              message.userId === session?.user?.id
+                              message.userId === user?.id
                                 ? 'bg-primary text-primary-foreground'
                                 : 'bg-muted'
                             }`}>

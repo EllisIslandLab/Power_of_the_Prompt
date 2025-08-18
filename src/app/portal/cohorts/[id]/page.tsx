@@ -14,13 +14,17 @@ import { ArrowLeft, Users, Calendar, Settings, UserPlus, Mail } from "lucide-rea
 interface Cohort {
   id: string
   name: string
-  description: string
-  status: 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
-  start_date: string
-  end_date: string
-  max_students: number
-  current_students: number
-  coach_id: string
+  description: string | null
+  status: string | null
+  start_date: string | null
+  end_date: string | null
+  max_students: number | null
+  current_students: number | null
+  coach_id: string | null
+  price: number | null
+  is_active: boolean | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 interface Student {
@@ -57,7 +61,13 @@ export default function CohortDetailsPage() {
         .eq('id', cohortId)
         .single()
       if (cohortError) throw cohortError
-      setCohort(cohortData)
+      
+      // Ensure cohortData has all required fields
+      if (cohortData && typeof cohortData === 'object') {
+        setCohort(cohortData as unknown as Cohort)
+      } else {
+        throw new Error('Invalid cohort data received')
+      }
 
       // Load enrolled students
       const { data: studentsData, error: studentsError } = await supabase
@@ -67,9 +77,9 @@ export default function CohortDetailsPage() {
       if (studentsError) throw studentsError
       
       // For now, just show basic membership info without profile details
-      const formattedStudents = studentsData?.map(membership => ({
+      const formattedStudents = studentsData?.map((membership: any) => ({
         id: membership.student_id,
-        name: `Student ${membership.student_id.slice(0, 8)}...`, // Show partial ID for now
+        name: `Student ${String(membership.student_id).slice(0, 8)}...`, // Show partial ID for now
         email: 'Email not available',
         joined_at: membership.joined_at
       })) || []
@@ -83,7 +93,7 @@ export default function CohortDetailsPage() {
     }
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null) => {
     switch (status) {
       case 'ACTIVE': return 'default'
       case 'DRAFT': return 'secondary'
@@ -106,7 +116,7 @@ export default function CohortDetailsPage() {
 
   if (!user || !cohort) return null
 
-  const isCoachOrAdmin = user.profile?.role === 'COACH' || user.profile?.role === 'ADMIN'
+  const isCoachOrAdmin = user.adminProfile?.role === 'Super Admin' || user.adminProfile?.role === 'Admin'
   const isOwner = cohort.coach_id === user.id
 
   return (
@@ -133,7 +143,7 @@ export default function CohortDetailsPage() {
             </div>
             <div className="flex items-center gap-3">
               <Badge variant={getStatusColor(cohort.status)}>
-                {cohort.status}
+                {cohort.status || 'DRAFT'}
               </Badge>
               {isOwner && (
                 <Button size="sm" asChild>
@@ -156,10 +166,10 @@ export default function CohortDetailsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {cohort.current_students}/{cohort.max_students}
+                {cohort.current_students || 0}/{cohort.max_students || 20}
               </div>
               <p className="text-xs text-muted-foreground">
-                {cohort.max_students - cohort.current_students} spots available
+                {(cohort.max_students || 20) - (cohort.current_students || 0)} spots available
               </p>
             </CardContent>
           </Card>

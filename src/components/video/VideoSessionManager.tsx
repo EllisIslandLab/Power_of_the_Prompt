@@ -71,7 +71,7 @@ export default function VideoSessionManager({
   showPastSessions = true,
   embedded = false
 }: VideoSessionManagerProps) {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [sessions, setSessions] = useState<VideoSession[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -80,7 +80,7 @@ export default function VideoSessionManager({
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming')
 
   // Use current session user ID if not provided
-  const currentUserId = userId || session?.user?.id
+  const currentUserId = userId || session?.user?.id || null
 
   useEffect(() => {
     if (currentUserId) {
@@ -291,6 +291,10 @@ export default function VideoSessionManager({
         />
       </div>
     )
+  }
+
+  if (status === 'loading') {
+    return <div className="flex items-center justify-center p-8">Loading...</div>
   }
 
   return (

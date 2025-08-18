@@ -2,13 +2,22 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { Play, AlertCircle, CheckCircle, Clock, TrendingDown, TrendingUp } from "lucide-react"
+import { Play, AlertCircle, CheckCircle, Clock, TrendingDown, TrendingUp, ExternalLink, Loader2 } from "lucide-react"
 
 export function TestAudit() {
   const [currentStep, setCurrentStep] = useState(0)
-  const [sampleUrl, setSampleUrl] = useState("")
+  const [url, setUrl] = useState("weblaunchacademy.com")
   const [showSampleReport, setShowSampleReport] = useState(false)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [quickResults, setQuickResults] = useState<any>(null)
+  const [showEmailForm, setShowEmailForm] = useState(false)
+  const [email, setEmail] = useState("")
+  const [name, setName] = useState("")
+  const [isSubmittingEmail, setIsSubmittingEmail] = useState(false)
+  const [emailSubmitted, setEmailSubmitted] = useState(false)
   
   const assessmentSteps = [
     {
@@ -32,6 +41,95 @@ export function TestAudit() {
       icon: "📊"
     }
   ]
+
+  const performQuickAnalysis = async (testUrl: string) => {
+    try {
+      const response = await fetch('/api/quick-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: testUrl }),
+      })
+      
+      if (!response.ok) {
+        throw new Error('Analysis failed')
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('Quick analysis error:', error)
+      throw error
+    }
+  }
+
+  const submitEmailForReport = async () => {
+    if (!quickResults) return
+    
+    try {
+      setIsSubmittingEmail(true)
+      
+      // Store lead in Airtable
+      await fetch('/api/store-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url,
+          email,
+          name: name || null,
+          quickScore: quickResults.overall,
+          sessionId: quickResults.sessionId
+        }),
+      })
+      
+      // Trigger detailed analysis in background
+      fetch('/api/deep-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url,
+          email,
+          name: name || null,
+          sessionId: quickResults.sessionId
+        }),
+      })
+      
+      setEmailSubmitted(true)
+    } catch (error) {
+      console.error('Email submission error:', error)
+      alert('There was an error. Please try again.')
+    } finally {
+      setIsSubmittingEmail(false)
+    }
+  }
+
+  const startAnalysis = async () => {
+    if (!url) return
+    
+    setIsAnalyzing(true)
+    setCurrentStep(1)
+    
+    try {
+      // Simulate step progression
+      setTimeout(() => setCurrentStep(2), 1000)
+      setTimeout(() => setCurrentStep(3), 2000)
+      
+      const results = await performQuickAnalysis(url)
+      setQuickResults(results)
+      setCurrentStep(4)
+      setShowEmailForm(true)
+    } catch (error) {
+      console.error('Analysis failed:', error)
+      alert('Analysis failed. Please check the URL and try again.')
+      setCurrentStep(0)
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
   
   const sampleResults = {
     overall: 73,
@@ -140,42 +238,159 @@ export function TestAudit() {
             
             <div className="bg-background border border-border rounded-xl p-6">
               <div className="flex items-center justify-center gap-4 mb-6">
-                <input
+                <Input
                   type="url"
                   placeholder="Enter your website URL (e.g., yoursite.com)"
-                  value={sampleUrl}
-                  onChange={(e) => setSampleUrl(e.target.value)}
-                  className="flex-1 max-w-md px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  className="flex-1 max-w-md"
+                  disabled={isAnalyzing}
                 />
                 <Button 
-                  onClick={() => {
-                    if (currentStep < assessmentSteps.length - 1) {
-                      setCurrentStep(currentStep + 1)
-                      setTimeout(() => {
-                        if (currentStep < assessmentSteps.length - 2) {
-                          setCurrentStep(currentStep + 2)
-                        }
-                      }, 1500)
-                    }
-                  }}
-                  disabled={!sampleUrl}
+                  onClick={startAnalysis}
+                  disabled={!url || isAnalyzing}
                 >
-                  Start Analysis
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    "Start Analysis"
+                  )}
                 </Button>
               </div>
               
-              {currentStep > 0 && (
-                <div className="bg-muted/50 rounded-lg p-4">
+              {currentStep > 0 && currentStep < 4 && (
+                <div className="bg-muted/50 rounded-lg p-4 mb-6">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
-                    <span className="text-foreground">Analyzing {assessmentSteps[Math.min(currentStep, assessmentSteps.length - 1)].title.toLowerCase()}...</span>
+                    <span className="text-foreground">Analyzing {assessmentSteps[Math.min(currentStep - 1, assessmentSteps.length - 1)].title.toLowerCase()}...</span>
                   </div>
                   <div className="w-full bg-border rounded-full h-2">
                     <div 
                       className="bg-primary h-2 rounded-full transition-all duration-1000" 
-                      style={{width: `${((currentStep + 1) / assessmentSteps.length) * 100}%`}}
+                      style={{width: `${(currentStep / assessmentSteps.length) * 100}%`}}
                     ></div>
                   </div>
+                </div>
+              )}
+
+              {quickResults && (
+                <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-primary/20 rounded-xl p-6 mb-6">
+                  <div className="text-center mb-6">
+                    <div className="text-5xl font-bold text-primary mb-2">{quickResults.overall}</div>
+                    <div className="text-lg font-semibold text-foreground">Overall Website Score</div>
+                    <div className="text-sm text-muted-foreground">
+                      {quickResults.overall >= 80 ? "Excellent!" : quickResults.overall >= 60 ? "Good, but can improve" : "Needs improvement"}
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="text-center p-3 bg-white/50 rounded-lg">
+                      <div className="text-xl font-bold text-foreground">{quickResults.performance || 0}</div>
+                      <div className="text-xs text-muted-foreground">Performance</div>
+                    </div>
+                    <div className="text-center p-3 bg-white/50 rounded-lg">
+                      <div className="text-xl font-bold text-foreground">{quickResults.seo || 0}</div>
+                      <div className="text-xs text-muted-foreground">SEO</div>
+                    </div>
+                    <div className="text-center p-3 bg-white/50 rounded-lg">
+                      <div className="text-xl font-bold text-foreground">{quickResults.security || 0}</div>
+                      <div className="text-xs text-muted-foreground">Security</div>
+                    </div>
+                    <div className="text-center p-3 bg-white/50 rounded-lg">
+                      <div className="text-xl font-bold text-foreground">{quickResults.mobile || 0}</div>
+                      <div className="text-xs text-muted-foreground">Mobile</div>
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <Button
+                      variant="outline"
+                      asChild
+                      className="mr-3 mb-3"
+                    >
+                      <a 
+                        href={`https://seoptimer.com/${url.replace(/^https?:\/\//, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Verify with Independent SEOptimer Analysis
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {showEmailForm && !emailSubmitted && (
+                <div className="bg-background border border-border rounded-lg p-6">
+                  <h4 className="text-lg font-semibold text-foreground mb-4 text-center">
+                    Get Your Detailed PDF Report
+                  </h4>
+                  <p className="text-sm text-muted-foreground text-center mb-6">
+                    We're generating a comprehensive analysis with action steps. Enter your email to receive it:
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="email">Email Address *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="name">Name (optional - for personalization)</Label>
+                      <Input
+                        id="name"
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Your name"
+                      />
+                    </div>
+                    
+                    <Button 
+                      onClick={submitEmailForReport}
+                      disabled={!email || isSubmittingEmail}
+                      className="w-full"
+                    >
+                      {isSubmittingEmail ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Sending...
+                        </>
+                      ) : (
+                        "Get My Detailed Report"
+                      )}
+                    </Button>
+                    
+                    <p className="text-xs text-muted-foreground text-center">
+                      We respect your privacy. Unsubscribe anytime.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {emailSubmitted && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                  <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                  <h4 className="text-lg font-semibold text-green-800 mb-2">Report Sent!</h4>
+                  <p className="text-green-700 mb-4">
+                    Your detailed PDF report will arrive in your inbox within the next few minutes.
+                    {name && ` Thanks ${name}!`}
+                  </p>
+                  <p className="text-sm text-green-600">
+                    Check your spam folder if you don't see it soon.
+                  </p>
                 </div>
               )}
             </div>

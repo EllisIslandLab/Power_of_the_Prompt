@@ -29,7 +29,7 @@ export default function NewCohortPage() {
   useEffect(() => {
     if (loading) return
     if (!user) router.push("/auth/signin")
-    if (user && user.profile?.role === 'STUDENT') {
+    if (user && user.userType === 'student') {
       router.push("/portal/cohorts")
     }
   }, [user, loading, router])
@@ -73,7 +73,7 @@ export default function NewCohortPage() {
     )
   }
 
-  if (!user || user.profile?.role === 'STUDENT') return null
+  if (!user || user.userType === 'student') return null
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4 sm:px-6 lg:px-8">

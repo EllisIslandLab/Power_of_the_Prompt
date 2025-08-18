@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+export const dynamic = 'force-dynamic'
+
+import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -38,7 +40,12 @@ interface SupportTicket {
 }
 
 export default function SupportPage() {
-  const { data: session } = useSession()
+  if (typeof window === 'undefined') {
+    return null
+  }
+  
+  const [isClient, setIsClient] = useState(false)
+  const { data: session, status } = useSession() || { data: null, status: 'loading' }
   const [selectedTab, setSelectedTab] = useState<'faq' | 'contact' | 'tickets'>('faq')
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null)
@@ -171,6 +178,14 @@ export default function SupportPage() {
     })
     // Show success message
     alert('Support ticket submitted successfully! We\'ll get back to you soon.')
+  }
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient || status === 'loading') {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>
   }
 
   return (
@@ -362,8 +377,8 @@ export default function SupportPage() {
                   <div>
                     <Label>Your Information</Label>
                     <div className="p-3 bg-muted/50 rounded-md text-sm">
-                      <p><strong>Name:</strong> {session?.user?.name}</p>
-                      <p><strong>Email:</strong> {session?.user?.email}</p>
+                      <p><strong>Name:</strong> {session?.user?.name || 'Not available'}</p>
+                      <p><strong>Email:</strong> {session?.user?.email || 'Not available'}</p>
                     </div>
                   </div>
                 </div>

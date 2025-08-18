@@ -10,7 +10,13 @@ export function Navigation() {
   const { user, signOut } = useAuth()
   const pathname = usePathname()
   const isInPortal = pathname?.startsWith('/portal')
-  const isAdmin = user?.profile?.role === 'ADMIN'
+  const isAuthPage = pathname?.startsWith('/auth')
+  const isAdmin = user?.userType === 'admin'
+
+  // Don't show navigation on auth pages
+  if (isAuthPage) {
+    return null
+  }
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -100,7 +106,7 @@ export function Navigation() {
                 )}
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    {user.profile?.name || user.email}
+                    {user.adminProfile?.full_name || user.studentProfile?.full_name || user.email}
                   </span>
                   <Button variant="outline" onClick={() => signOut()}>
                     Sign Out

@@ -1,9 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Singleton Supabase client to avoid multiple instances
+// Singleton pattern to prevent multiple clients
 let supabaseClient: ReturnType<typeof createClient> | null = null
 
 export function getSupabase() {
+  // Return existing client if already created
   if (supabaseClient) {
     return supabaseClient
   }
@@ -15,80 +16,137 @@ export function getSupabase() {
     throw new Error('Supabase environment variables not configured')
   }
   
+  // Create and store the client
   supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
   return supabaseClient
 }
 
-// Database types (we'll expand this as needed)
+// Database types for our new schema
 export type Database = {
   public: {
     Tables: {
-      profiles: {
+      students: {
         Row: {
           id: string
-          name: string | null
-          role: 'STUDENT' | 'COACH' | 'ADMIN'
+          user_id: string
+          full_name: string
+          email: string
+          course_enrolled: 'Foundation' | 'Premium' | 'None'
+          enrollment_date: string
+          status: 'Active' | 'Inactive' | 'Completed'
+          payment_status: 'Paid' | 'Pending' | 'Trial'
+          progress: number
+          last_login: string | null
+          notes: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
-          id: string
-          name?: string | null
-          role?: 'STUDENT' | 'COACH' | 'ADMIN'
+          id?: string
+          user_id: string
+          full_name: string
+          email: string
+          course_enrolled?: 'Foundation' | 'Premium' | 'None'
+          enrollment_date?: string
+          status?: 'Active' | 'Inactive' | 'Completed'
+          payment_status?: 'Paid' | 'Pending' | 'Trial'
+          progress?: number
+          last_login?: string | null
+          notes?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          name?: string | null
-          role?: 'STUDENT' | 'COACH' | 'ADMIN'
+          user_id?: string
+          full_name?: string
+          email?: string
+          course_enrolled?: 'Foundation' | 'Premium' | 'None'
+          enrollment_date?: string
+          status?: 'Active' | 'Inactive' | 'Completed'
+          payment_status?: 'Paid' | 'Pending' | 'Trial'
+          progress?: number
+          last_login?: string | null
+          notes?: string | null
           created_at?: string
           updated_at?: string
         }
       }
-      cohorts: {
+      admin_users: {
         Row: {
           id: string
-          name: string
-          description: string | null
-          status: 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
-          start_date: string | null
-          end_date: string | null
-          max_students: number
-          current_students: number
-          coach_id: string | null
-          price: number | null
-          is_active: boolean
+          user_id: string
+          full_name: string
+          email: string
+          role: 'Super Admin' | 'Admin' | 'Support'
+          permissions: string[]
+          last_login: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          name: string
-          description?: string | null
-          status?: 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
-          start_date?: string | null
-          end_date?: string | null
-          max_students?: number
-          current_students?: number
-          coach_id?: string | null
-          price?: number | null
-          is_active?: boolean
+          user_id: string
+          full_name: string
+          email: string
+          role?: 'Super Admin' | 'Admin' | 'Support'
+          permissions?: string[]
+          last_login?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          name?: string
-          description?: string | null
-          status?: 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
-          start_date?: string | null
-          end_date?: string | null
-          max_students?: number
-          current_students?: number
-          coach_id?: string | null
-          price?: number | null
-          is_active?: boolean
+          user_id?: string
+          full_name?: string
+          email?: string
+          role?: 'Super Admin' | 'Admin' | 'Support'
+          permissions?: string[]
+          last_login?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      jitsi_sessions: {
+        Row: {
+          id: string
+          session_name: string
+          room_name: string
+          scheduled_for: string
+          duration_minutes: number
+          max_participants: number
+          course_type: 'Foundation' | 'Premium' | 'All' | null
+          status: 'Scheduled' | 'Active' | 'Completed' | 'Cancelled'
+          meeting_password: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          session_name: string
+          room_name: string
+          scheduled_for: string
+          duration_minutes?: number
+          max_participants?: number
+          course_type?: 'Foundation' | 'Premium' | 'All' | null
+          status?: 'Scheduled' | 'Active' | 'Completed' | 'Cancelled'
+          meeting_password?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          session_name?: string
+          room_name?: string
+          scheduled_for?: string
+          duration_minutes?: number
+          max_participants?: number
+          course_type?: 'Foundation' | 'Premium' | 'All' | null
+          status?: 'Scheduled' | 'Active' | 'Completed' | 'Cancelled'
+          meeting_password?: string | null
+          created_by?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -97,5 +155,6 @@ export type Database = {
   }
 }
 
-export type Profile = Database['public']['Tables']['profiles']['Row']
-export type Cohort = Database['public']['Tables']['cohorts']['Row']
+export type Student = Database['public']['Tables']['students']['Row']
+export type AdminUser = Database['public']['Tables']['admin_users']['Row']
+export type JitsiSession = Database['public']['Tables']['jitsi_sessions']['Row']

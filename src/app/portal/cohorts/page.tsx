@@ -48,7 +48,7 @@ export default function CohortsPage() {
         console.error('Supabase error details:', error)
         throw error
       }
-      setCohorts(data || [])
+      setCohorts((data as unknown as Cohort[]) || [])
     } catch (error) {
       console.error('Error loading cohorts:', error)
       // Show error to user for debugging
@@ -81,7 +81,7 @@ export default function CohortsPage() {
 
   if (!user) return null
 
-  const isCoachOrAdmin = user.profile?.role === 'COACH' || user.profile?.role === 'ADMIN'
+  const isCoachOrAdmin = user.adminProfile?.role === 'Super Admin' || user.adminProfile?.role === 'Admin'
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4 sm:px-6 lg:px-8">

@@ -37,13 +37,25 @@ export default function PortalPage() {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {user.profile?.name || user.email}!
-          </h1>
-          <p className="text-muted-foreground">
-            Your Web Launch Academy dashboard
-          </p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Welcome back, {user.studentProfile?.full_name || user.adminProfile?.full_name || user.email}!
+            </h1>
+            <p className="text-muted-foreground">
+              Your Web Launch Academy dashboard
+            </p>
+          </div>
+          <Button 
+            onClick={async () => {
+              const { signOut } = useAuth()
+              await signOut()
+              router.push('/auth/signin')
+            }}
+            variant="outline"
+          >
+            Sign Out
+          </Button>
         </div>
 
         {/* Status Cards */}
@@ -54,14 +66,12 @@ export default function PortalPage() {
               <Zap className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <Badge variant={user.profile?.role === 'ADMIN' ? 'default' : 'secondary'}>
-                {user.profile?.role === 'ADMIN' ? 'Admin' : 
-                 user.profile?.role === 'COACH' ? 'Coach' : 'Student'}
+              <Badge variant={user.userType === 'admin' ? 'default' : 'secondary'}>
+                {user.userType === 'admin' ? 
+                  user.adminProfile?.role || 'Admin' : 'Student'}
               </Badge>
               <p className="text-xs text-muted-foreground mt-2">
-                {user.profile?.role === 'STUDENT' ? 'Student Access' : 
-                 user.profile?.role === 'COACH' ? 'Coach Access' : 
-                 'Admin Access'}
+                {user.userType === 'admin' ? 'Admin Access' : 'Student Access'}
               </p>
             </CardContent>
           </Card>
@@ -72,9 +82,11 @@ export default function PortalPage() {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0%</div>
+              <div className="text-2xl font-bold">
+                {user.studentProfile?.progress || 0}%
+              </div>
               <p className="text-xs text-muted-foreground">
-                Ready to start building
+                {user.studentProfile?.course_enrolled || 'Ready to start building'}
               </p>
             </CardContent>
           </Card>
@@ -126,7 +138,7 @@ export default function PortalPage() {
         </div>
 
         {/* Cohort Management */}
-        {(user.profile?.role === 'COACH' || user.profile?.role === 'ADMIN') && (
+        {user.userType === 'admin' && (
           <div className="mb-8">
             <Card>
               <CardHeader>
@@ -158,7 +170,7 @@ export default function PortalPage() {
         )}
 
         {/* Student Cohort View */}
-        {user.profile?.role === 'STUDENT' && (
+        {user.userType === 'student' && (
           <div className="mb-8">
             <Card>
               <CardHeader>
@@ -202,7 +214,7 @@ export default function PortalPage() {
                   📚 Student Textbook
                 </Link>
               </Button>
-              {user.profile?.role !== 'STUDENT' && (
+              {user.userType === 'admin' && (
                 <Button variant="outline" className="w-full" asChild>
                   <Link href="/portal/cohorts">
                     <Users className="h-4 w-4 mr-2" />
@@ -233,7 +245,8 @@ export default function PortalPage() {
                 <strong>Email:</strong> {user.email}
               </div>
               <div className="text-sm">
-                <strong>Role:</strong> {user.profile?.role || 'Student'}
+                <strong>Role:</strong> {user.userType === 'admin' ? 
+                  user.adminProfile?.role || 'Admin' : 'Student'}
               </div>
               <Button variant="outline" size="sm" className="mt-4">
                 Update Profile
