@@ -70,7 +70,7 @@ export function TestAudit() {
       setIsSubmittingEmail(true)
       
       // Store lead in Airtable
-      await fetch('/api/store-lead', {
+      const leadResponse = await fetch('/api/store-lead', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,8 +84,12 @@ export function TestAudit() {
         }),
       })
       
-      // Trigger detailed analysis in background
-      fetch('/api/deep-analysis', {
+      if (!leadResponse.ok) {
+        throw new Error('Failed to store lead information')
+      }
+      
+      // Trigger detailed analysis and email
+      const analysisResponse = await fetch('/api/deep-analysis', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,10 +102,14 @@ export function TestAudit() {
         }),
       })
       
+      if (!analysisResponse.ok) {
+        throw new Error('Failed to generate and send report')
+      }
+      
       setEmailSubmitted(true)
     } catch (error) {
       console.error('Email submission error:', error)
-      alert('There was an error. Please try again.')
+      alert('There was an error generating your report. Please try again or contact support.')
     } finally {
       setIsSubmittingEmail(false)
     }
