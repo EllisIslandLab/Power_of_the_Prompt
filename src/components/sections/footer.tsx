@@ -48,8 +48,7 @@ export function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
                 <span className="text-muted-foreground">
-                  123 Business St, Suite 100<br />
-                  Austin, TX 78701<br />
+                  Painesville Ohio, 44077<br />
                   Available nationwide via video call
                 </span>
               </div>

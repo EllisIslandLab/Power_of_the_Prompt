@@ -295,21 +295,21 @@ export function TestAudit() {
                   </div>
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div className="text-center p-3 bg-white/50 rounded-lg">
-                      <div className="text-xl font-bold text-foreground">{quickResults.performance || 0}</div>
-                      <div className="text-xs text-muted-foreground">Performance</div>
+                    <div className="text-center p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                      <div className="text-xl font-bold text-gray-800">{quickResults.performance || 0}</div>
+                      <div className="text-xs text-gray-600">Performance</div>
                     </div>
-                    <div className="text-center p-3 bg-white/50 rounded-lg">
-                      <div className="text-xl font-bold text-foreground">{quickResults.seo || 0}</div>
-                      <div className="text-xs text-muted-foreground">SEO</div>
+                    <div className="text-center p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                      <div className="text-xl font-bold text-gray-800">{quickResults.seo || 0}</div>
+                      <div className="text-xs text-gray-600">SEO</div>
                     </div>
-                    <div className="text-center p-3 bg-white/50 rounded-lg">
-                      <div className="text-xl font-bold text-foreground">{quickResults.security || 0}</div>
-                      <div className="text-xs text-muted-foreground">Security</div>
+                    <div className="text-center p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                      <div className="text-xl font-bold text-gray-800">{quickResults.security || 0}</div>
+                      <div className="text-xs text-gray-600">Security</div>
                     </div>
-                    <div className="text-center p-3 bg-white/50 rounded-lg">
-                      <div className="text-xl font-bold text-foreground">{quickResults.mobile || 0}</div>
-                      <div className="text-xs text-muted-foreground">Mobile</div>
+                    <div className="text-center p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                      <div className="text-xl font-bold text-gray-800">{quickResults.mobile || 0}</div>
+                      <div className="text-xs text-gray-600">Mobile</div>
                     </div>
                   </div>
 
@@ -428,21 +428,21 @@ export function TestAudit() {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-red-500">{sampleResults.performance}</div>
-                    <div className="text-sm text-foreground">Performance</div>
+                  <div className="text-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="text-2xl font-bold text-red-600">{sampleResults.performance}</div>
+                    <div className="text-sm text-gray-700">Performance</div>
                   </div>
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-500">{sampleResults.seo}</div>
-                    <div className="text-sm text-foreground">SEO</div>
+                  <div className="text-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="text-2xl font-bold text-green-600">{sampleResults.seo}</div>
+                    <div className="text-sm text-gray-700">SEO</div>
                   </div>
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-orange-500">{sampleResults.security}</div>
-                    <div className="text-sm text-foreground">Security</div>
+                  <div className="text-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="text-2xl font-bold text-orange-600">{sampleResults.security}</div>
+                    <div className="text-sm text-gray-700">Security</div>
                   </div>
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-orange-500">{sampleResults.ux}</div>
-                    <div className="text-sm text-foreground">User Experience</div>
+                  <div className="text-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                    <div className="text-2xl font-bold text-orange-600">{sampleResults.ux}</div>
+                    <div className="text-sm text-gray-700">User Experience</div>
                   </div>
                 </div>
               </div>

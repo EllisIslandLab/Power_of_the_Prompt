@@ -107,48 +107,168 @@ export type Database = {
           updated_at?: string
         }
       }
-      jitsi_sessions: {
+      video_sessions: {
         Row: {
           id: string
           session_name: string
-          room_name: string
-          scheduled_for: string
-          duration_minutes: number
-          max_participants: number
-          course_type: 'Foundation' | 'Premium' | 'All' | null
-          status: 'Scheduled' | 'Active' | 'Completed' | 'Cancelled'
-          meeting_password: string | null
-          created_by: string | null
+          jitsi_room_id: string
+          host_user_id: string
+          participant_user_ids: string[]
+          session_type: 'FREE_CONSULTATION' | 'PAID_SESSION' | 'GROUP_COACHING' | 'WORKSHOP' | 'OFFICE_HOURS'
+          scheduled_start: string
+          scheduled_end: string
+          actual_start: string | null
+          actual_end: string | null
+          stripe_payment_intent_id: string | null
+          session_status: 'SCHEDULED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW'
+          meeting_notes: string | null
+          recording_url: string | null
+          jitsi_config: any | null
+          waiting_room_enabled: boolean
+          max_participants: number | null
+          consultation_id: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           session_name: string
-          room_name: string
-          scheduled_for: string
-          duration_minutes?: number
-          max_participants?: number
-          course_type?: 'Foundation' | 'Premium' | 'All' | null
-          status?: 'Scheduled' | 'Active' | 'Completed' | 'Cancelled'
-          meeting_password?: string | null
-          created_by?: string | null
+          jitsi_room_id: string
+          host_user_id: string
+          participant_user_ids?: string[]
+          session_type?: 'FREE_CONSULTATION' | 'PAID_SESSION' | 'GROUP_COACHING' | 'WORKSHOP' | 'OFFICE_HOURS'
+          scheduled_start: string
+          scheduled_end: string
+          actual_start?: string | null
+          actual_end?: string | null
+          stripe_payment_intent_id?: string | null
+          session_status?: 'SCHEDULED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW'
+          meeting_notes?: string | null
+          recording_url?: string | null
+          jitsi_config?: any | null
+          waiting_room_enabled?: boolean
+          max_participants?: number | null
+          consultation_id?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           session_name?: string
-          room_name?: string
-          scheduled_for?: string
-          duration_minutes?: number
-          max_participants?: number
-          course_type?: 'Foundation' | 'Premium' | 'All' | null
-          status?: 'Scheduled' | 'Active' | 'Completed' | 'Cancelled'
-          meeting_password?: string | null
-          created_by?: string | null
+          jitsi_room_id?: string
+          host_user_id?: string
+          participant_user_ids?: string[]
+          session_type?: 'FREE_CONSULTATION' | 'PAID_SESSION' | 'GROUP_COACHING' | 'WORKSHOP' | 'OFFICE_HOURS'
+          scheduled_start?: string
+          scheduled_end?: string
+          actual_start?: string | null
+          actual_end?: string | null
+          stripe_payment_intent_id?: string | null
+          session_status?: 'SCHEDULED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW'
+          meeting_notes?: string | null
+          recording_url?: string | null
+          jitsi_config?: any | null
+          waiting_room_enabled?: boolean
+          max_participants?: number | null
+          consultation_id?: string | null
           created_at?: string
           updated_at?: string
+        }
+      }
+      consultations: {
+        Row: {
+          id: string
+          user_id: string
+          scheduled_time: string
+          status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
+          notes: string | null
+          type: 'FREE' | 'PREMIUM'
+          video_session_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          scheduled_time: string
+          status?: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
+          notes?: string | null
+          type: 'FREE' | 'PREMIUM'
+          video_session_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          scheduled_time?: string
+          status?: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
+          notes?: string | null
+          type?: 'FREE' | 'PREMIUM'
+          video_session_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      enrollments: {
+        Row: {
+          id: string
+          user_id: string
+          course_type: 'STANDARD' | 'PREMIUM'
+          payment_status: 'PENDING' | 'COMPLETED' | 'FAILED'
+          start_date: string
+          completion_date: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          course_type: 'STANDARD' | 'PREMIUM'
+          payment_status?: 'PENDING' | 'COMPLETED' | 'FAILED'
+          start_date?: string
+          completion_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          course_type?: 'STANDARD' | 'PREMIUM'
+          payment_status?: 'PENDING' | 'COMPLETED' | 'FAILED'
+          start_date?: string
+          completion_date?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      messages: {
+        Row: {
+          id: string
+          from_user_id: string
+          to_user_id: string
+          content: string
+          thread_id: string | null
+          read_status: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          from_user_id: string
+          to_user_id: string
+          content: string
+          thread_id?: string | null
+          read_status?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          from_user_id?: string
+          to_user_id?: string
+          content?: string
+          thread_id?: string | null
+          read_status?: boolean
+          created_at?: string
         }
       }
     }
@@ -157,4 +277,7 @@ export type Database = {
 
 export type Student = Database['public']['Tables']['students']['Row']
 export type AdminUser = Database['public']['Tables']['admin_users']['Row']
-export type JitsiSession = Database['public']['Tables']['jitsi_sessions']['Row']
+export type VideoSession = Database['public']['Tables']['video_sessions']['Row']
+export type Consultation = Database['public']['Tables']['consultations']['Row']
+export type Enrollment = Database['public']['Tables']['enrollments']['Row']
+export type Message = Database['public']['Tables']['messages']['Row']

@@ -91,7 +91,36 @@ export function SiteSamples() {
   // Individual arrow hover states
   const [leftArrowHover, setLeftArrowHover] = useState(false)
   const [rightArrowHover, setRightArrowHover] = useState(false)
+  
+  // Touch handling for mobile swipe
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
+  // Minimum distance for a swipe
+  const minSwipeDistance = 50
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null) // Clear the end position
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe) {
+      moveToNext()
+    } else if (isRightSwipe) {
+      moveToPrev()
+    }
+  }
 
   // Initialize with Winchester in center
   useEffect(() => {
@@ -114,10 +143,10 @@ export function SiteSamples() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Websites Our <span className="text-primary">Students Built</span>
+            Websites Built with <span className="text-primary">Web Launch Academy</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-            Real websites, real results. See what our students accomplished with modern web technologies and complete code ownership.
+            Fully functional live websites using the techniques we teach with modern, professional web technologies: React, Next.js, TypeScript, Tailwind CSS, Vercel, and Prisma. Our clients own their code which means they start their website journey with complete control; not with lock-ins, hidden costs, or fees.
           </p>
           
           {/* Category Tabs */}
@@ -181,6 +210,9 @@ export function SiteSamples() {
         {/* Horizontal Wheel Container */}
         <div 
           className="w-full h-full flex items-center justify-center overflow-hidden"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
           <div
             ref={wheelRef}
@@ -468,7 +500,9 @@ export function SiteSamples() {
         {/* Instructions */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center">
           <p className="text-xs text-slate-400">
-            Hover left/right for navigation arrows • Click to browse gallery • Live websites included
+            <span className="hidden md:inline">Hover left/right for navigation arrows • </span>
+            <span className="md:hidden">Swipe left/right to navigate • </span>
+            Click to browse gallery • Live websites included
           </p>
         </div>
       </div>
@@ -614,18 +648,6 @@ export function SiteSamples() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mt-16">
-          <p className="text-muted-foreground mb-6">
-            Every site is built with modern, professional web technologies
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 text-sm mb-8">
-            <span className="bg-background border border-border px-3 py-2 rounded-full">React</span>
-            <span className="bg-background border border-border px-3 py-2 rounded-full">Next.js</span>
-            <span className="bg-background border border-border px-3 py-2 rounded-full">TypeScript</span>
-            <span className="bg-background border border-border px-3 py-2 rounded-full">Tailwind CSS</span>
-            <span className="bg-background border border-border px-3 py-2 rounded-full">Vercel</span>
-            <span className="bg-background border border-border px-3 py-2 rounded-full">Prisma</span>
-          </div>
-          
           <Button 
             size="lg" 
             onClick={() => document.getElementById('build-with-you')?.scrollIntoView({ behavior: 'smooth' })}

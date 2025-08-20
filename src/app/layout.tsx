@@ -40,6 +40,12 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -61,10 +67,9 @@ export default function RootLayout({
               "email": "hello@poweroftheprompt.com",
               "address": {
                 "@type": "PostalAddress",
-                "streetAddress": "123 Business St, Suite 100",
-                "addressLocality": "Austin",
-                "addressRegion": "TX",
-                "postalCode": "78701",
+                "addressLocality": "Painesville",
+                "addressRegion": "OH",
+                "postalCode": "44077",
                 "addressCountry": "US"
               },
               "sameAs": [],

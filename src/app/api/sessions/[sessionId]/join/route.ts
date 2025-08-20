@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
-import { VideoSessionStatus } from '@prisma/client'
+import { getSupabase } from '@/lib/supabase'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = getSupabase()
     
-    if (!session?.user?.id) {
+    // Get user from Supabase Auth
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -20,27 +20,34 @@ export async function PUT(
     const { userId } = body
 
     // Verify user is trying to join as themselves (unless admin)
-    if (userId !== session.user.id && session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    // For now, anyone can join - in production you'd check admin status via admin_users table
+    if (userId !== user.id) {
+      // Check if user is admin
+      const { data: adminProfile } = await supabase
+        .from('admin_users')
+        .select('id')
+        .eq('user_id', user.id)
+        .single()
+        
+      if (!adminProfile) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
     }
 
     // Get session details
-    const videoSession = await prisma.videoSession.findUnique({
-      where: { id: sessionId },
-      include: {
-        host: true,
-        participants: true,
-        consultation: true
-      }
-    })
+    const { data: videoSession, error: sessionError } = await supabase
+      .from('video_sessions')
+      .select('*')
+      .eq('id', sessionId)
+      .single()
 
-    if (!videoSession) {
+    if (sessionError || !videoSession) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
     // Check if user is authorized to join
-    const isHost = videoSession.hostUserId === userId
-    const isParticipant = videoSession.participants.some(p => p.id === userId)
+    const isHost = videoSession.host_user_id === userId
+    const isParticipant = videoSession.participant_user_ids?.includes(userId)
     
     if (!isHost && !isParticipant) {
       return NextResponse.json({ error: 'Not authorized to join this session' }, { status: 403 })
@@ -48,8 +55,8 @@ export async function PUT(
 
     // Check if session is joinable
     const now = new Date()
-    const startTime = new Date(videoSession.scheduledStart)
-    const endTime = new Date(videoSession.scheduledEnd)
+    const startTime = new Date(videoSession.scheduled_start)
+    const endTime = new Date(videoSession.scheduled_end)
     
     // Allow joining 15 minutes before scheduled start
     const joinWindow = new Date(startTime.getTime() - 15 * 60 * 1000)
@@ -64,12 +71,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Session has ended' }, { status: 400 })
     }
     
-    if (videoSession.sessionStatus === VideoSessionStatus.CANCELLED) {
+    if (videoSession.session_status === 'CANCELLED') {
       return NextResponse.json({ error: 'Session has been cancelled' }, { status: 400 })
     }
 
     // For paid sessions, verify payment
-    if (videoSession.sessionType === 'PAID_SESSION' && !videoSession.stripePaymentIntentId && !isHost) {
+    if (videoSession.session_type === 'PAID_SESSION' && !videoSession.stripe_payment_intent_id && !isHost) {
       return NextResponse.json({ 
         error: 'Payment required to join this session',
         paymentRequired: true,
@@ -78,56 +85,42 @@ export async function PUT(
     }
 
     // Check participant limit
-    if (!isHost && !isParticipant && videoSession.participants.length >= (videoSession.maxParticipants || 10)) {
+    const participantCount = videoSession.participant_user_ids?.length || 0
+    if (!isHost && !isParticipant && participantCount >= (videoSession.max_participants || 10)) {
       return NextResponse.json({ error: 'Session is at maximum capacity' }, { status: 400 })
     }
 
     // Update session status to ACTIVE if it's the first person joining
     let updateData: any = {}
     
-    if (videoSession.sessionStatus === VideoSessionStatus.SCHEDULED) {
-      updateData.sessionStatus = VideoSessionStatus.ACTIVE
-      updateData.actualStart = now
+    if (videoSession.session_status === 'SCHEDULED') {
+      updateData.session_status = 'ACTIVE'
+      updateData.actual_start = now.toISOString()
     }
 
     // If user is not already a participant, add them
     if (!isParticipant && !isHost) {
-      updateData.participants = {
-        connect: { id: userId }
-      }
+      const currentParticipants = videoSession.participant_user_ids || []
+      updateData.participant_user_ids = [...currentParticipants, userId]
     }
 
     // Update session if needed
     if (Object.keys(updateData).length > 0) {
-      await prisma.videoSession.update({
-        where: { id: sessionId },
-        data: updateData
-      })
+      await supabase
+        .from('video_sessions')
+        .update(updateData)
+        .eq('id', sessionId)
     }
 
     // Log join event (optional - could be used for analytics)
     console.log(`User ${userId} joined session ${sessionId}`)
 
     // Get updated session info
-    const updatedSession = await prisma.videoSession.findUnique({
-      where: { id: sessionId },
-      include: {
-        host: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        participants: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        }
-      }
-    })
+    const { data: updatedSession } = await supabase
+      .from('video_sessions')
+      .select('*')
+      .eq('id', sessionId)
+      .single()
 
     const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
 
@@ -135,9 +128,9 @@ export async function PUT(
       message: 'Successfully joined session',
       session: {
         ...updatedSession,
-        joinUrl: `https://${jitsiDomain}/${updatedSession!.jitsiRoomId}`,
-        isHost: updatedSession!.hostUserId === userId,
-        isParticipant: updatedSession!.participants.some(p => p.id === userId)
+        joinUrl: `https://${jitsiDomain}/${updatedSession!.jitsi_room_id}`,
+        isHost: updatedSession!.host_user_id === userId,
+        isParticipant: updatedSession!.participant_user_ids?.includes(userId)
       }
     })
 

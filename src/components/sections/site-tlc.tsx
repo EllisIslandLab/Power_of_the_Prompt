@@ -15,7 +15,7 @@ export function SiteTLC() {
       price: "$75",
       period: "/month",
       icon: <Shield className="h-6 w-6" />,
-      description: "Simple maintenance for small business websites - honest, basic care",
+      description: "Essential maintenance for small business websites - reliable, professional care",
       features: [
         "Monthly performance reports",
         "Content updates (1 hour/month)", 
@@ -23,7 +23,7 @@ export function SiteTLC() {
         "Email support (48h response)",
         "Simple bug fixes and updates"
       ],
-      popular: false // I'm new, nothing is "popular" yet
+      popular: false
     },
     // TODO: Offer this when I have more experience and systems in place
     // {
@@ -48,7 +48,7 @@ export function SiteTLC() {
       price: "TBD",
       period: "",
       icon: <TrendingUp className="h-6 w-6" />,
-      description: "More advanced packages coming as I gain experience and build systems",
+      description: "More advanced packages with expanded features coming soon",
       features: [
         "Will include automated backups",
         "Security update management", 
@@ -82,14 +82,14 @@ export function SiteTLC() {
       price: "N/A",
       period: "",
       icon: <Zap className="h-6 w-6" />,
-      description: "Enterprise-level services planned for when the business grows",
+      description: "Enterprise-level services planned for future expansion",
       features: [
-        "24/7 monitoring (when I have a team)",
-        "Custom development (when I'm more skilled)",
+        "24/7 monitoring and support",
+        "Custom development services",
         "Dedicated account management",
         "Same-day response times",
         "Weekly audits and reports",
-        "This will take time to build!"
+        "Premium enterprise features"
       ]
     }
   ]
@@ -99,35 +99,15 @@ export function SiteTLC() {
     { service: "Performance Report", price: "$100", description: "Site speed analysis and basic recommendations" },
     { service: "Content Updates", price: "$50/hour", description: "Text and image updates (what I can do!)" },
     { service: "Simple Feature Add", price: "Quote", description: "Basic functionality - depending on complexity" },
-    { service: "Coming Soon", price: "TBD", description: "More advanced services as I learn new skills" }
+    { service: "Additional Services", price: "Quote", description: "Custom solutions and advanced features available" }
   ]
   
-  // TODO: Add more services as I learn:
+  // Additional services available:
   // - Automated backups setup  
   // - Security implementations
   // - Advanced SEO optimization
   // - Performance optimization
   
-  const performanceMetrics = [
-    {
-      metric: "Page Load Speed",
-      before: "3.2s",
-      after: "2.1s", // More realistic improvement I can achieve
-      improvement: "34% faster"
-    },
-    {
-      metric: "Basic SEO Check",
-      before: "Basic setup",
-      after: "Improved", // Can't promise specific scores yet
-      improvement: "Better structure"
-    },
-    {
-      metric: "Site Monitoring",
-      before: "No monitoring",
-      after: "Monthly checks", // What I can actually do
-      improvement: "Peace of mind"
-    }
-  ]
   
   const selectedMaintenance = maintenancePackages.find(pkg => pkg.id === selectedPackage)
 
@@ -139,14 +119,14 @@ export function SiteTLC() {
             Basic Website <span className="text-primary">Care & Monitoring</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Simple, honest website maintenance for small businesses. I'm new to this, so I'm starting with basic services I can actually deliver while I learn more advanced techniques.
+            Professional website maintenance for small businesses.
           </p>
         </div>
         
         {/* Monthly Maintenance Packages */}
         <div className="mb-16">
           <h3 className="text-2xl font-bold text-foreground text-center mb-8">
-            Simple Care Options (Growing as I Learn!)
+            Website Care Options
           </h3>
           
           <div className="flex justify-center mb-8">
@@ -225,38 +205,6 @@ export function SiteTLC() {
           )}
         </div>
         
-        {/* Before/After Performance Improvements */}
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold text-foreground text-center mb-8">
-            Before/After Performance Improvements
-          </h3>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {performanceMetrics.map((metric, index) => (
-              <div key={index} className="bg-background border border-border rounded-xl p-6 text-center">
-                <h4 className="font-semibold text-foreground mb-4">{metric.metric}</h4>
-                
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">Before</div>
-                    <div className="text-2xl font-bold text-red-600">{metric.before}</div>
-                  </div>
-                  
-                  <div className="text-2xl text-muted-foreground">→</div>
-                  
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-1">After</div>
-                    <div className="text-2xl font-bold text-green-600">{metric.after}</div>
-                  </div>
-                  
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-2">
-                    <div className="text-sm font-medium text-green-700">{metric.improvement}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
         
         {/* One-Time Services */}
         <div className="grid lg:grid-cols-2 gap-12">
@@ -319,7 +267,7 @@ export function SiteTLC() {
                 <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="font-medium text-foreground">Growing With You</div>
-                  <div className="text-sm text-muted-foreground">As I learn more, you'll get better services</div>
+                  <div className="text-sm text-muted-foreground">Continuously improving service offerings</div>
                 </div>
               </div>
             </div>
@@ -328,7 +276,7 @@ export function SiteTLC() {
               <div className="text-center">
                 <div className="text-sm text-muted-foreground mb-1">Honest pricing - starting at</div>
                 <div className="text-2xl font-bold text-primary">$75/month</div>
-                <div className="text-xs text-muted-foreground">Simple care while I learn more advanced services</div>
+                <div className="text-xs text-muted-foreground">Professional website maintenance services</div>
               </div>
             </div>
           </div>

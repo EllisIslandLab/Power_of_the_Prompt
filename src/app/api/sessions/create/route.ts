@@ -1,27 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
-import { VideoSessionType, VideoSessionStatus } from '@prisma/client'
+import { getSupabase } from '@/lib/supabase'
+import { VideoSession } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = getSupabase()
     
-    if (!session?.user?.id) {
+    // Get user from Supabase Auth
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
     const {
       sessionName,
-      sessionType,
+      sessionType = 'FREE_CONSULTATION',
       scheduledStart,
       scheduledEnd,
       participantUserIds = [],
       maxParticipants = 10,
       waitingRoomEnabled = true,
-      recordingEnabled = false,
       jitsiConfig = {},
       consultationId
     } = body
@@ -40,42 +40,32 @@ export async function POST(request: NextRequest) {
     const jitsiRoomId = `session-${timestamp}-${randomId}`
 
     // Create video session
-    const videoSession = await prisma.videoSession.create({
-      data: {
-        sessionName,
-        jitsiRoomId,
-        hostUserId: session.user.id,
-        participantUserIds,
-        sessionType: sessionType as VideoSessionType,
-        scheduledStart: new Date(scheduledStart),
-        scheduledEnd: new Date(scheduledEnd),
-        sessionStatus: VideoSessionStatus.SCHEDULED,
-        waitingRoomEnabled,
-        maxParticipants,
-        jitsiConfig,
-        consultationId,
-        participants: {
-          connect: participantUserIds.map((id: string) => ({ id }))
-        }
-      },
-      include: {
-        host: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        participants: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        consultation: true
-      }
-    })
+    const { data: videoSession, error } = await supabase
+      .from('video_sessions')
+      .insert({
+        session_name: sessionName,
+        jitsi_room_id: jitsiRoomId,
+        host_user_id: user.id,
+        participant_user_ids: participantUserIds,
+        session_type: sessionType,
+        scheduled_start: scheduledStart,
+        scheduled_end: scheduledEnd,
+        session_status: 'SCHEDULED',
+        waiting_room_enabled: waitingRoomEnabled,
+        max_participants: maxParticipants,
+        jitsi_config: jitsiConfig,
+        consultation_id: consultationId
+      })
+      .select('*')
+      .single()
+
+    if (error) {
+      console.error('Error creating video session:', error)
+      return NextResponse.json(
+        { error: 'Failed to create video session' },
+        { status: 500 }
+      )
+    }
 
     // Get Jitsi domain from environment
     const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
@@ -98,9 +88,12 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = getSupabase()
     
-    if (!session?.user?.id) {
+    // Get user from Supabase Auth
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -110,56 +103,40 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    // Build where clause
-    const where: any = {
-      OR: [
-        { hostUserId: session.user.id },
-        { participants: { some: { id: session.user.id } } }
-      ]
-    }
+    // Build query
+    let query = supabase
+      .from('video_sessions')
+      .select('*')
+      .or(`host_user_id.eq.${user.id},participant_user_ids.cs.{${user.id}}`)
+      .order('scheduled_start', { ascending: true })
+      .range(offset, offset + limit - 1)
 
     if (sessionType) {
-      where.sessionType = sessionType as VideoSessionType
+      query = query.eq('session_type', sessionType)
     }
 
     if (status) {
-      where.sessionStatus = status as VideoSessionStatus
+      query = query.eq('session_status', status)
     }
 
-    const sessions = await prisma.videoSession.findMany({
-      where,
-      include: {
-        host: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        participants: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        consultation: true
-      },
-      orderBy: {
-        scheduledStart: 'asc'
-      },
-      take: limit,
-      skip: offset
-    })
+    const { data: sessions, error } = await query
+
+    if (error) {
+      console.error('Error fetching video sessions:', error)
+      return NextResponse.json(
+        { error: 'Failed to fetch video sessions' },
+        { status: 500 }
+      )
+    }
 
     // Add join URLs and user role
     const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
-    const sessionsWithUrls = sessions.map(videoSession => ({
+    const sessionsWithUrls = sessions?.map(videoSession => ({
       ...videoSession,
-      joinUrl: `https://${jitsiDomain}/${videoSession.jitsiRoomId}`,
-      isHost: videoSession.hostUserId === session.user.id,
-      isParticipant: videoSession.participants.some(p => p.id === session.user.id)
-    }))
+      joinUrl: `https://${jitsiDomain}/${videoSession.jitsi_room_id}`,
+      isHost: videoSession.host_user_id === user.id,
+      isParticipant: videoSession.participant_user_ids?.includes(user.id)
+    })) || []
 
     return NextResponse.json(sessionsWithUrls)
 

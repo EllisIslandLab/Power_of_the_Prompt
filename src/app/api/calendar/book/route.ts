@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { VideoSessionType, VideoSessionStatus } from '@prisma/client'
+import { getSupabase } from '@/lib/supabase'
 import { getAirtableBase } from '@/lib/airtable'
 
 export async function POST(request: NextRequest) {
@@ -37,10 +36,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // TODO: Check Airtable for conflicts - ensure this slot isn't already booked
-    // This will be implemented when we add booking conflict checking
-
-    // Create video session in database and Jitsi room
+    // Create video session in Supabase
     const videoSession = await createVideoSession({
       sessionName: `Free Consultation with ${fullName}`,
       scheduledStart: selectedSlot.timestamp,
@@ -87,7 +83,6 @@ export async function POST(request: NextRequest) {
     const createdRecord = await base('Consultations').create([record])
     
     // TODO: Send confirmation email with calendar invite
-    // TODO: Send Zoom meeting details
     
     return NextResponse.json({
       success: true,
@@ -113,7 +108,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Video session creation function
+// Video session creation function using Supabase
 async function createVideoSession(sessionData: {
   sessionName: string
   scheduledStart: string
@@ -122,20 +117,44 @@ async function createVideoSession(sessionData: {
   userName: string
 }) {
   try {
-    // First, try to find or create a user for the guest
-    let user = await prisma.user.findUnique({
-      where: { email: sessionData.userEmail }
-    })
+    const supabase = getSupabase()
 
-    if (!user) {
-      // Create a basic user record for the guest
-      user = await prisma.user.create({
-        data: {
-          name: sessionData.userName,
+    // First, try to find or create a student user for the guest
+    let { data: existingStudent } = await supabase
+      .from('students')
+      .select('*')
+      .eq('email', sessionData.userEmail)
+      .single()
+
+    let studentId = existingStudent?.user_id
+
+    if (!existingStudent) {
+      // Create a Supabase auth user for the guest (this might not work due to signup restrictions)
+      // For now, we'll use a placeholder approach
+      // In production, you'd handle this differently - maybe create a "guest" user system
+      
+      // Create student record with placeholder user_id
+      const guestUserId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      
+      const { data: newStudent, error: studentError } = await supabase
+        .from('students')
+        .insert({
+          user_id: guestUserId,
+          full_name: sessionData.userName,
           email: sessionData.userEmail,
-          role: 'STUDENT' // Default role for calendar bookings
-        }
-      })
+          course_enrolled: 'None',
+          status: 'Active',
+          payment_status: 'Trial', // Free consultation
+          progress: 0
+        })
+        .select('*')
+        .single()
+
+      if (studentError) {
+        throw new Error(`Failed to create student record: ${studentError.message}`)
+      }
+
+      studentId = newStudent.user_id
     }
 
     // Generate unique room ID based on session data
@@ -146,50 +165,56 @@ async function createVideoSession(sessionData: {
     const startTime = new Date(sessionData.scheduledStart)
     const endTime = new Date(startTime.getTime() + (sessionData.duration * 60 * 1000))
 
-    // Get the admin/host user (you might want to make this configurable)
-    const hostUser = await prisma.user.findFirst({
-      where: { role: 'ADMIN' }
-    })
+    // Get an admin user to host the session
+    const { data: adminUser } = await supabase
+      .from('admin_users')
+      .select('user_id')
+      .limit(1)
+      .single()
 
-    if (!hostUser) {
+    if (!adminUser) {
       throw new Error('No admin user found to host the session')
     }
 
     // Create video session
-    const videoSession = await prisma.videoSession.create({
-      data: {
-        sessionName: sessionData.sessionName,
-        jitsiRoomId: roomId,
-        hostUserId: hostUser.id,
-        participantUserIds: [user.id],
-        sessionType: VideoSessionType.FREE_CONSULTATION,
-        scheduledStart: startTime,
-        scheduledEnd: endTime,
-        sessionStatus: VideoSessionStatus.SCHEDULED,
-        waitingRoomEnabled: true,
-        maxParticipants: 2, // Host + 1 participant for consultation
-        participants: {
-          connect: { id: user.id }
-        }
-      },
-      include: {
-        host: true,
-        participants: true
-      }
-    })
+    const { data: videoSession, error: sessionError } = await supabase
+      .from('video_sessions')
+      .insert({
+        session_name: sessionData.sessionName,
+        jitsi_room_id: roomId,
+        host_user_id: adminUser.user_id,
+        participant_user_ids: [studentId],
+        session_type: 'FREE_CONSULTATION',
+        scheduled_start: startTime.toISOString(),
+        scheduled_end: endTime.toISOString(),
+        session_status: 'SCHEDULED',
+        waiting_room_enabled: true,
+        max_participants: 2 // Host + 1 participant for consultation
+      })
+      .select('*')
+      .single()
+
+    if (sessionError) {
+      throw new Error(`Failed to create video session: ${sessionError.message}`)
+    }
 
     // Create associated consultation record
-    const consultation = await prisma.consultation.create({
-      data: {
-        userId: user.id,
-        scheduledTime: startTime,
+    const { data: consultation, error: consultationError } = await supabase
+      .from('consultations')
+      .insert({
+        user_id: studentId,
+        scheduled_time: startTime.toISOString(),
         status: 'SCHEDULED',
         type: 'FREE',
-        videoSession: {
-          connect: { id: videoSession.id }
-        }
-      }
-    })
+        video_session_id: videoSession.id
+      })
+      .select('*')
+      .single()
+
+    if (consultationError) {
+      console.warn('Failed to create consultation record:', consultationError)
+      // Don't throw here - video session is more important
+    }
 
     // Get Jitsi domain from environment
     const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
@@ -201,9 +226,9 @@ async function createVideoSession(sessionData: {
       sessionName: sessionData.sessionName,
       scheduledStart: sessionData.scheduledStart,
       duration: sessionData.duration,
-      consultationId: consultation.id,
-      userId: user.id,
-      hostId: hostUser.id
+      consultationId: consultation?.id || null,
+      userId: studentId,
+      hostId: adminUser.user_id
     }
 
   } catch (error) {
