@@ -77,9 +77,22 @@ export function useAuth() {
           if (session?.user) {
             let userWithProfile = await getUserWithProfile(session.user)
             
-            // Don't automatically create profiles - let users sign up explicitly
-            if (!userWithProfile.studentProfile && !userWithProfile.adminProfile) {
-              console.log('User has no profile - they may need to complete registration or contact admin')
+            // Only create student profiles during SIGN_UP events, not SIGN_IN
+            if (!userWithProfile.studentProfile && !userWithProfile.adminProfile && event === 'SIGNED_UP' && session.user.email_confirmed_at) {
+              try {
+                console.log('New user sign-up detected, creating student profile...')
+                const name = session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User'
+                const studentProfile = await createStudentProfile(session.user.id, session.user.email!, name)
+                userWithProfile = {
+                  ...session.user,
+                  userType: 'student',
+                  studentProfile: studentProfile
+                }
+              } catch (error) {
+                console.error('Failed to create student profile during sign-up:', error)
+              }
+            } else if (!userWithProfile.studentProfile && !userWithProfile.adminProfile) {
+              console.log(`User has no profile (event: ${event}) - they may need to complete registration or contact admin`)
             }
             
             setUser(userWithProfile)
@@ -193,7 +206,30 @@ export function useAuth() {
     return data
   }
 
-  // Removed automatic student profile creation to prevent conflicts
+  const createStudentProfile = async (userId: string, email: string, name: string) => {
+    try {
+      const supabase = getSupabase()
+      const { data, error } = await supabase
+        .from('students')
+        .insert({
+          user_id: userId,
+          full_name: name,
+          email: email
+        })
+        .select()
+        .single()
+
+      if (error) {
+        throw new Error(`Failed to create student profile: ${error.message}`)
+      }
+      
+      console.log('✅ Student profile created successfully')
+      return data
+    } catch (error) {
+      console.error('Failed to create student profile:', error)
+      throw error
+    }
+  }
 
   const signIn = async (email: string, password: string) => {
     console.log('🔧 DEBUGGING AUTH STEP BY STEP...')
