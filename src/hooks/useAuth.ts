@@ -77,21 +77,8 @@ export function useAuth() {
           if (session?.user) {
             let userWithProfile = await getUserWithProfile(session.user)
             
-            // Only create student profiles during SIGN_UP events, not SIGN_IN
-            if (!userWithProfile.studentProfile && !userWithProfile.adminProfile && event === 'SIGNED_UP' && session.user.email_confirmed_at) {
-              try {
-                console.log('New user sign-up detected, creating student profile...')
-                const name = session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User'
-                const studentProfile = await createStudentProfile(session.user.id, session.user.email!, name)
-                userWithProfile = {
-                  ...session.user,
-                  userType: 'student',
-                  studentProfile: studentProfile
-                }
-              } catch (error) {
-                console.error('Failed to create student profile during sign-up:', error)
-              }
-            } else if (!userWithProfile.studentProfile && !userWithProfile.adminProfile) {
+            // Don't automatically create profiles - require explicit registration
+            if (!userWithProfile.studentProfile && !userWithProfile.adminProfile) {
               console.log(`User has no profile (event: ${event}) - they may need to complete registration or contact admin`)
             }
             
