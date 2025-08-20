@@ -240,8 +240,22 @@ export function useAuth() {
   }
 
   const signIn = async (email: string, password: string) => {
-    const supabase = getSupabase()
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { createClient } = await import('@supabase/supabase-js')
+    
+    // Create a fresh client to avoid singleton issues
+    const freshClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: false  // Disable URL detection for auth
+        }
+      }
+    )
+    
+    const { data, error } = await freshClient.auth.signInWithPassword({
       email,
       password,
     })

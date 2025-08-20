@@ -6,7 +6,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/hooks/useAuth"
-import { SupabaseDiagnostic } from "@/components/debug/SupabaseDiagnostic"
 
 export default function SignInPage() {
   const [email, setEmail] = useState("")
@@ -35,8 +34,6 @@ export default function SignInPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
-        {/* Debug diagnostics - remove after testing */}
-        <SupabaseDiagnostic />
         <div className="text-center mb-6">
           <Link href="/" className="text-primary hover:underline font-medium">
             ← Back to Homepage
