@@ -12,13 +12,46 @@ export function getSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Supabase environment variables not configured')
+  // More detailed error reporting
+  if (!supabaseUrl) {
+    throw new Error(`Supabase URL not configured. Got: ${typeof supabaseUrl} ${supabaseUrl}`)
   }
   
-  // Create and store the client
-  supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
-  return supabaseClient
+  if (!supabaseAnonKey) {
+    throw new Error(`Supabase anon key not configured. Got: ${typeof supabaseAnonKey} ${supabaseAnonKey?.substring(0, 10)}...`)
+  }
+
+  // Validate URL format
+  if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co')) {
+    throw new Error(`Invalid Supabase URL format: ${supabaseUrl}`)
+  }
+
+  // Validate key format  
+  if (!supabaseAnonKey.startsWith('eyJ')) {
+    throw new Error(`Invalid Supabase anon key format: ${supabaseAnonKey.substring(0, 20)}...`)
+  }
+  
+  try {
+    // Create client with additional options for debugging
+    supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'weblaunchcoach/1.0.0'
+        }
+      }
+    })
+    
+    console.log('✅ Supabase client created successfully')
+    return supabaseClient
+  } catch (error) {
+    console.error('❌ Failed to create Supabase client:', error)
+    throw new Error(`Failed to create Supabase client: ${(error as Error).message}`)
+  }
 }
 
 // Database types for our new schema
