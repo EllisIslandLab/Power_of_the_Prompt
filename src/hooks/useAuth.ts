@@ -240,46 +240,85 @@ export function useAuth() {
   }
 
   const signIn = async (email: string, password: string) => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    console.log('🔧 DEBUGGING AUTH STEP BY STEP...')
     
-    console.log('Attempting direct auth API call...')
+    // Debug environment variables
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    console.log('ENV CHECK:', {
+      hasUrl: !!supabaseUrl,
+      hasKey: !!supabaseKey,
+      urlType: typeof supabaseUrl,
+      keyType: typeof supabaseKey,
+      urlValue: supabaseUrl || 'MISSING',
+      keyPreview: supabaseKey ? `${supabaseKey.substring(0, 20)}...` : 'MISSING'
+    })
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Environment variables missing in production')
+    }
+    
+    // Validate formats
+    if (typeof supabaseUrl !== 'string' || typeof supabaseKey !== 'string') {
+      throw new Error(`Invalid env var types: url=${typeof supabaseUrl}, key=${typeof supabaseKey}`)
+    }
+    
+    // Build URL and debug it
+    const authUrl = `${supabaseUrl}/auth/v1/token?grant_type=password`
+    console.log('AUTH URL:', authUrl)
+    
+    // Debug headers
+    const headers = {
+      'Content-Type': 'application/json',
+      'apikey': supabaseKey,
+      'Authorization': `Bearer ${supabaseKey}`
+    }
+    console.log('HEADERS:', {
+      'Content-Type': headers['Content-Type'],
+      'apikey': `${supabaseKey.substring(0, 10)}...`,
+      'Authorization': `Bearer ${supabaseKey.substring(0, 10)}...`
+    })
+    
+    // Debug body
+    const requestBody = JSON.stringify({ email, password: '***' })
+    console.log('BODY:', requestBody.replace(password, '***'))
     
     try {
-      // Direct REST API call to Supabase Auth
-      const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+      console.log('🚀 MAKING FETCH REQUEST...')
+      
+      // Test basic fetch first
+      const testResponse = await fetch(`${supabaseUrl}/rest/v1/`, {
+        method: 'GET',
+        headers: { 'apikey': supabaseKey }
+      })
+      
+      console.log('✅ Basic fetch test passed:', testResponse.status)
+      
+      // Now try auth
+      const response = await fetch(authUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`
-        },
-        body: JSON.stringify({
-          email,
-          password
-        })
+        headers: headers,
+        body: JSON.stringify({ email, password })
+      })
+      
+      console.log('📡 AUTH RESPONSE:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: response.headers
       })
       
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error_description || `Authentication failed: ${response.status}`)
+        const errorText = await response.text()
+        console.error('❌ AUTH ERROR RESPONSE:', errorText)
+        throw new Error(`Authentication failed: ${response.status} - ${errorText}`)
       }
       
       const authData = await response.json()
-      console.log('Auth successful, setting session...')
+      console.log('✅ Auth successful! Setting session...')
       
-      // Set the session in our main Supabase client
-      const supabase = getSupabase()
-      const { error: sessionError } = await supabase.auth.setSession({
-        access_token: authData.access_token,
-        refresh_token: authData.refresh_token
-      })
-      
-      if (sessionError) {
-        console.warn('Session setting failed:', sessionError)
-        // Continue anyway as auth was successful
-      }
-      
+      // Simplified return - skip session setting for now
       return {
         user: authData.user,
         session: {
@@ -289,7 +328,11 @@ export function useAuth() {
         }
       }
     } catch (error) {
-      console.error('Direct auth failed:', error)
+      console.error('❌ FETCH ERROR DETAILS:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      })
       throw error
     }
   }
