@@ -77,19 +77,9 @@ export function useAuth() {
           if (session?.user) {
             let userWithProfile = await getUserWithProfile(session.user)
             
-            // If no profile exists and user is confirmed, create student profile
-            if (!userWithProfile.studentProfile && !userWithProfile.adminProfile && session.user.email_confirmed_at) {
-              try {
-                const name = session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User'
-                const studentProfile = await createStudentProfile(session.user.id, session.user.email!, name)
-                userWithProfile = {
-                  ...session.user,
-                  userType: 'student',
-                  studentProfile: studentProfile
-                }
-              } catch (error) {
-                console.error('Failed to create student profile on auth change:', error)
-              }
+            // Don't automatically create profiles - let users sign up explicitly
+            if (!userWithProfile.studentProfile && !userWithProfile.adminProfile) {
+              console.log('User has no profile - they may need to complete registration or contact admin')
             }
             
             setUser(userWithProfile)
@@ -203,41 +193,7 @@ export function useAuth() {
     return data
   }
 
-  const createStudentProfile = async (userId: string, email: string, name: string) => {
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000)
-      
-      const response = await fetch('https://jmwfpumnyxuaelmkwbvf.supabase.co/rest/v1/students', {
-        method: 'POST',
-        signal: controller.signal,
-        headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM',
-          'Content-Type': 'application/json',
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          full_name: name,
-          email: email
-        })
-      })
-      
-      clearTimeout(timeoutId)
-      
-      if (!response.ok) {
-        const error = await response.text()
-        throw new Error(`Failed to create student profile: ${response.status} - ${error}`)
-      }
-      
-      const data = await response.json()
-      return Array.isArray(data) ? data[0] : data
-    } catch (error) {
-      console.error('Failed to create student profile:', error)
-      throw error
-    }
-  }
+  // Removed automatic student profile creation to prevent conflicts
 
   const signIn = async (email: string, password: string) => {
     console.log('🔧 DEBUGGING AUTH STEP BY STEP...')
