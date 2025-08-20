@@ -240,28 +240,58 @@ export function useAuth() {
   }
 
   const signIn = async (email: string, password: string) => {
-    const { createClient } = await import('@supabase/supabase-js')
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     
-    // Create a fresh client to avoid singleton issues
-    const freshClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: false  // Disable URL detection for auth
+    console.log('Attempting direct auth API call...')
+    
+    try {
+      // Direct REST API call to Supabase Auth
+      const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        },
+        body: JSON.stringify({
+          email,
+          password
+        })
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error_description || `Authentication failed: ${response.status}`)
+      }
+      
+      const authData = await response.json()
+      console.log('Auth successful, setting session...')
+      
+      // Set the session in our main Supabase client
+      const supabase = getSupabase()
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: authData.access_token,
+        refresh_token: authData.refresh_token
+      })
+      
+      if (sessionError) {
+        console.warn('Session setting failed:', sessionError)
+        // Continue anyway as auth was successful
+      }
+      
+      return {
+        user: authData.user,
+        session: {
+          access_token: authData.access_token,
+          refresh_token: authData.refresh_token,
+          user: authData.user
         }
       }
-    )
-    
-    const { data, error } = await freshClient.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) throw error
-    return data
+    } catch (error) {
+      console.error('Direct auth failed:', error)
+      throw error
+    }
   }
 
   const signOut = async () => {

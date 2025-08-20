@@ -37,7 +37,9 @@ export function getSupabase() {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true
+        detectSessionInUrl: false,
+        storageKey: 'weblaunchcoach-auth', // Unique storage key
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined
       },
       global: {
         headers: {
