@@ -39,10 +39,16 @@ export function JitsiMeet({
 
     const loadJitsiScript = async () => {
       try {
+        const jitsiAppId = process.env.NEXT_PUBLIC_JITSI_APP_ID
+        
+        if (!jitsiAppId) {
+          throw new Error('Jitsi App ID not configured')
+        }
+        
         // Load Jitsi script if not already loaded
         if (!window.JitsiMeetExternalAPI) {
           const script = document.createElement('script')
-          script.src = 'https://8x8.vc/vpaas-magic-cookie-1764593a618848cfa0023ac1a152f3c8/external_api.js'
+          script.src = `https://8x8.vc/${jitsiAppId}/external_api.js`
           script.async = true
           
           await new Promise((resolve, reject) => {
@@ -54,7 +60,7 @@ export function JitsiMeet({
 
         // Initialize Jitsi Meet
         const options = {
-          roomName: `vpaas-magic-cookie-1764593a618848cfa0023ac1a152f3c8/${roomName}`,
+          roomName: `${jitsiAppId}/${roomName}`,
           parentNode: containerRef.current,
           configOverwrite: {
             startWithAudioMuted: true,
