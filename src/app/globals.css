@@ -126,6 +126,11 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   min-height: 100dvh;
+  /* Improve touch scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent text size adjustment on mobile */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 * {

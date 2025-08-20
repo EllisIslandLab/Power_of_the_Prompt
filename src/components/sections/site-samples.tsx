@@ -95,9 +95,10 @@ export function SiteSamples() {
   // Touch handling for mobile swipe
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const [isSwiping, setIsSwiping] = useState(false)
 
-  // Minimum distance for a swipe
-  const minSwipeDistance = 50
+  // Minimum distance for a swipe - reduced for better mobile sensitivity
+  const minSwipeDistance = 30
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null) // Clear the end position

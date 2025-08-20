@@ -113,7 +113,7 @@ export function ResponsiveComparison() {
           <div className="text-lg font-semibold text-foreground">Traditional Agencies</div>
           <div className="text-sm text-muted-foreground">WordPress developers and similar</div>
         </div>
-        <div className="p-4 text-center border-l-2 border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5 relative">
+        <div className="p-4 text-center relative">
           <div className="absolute top-2 right-2">
             <span className="bg-primary text-primary-foreground rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold">★</span>
           </div>
@@ -145,7 +145,7 @@ export function ResponsiveComparison() {
               <span className="text-sm">{comparison.agencies}</span>
             )}
           </div>
-          <div className="p-4 text-center border-l-2 border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5">
+          <div className="p-4 text-center">
             <div className="flex items-center justify-center gap-2 text-green-600">
               <Check className="h-4 w-4 flex-shrink-0" />
               <span className="font-semibold text-sm">{comparison.webLaunch}</span>
