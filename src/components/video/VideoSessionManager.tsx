@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/hooks/useAuth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -71,7 +71,7 @@ export default function VideoSessionManager({
   showPastSessions = true,
   embedded = false
 }: VideoSessionManagerProps) {
-  const { data: session, status } = useSession()
+  const { user, loading: authLoading } = useAuth()
   const [sessions, setSessions] = useState<VideoSession[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -80,7 +80,7 @@ export default function VideoSessionManager({
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming')
 
   // Use current session user ID if not provided
-  const currentUserId = userId || session?.user?.id || null
+  const currentUserId = userId || user?.id || null
 
   useEffect(() => {
     if (currentUserId) {
@@ -279,8 +279,8 @@ export default function VideoSessionManager({
         
         <JitsiMeetEmbed
           roomId={selectedSession.jitsiRoomId}
-          displayName={session?.user?.name || 'Guest'}
-          email={session?.user?.email}
+          displayName={user?.adminProfile?.full_name || user?.studentProfile?.full_name || 'Guest'}
+          email={user?.email}
           userRole={selectedSession.hostUserId === currentUserId ? 'host' : 'participant'}
           sessionType={selectedSession.sessionType.toLowerCase() as any}
           waitingRoomEnabled={selectedSession.waitingRoomEnabled}
@@ -533,8 +533,8 @@ export default function VideoSessionManager({
           {selectedSession && (
             <JitsiMeetEmbed
               roomId={selectedSession.jitsiRoomId}
-              displayName={session?.user?.name || 'Guest'}
-              email={session?.user?.email}
+              displayName={user?.adminProfile?.full_name || user?.studentProfile?.full_name || 'Guest'}
+              email={user?.email}
               userRole={selectedSession.hostUserId === currentUserId ? 'host' : 'participant'}
               sessionType={selectedSession.sessionType.toLowerCase() as any}
               waitingRoomEnabled={selectedSession.waitingRoomEnabled}

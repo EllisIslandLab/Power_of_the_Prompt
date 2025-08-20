@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/hooks/useAuth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -45,7 +45,7 @@ export default function SupportPage() {
   }
   
   const [isClient, setIsClient] = useState(false)
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const [selectedTab, setSelectedTab] = useState<'faq' | 'contact' | 'tickets'>('faq')
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null)
@@ -377,8 +377,8 @@ export default function SupportPage() {
                   <div>
                     <Label>Your Information</Label>
                     <div className="p-3 bg-muted/50 rounded-md text-sm">
-                      <p><strong>Name:</strong> {session?.user?.name || 'Not available'}</p>
-                      <p><strong>Email:</strong> {session?.user?.email || 'Not available'}</p>
+                      <p><strong>Name:</strong> {user?.adminProfile?.full_name || user?.studentProfile?.full_name || 'Not available'}</p>
+                      <p><strong>Email:</strong> {user?.email || 'Not available'}</p>
                     </div>
                   </div>
                 </div>

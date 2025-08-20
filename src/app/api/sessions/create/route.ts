@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
       ...videoSession,
       joinUrl: `https://${jitsiDomain}/${videoSession.jitsi_room_id}`,
       isHost: videoSession.host_user_id === user.id,
-      isParticipant: videoSession.participant_user_ids?.includes(user.id)
+      isParticipant: Array.isArray(videoSession.participant_user_ids) && videoSession.participant_user_ids.includes(user.id)
     })) || []
 
     return NextResponse.json(sessionsWithUrls)

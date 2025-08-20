@@ -47,7 +47,8 @@ export async function PUT(
 
     // Check if user is authorized to join
     const isHost = videoSession.host_user_id === userId
-    const isParticipant = videoSession.participant_user_ids?.includes(userId)
+    const participantIds = Array.isArray(videoSession.participant_user_ids) ? videoSession.participant_user_ids : []
+    const isParticipant = participantIds.includes(userId)
     
     if (!isHost && !isParticipant) {
       return NextResponse.json({ error: 'Not authorized to join this session' }, { status: 403 })
@@ -55,8 +56,8 @@ export async function PUT(
 
     // Check if session is joinable
     const now = new Date()
-    const startTime = new Date(videoSession.scheduled_start)
-    const endTime = new Date(videoSession.scheduled_end)
+    const startTime = new Date(videoSession.scheduled_start as string)
+    const endTime = new Date(videoSession.scheduled_end as string)
     
     // Allow joining 15 minutes before scheduled start
     const joinWindow = new Date(startTime.getTime() - 15 * 60 * 1000)
@@ -85,8 +86,9 @@ export async function PUT(
     }
 
     // Check participant limit
-    const participantCount = videoSession.participant_user_ids?.length || 0
-    if (!isHost && !isParticipant && participantCount >= (videoSession.max_participants || 10)) {
+    const participantCount = participantIds.length
+    const maxParticipants = (videoSession.max_participants as number) || 10
+    if (!isHost && !isParticipant && participantCount >= maxParticipants) {
       return NextResponse.json({ error: 'Session is at maximum capacity' }, { status: 400 })
     }
 
@@ -100,8 +102,7 @@ export async function PUT(
 
     // If user is not already a participant, add them
     if (!isParticipant && !isHost) {
-      const currentParticipants = videoSession.participant_user_ids || []
-      updateData.participant_user_ids = [...currentParticipants, userId]
+      updateData.participant_user_ids = [...participantIds, userId]
     }
 
     // Update session if needed
@@ -130,7 +131,7 @@ export async function PUT(
         ...updatedSession,
         joinUrl: `https://${jitsiDomain}/${updatedSession!.jitsi_room_id}`,
         isHost: updatedSession!.host_user_id === userId,
-        isParticipant: updatedSession!.participant_user_ids?.includes(userId)
+        isParticipant: Array.isArray(updatedSession!.participant_user_ids) && updatedSession!.participant_user_ids.includes(userId)
       }
     })
 

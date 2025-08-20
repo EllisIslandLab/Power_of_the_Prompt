@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/hooks/useAuth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -45,7 +45,7 @@ export default function CollaborationPage() {
   }
   
   const [isClient, setIsClient] = useState(false)
-  const { data: session, status } = useSession()
+  const { user, loading } = useAuth()
   const [selectedTab, setSelectedTab] = useState<'sessions' | 'resources'>('sessions')
   const [quickJoinRoom, setQuickJoinRoom] = useState('')
 
@@ -179,7 +179,7 @@ export default function CollaborationPage() {
               </div>
 
               {/* Schedule Session (for admins/hosts) */}
-              {session?.user?.role === 'ADMIN' && (
+              {user?.userType === 'admin' && (
                 <div>
                   <Label className="text-sm font-medium mb-2 block">
                     Host Actions
@@ -242,7 +242,7 @@ export default function CollaborationPage() {
               </CardHeader>
               <CardContent>
                 <VideoSessionManager
-                  userId={session?.user?.id || undefined}
+                  userId={user?.id || undefined}
                   viewMode="all"
                   showPastSessions={true}
                   embedded={false}
