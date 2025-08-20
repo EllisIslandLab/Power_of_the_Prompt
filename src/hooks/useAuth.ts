@@ -318,7 +318,23 @@ export function useAuth() {
       const authData = await response.json()
       console.log('✅ Auth successful! Setting session...')
       
-      // Simplified return - skip session setting for now
+      // Set the session in our main Supabase client
+      try {
+        const supabase = getSupabase()
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: authData.access_token,
+          refresh_token: authData.refresh_token
+        })
+        
+        if (sessionError) {
+          console.warn('⚠️  Session setting warning:', sessionError)
+        } else {
+          console.log('✅ Session set successfully')
+        }
+      } catch (sessionErr) {
+        console.warn('⚠️  Session setting failed:', sessionErr)
+      }
+      
       return {
         user: authData.user,
         session: {
