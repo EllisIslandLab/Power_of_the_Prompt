@@ -258,28 +258,13 @@ export function useAuth() {
   const signIn = async (email: string, password: string) => {
     console.log('🔧 DEBUGGING AUTH STEP BY STEP...')
     
-    // Debug environment variables with more detail
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    
-    console.log('🔍 ENV CHECK - URL exists:', !!supabaseUrl)
-    console.log('🔍 ENV CHECK - Key exists:', !!supabaseKey) 
-    console.log('🔍 ENV CHECK - URL type:', typeof supabaseUrl)
-    console.log('🔍 ENV CHECK - Key type:', typeof supabaseKey)
-    console.log('🔍 ENV CHECK - URL value:', supabaseUrl || 'MISSING')
-    console.log('🔍 ENV CHECK - Key preview:', supabaseKey ? `${supabaseKey.substring(0, 20)}...` : 'MISSING')
-    
-    // Fallback values for production debugging
-    const finalUrl = supabaseUrl || 'https://jmwfpumnyxuaelmkwbvf.supabase.co'
-    const finalKey = supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM'
+    // Use hardcoded values due to Vercel environment variable truncation issue
+    const finalUrl = 'https://jmwfpumnyxuaelmkwbvf.supabase.co'
+    const finalKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM'
     
     console.log('🚀 FINAL URL:', finalUrl)
     console.log('🚀 FINAL KEY preview:', `${finalKey.substring(0, 20)}...`)
-    console.log('🚀 From environment:', !!supabaseUrl && !!supabaseKey)
-    
-    if (!supabaseUrl || !supabaseKey) {
-      console.warn('⚠️  Using fallback values - environment variables not accessible')
-    }
+    console.log('🚀 Using hardcoded values due to env var truncation issue')
     
     // Validate formats using final values
     if (typeof finalUrl !== 'string' || typeof finalKey !== 'string') {

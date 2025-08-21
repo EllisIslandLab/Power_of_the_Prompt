@@ -61,7 +61,12 @@ export default function EnvCheckPage() {
             const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jmwfpumnyxuaelmkwbvf.supabase.co'
             const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM'
             
-            console.log('Testing fetch with:', { url: url.substring(0, 30), key: key.substring(0, 20) })
+            console.log('Testing fetch with FULL values:')
+            console.log('  URL:', url)
+            console.log('  URL length:', url.length)
+            console.log('  Key length:', key.length)
+            console.log('  URL from env:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
+            console.log('  Key from env:', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
             
             fetch(`${url}/rest/v1/`, {
               headers: { 'apikey': key }
