@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { getJitsiConfig } from '@/lib/env-config'
 
 declare global {
   interface Window {
@@ -39,7 +40,7 @@ export function JitsiMeet({
 
     const loadJitsiScript = async () => {
       try {
-        const jitsiAppId = process.env.NEXT_PUBLIC_JITSI_APP_ID
+        const { appId: jitsiAppId } = getJitsiConfig()
         
         if (!jitsiAppId) {
           throw new Error('Jitsi App ID not configured')

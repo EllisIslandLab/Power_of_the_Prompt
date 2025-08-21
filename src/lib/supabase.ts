@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseConfig } from './env-config'
 
 // Singleton pattern to prevent multiple clients
 let supabaseClient: ReturnType<typeof createClient> | null = null
@@ -9,18 +10,8 @@ export function getSupabase() {
     return supabaseClient
   }
 
-  // Use hardcoded values due to Vercel env var truncation issue
-  const supabaseUrl = 'https://jmwfpumnyxuaelmkwbvf.supabase.co'
-  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM'
-  
-  // Log environment access
-  console.log('🔧 Supabase client env check:', {
-    hasEnvUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-    hasEnvKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    usingFallback: !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    urlPreview: supabaseUrl.substring(0, 30),
-    keyPreview: supabaseAnonKey.substring(0, 20)
-  })
+  // Get configuration with proper validation and fallbacks
+  const { url: supabaseUrl, anonKey: supabaseAnonKey } = getSupabaseConfig()
 
   // Validate URL format
   if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co')) {

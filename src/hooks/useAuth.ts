@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getSupabase } from '@/lib/supabase'
+import { getSupabaseConfig } from '@/lib/env-config'
 import type { User } from '@supabase/supabase-js'
 
 export interface StudentProfile {
@@ -258,13 +259,11 @@ export function useAuth() {
   const signIn = async (email: string, password: string) => {
     console.log('🔧 DEBUGGING AUTH STEP BY STEP...')
     
-    // Use hardcoded values due to Vercel environment variable truncation issue
-    const finalUrl = 'https://jmwfpumnyxuaelmkwbvf.supabase.co'
-    const finalKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM'
+    // Get configuration with proper validation and fallbacks
+    const { url: finalUrl, anonKey: finalKey } = getSupabaseConfig()
     
-    console.log('🚀 FINAL URL:', finalUrl)
-    console.log('🚀 FINAL KEY preview:', `${finalKey.substring(0, 20)}...`)
-    console.log('🚀 Using hardcoded values due to env var truncation issue')
+    console.log('🚀 AUTH URL:', finalUrl)
+    console.log('🚀 AUTH KEY preview:', `${finalKey.substring(0, 20)}...`)
     
     // Validate formats using final values
     if (typeof finalUrl !== 'string' || typeof finalKey !== 'string') {
