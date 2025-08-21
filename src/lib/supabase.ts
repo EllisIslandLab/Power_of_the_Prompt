@@ -9,17 +9,17 @@ export function getSupabase() {
     return supabaseClient
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jmwfpumnyxuaelmkwbvf.supabase.co'
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM'
   
-  // More detailed error reporting
-  if (!supabaseUrl) {
-    throw new Error(`Supabase URL not configured. Got: ${typeof supabaseUrl} ${supabaseUrl}`)
-  }
-  
-  if (!supabaseAnonKey) {
-    throw new Error(`Supabase anon key not configured. Got: ${typeof supabaseAnonKey} ${supabaseAnonKey?.substring(0, 10)}...`)
-  }
+  // Log environment access
+  console.log('🔧 Supabase client env check:', {
+    hasEnvUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    hasEnvKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    usingFallback: !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    urlPreview: supabaseUrl.substring(0, 30),
+    keyPreview: supabaseAnonKey.substring(0, 20)
+  })
 
   // Validate URL format
   if (!supabaseUrl.startsWith('https://') || !supabaseUrl.includes('.supabase.co')) {
