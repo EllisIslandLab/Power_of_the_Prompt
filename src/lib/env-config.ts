@@ -38,10 +38,10 @@ function getEnvConfig(): EnvConfig {
   const validJitsi = validateEnvVar('NEXT_PUBLIC_JITSI_APP_ID', envJitsi, 50)
   const validResend = validateEnvVar('RESEND_API_KEY', envResend, 30)
   
-  // Known good fallback values
+  // Known good fallback values (updated with new clean database)
   const fallbacks = {
-    supabaseUrl: 'https://jmwfpumnyxuaelmkwbvf.supabase.co',
-    supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM',
+    supabaseUrl: 'https://xwqfhjylkmnmskvwkbtm.supabase.co',
+    supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3cWZoanlsa21ubXNrdndrYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3OTc5NzcsImV4cCI6MjA3MTM3Mzk3N30.5Q-gCSqFQ1MsKiY8od8axMYGSgfEyeCni0Qcx0R2xcE',
     jitsiAppId: 'vpaas-magic-cookie-1764593a618848cfa0023ac1a152f3c8',
     resendApiKey: 're_9EcX2S6Z_5XqAWExwMS7XKSiuMFf3Hsyf'
   }

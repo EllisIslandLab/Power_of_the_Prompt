@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js')
 
-const supabaseUrl = 'https://jmwfpumnyxuaelmkwbvf.supabase.co'
-const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MzY2ODU0NywiZXhwIjoyMDY5MjQ0NTQ3fQ.Xnv1khD1ePM5r5taW6ozwjqOvuUtns9nLdaGfGNyGXU'
+const supabaseUrl = 'https://xwqfhjylkmnmskvwkbtm.supabase.co'
+const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3cWZoanlsa21ubXNrdndrYnRtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTc5Nzk3NywiZXhwIjoyMDcxMzczOTc3fQ.q_BSpVlMR8XHDuldtUkxU9ITTMOGdfao-q2SwVirL8w'
 
 const supabase = createClient(supabaseUrl, serviceRoleKey)
 
