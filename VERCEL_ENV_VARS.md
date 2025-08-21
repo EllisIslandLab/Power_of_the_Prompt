@@ -14,10 +14,10 @@ Implemented a robust environment configuration system with validation and fallba
 
 ### 2. **Expected Values (Full Length)**
 ```
-NEXT_PUBLIC_SUPABASE_URL = https://jmwfpumnyxuaelmkwbvf.supabase.co
+NEXT_PUBLIC_SUPABASE_URL = https://YOUR_PROJECT_ID.supabase.co
 (Should be 48 characters)
 
-NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM
+NEXT_PUBLIC_SUPABASE_ANON_KEY = YOUR_ANON_KEY_HERE
 (Should be 208 characters)
 
 NEXT_PUBLIC_JITSI_APP_ID = vpaas-magic-cookie-1764593a618848cfa0023ac1a152f3c8

@@ -58,8 +58,8 @@ export default function EnvCheckPage() {
         <h2 className="text-xl font-semibold mb-2">Test Fetch:</h2>
         <button 
           onClick={() => {
-            const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jmwfpumnyxuaelmkwbvf.supabase.co'
-            const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM'
+            const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://YOUR_PROJECT_ID.supabase.co'
+            const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'YOUR_ANON_KEY_HERE'
             
             console.log('Testing fetch with FULL values:')
             console.log('  URL:', url)
