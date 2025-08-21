@@ -262,27 +262,20 @@ export function useAuth() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     
-    console.log('🔍 DETAILED ENV CHECK:', {
-      hasUrl: !!supabaseUrl,
-      hasKey: !!supabaseKey,
-      urlType: typeof supabaseUrl,
-      keyType: typeof supabaseKey,
-      urlValue: supabaseUrl || 'MISSING',
-      keyPreview: supabaseKey ? `${supabaseKey.substring(0, 20)}...` : 'MISSING',
-      nodeEnv: process.env.NODE_ENV,
-      allEnvKeys: Object.keys(process.env).filter(key => key.includes('SUPABASE')),
-      buildTime: typeof window === 'undefined' ? 'SERVER' : 'CLIENT'
-    })
+    console.log('🔍 ENV CHECK - URL exists:', !!supabaseUrl)
+    console.log('🔍 ENV CHECK - Key exists:', !!supabaseKey) 
+    console.log('🔍 ENV CHECK - URL type:', typeof supabaseUrl)
+    console.log('🔍 ENV CHECK - Key type:', typeof supabaseKey)
+    console.log('🔍 ENV CHECK - URL value:', supabaseUrl || 'MISSING')
+    console.log('🔍 ENV CHECK - Key preview:', supabaseKey ? `${supabaseKey.substring(0, 20)}...` : 'MISSING')
     
     // Fallback values for production debugging
     const finalUrl = supabaseUrl || 'https://jmwfpumnyxuaelmkwbvf.supabase.co'
     const finalKey = supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imptd2ZwdW1ueXh1YWVsbWt3YnZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2Njg1NDcsImV4cCI6MjA2OTI0NDU0N30.7EuN5hMY44rlXEgcOC2IMdPnJXn5zd0Ftnx0EDdERKM'
     
-    console.log('🚀 USING VALUES:', {
-      url: finalUrl,
-      keyPreview: `${finalKey.substring(0, 20)}...`,
-      fromEnv: !!supabaseUrl && !!supabaseKey
-    })
+    console.log('🚀 FINAL URL:', finalUrl)
+    console.log('🚀 FINAL KEY preview:', `${finalKey.substring(0, 20)}...`)
+    console.log('🚀 From environment:', !!supabaseUrl && !!supabaseKey)
     
     if (!supabaseUrl || !supabaseKey) {
       console.warn('⚠️  Using fallback values - environment variables not accessible')
@@ -297,21 +290,37 @@ export function useAuth() {
     const authUrl = `${finalUrl}/auth/v1/token?grant_type=password`
     console.log('AUTH URL:', authUrl)
     
+    // Validate all values before creating headers
+    console.log('🔧 PRE-VALIDATION:')
+    console.log('  - finalUrl valid:', typeof finalUrl === 'string' && finalUrl.length > 0)
+    console.log('  - finalKey valid:', typeof finalKey === 'string' && finalKey.length > 0)
+    console.log('  - email valid:', typeof email === 'string' && email.length > 0)
+    console.log('  - password valid:', typeof password === 'string' && password.length > 0)
+    
     // Debug headers
     const headers = {
       'Content-Type': 'application/json',
       'apikey': finalKey,
       'Authorization': `Bearer ${finalKey}`
     }
-    console.log('HEADERS:', {
-      'Content-Type': headers['Content-Type'],
-      'apikey': `${finalKey.substring(0, 10)}...`,
-      'Authorization': `Bearer ${finalKey.substring(0, 10)}...`
-    })
+    
+    console.log('🔧 HEADERS:')
+    console.log('  - Content-Type:', headers['Content-Type'])
+    console.log('  - apikey length:', finalKey.length)
+    console.log('  - apikey preview:', `${finalKey.substring(0, 10)}...`)
+    console.log('  - Authorization preview:', `Bearer ${finalKey.substring(0, 10)}...`)
+    
+    // Validate headers
+    for (const [key, value] of Object.entries(headers)) {
+      if (typeof value !== 'string' || value.length === 0) {
+        console.error(`❌ Invalid header ${key}:`, typeof value, value)
+      }
+    }
     
     // Debug body
-    const requestBody = JSON.stringify({ email, password: '***' })
-    console.log('BODY:', requestBody.replace(password, '***'))
+    const requestBody = JSON.stringify({ email, password })
+    console.log('🔧 BODY length:', requestBody.length)
+    console.log('🔧 BODY preview:', requestBody.replace(password, '***'))
     
     try {
       console.log('🚀 MAKING FETCH REQUEST...')
