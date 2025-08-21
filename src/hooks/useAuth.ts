@@ -173,6 +173,18 @@ export function useAuth() {
   const signUp = async (email: string, password: string, name: string) => {
     const supabase = getSupabase()
     
+    // SAFETY CHECK: Prevent admin emails from signing up as students
+    console.log('🔍 Checking if email is already an admin...')
+    const { data: existingAdmin } = await supabase
+      .from('admin_users')
+      .select('email')
+      .eq('email', email.toLowerCase())
+      .single()
+    
+    if (existingAdmin) {
+      throw new Error('This email is registered as an admin. Please contact support if you need access.')
+    }
+    
     // Sign up with Supabase Auth
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -196,12 +208,37 @@ export function useAuth() {
   const createStudentProfile = async (userId: string, email: string, name: string) => {
     try {
       const supabase = getSupabase()
+      
+      // SAFETY CHECK: Double-check this email isn't an admin before creating student
+      console.log('🔍 Final safety check before creating student profile...')
+      const { data: adminCheck } = await supabase
+        .from('admin_users')
+        .select('email')
+        .eq('email', email.toLowerCase())
+        .single()
+      
+      if (adminCheck) {
+        throw new Error('Cannot create student profile: email is registered as admin')
+      }
+      
+      // SAFETY CHECK: Ensure this user doesn't already have a student profile
+      const { data: existingStudent } = await supabase
+        .from('students')
+        .select('user_id')
+        .eq('user_id', userId)
+        .single()
+      
+      if (existingStudent) {
+        console.log('Student profile already exists')
+        return existingStudent
+      }
+      
       const { data, error } = await supabase
         .from('students')
         .insert({
           user_id: userId,
           full_name: name,
-          email: email
+          email: email.toLowerCase() // Normalize email
         })
         .select()
         .single()
