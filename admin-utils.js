@@ -1,7 +1,15 @@
 const { createClient } = require('@supabase/supabase-js')
 
-const supabaseUrl = 'https://xwqfhjylkmnmskvwkbtm.supabase.co'
-const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3cWZoanlsa21ubXNrdndrYnRtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTc5Nzk3NywiZXhwIjoyMDcxMzczOTc3fQ.q_BSpVlMR8XHDuldtUkxU9ITTMOGdfao-q2SwVirL8w'
+// Load from environment variables - NEVER hardcode credentials!
+require('dotenv').config({ path: '.env.local' })
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !serviceRoleKey) {
+  console.error('❌ Missing environment variables. Make sure .env.local is configured.')
+  process.exit(1)
+}
 
 const supabase = createClient(supabaseUrl, serviceRoleKey)
 
