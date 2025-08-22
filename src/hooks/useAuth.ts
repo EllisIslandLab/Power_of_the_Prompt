@@ -116,16 +116,21 @@ export function useAuth() {
 
   const getUserWithProfile = async (user: User): Promise<AuthUser> => {
     try {
+      console.log('🔍 Looking up profile for user:', user.id)
       const supabase = getSupabase()
       
       // Check admin first
+      console.log('🔍 Checking admin profile...')
       const { data: adminData, error: adminError } = await supabase
         .from('admin_users')
         .select('*')
         .eq('user_id', user.id)
         .single()
       
+      console.log('🔍 Admin query result:', { adminData, adminError })
+      
       if (adminData) {
+        console.log('✅ Found admin profile:', adminData)
         return {
           ...user,
           userType: 'admin' as const,
@@ -138,13 +143,17 @@ export function useAuth() {
         console.warn('Admin profile check error:', adminError)
       }
 
+      console.log('🔍 Checking student profile...')
       const { data: studentData, error: studentError } = await supabase
         .from('students')
         .select('*')
         .eq('user_id', user.id)
         .single()
       
+      console.log('🔍 Student query result:', { studentData, studentError })
+      
       if (studentData) {
+        console.log('✅ Found student profile:', studentData)
         return {
           ...user,
           userType: 'student' as const,
@@ -157,6 +166,7 @@ export function useAuth() {
         console.warn('Student profile check error:', studentError)
       }
 
+      console.log('❌ No profile found for user:', user.id)
       return {
         ...user,
         userType: null
