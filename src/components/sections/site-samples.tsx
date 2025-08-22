@@ -151,12 +151,12 @@ export function SiteSamples() {
           </p>
           
           {/* Category Tabs */}
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex bg-muted rounded-xl p-1">
+          <div className="flex justify-center mb-8 overflow-x-auto">
+            <div className="inline-flex bg-muted rounded-xl p-1 min-w-fit">
               {categories.map((category) => (
                 <div
                   key={category}
-                  className="px-6 py-3 rounded-lg text-sm font-medium bg-muted text-muted-foreground"
+                  className="px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium bg-muted text-muted-foreground whitespace-nowrap"
                 >
                   {category}
                 </div>

@@ -42,6 +42,27 @@ export function useAuth() {
   useEffect(() => {
     const supabase = getSupabase()
     
+    // Clear any potentially corrupted session data first
+    const clearCorruptedSession = async () => {
+      try {
+        // Clear local storage keys
+        if (typeof window !== 'undefined') {
+          const keysToRemove = [
+            'sb-srnykdfmhnovdgypzmeg-auth-token',
+            'supabase.auth.token',
+            'sb-localhost-auth-token'
+          ]
+          keysToRemove.forEach(key => {
+            localStorage.removeItem(key)
+            sessionStorage.removeItem(key)
+          })
+        }
+        await supabase.auth.signOut()
+      } catch (err) {
+        console.log('Session clear attempt completed')
+      }
+    }
+
     // Get initial session
     const getInitialSession = async () => {
       try {
@@ -49,7 +70,8 @@ export function useAuth() {
         if (error) {
           // Clear any invalid session data
           if (error.message.includes('Invalid Refresh Token') || error.message.includes('Refresh Token Not Found')) {
-            await supabase.auth.signOut()
+            console.log('Clearing invalid refresh token...')
+            await clearCorruptedSession()
             setUser(null)
             return
           }
@@ -62,7 +84,7 @@ export function useAuth() {
       } catch (error) {
         console.error('Initial session error:', error)
         // Clear any corrupted auth state
-        await supabase.auth.signOut()
+        await clearCorruptedSession()
         setUser(null)
       } finally {
         setLoading(false)
@@ -77,12 +99,6 @@ export function useAuth() {
         try {
           if (session?.user) {
             let userWithProfile = await getUserWithProfile(session.user)
-            
-            // Don't automatically create profiles - require explicit registration
-            if (!userWithProfile.studentProfile && !userWithProfile.adminProfile) {
-              console.log(`User has no profile (event: ${event}) - they may need to complete registration or contact admin`)
-            }
-            
             setUser(userWithProfile)
           } else {
             setUser(null)
@@ -100,64 +116,47 @@ export function useAuth() {
 
   const getUserWithProfile = async (user: User): Promise<AuthUser> => {
     try {
-      console.log('Checking profile for user ID:', user.id)
-      
-      // Use direct fetch API since Supabase client is hanging
-      const checkProfile = async (table: string) => {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 3000)
-        
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/${table}?select=*&user_id=eq.${user.id}`, {
-            signal: controller.signal,
-            headers: {
-              'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-              'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''}`,
-              'Content-Type': 'application/json'
-            }
-          })
-          
-          clearTimeout(timeoutId)
-          
-          if (response.ok) {
-            const data = await response.json()
-            return data.length > 0 ? data[0] : null
-          }
-          return null
-        } catch (err) {
-          clearTimeout(timeoutId)
-          console.error(`Error checking ${table}:`, err)
-          return null
-        }
-      }
+      const supabase = getSupabase()
       
       // Check admin first
-      console.log('Starting admin check...')
-      const adminData = await checkProfile('admin_users')
+      const { data: adminData, error: adminError } = await supabase
+        .from('admin_users')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
       
       if (adminData) {
-        console.log('Found admin profile:', adminData)
         return {
           ...user,
-          userType: 'admin',
-          adminProfile: adminData
+          userType: 'admin' as const,
+          adminProfile: adminData as unknown as AdminProfile
         }
       }
 
-      // Check student if not admin
-      console.log('Starting student check...')
-      const studentData = await checkProfile('students')
+      // Check student if not admin (ignore PGRST116 error - means no rows found)
+      if (adminError?.code !== 'PGRST116') {
+        console.warn('Admin profile check error:', adminError)
+      }
+
+      const { data: studentData, error: studentError } = await supabase
+        .from('students')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
       
       if (studentData) {
-        console.log('Found student profile:', studentData)
         return {
           ...user,
-          userType: 'student',
-          studentProfile: studentData
+          userType: 'student' as const,
+          studentProfile: studentData as unknown as StudentProfile
         }
       }
 
-      console.log('No profile found for user')
+      // Log only if it's not a "no rows found" error
+      if (studentError?.code !== 'PGRST116') {
+        console.warn('Student profile check error:', studentError)
+      }
+
       return {
         ...user,
         userType: null
@@ -257,104 +256,48 @@ export function useAuth() {
   }
 
   const signIn = async (email: string, password: string) => {
-    console.log('🔧 DEBUGGING AUTH STEP BY STEP...')
-    
-    // Get configuration with proper validation and fallbacks
+    console.log('🔄 Starting authentication...')
     const { url: finalUrl, anonKey: finalKey } = getSupabaseConfig()
     
-    console.log('🚀 AUTH URL:', finalUrl)
-    console.log('🚀 AUTH KEY preview:', `${finalKey.substring(0, 20)}...`)
-    
-    // Validate formats using final values
-    if (typeof finalUrl !== 'string' || typeof finalKey !== 'string') {
-      throw new Error(`Invalid final values: url=${typeof finalUrl}, key=${typeof finalKey}`)
+    // Validate inputs
+    if (!finalUrl || !finalKey || !email || !password) {
+      throw new Error('Missing required authentication parameters')
     }
-    
-    // Build URL and debug it
-    const authUrl = `${finalUrl}/auth/v1/token?grant_type=password`
-    console.log('AUTH URL:', authUrl)
-    
-    // Validate all values before creating headers
-    console.log('🔧 PRE-VALIDATION:')
-    console.log('  - finalUrl valid:', typeof finalUrl === 'string' && finalUrl.length > 0)
-    console.log('  - finalKey valid:', typeof finalKey === 'string' && finalKey.length > 0)
-    console.log('  - email valid:', typeof email === 'string' && email.length > 0)
-    console.log('  - password valid:', typeof password === 'string' && password.length > 0)
-    
-    // Debug headers
-    const headers = {
-      'Content-Type': 'application/json',
-      'apikey': finalKey,
-      'Authorization': `Bearer ${finalKey}`
-    }
-    
-    console.log('🔧 HEADERS:')
-    console.log('  - Content-Type:', headers['Content-Type'])
-    console.log('  - apikey length:', finalKey.length)
-    console.log('  - apikey preview:', `${finalKey.substring(0, 10)}...`)
-    console.log('  - Authorization preview:', `Bearer ${finalKey.substring(0, 10)}...`)
-    
-    // Validate headers
-    for (const [key, value] of Object.entries(headers)) {
-      if (typeof value !== 'string' || value.length === 0) {
-        console.error(`❌ Invalid header ${key}:`, typeof value, value)
-      }
-    }
-    
-    // Debug body
-    const requestBody = JSON.stringify({ email, password })
-    console.log('🔧 BODY length:', requestBody.length)
-    console.log('🔧 BODY preview:', requestBody.replace(password, '***'))
     
     try {
-      console.log('🚀 MAKING FETCH REQUEST...')
-      
-      // Test basic fetch first
-      const testResponse = await fetch(`${finalUrl}/rest/v1/`, {
-        method: 'GET',
-        headers: { 'apikey': finalKey }
-      })
-      
-      console.log('✅ Basic fetch test passed:', testResponse.status)
-      
-      // Now try auth
-      const response = await fetch(authUrl, {
+      console.log('📡 Making auth request...')
+      const response = await fetch(`${finalUrl}/auth/v1/token?grant_type=password`, {
         method: 'POST',
-        headers: headers,
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': finalKey,
+          'Authorization': `Bearer ${finalKey}`
+        },
         body: JSON.stringify({ email, password })
       })
       
-      console.log('📡 AUTH RESPONSE:', {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        headers: response.headers
-      })
+      console.log('📡 Auth response:', response.status, response.ok)
       
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('❌ AUTH ERROR RESPONSE:', errorText)
+        console.error('❌ Auth failed:', response.status, errorText)
         throw new Error(`Authentication failed: ${response.status} - ${errorText}`)
       }
       
       const authData = await response.json()
-      console.log('✅ Auth successful! Setting session...')
+      console.log('✅ Auth successful, user:', authData.user?.id)
       
       // Set the session in our main Supabase client
-      try {
-        const supabase = getSupabase()
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token: authData.access_token,
-          refresh_token: authData.refresh_token
-        })
-        
-        if (sessionError) {
-          console.warn('⚠️  Session setting warning:', sessionError)
-        } else {
-          console.log('✅ Session set successfully')
-        }
-      } catch (sessionErr) {
-        console.warn('⚠️  Session setting failed:', sessionErr)
+      const supabase = getSupabase()
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: authData.access_token,
+        refresh_token: authData.refresh_token
+      })
+      
+      if (sessionError) {
+        console.warn('Session setting warning:', sessionError)
+      } else {
+        console.log('✅ Session set successfully')
       }
       
       return {
@@ -366,19 +309,38 @@ export function useAuth() {
         }
       }
     } catch (error) {
-      console.error('❌ FETCH ERROR DETAILS:', {
-        name: error instanceof Error ? error.name : 'Unknown',
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined
-      })
+      console.error('❌ Authentication error:', error)
       throw error
     }
   }
 
   const signOut = async () => {
     const supabase = getSupabase()
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        console.warn('Sign out error (non-critical):', error.message)
+        // Don't throw for sign-out errors - just clear local state
+      }
+    } catch (error) {
+      console.warn('Sign out failed (clearing local state):', error)
+    }
+    
+    // Always clear local state regardless of API response
+    setUser(null)
+    
+    // Clear localStorage/sessionStorage
+    if (typeof window !== 'undefined') {
+      const keysToRemove = [
+        'sb-srnykdfmhnovdgypzmeg-auth-token',
+        'supabase.auth.token',
+        'sb-localhost-auth-token'
+      ]
+      keysToRemove.forEach(key => {
+        localStorage.removeItem(key)
+        sessionStorage.removeItem(key)
+      })
+    }
   }
 
   const updateStudentProfile = async (updates: Partial<StudentProfile>) => {
