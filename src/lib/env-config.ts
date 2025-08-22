@@ -44,7 +44,7 @@ function getEnvConfig(): EnvConfig {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
     jitsiAppId: 'vpaas-magic-cookie-1764593a618848cfa0023ac1a152f3c8',
-    resendApiKey: 're_9EcX2S6Z_5XqAWExwMS7XKSiuMFf3Hsyf'
+    resendApiKey: process.env.RESEND_API_KEY || ''
   }
   
   const config: EnvConfig = {
