@@ -30,7 +30,7 @@ export default function CohortsPage() {
 
   useEffect(() => {
     if (loading) return
-    if (!user) router.push("/auth/signin")
+    if (!user) router.push("/signin")
     else loadCohorts()
   }, [user, loading, router])
 

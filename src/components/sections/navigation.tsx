@@ -2,21 +2,16 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { useAuth } from "@/hooks/useAuth"
 import { usePathname } from "next/navigation"
 import { MessageCircle, BookOpen, Video, FileText, HelpCircle, Settings, Crown, Monitor } from "lucide-react"
 
 export function Navigation() {
-  const { user, signOut } = useAuth()
   const pathname = usePathname()
   const isInPortal = pathname?.startsWith('/portal')
-  const isAuthPage = pathname?.startsWith('/auth')
-  const isAdmin = user?.userType === 'admin'
-
-  // Don't show navigation on auth pages
-  if (isAuthPage) {
-    return null
-  }
+  
+  // Temporarily disable auth - always show as logged out
+  const user = null
+  const isAdmin = false
 
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -108,15 +103,24 @@ export function Navigation() {
                   <span className="text-sm text-muted-foreground">
                     {user.adminProfile?.full_name || user.studentProfile?.full_name || user.email}
                   </span>
-                  <Button variant="outline" onClick={() => signOut()}>
+                  <Button variant="outline" onClick={() => console.log('Sign out clicked')}>
                     Sign Out
                   </Button>
                 </div>
               </>
             ) : (
-              <Link href="/auth/signin" className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                Login/Sign Up
-              </Link>
+              <div className="flex items-center space-x-3">
+                <Link href="/signin">
+                  <Button variant="outline">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button>
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>

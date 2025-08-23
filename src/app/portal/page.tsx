@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { useAuth } from "@/hooks/useAuth"
+// import { useAuth } from "@/hooks/useAuth" // Temporarily disabled
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,28 +10,14 @@ import Link from "next/link"
 import { Zap, BookOpen, MessageSquare, Settings, Users, Plus } from "lucide-react"
 
 export default function PortalPage() {
-  const { user, loading } = useAuth()
-  const router = useRouter()
-
-  useEffect(() => {
-    if (loading) return // Still loading
-    if (!user) router.push("/auth/signin")
-  }, [user, loading, router])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    )
+  // Temporarily disable auth - allow access to portal for testing
+  const user = {
+    email: 'test@weblaunchacademy.com',
+    studentProfile: {
+      full_name: 'Test Student'
+    }
   }
-
-  if (!user) {
-    return null // Will redirect to signin
-  }
+  const loading = false
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4 sm:px-6 lg:px-8">
@@ -46,16 +32,11 @@ export default function PortalPage() {
               Your Web Launch Academy dashboard
             </p>
           </div>
-          <Button 
-            onClick={async () => {
-              const { signOut } = useAuth()
-              await signOut()
-              router.push('/auth/signin')
-            }}
-            variant="outline"
-          >
-            Sign Out
-          </Button>
+          <Link href="/signin">
+            <Button variant="outline">
+              Sign Out
+            </Button>
+          </Link>
         </div>
 
         {/* Status Cards */}

@@ -28,7 +28,7 @@ export default function NewCohortPage() {
 
   useEffect(() => {
     if (loading) return
-    if (!user) router.push("/auth/signin")
+    if (!user) router.push("/signin")
     if (user && user.userType === 'student') {
       router.push("/portal/cohorts")
     }
