@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading')
   const [message, setMessage] = useState('')
   const searchParams = useSearchParams()
@@ -146,7 +146,7 @@ export default function VerifyEmailPage() {
   )
 }
 
-function ResendButton() {
+function ResendButtonContent() {
   const [resending, setResending] = useState(false)
   const [resendMessage, setResendMessage] = useState('')
   const searchParams = useSearchParams()
@@ -202,5 +202,28 @@ function ResendButton() {
         </p>
       )}
     </div>
+  )
+}
+
+function ResendButton() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResendButtonContent />
+    </Suspense>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
   )
 }
