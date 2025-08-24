@@ -71,8 +71,8 @@ export function ExpiredLinkModal({ isOpen, onClose }: ExpiredLinkModalProps) {
           </p>
 
           {resendMessage && (
-            <div className="p-3 bg-accent/10 border border-accent/20 rounded-md">
-              <p className="text-sm text-accent-foreground">{resendMessage}</p>
+            <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-sm text-green-800 font-medium">{resendMessage}</p>
             </div>
           )}
 

@@ -107,8 +107,8 @@ export default function SignupPage() {
                   : 'Please check your email and click the verification link to activate your account.'}
               </p>
               {isResend && (
-                <div className="p-3 bg-accent/10 border border-accent/20 rounded-md">
-                  <p className="text-sm text-accent-foreground">
+                <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-sm text-green-800 font-medium">
                     <strong>Note:</strong> We've also updated your account details with any changes you made.
                   </p>
                 </div>

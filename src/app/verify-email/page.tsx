@@ -197,9 +197,11 @@ function ResendButtonContent() {
         {resending ? 'Sending...' : 'Resend Verification Email'}
       </Button>
       {resendMessage && (
-        <p className="text-sm text-center text-muted-foreground">
-          {resendMessage}
-        </p>
+        <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+          <p className="text-sm text-center text-green-800 font-medium">
+            {resendMessage}
+          </p>
+        </div>
       )}
     </div>
   )
