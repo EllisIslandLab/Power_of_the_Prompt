@@ -49,9 +49,23 @@ export async function POST(request: NextRequest) {
         try {
           // First, get the existing user to update their auth metadata
           const { data: { users }, error: listError } = await supabase.auth.admin.listUsers()
-          const existingUser = users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+          
+          if (listError) {
+            // console.error('Failed to list users:', listError) // Commented out for auth transition
+            // Continue with profile update even if we can't check auth users
+          }
+          
+          const existingUser = users?.find(u => u.email?.toLowerCase() === email.toLowerCase())
           
           if (existingUser) {
+            // Check if user is already verified
+            if (existingUser.email_confirmed_at) {
+              return NextResponse.json(
+                { error: 'This email is already verified. Please sign in instead.' },
+                { status: 409 }
+              )
+            }
+            
             // Update auth user metadata with new full name
             await supabase.auth.admin.updateUserById(existingUser.id, {
               user_metadata: { full_name: fullName }
@@ -77,13 +91,18 @@ export async function POST(request: NextRequest) {
             email: email.toLowerCase()
           })
           
-          if (!resendError) {
-            return NextResponse.json({
-              success: true,
-              message: 'Account exists but not verified. Profile updated and new verification email sent!',
-              isResend: true
-            })
+          if (resendError) {
+            return NextResponse.json(
+              { error: 'Profile updated but failed to send verification email. Please try again or use the resend option.' },
+              { status: 500 }
+            )
           }
+          
+          return NextResponse.json({
+            success: true,
+            message: 'Account exists but not verified. Profile updated and new verification email sent!',
+            isResend: true
+          })
         } catch (profileErr) {
           // console.error('Profile update error:', profileErr) // Commented out for auth transition
         }
