@@ -9,7 +9,7 @@ export function Navigation() {
   const pathname = usePathname()
   const isInPortal = pathname?.startsWith('/portal')
   
-  // Temporarily disable auth - always show as logged out
+  // Temporarily disable auth - use mock user for testing
   const user = null
   const isAdmin = false
 
@@ -86,28 +86,9 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {user ? (
-              <>
-                {!isInPortal && (
-                  <Link href="/portal" className="text-foreground hover:text-primary transition-colors">
-                    Portal
-                  </Link>
-                )}
-                {isAdmin && (
-                  <div className="flex items-center gap-2 px-3 py-1 bg-orange-100 border border-orange-200 rounded-full">
-                    <Crown className="h-4 w-4 text-orange-600" />
-                    <span className="text-sm font-medium text-orange-700">Admin</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    {user.adminProfile?.full_name || user.studentProfile?.full_name || user.email}
-                  </span>
-                  <Button variant="outline" onClick={() => console.log('Sign out clicked')}>
-                    Sign Out
-                  </Button>
-                </div>
-              </>
+            {/* COMMENTED OUT - User auth disabled during transition */}
+            {false ? (
+              <></>
             ) : (
               <div className="flex items-center space-x-3">
                 <Link href="/signin">
