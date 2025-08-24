@@ -163,7 +163,7 @@ export default function ChatPage() {
       content: newMessage,
       userId: user.id || 'current-user',
       userName: user.studentProfile?.full_name || user.adminProfile?.full_name || 'You',
-      userRole: user.userType === 'admin' ? 'ADMIN' : 'STUDENT',
+      userRole: (user.userType as string) === 'admin' ? 'ADMIN' : 'STUDENT',
       timestamp: new Date(),
       isRead: false
     }
