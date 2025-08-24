@@ -8,12 +8,12 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 export async function POST(request: NextRequest) {
   try {
-    const { fullName, email, password } = await request.json()
+    const { fullName, email, password, inviteToken } = await request.json()
 
     // Validate input
-    if (!fullName || !email || !password) {
+    if (!fullName || !email || !password || !inviteToken) {
       return NextResponse.json(
-        { error: 'Full name, email, and password are required' },
+        { error: 'Full name, email, password, and invite token are required' },
         { status: 400 }
       )
     }
@@ -21,6 +21,44 @@ export async function POST(request: NextRequest) {
     if (password.length < 6) {
       return NextResponse.json(
         { error: 'Password must be at least 6 characters long' },
+        { status: 400 }
+      )
+    }
+
+    // Validate invite token
+    const { data: invite, error: inviteError } = await supabase
+      .from('invite_tokens')
+      .select('*')
+      .eq('token', inviteToken)
+      .single()
+
+    if (inviteError || !invite) {
+      return NextResponse.json(
+        { error: 'Invalid invite token' },
+        { status: 400 }
+      )
+    }
+
+    // Check if token has expired
+    if (new Date(invite.expires_at) < new Date()) {
+      return NextResponse.json(
+        { error: 'Invite token has expired' },
+        { status: 400 }
+      )
+    }
+
+    // Check if token has already been used
+    if (invite.used_at) {
+      return NextResponse.json(
+        { error: 'Invite token has already been used' },
+        { status: 400 }
+      )
+    }
+
+    // Ensure email matches the invite
+    if (invite.email.toLowerCase() !== email.toLowerCase()) {
+      return NextResponse.json(
+        { error: 'Email does not match the invite' },
         { status: 400 }
       )
     }
@@ -139,6 +177,10 @@ export async function POST(request: NextRequest) {
             full_name: fullName,
             email: email.toLowerCase(),
             email_verified: !!data.user.email_confirmed_at,
+            tier: invite.tier, // Set tier from invite
+            payment_status: invite.tier === 'full' ? 'paid' : 'trial',
+            invited_by: invite.created_by,
+            invited_at: new Date().toISOString(),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -154,6 +196,19 @@ export async function POST(request: NextRequest) {
       }
     } catch (profileErr) {
       // console.error('Profile creation error:', profileErr) // Commented out for auth transition
+    }
+
+    // Mark invite token as used
+    try {
+      await supabase
+        .from('invite_tokens')
+        .update({
+          used_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('token', inviteToken)
+    } catch (tokenErr) {
+      // console.error('Failed to mark invite token as used:', tokenErr) // Commented out for auth transition
     }
 
     // Check if email verification is needed

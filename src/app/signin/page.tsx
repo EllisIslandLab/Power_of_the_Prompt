@@ -129,14 +129,7 @@ export default function SigninPage() {
               {loading ? 'Signing In...' : 'Sign In'}
             </Button>
 
-            <div className="text-center pt-4 border-t border-border/50">
-              <span className="text-sm text-muted-foreground">
-                Don't have an account?{' '}
-                <Link href="/signup" className="text-primary hover:text-primary/80 font-medium">
-                  Sign up
-                </Link>
-              </span>
-            </div>
+            {/* Sign-up removed - now invite-only for committed students */}
             
             <div className="text-center">
               <Link href="/forgot-password" className="text-sm text-primary hover:text-primary/80">

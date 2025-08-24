@@ -1,44 +1,107 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 
-export default function SignupPage() {
+function SignupContent() {
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token')
+  
+  const [inviteData, setInviteData] = useState<{
+    email: string
+    full_name?: string
+    tier: string
+    valid: boolean
+    error?: string
+  } | null>(null)
+  
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: '',
     confirmPassword: ''
   })
-  const [loading, setLoading] = useState(false)
+  
+  const [loading, setLoading] = useState(true)
+  const [submitLoading, setSubmitLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [isResend, setIsResend] = useState(false)
+
+  // Validate invite token on component mount
+  useEffect(() => {
+    const validateToken = async () => {
+      if (!token) {
+        setInviteData({ email: '', tier: '', valid: false, error: 'No invite token provided' })
+        setLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/auth/validate-invite?token=${token}`)
+        const data = await response.json()
+        
+        if (response.ok && data.valid) {
+          setInviteData({
+            email: data.email,
+            full_name: data.full_name,
+            tier: data.tier,
+            valid: true
+          })
+          
+          // Pre-fill form with invite data
+          setFormData(prev => ({
+            ...prev,
+            email: data.email,
+            fullName: data.full_name || ''
+          }))
+        } else {
+          setInviteData({
+            email: '',
+            tier: '',
+            valid: false,
+            error: data.error || 'Invalid or expired invite token'
+          })
+        }
+      } catch (err) {
+        setInviteData({
+          email: '',
+          tier: '',
+          valid: false,
+          error: 'Failed to validate invite token'
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    validateToken()
+  }, [token])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setLoading(true)
+    setSubmitLoading(true)
 
     // Basic validation
     if (!formData.fullName || !formData.email || !formData.password) {
       setError('All fields are required')
-      setLoading(false)
+      setSubmitLoading(false)
       return
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
-      setLoading(false)
+      setSubmitLoading(false)
       return
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters')
-      setLoading(false)
+      setError('Password must be at least 6 characters long')
+      setSubmitLoading(false)
       return
     }
 
@@ -52,7 +115,8 @@ export default function SignupPage() {
           fullName: formData.fullName,
           email: formData.email,
           password: formData.password,
-        }),
+          inviteToken: token
+        })
       })
 
       const data = await response.json()
@@ -62,13 +126,10 @@ export default function SignupPage() {
       }
 
       setSuccess(true)
-      setIsResend(data.isResend || false)
-      // console.log('Signup successful:', data) // Commented out for auth transition
     } catch (err) {
-      // console.error('Signup error:', err) // Commented out for auth transition
       setError(err instanceof Error ? err.message : 'An error occurred during signup')
     } finally {
-      setLoading(false)
+      setSubmitLoading(false)
     }
   }
 
@@ -79,45 +140,73 @@ export default function SignupPage() {
     }))
   }
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Validating invite...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Invalid token state
+  if (!inviteData?.valid) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-foreground">Invalid Invite</h2>
+            <p className="mt-4 text-muted-foreground">
+              {inviteData?.error || 'This signup link is invalid or has expired.'}
+            </p>
+            <div className="mt-6">
+              <Link href="/">
+                <Button variant="outline">
+                  Return to Home
+                </Button>
+              </Link>
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              If you believe this is an error, please contact us for a new invitation.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Success state
   if (success) {
     return (
-      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-md w-full space-y-8">
-          <div className="space-y-6">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-accent/20">
-              <svg className="h-8 w-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.9a.99.99 0 001.78 0L21 8m-16 8v4a1 1 0 001 1h12a1 1 0 001-1v-4"></path>
+      <section className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center space-y-6">
+            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            
             <h1 className="text-3xl font-bold text-foreground">
-              {isResend ? 'Verification Email Resent!' : 'Check Your Email'}
+              Welcome to Web Launch Academy!
             </h1>
-            
             <div className="space-y-4">
               <p className="text-muted-foreground">
-                {isResend 
-                  ? `We've sent a new verification link to ` 
-                  : `We've sent a verification link to `}
-                <span className="font-semibold text-foreground">{formData.email}</span>
+                Your account has been created successfully! Please check your email and click the verification link to activate your account.
               </p>
-              <p className="text-sm text-muted-foreground">
-                {isResend 
-                  ? 'Please check your email for the new verification link. The previous link is no longer valid.'
-                  : 'Please check your email and click the verification link to activate your account.'}
-              </p>
-              {isResend && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-md">
-                  <p className="text-sm text-green-800 font-medium">
-                    <strong>Note:</strong> We've also updated your account details with any changes you made.
-                  </p>
-                </div>
-              )}
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800">
+                  <strong>Access Level:</strong> {inviteData.tier === 'full' ? 'Full Access' : 'Free Tier'} - 
+                  You'll have access to {inviteData.tier === 'full' ? 'all course materials and premium features' : 'basic course materials and community features'}.
+                </p>
+              </div>
             </div>
             
-            <Button asChild variant="outline" className="w-full">
+            <Button asChild className="w-full h-11 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold">
               <Link href="/signin">
-                Return to Sign In
+                Continue to Sign In
               </Link>
             </Button>
           </div>
@@ -126,117 +215,132 @@ export default function SignupPage() {
     )
   }
 
+  // Signup form
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <section className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-foreground">
             Join Web Launch Academy
           </h1>
           <p className="text-xl text-muted-foreground">
-            Create your student account and start your journey
+            Complete your student account setup
           </p>
+          
+          {/* Show invite details */}
+          <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+            <p className="text-sm text-green-800">
+              <strong>Invited to:</strong> {inviteData.tier === 'full' ? 'Full Access' : 'Free Tier'} • 
+              <strong>Email:</strong> {inviteData.email}
+            </p>
+          </div>
         </div>
-        
-        <div className="bg-card rounded-lg border border-border p-8 shadow-sm">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-sm font-medium text-foreground">
-                  Full Name
-                </Label>
-                <Input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  required
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="h-11"
-                  placeholder="Enter your full name"
-                />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-foreground">
-                  Email Address
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="h-11"
-                  placeholder="Enter your email"
-                />
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-800">{error}</p>
+            </div>
+          )}
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="h-11"
-                  placeholder="Enter your password"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
-                  Confirm Password
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="h-11"
-                  placeholder="Confirm your password"
-                />
-              </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName" className="text-sm font-medium text-foreground">
+                Full Name
+              </Label>
+              <Input
+                id="fullName"
+                name="fullName"
+                type="text"
+                required
+                value={formData.fullName}
+                onChange={handleChange}
+                className="h-11"
+                placeholder="Enter your full name"
+              />
             </div>
 
-            {error && (
-              <div className="bg-destructive/10 border border-destructive/20 rounded-md p-4">
-                <div className="flex items-center gap-2">
-                  <svg className="h-4 w-4 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                  </svg>
-                  <p className="text-sm text-destructive">{error}</p>
-                </div>
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full h-11 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
-              size="lg"
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </Button>
-
-            <div className="text-center pt-4 border-t border-border/50">
-              <span className="text-sm text-muted-foreground">
-                Already have an account?{' '}
-                <Link href="/signin" className="text-primary hover:text-primary/80 font-medium">
-                  Sign in
-                </Link>
-              </span>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium text-foreground">
+                Email Address
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="h-11"
+                placeholder="Enter your email address"
+                disabled // Email comes from invite
+              />
             </div>
-          </form>
-        </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium text-foreground">
+                Password
+              </Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="h-11"
+                placeholder="Create a secure password"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+                Confirm Password
+              </Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="h-11"
+                placeholder="Confirm your password"
+              />
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            disabled={submitLoading}
+            className="w-full h-11 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
+            size="lg"
+          >
+            {submitLoading ? 'Creating Account...' : 'Create My Account'}
+          </Button>
+          
+          <div className="text-center">
+            <Link href="/signin" className="text-sm text-primary hover:text-primary/80">
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </form>
       </div>
     </section>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    }>
+      <SignupContent />
+    </Suspense>
   )
 }

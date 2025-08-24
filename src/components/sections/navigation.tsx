@@ -96,11 +96,7 @@ export function Navigation() {
                     Sign In
                   </Button>
                 </Link>
-                <Link href="/signup">
-                  <Button>
-                    Sign Up
-                  </Button>
-                </Link>
+                {/* Sign Up removed - now invite-only for committed students */}
               </div>
             )}
           </div>
