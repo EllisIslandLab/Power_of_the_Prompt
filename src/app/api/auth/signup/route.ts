@@ -45,18 +45,47 @@ export async function POST(request: NextRequest) {
       
       // Handle specific error cases
       if (error.message.includes('already registered')) {
-        // For existing users, try to resend verification email via Supabase
-        const { error: resendError } = await supabase.auth.resend({
-          type: 'signup',
-          email: email.toLowerCase()
-        })
-        
-        if (!resendError) {
-          return NextResponse.json({
-            success: true,
-            message: 'Account exists but not verified. New verification email sent!',
-            isResend: true
+        // For existing users, update their profile and resend verification email
+        try {
+          // First, get the existing user to update their auth metadata
+          const { data: { users }, error: listError } = await supabase.auth.admin.listUsers()
+          const existingUser = users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+          
+          if (existingUser) {
+            // Update auth user metadata with new full name
+            await supabase.auth.admin.updateUserById(existingUser.id, {
+              user_metadata: { full_name: fullName }
+            })
+          }
+          
+          // Update the student profile with new full name
+          const { error: updateError } = await supabase
+            .from('students')
+            .update({ 
+              full_name: fullName,
+              updated_at: new Date().toISOString()
+            })
+            .eq('email', email.toLowerCase())
+          
+          if (updateError) {
+            // console.error('Failed to update student profile:', updateError) // Commented out for auth transition
+          }
+          
+          // Resend verification email via Supabase
+          const { error: resendError } = await supabase.auth.resend({
+            type: 'signup',
+            email: email.toLowerCase()
           })
+          
+          if (!resendError) {
+            return NextResponse.json({
+              success: true,
+              message: 'Account exists but not verified. Profile updated and new verification email sent!',
+              isResend: true
+            })
+          }
+        } catch (profileErr) {
+          // console.error('Profile update error:', profileErr) // Commented out for auth transition
         }
         
         return NextResponse.json(
