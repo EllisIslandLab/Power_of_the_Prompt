@@ -8,7 +8,8 @@ export function useAuth() {
     studentProfile: {
       full_name: 'Development User',
       email: 'temp@weblaunchcoach.com'
-    }
+    },
+    adminProfile: undefined as any
   }
 
   return {
