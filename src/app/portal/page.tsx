@@ -50,12 +50,12 @@ export default function PortalPage() {
               <Zap className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <Badge variant={user.userType === 'admin' ? 'default' : 'secondary'}>
-                {user.userType === 'admin' ? 
+              <Badge variant={(user.userType as string) === 'admin' ? 'default' : 'secondary'}>
+                {(user.userType as string) === 'admin' ? 
                   user.adminProfile?.role || 'Admin' : 'Student'}
               </Badge>
               <p className="text-xs text-muted-foreground mt-2">
-                {user.userType === 'admin' ? 'Admin Access' : 'Student Access'}
+                {(user.userType as string) === 'admin' ? 'Admin Access' : 'Student Access'}
               </p>
             </CardContent>
           </Card>
@@ -122,7 +122,7 @@ export default function PortalPage() {
         </div>
 
         {/* Cohort Management */}
-        {user.userType === 'admin' && (
+        {(user.userType as string) === 'admin' && (
           <div className="mb-8">
             <Card>
               <CardHeader>
@@ -154,7 +154,7 @@ export default function PortalPage() {
         )}
 
         {/* Student Cohort View */}
-        {user.userType === 'student' && (
+        {(user.userType as string) === 'student' && (
           <div className="mb-8">
             <Card>
               <CardHeader>
@@ -198,7 +198,7 @@ export default function PortalPage() {
                   📚 Student Textbook
                 </Link>
               </Button>
-              {user.userType === 'admin' && (
+              {(user.userType as string) === 'admin' && (
                 <Button variant="outline" className="w-full" asChild>
                   <Link href="/portal/cohorts">
                     <Users className="h-4 w-4 mr-2" />
@@ -229,7 +229,7 @@ export default function PortalPage() {
                 <strong>Email:</strong> {user.email}
               </div>
               <div className="text-sm">
-                <strong>Role:</strong> {user.userType === 'admin' ? 
+                <strong>Role:</strong> {(user.userType as string) === 'admin' ? 
                   user.adminProfile?.role || 'Admin' : 'Student'}
               </div>
               <Button variant="outline" size="sm" className="mt-4">
