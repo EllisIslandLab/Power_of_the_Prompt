@@ -44,7 +44,7 @@ export function ExpiredLinkModal({ isOpen, onClose }: ExpiredLinkModalProps) {
         setResendMessage(`❌ ${data.error || 'Failed to send email'}`)
       }
     } catch (error) {
-      console.error('Resend error:', error)
+      // console.error('Resend error:', error) // Commented out for auth transition
       setResendMessage('❌ Failed to send email. Please try again.')
     } finally {
       setResending(false)

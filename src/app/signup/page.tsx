@@ -63,9 +63,9 @@ export default function SignupPage() {
 
       setSuccess(true)
       setIsResend(data.isResend || false)
-      console.log('Signup successful:', data)
+      // console.log('Signup successful:', data) // Commented out for auth transition
     } catch (err) {
-      console.error('Signup error:', err)
+      // console.error('Signup error:', err) // Commented out for auth transition
       setError(err instanceof Error ? err.message : 'An error occurred during signup')
     } finally {
       setLoading(false)

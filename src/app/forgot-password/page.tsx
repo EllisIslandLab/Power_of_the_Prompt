@@ -25,10 +25,10 @@ export default function ForgotPasswordPage() {
 
     try {
       // TODO: Implement password reset logic
-      console.log('Password reset request for:', email)
+      // console.log('Password reset request for:', email) // Commented out for auth transition
       setSuccess(true)
     } catch (err) {
-      console.error('Password reset error:', err)
+      // console.error('Password reset error:', err) // Commented out for auth transition
       setError('An error occurred. Please try again.')
     } finally {
       setLoading(false)

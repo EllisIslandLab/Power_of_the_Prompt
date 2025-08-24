@@ -21,7 +21,7 @@ export default function Home() {
       const hash = window.location.hash
       
       if (hash.includes('error=access_denied') && hash.includes('error_code=otp_expired')) {
-        console.log('🔍 Detected expired verification link')
+        // console.log('🔍 Detected expired verification link') // Commented out for auth transition
         setShowExpiredModal(true)
         
         // Clean the URL hash

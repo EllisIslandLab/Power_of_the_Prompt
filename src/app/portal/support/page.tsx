@@ -168,7 +168,7 @@ export default function SupportPage() {
   const handleSubmitTicket = (e: React.FormEvent) => {
     e.preventDefault()
     // In production, this would submit to your backend
-    console.log('Support ticket submitted:', supportForm)
+    // console.log('Support ticket submitted:', supportForm) // Commented out for auth transition
     // Reset form
     setSupportForm({
       subject: '',

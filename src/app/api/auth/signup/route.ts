@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('🔧 Starting Supabase auth signup for:', email)
+    // console.log('🔧 Starting Supabase auth signup for:', email) // Commented out for auth transition
 
     // Use Supabase's built-in auth system
     const { data, error } = await supabase.auth.signUp({
@@ -38,10 +38,10 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    console.log('🔧 Supabase signup result:', { data, error })
+    // console.log('🔧 Supabase signup result:', { data, error }) // Commented out for auth transition
 
     if (error) {
-      console.error('❌ Supabase signup error:', error)
+      // console.error('❌ Supabase signup error:', error) // Commented out for auth transition
       
       // Handle specific error cases
       if (error.message.includes('already registered')) {
@@ -64,8 +64,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('✅ Supabase user created:', data.user.id)
-    console.log('📧 Email confirmed:', data.user.email_confirmed_at)
+    // console.log('✅ Supabase user created:', data.user.id) // Commented out for auth transition
+    // console.log('📧 Email confirmed:', data.user.email_confirmed_at) // Commented out for auth transition
 
     // Create student profile in our custom table
     try {
@@ -85,18 +85,18 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (profileError) {
-        console.error('Failed to create student profile:', profileError)
+        // console.error('Failed to create student profile:', profileError) // Commented out for auth transition
         // Don't fail the signup if profile creation fails - they can still verify email
       } else {
-        console.log('✅ Student profile created:', studentProfile.id)
+        // console.log('✅ Student profile created:', studentProfile.id) // Commented out for auth transition
       }
     } catch (profileErr) {
-      console.error('Profile creation error:', profileErr)
+      // console.error('Profile creation error:', profileErr) // Commented out for auth transition
     }
 
     // Check if email verification is needed
     if (!data.user.email_confirmed_at) {
-      console.log('📧 Email verification required - Supabase will send verification email')
+      // console.log('📧 Email verification required - Supabase will send verification email') // Commented out for auth transition
       return NextResponse.json({
         success: true,
         message: 'Account created successfully. Please check your email for verification.',
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         needsEmailVerification: true,
       })
     } else {
-      console.log('✅ Email already verified')
+      // console.log('✅ Email already verified') // Commented out for auth transition
       return NextResponse.json({
         success: true,
         message: 'Account created and verified successfully.',
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Signup error:', error)
+    // console.error('Signup error:', error) // Commented out for auth transition
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

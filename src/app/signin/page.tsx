@@ -28,10 +28,10 @@ export default function SigninPage() {
 
     try {
       // TODO: Implement signin logic
-      console.log('Signin attempt:', formData.email)
+      // console.log('Signin attempt:', formData.email) // Commented out for auth transition
       setError('Sign-in functionality coming soon! Please complete email verification first.')
     } catch (err) {
-      console.error('Signin error:', err)
+      // console.error('Signin error:', err) // Commented out for auth transition
       setError(err instanceof Error ? err.message : 'An error occurred during signin')
     } finally {
       setLoading(false)

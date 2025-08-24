@@ -20,12 +20,12 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (error) {
-      console.error('❌ Auth callback error:', error)
+      // console.error('❌ Auth callback error:', error) // Commented out for auth transition
       return NextResponse.redirect(new URL('/signin?error=auth_failed', request.url))
     }
 
     if (data.user) {
-      console.log('✅ Email verified for user:', data.user.id)
+      // console.log('✅ Email verified for user:', data.user.id) // Commented out for auth transition
       
       // Manually sync the email verification status to our students table
       try {
@@ -38,12 +38,12 @@ export async function GET(request: NextRequest) {
           .eq('id', data.user.id)
 
         if (updateError) {
-          console.error('Failed to sync email verification:', updateError)
+          // console.error('Failed to sync email verification:', updateError) // Commented out for auth transition
         } else {
-          console.log('✅ Email verification synced to students table')
+          // console.log('✅ Email verification synced to students table') // Commented out for auth transition
         }
       } catch (syncError) {
-        console.error('Sync error:', syncError)
+        // console.error('Sync error:', syncError) // Commented out for auth transition
       }
     }
 
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/email-verified', request.url))
 
   } catch (error) {
-    console.error('Callback error:', error)
+    // console.error('Callback error:', error) // Commented out for auth transition
     return NextResponse.redirect(new URL('/signin?error=callback_failed', request.url))
   }
 }
