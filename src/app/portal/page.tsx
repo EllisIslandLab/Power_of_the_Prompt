@@ -12,10 +12,13 @@ import { Zap, BookOpen, MessageSquare, Settings, Users, Plus } from "lucide-reac
 export default function PortalPage() {
   // Temporarily disable auth - allow access to portal for testing
   const user = {
+    id: 'test-user',
     email: 'test@weblaunchacademy.com',
+    userType: 'student' as const,
     studentProfile: {
       full_name: 'Test Student'
-    }
+    },
+    adminProfile: undefined as any
   }
   const loading = false
 
