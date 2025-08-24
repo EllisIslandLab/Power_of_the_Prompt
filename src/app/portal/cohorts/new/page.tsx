@@ -1,3 +1,26 @@
+/*
+COMMENTED OUT - Complex admin cohort creation page
+This page contains complex admin functionality that may interfere with the new authentication system.
+Commented out during auth transition - can be re-enabled later when admin functionality is needed.
+
+Original functionality: Admin page for creating new student cohorts with form validation,
+database integration, and complex permission checking.
+*/
+
+export default function NewCohortPage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-foreground mb-4">Page Temporarily Unavailable</h1>
+        <p className="text-muted-foreground">This admin feature is currently disabled during system updates.</p>
+      </div>
+    </div>
+  )
+}
+
+/*
+ORIGINAL CODE - COMMENTED OUT FOR AUTH TRANSITION:
+
 "use client"
 
 import { useRouter } from "next/navigation"
@@ -78,7 +101,7 @@ export default function NewCohortPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-2xl">
-        {/* Header */}
+        {/* Header *}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
             <Button variant="ghost" size="sm" asChild>
@@ -96,7 +119,7 @@ export default function NewCohortPage() {
           </p>
         </div>
 
-        {/* Form */}
+        {/* Form *}
         <Card>
           <CardHeader>
             <CardTitle>Cohort Details</CardTitle>
@@ -193,3 +216,5 @@ export default function NewCohortPage() {
     </div>
   )
 }
+
+END COMMENTED OUT CODE */

@@ -1,3 +1,26 @@
+/*
+COMMENTED OUT - Complex video conferencing page with Jitsi integration
+This page contains complex authentication dependencies and video components that may interfere with the new authentication system.
+Commented out during auth transition - can be re-enabled later when video conferencing features are needed.
+
+Original functionality: Standalone video conferencing page with Jitsi Meet integration,
+participant management, admin quick rooms, and real-time video communication.
+*/
+
+export default function VideoConferencePage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-foreground mb-4">Page Temporarily Unavailable</h1>
+        <p className="text-muted-foreground">This video conferencing feature is currently disabled during system updates.</p>
+      </div>
+    </div>
+  )
+}
+
+/*
+ORIGINAL CODE - COMMENTED OUT FOR AUTH TRANSITION:
+
 "use client"
 
 import { useState } from 'react'
@@ -184,3 +207,5 @@ export default function VideoConferencePage() {
     </div>
   )
 }
+
+END COMMENTED OUT CODE */
