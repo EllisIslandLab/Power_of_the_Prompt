@@ -45,6 +45,20 @@ export async function POST(request: NextRequest) {
       
       // Handle specific error cases
       if (error.message.includes('already registered')) {
+        // For existing users, try to resend verification email via Supabase
+        const { error: resendError } = await supabase.auth.resend({
+          type: 'signup',
+          email: email.toLowerCase()
+        })
+        
+        if (!resendError) {
+          return NextResponse.json({
+            success: true,
+            message: 'Account exists but not verified. New verification email sent!',
+            isResend: true
+          })
+        }
+        
         return NextResponse.json(
           { error: 'An account with this email already exists. Please sign in instead.' },
           { status: 409 }

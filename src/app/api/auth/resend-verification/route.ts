@@ -65,7 +65,11 @@ export async function POST(request: NextRequest) {
 
     // Send verification email
     try {
-      const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`
+      // Use production URL - get from request headers or fallback to environment
+      const host = request.headers.get('host') || 'weblaunchacademy.com'
+      const protocol = request.headers.get('x-forwarded-proto') || 'https'
+      const baseUrl = `${protocol}://${host}`
+      const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`
       
       await sendVerificationEmail(email, student.full_name, verificationUrl)
       
