@@ -126,7 +126,7 @@ async function createVideoSession(sessionData: {
       .eq('email', sessionData.userEmail)
       .single()
 
-    let studentId = existingStudent?.user_id
+    let studentId = existingStudent?.id
 
     if (!existingStudent) {
       // Create a Supabase auth user for the guest (this might not work due to signup restrictions)
