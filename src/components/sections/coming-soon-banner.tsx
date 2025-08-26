@@ -9,18 +9,35 @@ export function ComingSoonBanner() {
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError('')
 
-    // TODO: Connect to Airtable for email signups
-    // Simulate submission for now
-    setTimeout(() => {
-      setIsSubmitting(false)
+    try {
+      const response = await fetch('/api/waitlist/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong')
+      }
+
       setIsSubmitted(true)
       setEmail('')
-    }, 1000)
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Something went wrong')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -44,24 +61,33 @@ export function ComingSoonBanner() {
                   <div className="text-2xl mb-2">🎉</div>
                   <h3 className="font-semibold mb-2">Thanks for signing up!</h3>
                   <p className="text-muted-foreground text-sm">
-                    We'll notify you as soon as we're ready to launch.
+                    Check your email for confirmation. We'll notify you as soon as we launch!
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <h3 className="font-semibold text-lg">Get Early Access</h3>
+                  {error && (
+                    <div className="text-sm text-red-600 bg-red-50 p-2 rounded border">
+                      {error}
+                    </div>
+                  )}
                   <div className="flex gap-2">
                     <Input
                       type="email"
                       placeholder="Enter your email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value)
+                        if (error) setError('') // Clear error when user starts typing
+                      }}
                       required
                       className="flex-1"
+                      disabled={isSubmitting}
                     />
                     <Button 
                       type="submit" 
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !email.trim()}
                     >
                       {isSubmitting ? 'Signing up...' : 'Notify Me'}
                     </Button>
