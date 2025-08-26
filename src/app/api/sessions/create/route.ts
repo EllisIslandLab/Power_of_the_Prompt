@@ -43,18 +43,13 @@ export async function POST(request: NextRequest) {
     const { data: videoSession, error } = await supabase
       .from('video_sessions')
       .insert({
-        session_name: sessionName,
-        jitsi_room_id: jitsiRoomId,
-        host_user_id: user.id,
-        participant_user_ids: participantUserIds,
-        session_type: sessionType,
-        scheduled_start: scheduledStart,
-        scheduled_end: scheduledEnd,
-        session_status: 'SCHEDULED',
-        waiting_room_enabled: waitingRoomEnabled,
-        max_participants: maxParticipants,
-        jitsi_config: jitsiConfig,
-        consultation_id: consultationId
+        title: sessionName,
+        room_name: jitsiRoomId,
+        host_id: user.id,
+        type: sessionType,
+        scheduled_for: scheduledStart,
+        status: 'scheduled',
+        description: `${sessionType} session`
       })
       .select('*')
       .single()
@@ -107,16 +102,16 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('video_sessions')
       .select('*')
-      .or(`host_user_id.eq.${user.id},participant_user_ids.cs.{${user.id}}`)
-      .order('scheduled_start', { ascending: true })
+      .eq('host_id', user.id)
+      .order('scheduled_for', { ascending: true })
       .range(offset, offset + limit - 1)
 
     if (sessionType) {
-      query = query.eq('session_type', sessionType)
+      query = query.eq('type', sessionType)
     }
 
-    if (status) {
-      query = query.eq('session_status', status)
+    if (status && ['scheduled', 'active', 'ended'].includes(status)) {
+      query = query.eq('status', status as 'scheduled' | 'active' | 'ended')
     }
 
     const { data: sessions, error } = await query
@@ -133,9 +128,9 @@ export async function GET(request: NextRequest) {
     const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
     const sessionsWithUrls = sessions?.map(videoSession => ({
       ...videoSession,
-      joinUrl: `https://${jitsiDomain}/${videoSession.jitsi_room_id}`,
-      isHost: videoSession.host_user_id === user.id,
-      isParticipant: Array.isArray(videoSession.participant_user_ids) && videoSession.participant_user_ids.includes(user.id)
+      joinUrl: `https://${jitsiDomain}/${videoSession.room_name}`,
+      isHost: videoSession.host_id === user.id,
+      isParticipant: false // Note: participant_user_ids field doesn't exist in schema
     })) || []
 
     return NextResponse.json(sessionsWithUrls)
