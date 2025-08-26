@@ -154,7 +154,7 @@ async function createVideoSession(sessionData: {
         throw new Error(`Failed to create student record: ${studentError.message}`)
       }
 
-      studentId = newStudent.user_id
+      studentId = newStudent.id
     }
 
     // Generate unique room ID based on session data
