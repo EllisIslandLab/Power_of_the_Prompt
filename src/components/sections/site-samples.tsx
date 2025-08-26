@@ -631,44 +631,22 @@ export function SiteSamples() {
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex justify-center">
                 <a
                   href={selectedSample.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center gap-2 h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 h-10 px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors cursor-pointer"
                 >
                   <ExternalLink className="h-4 w-4" />
                   View Live Site
                 </a>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground border-accent" 
-                  onClick={() => {
-                    setSelectedSample(null)
-                    document.getElementById('build-with-you')?.scrollIntoView({ behavior: 'smooth' })
-                  }}
-                >
-                  Start Your Website Journey
-                </Button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mt-16">
-          <Button 
-            size="lg" 
-            onClick={() => document.getElementById('build-with-you')?.scrollIntoView({ behavior: 'smooth' })}
-            className="bg-accent hover:bg-accent/90 text-accent-foreground"
-          >
-            Build Your Own Website
-          </Button>
-        </div>
-      </div>
     </section>
   )
 }
