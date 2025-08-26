@@ -173,16 +173,12 @@ async function createVideoSession(sessionData: {
     const { data: videoSession, error: sessionError } = await supabase
       .from('video_sessions')
       .insert({
-        session_name: sessionData.sessionName,
-        jitsi_room_id: roomId,
-        host_user_id: adminUser.user_id,
-        participant_user_ids: [studentId],
-        session_type: 'FREE_CONSULTATION',
-        scheduled_start: startTime.toISOString(),
-        scheduled_end: endTime.toISOString(),
-        session_status: 'SCHEDULED',
-        waiting_room_enabled: true,
-        max_participants: 2 // Host + 1 participant for consultation
+        title: sessionData.sessionName,
+        room_name: roomId,
+        host_id: adminUser.user_id,
+        status: 'scheduled',
+        scheduled_for: startTime.toISOString(),
+        description: 'Free consultation session'
       })
       .select('*')
       .single()
