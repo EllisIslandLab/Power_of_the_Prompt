@@ -139,12 +139,12 @@ async function createVideoSession(sessionData: {
       const { data: newStudent, error: studentError } = await supabase
         .from('students')
         .insert({
-          user_id: guestUserId,
+          id: guestUserId,
           full_name: sessionData.userName,
           email: sessionData.userEmail,
           course_enrolled: 'None',
           status: 'Active',
-          payment_status: 'Trial', // Free consultation
+          payment_status: 'trial', // Free consultation
           progress: 0
         })
         .select('*')
