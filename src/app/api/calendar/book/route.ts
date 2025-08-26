@@ -166,15 +166,8 @@ async function createVideoSession(sessionData: {
     const endTime = new Date(startTime.getTime() + (sessionData.duration * 60 * 1000))
 
     // Get an admin user to host the session
-    const { data: adminUser } = await supabase
-      .from('admin_users')
-      .select('user_id')
-      .limit(1)
-      .single()
-
-    if (!adminUser) {
-      throw new Error('No admin user found to host the session')
-    }
+    // Note: admin_users table doesn't exist yet, using placeholder for coming soon page
+    const adminUser = { user_id: 'admin-placeholder' }
 
     // Create video session
     const { data: videoSession, error: sessionError } = await supabase
