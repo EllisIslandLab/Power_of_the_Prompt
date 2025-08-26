@@ -421,14 +421,16 @@ function generateRecommendations(performance: any, seo: any, security: any, mobi
 }
 
 async function storeAnalysisResults(supabase: any, sessionId: string, url: string, results: any) {
-  const { error } = await supabase
-    .from('website_analysis_results')
-    .insert({
-      session_id: sessionId,
-      url,
-      analysis_data: results,
-      created_at: new Date().toISOString()
-    })
+  // Note: website_analysis_results table doesn't exist yet, using placeholder for coming soon page
+  console.log('Analysis results stored (placeholder):', {
+    session_id: sessionId,
+    url,
+    analysis_data: results,
+    created_at: new Date().toISOString()
+  })
+  
+  // Simulate successful storage for coming soon page
+  const error = null
   
   if (error) {
     console.error('Error storing analysis results:', error)

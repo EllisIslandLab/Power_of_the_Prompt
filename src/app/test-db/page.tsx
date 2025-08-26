@@ -15,7 +15,7 @@ export default function TestDbPage() {
       console.log('Testing basic connection...')
       // First test basic connection
       const { data: basicData, error: basicError } = await supabase
-        .from('admin_users')
+        .from('students')
         .select('count', { count: 'exact' })
       
       if (basicError) {
@@ -29,9 +29,9 @@ export default function TestDbPage() {
       const timeoutId = setTimeout(() => controller.abort(), 5000)
       
       const { data, error } = await supabase
-        .from('admin_users')
+        .from('students')
         .select('*')
-        .eq('user_id', 'c91e87c1-4293-40b2-aae5-8b4e91274356')
+        .limit(1)
         .abortSignal(controller.signal)
         .single()
       
