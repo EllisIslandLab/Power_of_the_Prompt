@@ -607,7 +607,7 @@ export function SiteSamples() {
                       "{selectedSample.testimonial}"
                     </blockquote>
                     <cite className="text-primary font-semibold">— {selectedSample.studentName}</cite>
-                    <p className="text-xs text-muted-foreground mt-1">Web Launch Academy Graduate</p>
+                    <p className="text-xs text-muted-foreground mt-1">{selectedSample.studentName === "Michael E." ? "Big Brother" : "Web Launch Academy Graduate"}</p>
                   </div>
                 </div>
               </div>

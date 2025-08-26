@@ -38,7 +38,7 @@ export const siteSamples: SiteSample[] = [
     image: "https://www.winchestertherapyservices.com",
     liveUrl: "https://www.winchestertherapyservices.com",
     category: "Service Business",
-    testimonial: "My brother helped me create a professional, HIPAA-compliant therapy website that attracts clients while maintaining the highest standards of confidentiality and care.",
+    testimonial: "I remember when I was finishing my basement, my parents came over and brought my little brother to help out. Well, he barely lifted a finger. Now, he got me a working website that saves me about $200 per year and I own my own code! Better late than never little bro.",
     studentName: "Michael E.",
     isFeatured: true,
     realSiteData: {
