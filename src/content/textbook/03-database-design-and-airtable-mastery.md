@@ -1,6 +1,8 @@
-# Chapter 3: Database Design and Airtable Mastery
+# 📊 Chapter 3: Database Design and Airtable Mastery
 
-## 3.1 Database Fundamentals for Web Development
+---
+
+## 📊 3.1 Database Fundamentals for Web Development
 
 ### Understanding Databases in Web Development
 

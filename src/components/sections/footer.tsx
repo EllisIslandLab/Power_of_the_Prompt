@@ -21,9 +21,6 @@ export function Footer() {
             <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8 py-6 h-auto">
               <Link href="/#build-with-you">Start Learning & Building</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="text-lg px-8 py-6 h-auto">
-              <Link href="/audit">Get Free Website Audit</Link>
-            </Button>
           </div>
         </div>
 
@@ -73,9 +70,6 @@ export function Footer() {
               </Link>
               <Link href="/#site-tlc" className="block text-muted-foreground hover:text-primary transition-colors">
                 Site Maintenance
-              </Link>
-              <Link href="/#test-audit" className="block text-muted-foreground hover:text-primary transition-colors">
-                Free Website Audit
               </Link>
             </div>
           </div>

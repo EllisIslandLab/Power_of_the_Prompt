@@ -107,6 +107,35 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
       }])
     }
 
+    // Generate invite token for the paying customer
+    try {
+      const inviteResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/generate-invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: customerEmail,
+          fullName: customerName,
+          tier: 'full', // Paying customers get full access
+          createdBy: 'stripe-webhook',
+          expiresInDays: 7
+        })
+      })
+
+      if (inviteResponse.ok) {
+        const inviteData = await inviteResponse.json()
+        console.log(`Invite token created for paying customer: ${customerEmail}`)
+        
+        // You could optionally send an email with the signup link here
+        // await sendInviteEmail(customerEmail, inviteData.invite.signup_url)
+      } else {
+        console.error('Failed to create invite token for paying customer:', await inviteResponse.text())
+      }
+    } catch (error) {
+      console.error('Error generating invite token:', error)
+    }
+
     // Handle service-specific post-purchase actions
     await handleServiceSpecificActions(serviceType, {
       serviceId,

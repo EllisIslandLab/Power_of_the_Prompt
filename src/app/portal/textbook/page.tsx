@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { BookOpen, Clock, CheckCircle, ArrowRight, FileText, Users } from "lucide-react"
-import { textbookChapters } from "@/content/textbook"
+import { textbookChapters } from "@/content/textbook/index"
 
 export default function TextbookPortalPage() {
   const [completedChapters, setCompletedChapters] = useState<string[]>([])
@@ -16,6 +16,18 @@ export default function TextbookPortalPage() {
       prev.includes(chapterId) 
         ? prev.filter(id => id !== chapterId)
         : [...prev, chapterId]
+    )
+  }
+
+  // Add safety check for textbookChapters
+  if (!textbookChapters || !Array.isArray(textbookChapters) || textbookChapters.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-6xl text-center">
+          <h1 className="text-4xl font-bold text-foreground mb-4">Textbook Content Loading...</h1>
+          <p className="text-muted-foreground">Please check back in a moment.</p>
+        </div>
+      </div>
     )
   }
 

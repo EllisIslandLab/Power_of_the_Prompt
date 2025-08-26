@@ -14,30 +14,39 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabase()
 
-    // Sign in with Supabase
+    // Simple, clean signin approach
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.toLowerCase(),
       password: password
     })
 
     if (error) {
-      // Check if it's an email not confirmed error
+      // Handle email not confirmed error specifically
       if (error.message.includes('Email not confirmed')) {
-        return NextResponse.json(
-          { error: 'Please verify your email address before signing in. Check your inbox for the verification link.' },
-          { status: 400 }
-        )
+        // Try to resend verification email
+        const { error: resendError } = await supabase.auth.resend({
+          type: 'signup',
+          email: email.toLowerCase(),
+        })
+
+        return NextResponse.json({
+          error: 'Please verify your email address before signing in.',
+          needsVerification: true,
+          message: 'We\'ve sent a new verification link to your email address. Please check your inbox and click the verification link to activate your account.',
+          emailSent: !resendError
+        }, { status: 400 })
       }
 
+      // Standard invalid credentials error
       return NextResponse.json(
-        { error: error.message },
+        { error: 'Invalid credentials. Please check your email and password and try again.' },
         { status: 400 }
       )
     }
 
     if (!data.user) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { error: 'Invalid credentials. Please check your email and password and try again.' },
         { status: 400 }
       )
     }
@@ -53,7 +62,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    // console.error('Signin error:', error) // Commented out for auth transition
+    console.error('Signin error:', error)
     return NextResponse.json(
       { error: 'An error occurred during sign-in' },
       { status: 500 }

@@ -13,10 +13,12 @@ export default function SigninPage() {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [verificationMessage, setVerificationMessage] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setVerificationMessage('')
     setLoading(true)
 
     // Basic validation
@@ -41,13 +43,18 @@ export default function SigninPage() {
       const data = await response.json()
 
       if (!response.ok) {
+        // Handle verification needed case specifically
+        if (data.needsVerification) {
+          setVerificationMessage(data.message || 'Please verify your email address before signing in.')
+          return
+        }
         throw new Error(data.error || 'Sign-in failed')
       }
 
       // Success - redirect to portal
       window.location.href = '/portal'
     } catch (err) {
-      // console.error('Signin error:', err) // Commented out for auth transition
+      console.error('Signin error:', err)
       setError(err instanceof Error ? err.message : 'An error occurred during signin')
     } finally {
       setLoading(false)
@@ -116,6 +123,23 @@ export default function SigninPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                   </svg>
                   <p className="text-sm text-destructive">{error}</p>
+                </div>
+              </div>
+            )}
+
+            {verificationMessage && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                <div className="flex items-start gap-2">
+                  <svg className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  <div>
+                    <p className="text-sm text-blue-800 font-medium mb-1">Email Verification Required</p>
+                    <p className="text-sm text-blue-700">{verificationMessage}</p>
+                    <p className="text-xs text-blue-600 mt-2">
+                      Don't see the email? Check your spam folder or contact support if you need help.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

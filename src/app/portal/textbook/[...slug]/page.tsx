@@ -42,6 +42,8 @@ export default function TextbookChapterPage() {
   const [readingProgress, setReadingProgress] = useState(0)
   const [estimatedReadTime, setEstimatedReadTime] = useState(0)
   const [darkMode, setDarkMode] = useState(false)
+  const [hoveredChapter, setHoveredChapter] = useState<string | null>(null)
+  const [sidebarOffset, setSidebarOffset] = useState(0)
 
   const currentChapter = getChapterByPath(chapterPath)
   const nextChapter = currentChapter ? getNextChapter(currentChapter.id) : undefined
@@ -74,12 +76,30 @@ export default function TextbookChapterPage() {
     }
   }, [currentChapter, loadChapterContent])
 
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      const viewportHeight = window.innerHeight
+      
+      // Calculate reading progress for progress bar
       const progress = scrollTop / docHeight
       setReadingProgress(Math.min(progress * 100, 100))
+      
+      // Calculate scroll progress (0 to 1)
+      const scrollProgress = scrollTop / docHeight
+      
+      // Define sidebar dimensions
+      const sidebarHeight = viewportHeight * 1.6 // Sidebar is 60% taller than viewport
+      const maxMovement = sidebarHeight - viewportHeight // How much the sidebar can move
+      
+      // Calculate offset: start at 0 (normal position), move up as we scroll down
+      // This will push the top navigation out of view and bring bottom navigation into view
+      // Multiply by 2.0 to make it move faster than the scroll
+      const offset = -scrollProgress * maxMovement * 2.0
+      
+      setSidebarOffset(offset)
     }
 
     window.addEventListener('scroll', handleScroll)
@@ -129,10 +149,18 @@ export default function TextbookChapterPage() {
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className={`
-          fixed lg:static inset-y-0 left-0 z-30 w-80 bg-card border-r transform transition-transform duration-300
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}>
+        <aside 
+          className={`
+            fixed inset-y-0 left-0 z-30 w-80 bg-card border-r 
+            transform transition-transform duration-300 flex flex-col
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          `}
+          style={{
+            top: `${sidebarOffset}px`,
+            height: '160vh', // Taller than viewport to hold all content
+            transition: 'top 0.1s ease-out'
+          }}
+        >
           <div className="p-6 border-b">
             <Link href="/portal/textbook" className="flex items-center gap-2 text-lg font-semibold">
               <BookOpen className="h-5 w-5" />
@@ -140,10 +168,14 @@ export default function TextbookChapterPage() {
             </Link>
           </div>
           
-          <nav className="p-4 h-full overflow-y-auto">
+          <nav className="p-4 flex-1 overflow-hidden">
             <div className="space-y-2">
               {textbookChapters.map((chapter) => (
-                <div key={chapter.id}>
+                <div 
+                  key={chapter.id}
+                  onMouseEnter={() => setHoveredChapter(chapter.id)}
+                  onMouseLeave={() => setHoveredChapter(null)}
+                >
                   <Link
                     href={`/portal/textbook${chapter.filePath}`}
                     className={`
@@ -166,19 +198,31 @@ export default function TextbookChapterPage() {
                     <span className="flex-1">{chapter.title}</span>
                   </Link>
                   
-                  {currentChapter.id === chapter.id && (
-                    <div className="ml-9 mt-2 space-y-1">
-                      {chapter.sections.map((section) => (
-                        <a
-                          key={section.id}
-                          href={`#section-${section.id}`}
-                          className="block px-3 py-1 text-xs text-muted-foreground hover:text-foreground rounded"
-                        >
-                          {section.title}
-                        </a>
-                      ))}
-                    </div>
-                  )}
+                  <div 
+                    className="ml-9 mt-2 space-y-1 overflow-hidden transition-all duration-500 ease-in-out"
+                    style={{
+                      maxHeight: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? '500px' : '0px',
+                      opacity: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? 1 : 0,
+                      paddingTop: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? '8px' : '0px',
+                      marginTop: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? '8px' : '0px'
+                    }}
+                  >
+                    {chapter.sections.map((section, index) => (
+                      <a
+                        key={section.id}
+                        href={`#section-${section.id}`}
+                        className="block px-3 py-1 text-xs text-muted-foreground hover:text-foreground rounded transition-all"
+                        style={{
+                          transitionDelay: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? `${index * 100}ms` : '0ms',
+                          transitionDuration: '300ms',
+                          transform: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? 'translateY(0)' : 'translateY(-10px)',
+                          opacity: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? 1 : 0
+                        }}
+                      >
+                        {section.title}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>

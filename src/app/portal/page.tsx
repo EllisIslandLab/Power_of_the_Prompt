@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { Zap, BookOpen, MessageSquare, Settings, Users, Plus } from "lucide-react"
+import { Zap, BookOpen, MessageSquare, Settings, Users, Plus, Video, HelpCircle, Handshake } from "lucide-react"
 
 export default function PortalPage() {
   // Temporarily disable auth - allow access to portal for testing
@@ -26,20 +26,68 @@ export default function PortalPage() {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Welcome back, {user.studentProfile?.full_name || user.adminProfile?.full_name || user.email}!
-            </h1>
-            <p className="text-muted-foreground">
-              Your Web Launch Academy dashboard
-            </p>
+        <div className="mb-8 bg-card/50 backdrop-blur border rounded-lg p-8">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Welcome back, {user.studentProfile?.full_name || user.adminProfile?.full_name || user.email}!
+              </h1>
+              <p className="text-muted-foreground">
+                Your Web Launch Academy dashboard
+              </p>
+            </div>
+            <Link href="/">
+              <Button variant="outline">
+                Sign Out
+              </Button>
+            </Link>
           </div>
-          <Link href="/signin">
-            <Button variant="outline">
-              Sign Out
+
+          {/* Navigation Links */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
+              <Link href="/portal/chat">
+                <MessageSquare className="h-5 w-5" />
+                <span className="text-sm">Chat</span>
+              </Link>
             </Button>
-          </Link>
+            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
+              <Link href="/portal/cohorts">
+                <Users className="h-5 w-5" />
+                <span className="text-sm">Cohorts</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
+              <Link href="/portal/collaboration">
+                <Handshake className="h-5 w-5" />
+                <span className="text-sm">Collaboration</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
+              <Link href="/portal/resources">
+                <Zap className="h-5 w-5" />
+                <span className="text-sm">Resources</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
+              <Link href="/portal/support">
+                <HelpCircle className="h-5 w-5" />
+                <span className="text-sm">Support</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
+              <Link href="/portal/textbook">
+                <BookOpen className="h-5 w-5" />
+                <span className="text-sm">Textbook</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
+              <Link href="/portal/video">
+                <Video className="h-5 w-5" />
+                <span className="text-sm">Video</span>
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Status Cards */}

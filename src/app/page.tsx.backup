@@ -1,20 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ComingSoonBanner } from "@/components/sections/coming-soon-banner"
+import { NewHero } from "@/components/sections/new-hero"
 import { SiteSamples } from "@/components/sections/site-samples"
-import { Testimonials } from "@/components/sections/testimonials"
+import { ResponsiveComparison } from "@/components/sections/responsive-comparison"
+import { BuildWithYou } from "@/components/sections/build-with-you"
+import { Build4You } from "@/components/sections/build-4-you"
+import { SiteTLC } from "@/components/sections/site-tlc"
+import { TestAudit } from "@/components/sections/test-audit"
 import { Footer } from "@/components/sections/footer"
 import { ScrollProgress } from "@/components/scroll-progress"
 import { ExpiredLinkModal } from "@/components/modals/ExpiredLinkModal"
-
-// Commented out sections for coming soon page
-// import { NewHero } from "@/components/sections/new-hero"
-// import { ResponsiveComparison } from "@/components/sections/responsive-comparison"
-// import { BuildWithYou } from "@/components/sections/build-with-you"
-// import { Build4You } from "@/components/sections/build-4-you"
-// import { SiteTLC } from "@/components/sections/site-tlc"
-// import { TestAudit } from "@/components/sections/test-audit"
 
 export default function Home() {
   const [showExpiredModal, setShowExpiredModal] = useState(false)
@@ -52,25 +48,14 @@ export default function Home() {
         onClose={() => setShowExpiredModal(false)} 
       />
       <main className="scroll-smooth">
-        {/* Coming Soon Page - Simplified Version */}
-        <div id="coming-soon">
-          <ComingSoonBanner />
-        </div>
-        <div id="site-samples">
-          <SiteSamples />
-        </div>
-        <div id="testimonials">
-          <Testimonials />
-        </div>
-        <Footer />
-
-        {/* Commented out sections for coming soon page */}
-        {/*
         <div id="new-hero">
           <NewHero />
         </div>
         <div id="unique-approach">
           <ResponsiveComparison />
+        </div>
+        <div id="site-samples">
+          <SiteSamples />
         </div>
         <div id="build-with-you">
           <BuildWithYou />
@@ -84,7 +69,7 @@ export default function Home() {
         <div id="test-audit">
           <TestAudit />
         </div>
-        */}
+        <Footer />
       </main>
     </>
   )

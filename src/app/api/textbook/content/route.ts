@@ -47,7 +47,19 @@ export async function GET(request: NextRequest) {
     // Add custom styling and enhancements
     const enhancedContent = htmlContent
       // Add IDs to headings for navigation
-      .replace(/<h([1-6])>(.*?)<\/h[1-6]>/g, (match, level, content) => {
+      .replace(/<h2>([^<]+)<\/h2>/g, (match, content) => {
+        // Extract section number from heading like "🔐 1.1 Account Setup Strategy and Security"
+        const sectionMatch = content.match(/(\d+\.\d+)/)
+        if (sectionMatch) {
+          const sectionId = sectionMatch[1]
+          return `<h2 id="section-${sectionId}">${content}</h2>`
+        }
+        // Fallback for headings without section numbers
+        const id = content.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        return `<h2 id="section-${id}">${content}</h2>`
+      })
+      // Add IDs to other headings (h1, h3, h4, h5, h6) with text-based IDs
+      .replace(/<h([1346])>([^<]+)<\/h[1346]>/g, (match, level, content) => {
         const id = content.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
         return `<h${level} id="section-${id}">${content}</h${level}>`
       })

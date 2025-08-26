@@ -92,35 +92,46 @@ export function SiteSamples() {
   const [leftArrowHover, setLeftArrowHover] = useState(false)
   const [rightArrowHover, setRightArrowHover] = useState(false)
   
-  // Touch handling for mobile swipe
+  // Touch handling for mobile swipe - optimized for both directions
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const [isSwiping, setIsSwiping] = useState(false)
 
-  // Minimum distance for a swipe - reduced for better mobile sensitivity
-  const minSwipeDistance = 30
+  // Minimum distance for a swipe - optimized for mobile sensitivity
+  const minSwipeDistance = 50
 
   const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null) // Clear the end position
+    setTouchEnd(null)
     setTouchStart(e.targetTouches[0].clientX)
+    setIsSwiping(true)
   }
 
   const onTouchMove = (e: React.TouchEvent) => {
+    if (!isSwiping) return
     setTouchEnd(e.targetTouches[0].clientX)
+    // Prevent scrolling while swiping horizontally
+    if (touchStart && Math.abs(e.targetTouches[0].clientX - touchStart) > 10) {
+      e.preventDefault()
+    }
   }
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return
+    if (!touchStart || !touchEnd || !isSwiping) {
+      setIsSwiping(false)
+      return
+    }
     
     const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > minSwipeDistance
-    const isRightSwipe = distance < -minSwipeDistance
+    const isLeftSwipe = distance > minSwipeDistance  // Swipe left = next
+    const isRightSwipe = distance < -minSwipeDistance // Swipe right = previous
 
     if (isLeftSwipe) {
       moveToNext()
     } else if (isRightSwipe) {
       moveToPrev()
     }
+    
+    setIsSwiping(false)
   }
 
   // Initialize with Winchester in center
@@ -174,9 +185,9 @@ export function SiteSamples() {
         {/* Gallery Ceiling - Full Width with Three-Zone Lighting */}
         <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-r from-slate-800/60 via-slate-600 to-slate-800/60" />
         
-        {/* Left Hover Zone & Arrow */}
+        {/* Left Hover Zone & Arrow - Desktop Only */}
         <div 
-          className="absolute left-0 top-0 w-32 h-full z-10 cursor-pointer flex items-center"
+          className="absolute left-0 top-0 w-32 h-full z-10 cursor-pointer items-center hidden md:flex"
           onMouseEnter={() => setLeftArrowHover(true)}
           onMouseLeave={() => setLeftArrowHover(false)}
         >
@@ -191,9 +202,9 @@ export function SiteSamples() {
           </button>
         </div>
 
-        {/* Right Hover Zone & Arrow */}
+        {/* Right Hover Zone & Arrow - Desktop Only */}
         <div 
-          className="absolute right-0 top-0 w-32 h-full z-10 cursor-pointer flex items-center justify-end"
+          className="absolute right-0 top-0 w-32 h-full z-10 cursor-pointer items-center justify-end hidden md:flex"
           onMouseEnter={() => setRightArrowHover(true)}
           onMouseLeave={() => setRightArrowHover(false)}
         >

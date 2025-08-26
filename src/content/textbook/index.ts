@@ -26,26 +26,27 @@ export const textbookChapters: Chapter[] = [
         ]
       },
       {
-        id: "1.2", 
-        title: "Essential Account Creation",
+        id: "1.2",
+        title: "System Requirements and Software Installation",
         subsections: [
-          "GitHub Account",
-          "Vercel Account", 
-          "Airtable Account",
-          "Anthropic Account (Claude CLI)",
-          "Stripe Account"
+          "System Requirements Check",
+          "Visual Studio Code Installation and Configuration",
+          "Windows Subsystem for Linux (WSL)",
+          "VS Code Extensions Installation",
+          "Node.js Installation",
+          "Git Installation and Configuration",
+          "Claude CLI Installation"
         ]
       },
       {
         id: "1.3",
-        title: "Development Environment Installation",
+        title: "Essential Account Creation",
         subsections: [
-          "System Requirements Check",
-          "Windows Subsystem for Linux (WSL)",
-          "Visual Studio Code Setup",
-          "Node.js Installation",
-          "Git Configuration",
-          "Claude CLI Installation"
+          "Anthropic Account (Claude CLI)",
+          "GitHub Account",
+          "Netlify Account", 
+          "Airtable Account",
+          "Stripe Account"
         ]
       },
       {
@@ -339,7 +340,7 @@ export const textbookChapters: Chapter[] = [
   {
     id: "08",
     title: "Security, Maintenance, and Long-term Success",
-    filePath: "/textbook/08-security-maintenance-and-long-term-success",
+    filePath: "/textbook/08-long-term-success-and-maintenance",
     sections: [
       {
         id: "8.1",

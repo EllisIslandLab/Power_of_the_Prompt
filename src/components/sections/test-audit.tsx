@@ -219,9 +219,6 @@ export function TestAudit() {
               <Play className="h-4 w-4" />
               View Sample Report
             </Button>
-            <Button size="lg" asChild className="bg-accent hover:bg-accent/90 text-accent-foreground">
-              <Link href="/audit">Get My Free Audit</Link>
-            </Button>
           </div>
         </div>
         
@@ -562,9 +559,6 @@ export function TestAudit() {
                 </div>
               </div>
               
-              <Button asChild size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground mb-3">
-                <Link href="/audit">Get Free Audit</Link>
-              </Button>
               
               <p className="text-xs text-muted-foreground">
                 No obligation • Results in 24-48 hours
