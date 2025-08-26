@@ -188,21 +188,14 @@ async function createVideoSession(sessionData: {
     }
 
     // Create associated consultation record
-    const { data: consultation, error: consultationError } = await supabase
-      .from('consultations')
-      .insert({
-        user_id: studentId,
-        scheduled_time: startTime.toISOString(),
-        status: 'SCHEDULED',
-        type: 'FREE',
-        video_session_id: videoSession.id
-      })
-      .select('*')
-      .single()
-
-    if (consultationError) {
-      console.warn('Failed to create consultation record:', consultationError)
-      // Don't throw here - video session is more important
+    // Note: consultations table doesn't exist yet, using placeholder for coming soon page
+    const consultation = { 
+      id: `consultation-${Date.now()}`,
+      user_id: studentId,
+      scheduled_time: startTime.toISOString(),
+      status: 'SCHEDULED',
+      type: 'FREE',
+      video_session_id: videoSession?.id || 'placeholder'
     }
 
     // Get Jitsi domain from environment
