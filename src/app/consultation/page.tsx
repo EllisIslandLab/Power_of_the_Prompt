@@ -266,7 +266,7 @@ export default function ConsultationPage() {
                   <Mail className="h-6 w-6 text-secondary mx-auto mb-3" />
                   <h4 className="font-semibold mb-2">Questions about booking?</h4>
                   <p className="text-sm text-muted-foreground">
-                    Email hello@poweroftheprompt.com
+                    <a href="/#email-signup" className="text-primary hover:text-primary/80 underline">Join our email list</a> for contact details
                   </p>
                 </CardContent>
               </Card>

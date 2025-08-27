@@ -487,8 +487,8 @@ export function SiteSamples() {
                           {/* Hover Overlay */}
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
                           
-                          {/* Testimonial Bar - Only on center items */}
-                          {isCenter && (
+                          {/* Testimonial Bar - Only on center items with testimonials */}
+                          {isCenter && sample.testimonial && sample.studentName && (
                             <div className="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
                               <div className="bg-gradient-to-t from-black/95 via-black/80 to-transparent p-4">
                                 <h4 className="text-white font-semibold text-sm mb-1">{sample.title}</h4>
@@ -590,27 +590,29 @@ export function SiteSamples() {
                     <div className="text-center">
                       <div className="text-8xl mb-4">🖥️</div>
                       <div className="text-xl font-medium">{selectedSample.category} Demo</div>
-                      <div className="text-sm text-muted-foreground mt-2">Click "View Live Site" to see it in action</div>
+                      <div className="text-sm text-muted-foreground mt-2">Portfolio showcase example</div>
     </div>
                   </div>
                 )}
               </div>
               
               {/* Full Student Testimonial */}
-              <div className="bg-primary/5 border-l-4 border-primary rounded-r-lg p-6 mb-8">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-primary font-bold text-lg">{selectedSample.studentName.charAt(0)}</span>
-                  </div>
-                  <div>
-                    <blockquote className="text-foreground italic text-lg mb-3 leading-relaxed">
-                      "{selectedSample.testimonial}"
-                    </blockquote>
-                    <cite className="text-primary font-semibold">— {selectedSample.studentName}</cite>
-                    <p className="text-xs text-muted-foreground mt-1">{selectedSample.studentName === "Michael E." ? "Big Brother" : "Web Launch Academy Graduate"}</p>
+              {selectedSample.testimonial && selectedSample.studentName && (
+                <div className="bg-primary/5 border-l-4 border-primary rounded-r-lg p-6 mb-8">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-primary font-bold text-lg">{selectedSample.studentName.charAt(0)}</span>
+                    </div>
+                    <div>
+                      <blockquote className="text-foreground italic text-lg mb-3 leading-relaxed">
+                        "{selectedSample.testimonial}"
+                      </blockquote>
+                      <cite className="text-primary font-semibold">— {selectedSample.studentName}</cite>
+                      <p className="text-xs text-muted-foreground mt-1">{selectedSample.studentName === "Maria E." ? "Wife & Mother" : selectedSample.studentName === "Michael E." ? "Big Brother" : "Web Launch Academy Graduate"}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div>
@@ -631,17 +633,19 @@ export function SiteSamples() {
                 </div>
               </div>
               
-              <div className="flex justify-center">
-                <a
-                  href={selectedSample.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 h-10 px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors cursor-pointer"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  View Live Site
-                </a>
-              </div>
+              {selectedSample.liveUrl && selectedSample.liveUrl !== "#" && (
+                <div className="flex justify-center">
+                  <a
+                    href={selectedSample.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 h-10 px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    View Live Site
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>

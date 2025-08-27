@@ -62,29 +62,17 @@ export function Navigation() {
             ) : (
               // Public Marketing Navigation
               <>
-                <Link href="/#unique-approach" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
-                  <span>🥇</span>
-                  Unique Approach
+                <Link href="/#email-signup" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  <span>🚀</span>
+                  Get Early Access
                 </Link>
                 <Link href="/#site-samples" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
                   <span>🌐</span>
                   Site Samples
                 </Link>
-                <Link href="/#build-with-you" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
-                  <span>🎓</span>
-                  Build With You
-                </Link>
-                <Link href="/#build-4-you" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
-                  <Monitor className="h-4 w-4" />
-                  Build 4 You
-                </Link>
-                <Link href="/#site-tlc" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
-                  <span>⚒️</span>
-                  Site TLC
-                </Link>
-                <Link href="/#test-audit" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
-                  <span>📃</span>
-                  Test & Audit
+                <Link href="/#testimonials" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
+                  <span>💬</span>
+                  Testimonials
                 </Link>
               </>
             )}

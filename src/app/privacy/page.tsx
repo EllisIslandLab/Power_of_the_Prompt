@@ -53,7 +53,7 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="text-2xl font-semibold text-foreground mb-4">Contact Us</h2>
           <p className="text-muted-foreground">
-            If you have questions about this Privacy Policy, please contact us at hello@poweroftheprompt.com
+            If you have questions about this Privacy Policy, please <a href="/#email-signup" className="text-primary hover:text-primary/80 underline">join our email list</a> for contact information.
           </p>
         </section>
       </div>

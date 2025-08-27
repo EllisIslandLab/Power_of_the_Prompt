@@ -8,6 +8,56 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// Funny titles library for random assignment
+const FUNNY_TITLES = [
+  'Random Homeless Person',
+  'Paid Testimonial',
+  'Professional Procrastinator',
+  'Chief Happiness Officer',
+  'Senior Couch Potato',
+  'Expert Overthinking Specialist', 
+  'Certified Coffee Addict',
+  'Part-time Superhero',
+  'Full-time Cat Parent',
+  'Amateur Life Coach',
+  'Professional Netflix Binger',
+  'Self-Proclaimed Genius',
+  'Recovering Perfectionist',
+  'Aspiring Influencer',
+  'Weekend Warrior',
+  'Serial Entrepreneur (Failed)',
+  'Professional Nap Taker',
+  'Chief Fun Officer',
+  'Expert Googler',
+  'Social Media Stalker',
+  'Certified Overthinker',
+  'Professional Daydreamer',
+  'Senior Meme Curator',
+  'Freelance Pessimist',
+  'Part-time Human',
+  'Full-time Mood',
+  'Chronic Snack Consumer',
+  'Professional Excuse Maker',
+  'Licensed Chaos Creator',
+  'Certified Problem Magnet'
+]
+
+// Random avatar library  
+const RANDOM_AVATARS = [
+  '😊', '😎', '🤓', '😂', '🤪', '🙃', '😴', '🤔', 
+  '🤯', '😇', '🤠', '🤡', '🥳', '🤗', '😋', '🤨',
+  '🧐', '🤭', '😬', '🤫', '🤷‍♂️', '🤷‍♀️', '🤦‍♂️', '🤦‍♀️',
+  '🙋‍♂️', '🙋‍♀️', '🧑‍💻', '👨‍💻', '👩‍💻', '🧑‍🎨', '🧑‍🍳',
+  '🧑‍🚀', '🧑‍🔬', '🧙‍♂️', '🧙‍♀️', '🦸‍♂️', '🦸‍♀️', '🤖',
+  '👽', '🐱', '🐶', '🐸', '🐙', '🦄', '🐲', '🦊',
+  '🐭', '🐹', '🐰', '🦝', '🐻', '🐼', '🐨', '🐯'
+]
+
+// Helper function to get random item from array
+const getRandomItem = (array: string[]) => {
+  return array[Math.floor(Math.random() * array.length)]
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -100,8 +150,8 @@ export async function POST(request: NextRequest) {
       'Arrangement': 0, // Default to 0 (not arranged/displayed yet) - admin can set order number to display
       'Existing Waitlist User': isExistingWaitlistUser ? 'Yes' : 'No', // Track if user was already in waitlist
       'Updated Date': new Date().toISOString().split('T')[0], // Track when it was last updated
-      'Title/Role': body.title?.trim() || 'Customer', // Default role if not provided
-      'Avatar': body.avatar?.trim() || '😊' // Default emoji if not provided
+      'Title/Role': body.title?.trim() || getRandomItem(FUNNY_TITLES), // Random funny title if not provided
+      'Avatar': body.avatar?.trim() || getRandomItem(RANDOM_AVATARS) // Random avatar if not provided
     }
 
     let finalRecord

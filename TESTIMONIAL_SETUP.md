@@ -42,11 +42,15 @@ Create a new table in your existing Airtable base called **"Testimonial Submissi
 
 9. **Title/Role** (Single line text)
    - User's job title or role
-   - Default: "Customer" if not provided
+   - **Auto-assigned**: Random funny title from library if not provided by user
+   - **Examples**: "Random Homeless Person", "Professional Procrastinator", "Chief Happiness Officer", "Expert Overthinking Specialist", "Certified Coffee Addict", "Professional Netflix Binger", etc.
+   - **Manual Override**: You can change to any title in Airtable before approval
 
 10. **Avatar** (Single line text)
-    - Emoji avatar for display
-    - Default: "😊" if not provided
+    - Emoji avatar for display on testimonials
+    - **Auto-assigned**: Random emoji from library if not provided by user
+    - **Examples**: 😊, 😎, 🤓, 🤪, 🦸‍♀️, 🤖, 🐱, 🦄, 🐲, etc.
+    - **Manual Override**: You can change to any emoji in Airtable
 
 ### Optional Fields (you can add these for enhanced management):
 
@@ -115,6 +119,32 @@ Make sure you have these set up (should already exist from your calendar booking
    - Resubmit without email → should create new record
    - Try updating with different email → should create new record
 
+## Humor & Randomization Features:
+
+### **Random Funny Titles (30+ Options)**
+When users don't provide a title, the system randomly assigns humorous roles like:
+- "Random Homeless Person" 
+- "Paid Testimonial"
+- "Professional Procrastinator"
+- "Chief Happiness Officer" 
+- "Senior Couch Potato"
+- "Expert Overthinking Specialist"
+- "Certified Coffee Addict"
+- "Professional Netflix Binger"
+- "Self-Proclaimed Genius"
+- "Serial Entrepreneur (Failed)"
+- "Licensed Chaos Creator"
+- ...and 20 more hilarious options!
+
+### **Random Avatar Library (50+ Emojis)**
+Automatically assigns diverse emojis including:
+- **Faces**: 😊, 😎, 🤓, 😂, 🤪, 🙃, 🤔, 🤯, 😇, 🤠, 🤡, 🥳
+- **Professionals**: 🧑‍💻, 👨‍💻, 👩‍💻, 🧑‍🎨, 🧑‍🍳, 🧑‍🚀, 🧑‍🔬
+- **Characters**: 🧙‍♂️, 🧙‍♀️, 🦸‍♂️, 🦸‍♀️, 🤖, 👽
+- **Animals**: 🐱, 🐶, 🐸, 🐙, 🦄, 🐲, 🦊, 🐭, 🐹, 🐰, 🦝, 🐻, 🐼
+
+**💡 Pro Tip**: You can always override both title and avatar in Airtable before approving testimonials!
+
 ## Security Features:
 
 - **Email-based authentication** for updates prevents testimonial hijacking
@@ -136,3 +166,5 @@ Make sure you have these set up (should already exist from your calendar booking
 ✅ **Security via email authentication**
 ✅ **Waitlist integration**
 ✅ **Featured testimonials (hardcoded)**
+✅ **Random funny title assignment (30+ options)**
+✅ **Random avatar assignment (50+ emojis)**

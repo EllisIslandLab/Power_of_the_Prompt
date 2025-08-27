@@ -76,10 +76,10 @@ export default function ServicesPage() {
               Book Free Consultation
             </a>
             <a 
-              href="mailto:hello@poweroftheprompt.com" 
+              href="/#email-signup" 
               className="inline-flex items-center justify-center px-6 py-3 border border-muted text-base font-medium rounded-md text-foreground bg-background hover:bg-muted transition-colors"
             >
-              Email Questions
+              Get Contact Info
             </a>
           </div>
         </div>

@@ -127,7 +127,7 @@ export function Testimonials() {
         </div>
 
         {/* Main Content Layout */}
-        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
           {/* Left Side - Featured Testimonials */}
           <div>
             <h3 className="text-2xl font-bold mb-6 text-center">Featured Testimonials</h3>
@@ -188,7 +188,7 @@ export function Testimonials() {
           {/* Right Side - Testimonial Form */}
           <div>
             <Card>
-            <CardContent className="p-8">
+            <CardContent className="p-6 md:p-8">
               <h3 className="text-2xl font-bold mb-6 text-center">
                 Share Your Experience
               </h3>
@@ -200,10 +200,16 @@ export function Testimonials() {
                   <p className="text-muted-foreground mb-2">
                     We appreciate your feedback and will review it soon.
                   </p>
-                  {submittedWithEmail && (
+                  {submittedWithEmail ? (
                     <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-md">
                       <p className="text-sm text-primary font-medium">
                         🚀 You've also been signed up for early access updates!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <p className="text-sm text-blue-700 font-medium">
+                        💡 If you haven't already, don't forget to sign up for the launch!
                       </p>
                     </div>
                   )}

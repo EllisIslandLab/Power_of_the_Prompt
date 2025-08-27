@@ -41,7 +41,7 @@ export function ComingSoonBanner() {
   }
 
   return (
-    <section className="py-24 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
+    <section id="email-signup" className="py-24 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
       <div className="container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
@@ -72,7 +72,7 @@ export function ComingSoonBanner() {
                       {error}
                     </div>
                   )}
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       type="email"
                       placeholder="Enter your email"
@@ -82,12 +82,13 @@ export function ComingSoonBanner() {
                         if (error) setError('') // Clear error when user starts typing
                       }}
                       required
-                      className="flex-1"
+                      className="flex-1 w-full"
                       disabled={isSubmitting}
                     />
                     <Button 
                       type="submit" 
                       disabled={isSubmitting || !email.trim()}
+                      className="w-full sm:w-auto"
                     >
                       {isSubmitting ? 'Signing up...' : 'Notify Me'}
                     </Button>

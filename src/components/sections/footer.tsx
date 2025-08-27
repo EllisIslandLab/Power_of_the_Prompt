@@ -25,21 +25,15 @@ export function Footer() {
         </div>
 
         {/* Footer Content */}
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-8">
           {/* Contact Information */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Contact Us</h4>
+            <h4 className="font-semibold text-lg mb-4">Get In Touch</h4>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-primary flex-shrink-0" />
-                <a href="mailto:hello@poweroftheprompt.com" className="text-muted-foreground hover:text-primary transition-colors">
-                  Send us an email
-                </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-primary flex-shrink-0" />
-                <a href="tel:+15551234567" className="text-muted-foreground hover:text-primary transition-colors">
-                  (555) 123-4567
+                <a href="/#email-signup" className="text-muted-foreground hover:text-primary transition-colors">
+                  Join our email list for contact info
                 </a>
               </div>
               <div className="flex items-start gap-3">
@@ -48,6 +42,14 @@ export function Footer() {
                   Painesville Ohio, 44077<br />
                   Available nationwide via video call
                 </span>
+              </div>
+              <div className="mt-4">
+                <Button asChild variant="outline" size="sm" className="w-full">
+                  <a href="/#email-signup">
+                    <ArrowRight className="h-4 w-4 mr-2" />
+                    Get Contact Details
+                  </a>
+                </Button>
               </div>
             </div>
           </div>
@@ -86,7 +88,7 @@ export function Footer() {
                 Monday - Friday: 9am - 6pm EST
               </p>
               <p className="text-sm text-muted-foreground">
-                Free consultation response: Within 4 hours
+                <a href="/#email-signup" className="text-primary hover:text-primary/80 underline">Join our list</a> for consultation booking
               </p>
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-green-500">✓</span>

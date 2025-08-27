@@ -51,7 +51,7 @@ export default function TermsOfService() {
         <section>
           <h2 className="text-2xl font-semibold text-foreground mb-4">Contact Information</h2>
           <p className="text-muted-foreground">
-            For questions about these Terms of Service, contact us at hello@poweroftheprompt.com
+            For questions about these Terms of Service, <a href="/#email-signup" className="text-primary hover:text-primary/80 underline">join our email list</a> for contact information.
           </p>
         </section>
       </div>

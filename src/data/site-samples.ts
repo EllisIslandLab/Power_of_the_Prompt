@@ -83,8 +83,8 @@ export const siteSamples: SiteSample[] = [
     image: "https://www.mechescreations.com",
     liveUrl: "https://www.mechescreations.com",
     category: "E-commerce",
-    testimonial: "My wife's creative business took off after launching her professional website. The elegant design perfectly showcases her handmade jewelry and attracts customers who value artisan quality.",
-    studentName: "Meche C.",
+    testimonial: "I've given Matt three kids; he built me this website with no hosting fees. It's a start I suppose.",
+    studentName: "Maria E.",
     isFeatured: true,
     realSiteData: {
       tagline: "Handcrafted with Love",
@@ -107,8 +107,8 @@ export const siteSamples: SiteSample[] = [
     image: "/api/placeholder/400/300",
     liveUrl: "#",
     category: "E-commerce",
-    testimonial: "I launched my store and made $10K in the first month. Complete code ownership means no monthly fees!",
-    studentName: "Sarah M.",
+    testimonial: "",
+    studentName: "",
     isFeatured: false
   },
   {
@@ -119,8 +119,8 @@ export const siteSamples: SiteSample[] = [
     image: "/api/placeholder/400/300",
     liveUrl: "#",
     category: "Portfolio",
-    testimonial: "My portfolio helped me land 3 new clients within weeks of launching. The animations are incredible!",
-    studentName: "Jessica L.",
+    testimonial: "",
+    studentName: "",
     isFeatured: false
   },
   {
@@ -131,8 +131,8 @@ export const siteSamples: SiteSample[] = [
     image: "/api/placeholder/400/300",
     liveUrl: "#",
     category: "Service Business",
-    testimonial: "The lead generation features tripled my inquiries. Best investment I've made for my business.",
-    studentName: "David K.",
+    testimonial: "",
+    studentName: "",
     isFeatured: false
   },
   {
@@ -143,8 +143,8 @@ export const siteSamples: SiteSample[] = [
     image: "/api/placeholder/400/300",
     liveUrl: "#",
     category: "E-commerce",
-    testimonial: "Online orders increased 300% after launch. The system paid for itself in the first week.",
-    studentName: "Maria G.",
+    testimonial: "",
+    studentName: "",
     isFeatured: false
   },
   {
@@ -155,8 +155,8 @@ export const siteSamples: SiteSample[] = [
     image: "/api/placeholder/400/300",
     liveUrl: "#",
     category: "Service Business",
-    testimonial: "Launched our MVP in record time. The code quality impressed our investors.",
-    studentName: "Alex T.",
+    testimonial: "",
+    studentName: "",
     isFeatured: false
   },
   {
@@ -167,8 +167,8 @@ export const siteSamples: SiteSample[] = [
     image: "/api/placeholder/400/300",
     liveUrl: "#",
     category: "Non-Profit",
-    testimonial: "Donations increased 150% with our new site. The volunteer portal saves us hours weekly.",
-    studentName: "Linda C.",
+    testimonial: "",
+    studentName: "",
     isFeatured: false
   },
   {
@@ -179,8 +179,8 @@ export const siteSamples: SiteSample[] = [
     image: "/api/placeholder/400/300",
     liveUrl: "#",
     category: "Portfolio",
-    testimonial: "Bookings doubled and print sales are through the roof. The client galleries are a game-changer.",
-    studentName: "Robert P.",
+    testimonial: "",
+    studentName: "",
     isFeatured: false
   }
 ]
