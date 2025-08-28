@@ -32,11 +32,20 @@ export const metadata: Metadata = {
     url: 'https://weblaunchacademy.com',
     siteName: 'Web Launch Academy',
     type: 'website',
+    images: [
+      {
+        url: 'https://weblaunchacademy.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Web Launch Academy - Learn to Build Your Own Website',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: "Own Your Code, Take Back Control - Web Launch Academy",
     description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Build your digital presence with Web Launch Academy.",
+    images: ['https://weblaunchacademy.com/og-image.png'],
   },
 };
 
