@@ -47,7 +47,7 @@ export function TripleGuarantee() {
             We'll Buy Your Site After 1 Year
           </h4>
           <p className="text-sm text-muted-foreground">
-            If you're not completely satisfied with your website after one year of ownership, we will purchase it from you for the price you paid (minus the ).
+            If you're not completely satisfied with your website after one year of ownership, we will purchase it from you for the price you paid to build it using our methods.
           </p>
         </div>
       </div>

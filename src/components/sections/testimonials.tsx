@@ -152,24 +152,6 @@ export function Testimonials() {
                 </CardContent>
               </Card>
 
-              {/* Matthew Ellis Testimonial - Always show this one */}
-              <Card className="relative">
-                <CardContent className="p-6">
-                  <Quote className="h-6 w-6 text-primary mb-3" />
-                  <blockquote className="text-base mb-4 italic">
-                    "If you have anything to say about me that comes from the darkest parts of your soul, and emerges as morally disgusting, abhorrent, and just plain mean, I'll put it up on this testimonial page, because I can't pass up a good roast!"
-                  </blockquote>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-sm">🔥</span>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm">Matthew Ellis</div>
-                      <div className="text-xs text-muted-foreground">Founder and CEO of Web Launch Academy</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* View More Button */}
               <div className="text-center">
