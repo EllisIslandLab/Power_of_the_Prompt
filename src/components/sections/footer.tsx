@@ -30,24 +30,29 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-lg mb-4">Get In Touch</h4>
             <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-primary flex-shrink-0" />
-                <a href="/#email-signup" className="text-muted-foreground hover:text-primary transition-colors">
-                  Join our email list for contact info
+              <div className="flex items-start gap-3">
+                <span className="text-lg">📧</span>
+                <a href="mailto:hello@weblaunchacademy.com" className="text-muted-foreground hover:text-primary transition-colors">
+                  hello@weblaunchacademy.com
                 </a>
               </div>
               <div className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
+                <span className="text-lg">📞</span>
+                <a href="tel:+14403549904" className="text-muted-foreground hover:text-primary transition-colors">
+                  (440) 354-9904
+                </a>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="text-lg">📍</span>
                 <span className="text-muted-foreground">
-                  Painesville Ohio, 44077<br />
-                  Available nationwide via video call
+                  Painesville, Ohio | Available nationwide via video call
                 </span>
               </div>
               <div className="mt-4">
                 <Button asChild variant="outline" size="sm" className="w-full">
                   <a href="/#email-signup">
                     <ArrowRight className="h-4 w-4 mr-2" />
-                    Get Contact Details
+                    Join Mailing List
                   </a>
                 </Button>
               </div>
