@@ -107,6 +107,7 @@ export default function RootLayout({
           {/* Dark mode toggle in bottom right */}
           <DarkModeToggle />
         </DarkModeProvider>
+        
       </body>
     </html>
   );
