@@ -188,7 +188,7 @@ async function addLead(body: any) {
         email: email.toLowerCase(),
         name: name || null,
         source: source || 'manual',
-        status: 'active',
+        status: 'interested',
         tags: tags || [],
         custom_fields: customFields || {}
       })
