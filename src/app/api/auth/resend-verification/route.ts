@@ -19,13 +19,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user with this email
-    const { data: student, error } = await supabase
-      .from('students')
+    const { data: user, error } = await supabase
+      .from('users')
       .select('*')
       .eq('email', email.toLowerCase())
       .single()
 
-    if (error || !student) {
+    if (error || !user) {
       // Don't reveal whether email exists or not for security
       return NextResponse.json({
         success: true,
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already verified
-    if (student.email_verified) {
+    if (user.email_verified) {
       return NextResponse.json(
         { error: 'This email is already verified. Please sign in instead.' },
         { status: 400 }
@@ -47,13 +47,13 @@ export async function POST(request: NextRequest) {
 
     // Update verification token
     const { error: updateError } = await supabase
-      .from('students')
+      .from('users')
       .update({
         email_verification_token: verificationToken,
         email_verification_expires_at: verificationExpires.toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .eq('id', student.id)
+      .eq('id', user.id)
 
     if (updateError) {
       console.error('Failed to update verification token:', updateError)
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       const baseUrl = `${protocol}://${host}`
       const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`
       
-      await sendVerificationEmail(email, student.full_name, verificationUrl)
+      await sendVerificationEmail(email, user.full_name, verificationUrl)
       
       console.log('✅ Verification email resent to:', email)
     } catch (emailError) {

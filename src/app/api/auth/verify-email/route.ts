@@ -17,15 +17,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find student with this verification token
-    const { data: student, error } = await supabase
-      .from('students')
+    // Find user with this verification token
+    const { data: user, error } = await supabase
+      .from('users')
       .select('*')
       .eq('email_verification_token', token)
       .single()
 
-    if (error || !student) {
-      console.error('Student not found for token:', error)
+    if (error || !user) {
+      console.error('User not found for token:', error)
       return NextResponse.json(
         { error: 'Invalid verification token' },
         { status: 400 }
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already verified
-    if (student.email_verified) {
+    if (user.email_verified) {
       return NextResponse.json({
         success: true,
         message: 'Email already verified',
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     // Check if token has expired
     const now = new Date()
-    const expiresAt = new Date(student.email_verification_expires_at)
+    const expiresAt = new Date(user.email_verification_expires_at)
     
     if (now > expiresAt) {
       return NextResponse.json(
@@ -51,34 +51,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update student to mark email as verified
+    // Update user to mark email as verified
     const { error: updateError } = await supabase
-      .from('students')
+      .from('users')
       .update({
         email_verified: true,
         email_verification_token: null,
         email_verification_expires_at: null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', student.id)
+      .eq('id', user.id)
 
     if (updateError) {
-      console.error('Failed to update student verification status:', updateError)
+      console.error('Failed to update user verification status:', updateError)
       return NextResponse.json(
         { error: 'Failed to verify email. Please try again.' },
         { status: 500 }
       )
     }
 
-    console.log('✅ Email verified for student:', student.email)
+    console.log('✅ Email verified for user:', user.email)
 
     return NextResponse.json({
       success: true,
       message: 'Email verified successfully',
-      student: {
-        id: student.id,
-        email: student.email,
-        full_name: student.full_name,
+      user: {
+        id: user.id,
+        email: user.email,
+        full_name: user.full_name,
       },
     })
 

@@ -14,13 +14,13 @@ export default function TestSupabasePage() {
       
       // Test basic connection - just select all records
       const { data, error, count } = await supabase
-        .from('students')
+        .from('users')
         .select('*', { count: 'exact' })
 
       if (error) {
         setResult(`❌ Error: ${error.message}`)
       } else {
-        setResult(`✅ Connection successful! Students table exists with ${count || 0} records.`)
+        setResult(`✅ Connection successful! Users table exists with ${count || 0} records.`)
       }
     } catch (err) {
       setResult(`❌ Connection failed: ${err}`)

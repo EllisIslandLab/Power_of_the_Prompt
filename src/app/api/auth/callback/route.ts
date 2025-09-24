@@ -27,11 +27,11 @@ export async function GET(request: NextRequest) {
     if (data.user) {
       // console.log('✅ Email verified for user:', data.user.id) // Commented out for auth transition
       
-      // Manually sync the email verification status to our students table
+      // Manually sync the email verification status to our users table
       try {
         const { error: updateError } = await supabase
-          .from('students')
-          .update({ 
+          .from('users')
+          .update({
             email_verified: !!data.user.email_confirmed_at,
             updated_at: new Date().toISOString()
           })
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         if (updateError) {
           // console.error('Failed to sync email verification:', updateError) // Commented out for auth transition
         } else {
-          // console.log('✅ Email verification synced to students table') // Commented out for auth transition
+          // console.log('✅ Email verification synced to users table') // Commented out for auth transition
         }
       } catch (syncError) {
         // console.error('Sync error:', syncError) // Commented out for auth transition

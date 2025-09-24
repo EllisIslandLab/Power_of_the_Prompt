@@ -110,17 +110,17 @@ export async function POST(request: NextRequest) {
             })
           }
           
-          // Update the student profile with new full name
+          // Update the user profile with new full name
           const { error: updateError } = await supabase
-            .from('students')
-            .update({ 
+            .from('users')
+            .update({
               full_name: fullName,
               updated_at: new Date().toISOString()
             })
             .eq('email', email.toLowerCase())
-          
+
           if (updateError) {
-            // console.error('Failed to update student profile:', updateError) // Commented out for auth transition
+            // console.error('Failed to update user profile:', updateError) // Commented out for auth transition
           }
           
           // Resend verification email via Supabase
@@ -167,10 +167,10 @@ export async function POST(request: NextRequest) {
     // console.log('✅ Supabase user created:', data.user.id) // Commented out for auth transition
     // console.log('📧 Email confirmed:', data.user.email_confirmed_at) // Commented out for auth transition
 
-    // Create student profile in our custom table
+    // Create user profile in our custom table
     try {
-      const { data: studentProfile, error: profileError } = await supabase
-        .from('students')
+      const { data: userProfile, error: profileError } = await supabase
+        .from('users')
         .insert([
           {
             id: data.user.id, // Use the same ID as the auth user
@@ -189,10 +189,10 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (profileError) {
-        // console.error('Failed to create student profile:', profileError) // Commented out for auth transition
+        // console.error('Failed to create user profile:', profileError) // Commented out for auth transition
         // Don't fail the signup if profile creation fails - they can still verify email
       } else {
-        // console.log('✅ Student profile created:', studentProfile.id) // Commented out for auth transition
+        // console.log('✅ User profile created:', userProfile.id) // Commented out for auth transition
       }
     } catch (profileErr) {
       // console.error('Profile creation error:', profileErr) // Commented out for auth transition
