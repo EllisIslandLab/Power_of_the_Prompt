@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const source = searchParams.get('source')
-    const status = searchParams.get('status') || 'active'
+    const statusParam = searchParams.get('status') || 'waitlist'
+    const status = statusParam as 'waitlist' | 'interested' | 'nurturing' | 'converted'
     const limit = parseInt(searchParams.get('limit') || '100')
 
     let query = supabase
@@ -115,7 +116,7 @@ async function migrateFromAirtable() {
             email: email.toLowerCase(),
             name: name || null,
             source: 'website_analyzer',
-            status: 'active',
+            status: 'interested',
             tags: ['website_analyzer'],
             custom_fields: {
               quick_score: fields['Quick Score'] ? Number(fields['Quick Score']) : null,

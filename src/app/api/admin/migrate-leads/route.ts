@@ -76,7 +76,7 @@ async function migrateFromAirtable() {
           email: email.toLowerCase(),
           name: name || null,
           source: 'website_analyzer',
-          status: 'active',
+          status: 'interested',
           tags: ['website_analyzer', 'migrated_from_airtable'],
           custom_fields: {
             quick_score: quickScore,
