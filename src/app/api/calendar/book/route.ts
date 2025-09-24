@@ -119,42 +119,42 @@ async function createVideoSession(sessionData: {
   try {
     const supabase = getSupabase()
 
-    // First, try to find or create a student user for the guest
-    let { data: existingStudent } = await supabase
-      .from('students')
+    // First, try to find or create a user for the guest
+    let { data: existingUser } = await supabase
+      .from('users')
       .select('*')
       .eq('email', sessionData.userEmail)
       .single()
 
-    let studentId = existingStudent?.id
+    let userId = existingUser?.id
 
-    if (!existingStudent) {
+    if (!existingUser) {
       // Create a Supabase auth user for the guest (this might not work due to signup restrictions)
       // For now, we'll use a placeholder approach
       // In production, you'd handle this differently - maybe create a "guest" user system
-      
-      // Create student record with placeholder user_id
+
+      // Create user record with placeholder user_id
       const guestUserId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      
-      const { data: newStudent, error: studentError } = await supabase
-        .from('students')
+
+      const { data: newUser, error: userError } = await supabase
+        .from('users')
         .insert({
           id: guestUserId,
           full_name: sessionData.userName,
           email: sessionData.userEmail,
           course_enrolled: 'None',
-          status: 'Active',
+          status: 'active',
           payment_status: 'trial', // Free consultation
           progress: 0
         })
         .select('*')
         .single()
 
-      if (studentError) {
-        throw new Error(`Failed to create student record: ${studentError.message}`)
+      if (userError) {
+        throw new Error(`Failed to create user record: ${userError.message}`)
       }
 
-      studentId = newStudent.id
+      userId = newUser.id
     }
 
     // Generate unique room ID based on session data
@@ -189,9 +189,9 @@ async function createVideoSession(sessionData: {
 
     // Create associated consultation record
     // Note: consultations table doesn't exist yet, using placeholder for coming soon page
-    const consultation = { 
+    const consultation = {
       id: `consultation-${Date.now()}`,
-      user_id: studentId,
+      user_id: userId,
       scheduled_time: startTime.toISOString(),
       status: 'SCHEDULED',
       type: 'FREE',
@@ -209,7 +209,7 @@ async function createVideoSession(sessionData: {
       scheduledStart: sessionData.scheduledStart,
       duration: sessionData.duration,
       consultationId: consultation?.id || null,
-      userId: studentId,
+      userId: userId,
       hostId: adminUser.user_id
     }
 
