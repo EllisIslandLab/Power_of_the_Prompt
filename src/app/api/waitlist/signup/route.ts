@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if email already exists
+    // Check if email already exists in leads table
     const { data: existingEmail, error: checkError } = await supabase
-      .from('waitlist')
+      .from('leads')
       .select('email')
       .eq('email', email.toLowerCase())
       .single()
@@ -55,13 +55,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Add email to waitlist
+    // Add email to leads table with waitlist status
     const { data: newSignup, error: insertError } = await supabase
-      .from('waitlist')
+      .from('leads')
       .insert([
         {
           email: email.toLowerCase(),
-          source: 'coming-soon-page'
+          status: 'waitlist',
+          source: 'coming-soon-page',
+          signup_date: new Date().toISOString()
         }
       ])
       .select()
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       console.error('Insert error:', insertError)
       return NextResponse.json(
-        { error: 'Failed to add email to waitlist' },
+        { error: 'Failed to add email to leads' },
         { status: 500 }
       )
     }

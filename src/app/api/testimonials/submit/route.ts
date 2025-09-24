@@ -87,28 +87,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Handle email logic - check if it's already in waitlist
+    // Handle email logic - check if it's already in leads (waitlist)
     let shouldStoreEmailInAirtable = true
     let isExistingWaitlistUser = false
-    
+
     if (body.email && body.email.trim()) {
       const emailToCheck = body.email.trim().toLowerCase()
-      
-      // Check if email already exists in waitlist
+
+      // Check if email already exists in leads table
       const { data: existingEmail, error: checkError } = await supabase
-        .from('waitlist')
-        .select('email')
+        .from('leads')
+        .select('email, status')
         .eq('email', emailToCheck)
         .single()
-      
+
       if (checkError && checkError.code !== 'PGRST116') {
         // PGRST116 is "not found" error, which is what we want
-        console.error('Waitlist check error:', checkError)
-        // Continue with testimonial submission even if waitlist check fails
+        console.error('Leads check error:', checkError)
+        // Continue with testimonial submission even if leads check fails
       }
-      
+
       if (existingEmail) {
-        // User is already in waitlist - don't store email in Airtable to avoid conflicts
+        // User is already in leads - don't store email in Airtable to avoid conflicts
         shouldStoreEmailInAirtable = false
         isExistingWaitlistUser = true
       }
@@ -146,9 +146,9 @@ export async function POST(request: NextRequest) {
       'Testimonial': testimonial.trim(),
       'Status': 'Pending Review',
       'Submitted Date': new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-      'Email': shouldStoreEmailInAirtable ? (body.email?.trim() || '') : '', // Only store email if not in waitlist
+      'Email': shouldStoreEmailInAirtable ? (body.email?.trim() || '') : '', // Only store email if not in leads
       'Arrangement': 0, // Default to 0 (not arranged/displayed yet) - admin can set order number to display
-      'Existing Waitlist User': isExistingWaitlistUser ? 'Yes' : 'No', // Track if user was already in waitlist
+      'Existing Lead User': isExistingWaitlistUser ? 'Yes' : 'No', // Track if user was already in leads
       'Updated Date': new Date().toISOString().split('T')[0], // Track when it was last updated
       'Title/Role': body.title?.trim() || getRandomItem(FUNNY_TITLES), // Random funny title if not provided
       'Avatar': body.avatar?.trim() || getRandomItem(RANDOM_AVATARS) // Random avatar if not provided
@@ -182,13 +182,13 @@ export async function POST(request: NextRequest) {
     
     if (isUpdate) {
       if (isExistingWaitlistUser) {
-        successMessage = 'Your testimonial has been updated successfully! Since you\'re already on our waitlist, we\'ll review your updated testimonial and notify you when we launch.'
+        successMessage = 'Your testimonial has been updated successfully! Since you\'re already on our lead list, we\'ll review your updated testimonial and notify you when we launch.'
       } else {
         successMessage = 'Your testimonial has been updated successfully! We\'ll review your changes and get back to you.'
       }
     } else {
       if (isExistingWaitlistUser) {
-        successMessage = 'Testimonial submitted successfully! Since you\'re already on our waitlist, we\'ll review your testimonial and notify you when we launch.'
+        successMessage = 'Testimonial submitted successfully! Since you\'re already on our lead list, we\'ll review your testimonial and notify you when we launch.'
       } else {
         if (body.email && body.email.trim()) {
           successMessage = 'Testimonial submitted successfully! We\'ll review it and get back to you. (Tip: You can edit this testimonial anytime by resubmitting with the same email.)'

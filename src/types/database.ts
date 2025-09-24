@@ -9,6 +9,212 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      campaigns: {
+        Row: {
+          id: string
+          subject: string
+          content: string
+          status: 'draft' | 'sending' | 'sent' | 'failed'
+          recipient_count: number
+          sent_count: number
+          opened_count: number
+          clicked_count: number
+          target_audience: Json
+          scheduled_at: string | null
+          sent_at: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          subject: string
+          content: string
+          status?: 'draft' | 'sending' | 'sent' | 'failed'
+          recipient_count?: number
+          sent_count?: number
+          opened_count?: number
+          clicked_count?: number
+          target_audience?: Json
+          scheduled_at?: string | null
+          sent_at?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          subject?: string
+          content?: string
+          status?: 'draft' | 'sending' | 'sent' | 'failed'
+          recipient_count?: number
+          sent_count?: number
+          opened_count?: number
+          clicked_count?: number
+          target_audience?: Json
+          scheduled_at?: string | null
+          sent_at?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      campaign_sends: {
+        Row: {
+          id: string
+          campaign_id: string
+          recipient_email: string
+          recipient_name: string | null
+          sent_at: string
+          opened_at: string | null
+          clicked_at: string | null
+          bounced_at: string | null
+          unsubscribed_at: string | null
+          send_error: string | null
+          email_client: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          id?: string
+          campaign_id: string
+          recipient_email: string
+          recipient_name?: string | null
+          sent_at?: string
+          opened_at?: string | null
+          clicked_at?: string | null
+          bounced_at?: string | null
+          unsubscribed_at?: string | null
+          send_error?: string | null
+          email_client?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          id?: string
+          campaign_id?: string
+          recipient_email?: string
+          recipient_name?: string | null
+          sent_at?: string
+          opened_at?: string | null
+          clicked_at?: string | null
+          bounced_at?: string | null
+          unsubscribed_at?: string | null
+          send_error?: string | null
+          email_client?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      email_templates: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          category: string
+          subject_template: string
+          content_template: string
+          variables: Json
+          is_active: boolean
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          category?: string
+          subject_template: string
+          content_template: string
+          variables?: Json
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          category?: string
+          subject_template?: string
+          content_template?: string
+          variables?: Json
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          id: string
+          email: string
+          name: string | null
+          status: 'waitlist' | 'interested' | 'nurturing' | 'converted'
+          source: string | null
+          notes: string | null
+          tags: Json
+          custom_fields: Json
+          signup_date: string
+          last_engagement: string | null
+          converted_at: string | null
+          referrer_url: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          name?: string | null
+          status?: 'waitlist' | 'interested' | 'nurturing' | 'converted'
+          source?: string | null
+          notes?: string | null
+          tags?: Json
+          custom_fields?: Json
+          signup_date?: string
+          last_engagement?: string | null
+          converted_at?: string | null
+          referrer_url?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          name?: string | null
+          status?: 'waitlist' | 'interested' | 'nurturing' | 'converted'
+          source?: string | null
+          notes?: string | null
+          tags?: Json
+          custom_fields?: Json
+          signup_date?: string
+          last_engagement?: string | null
+          converted_at?: string | null
+          referrer_url?: string | null
+          utm_source?: string | null
+          utm_medium?: string | null
+          utm_campaign?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invite_tokens: {
         Row: {
           id: string
@@ -48,7 +254,7 @@ export type Database = {
         }
         Relationships: []
       }
-      students: {
+      users: {
         Row: {
           id: string
           email: string
@@ -56,7 +262,8 @@ export type Database = {
           email_verified: boolean
           created_at: string
           updated_at: string
-          tier: 'free' | 'full'
+          role: 'student' | 'admin'
+          tier: 'basic' | 'premium' | 'vip' | 'enterprise'
           payment_status: 'pending' | 'paid' | 'trial' | 'expired'
           invited_by: string | null
           invited_at: string | null
@@ -68,7 +275,8 @@ export type Database = {
           email_verified?: boolean
           created_at?: string
           updated_at?: string
-          tier?: 'free' | 'full'
+          role?: 'student' | 'admin'
+          tier?: 'basic' | 'premium' | 'vip' | 'enterprise'
           payment_status?: 'pending' | 'paid' | 'trial' | 'expired'
           invited_by?: string | null
           invited_at?: string | null
@@ -80,12 +288,21 @@ export type Database = {
           email_verified?: boolean
           created_at?: string
           updated_at?: string
-          tier?: 'free' | 'full'
+          role?: 'student' | 'admin'
+          tier?: 'basic' | 'premium' | 'vip' | 'enterprise'
           payment_status?: 'pending' | 'paid' | 'trial' | 'expired'
           invited_by?: string | null
           invited_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "users_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       video_sessions: {
         Row: {
@@ -140,6 +357,21 @@ export type Database = {
       cleanup_expired_invite_tokens: {
         Args: {}
         Returns: number
+      }
+      migrate_airtable_leads: {
+        Args: {}
+        Returns: { migrated_count: number; error_count: number }[]
+      }
+      migrate_waitlist_to_leads: {
+        Args: {}
+        Returns: { migrated_count: number; skipped_count: number }[]
+      }
+      convert_lead_to_user: {
+        Args: {
+          lead_email: string
+          user_tier?: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
@@ -233,10 +465,18 @@ export type Enums<
     : never
 
 // Convenience types for common use cases
-export type StudentProfile = Tables<"students">
+export type UserProfile = Tables<"users">
+export type Lead = Tables<"leads">
+export type Campaign = Tables<"campaigns">
+export type EmailTemplate = Tables<"email_templates">
 export type VideoSession = Tables<"video_sessions">
 export type InviteToken = Tables<"invite_tokens">
 
-export type Students = StudentProfile
+// Backwards compatibility
+export type Students = UserProfile // For backwards compatibility
+export type AdminProfile = UserProfile // For backwards compatibility
+
+// New type aliases
+export type Users = UserProfile
+export type Leads = Lead
 export type VideoSessions = VideoSession
-export type AdminProfile = StudentProfile // For backwards compatibility
