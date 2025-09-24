@@ -104,7 +104,7 @@ async function getRecipientCount(targetAudience: any): Promise<number> {
     let query = supabase
       .from('leads')
       .select('id', { count: 'exact', head: true })
-      .eq('status', 'active')
+      .eq('status', 'waitlist')
 
     // Apply filters based on target audience
     if (targetAudience?.source) {
