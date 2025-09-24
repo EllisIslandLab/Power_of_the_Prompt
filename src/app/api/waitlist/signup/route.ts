@@ -13,6 +13,15 @@ const resend = new Resend(process.env.RESEND_API_KEY!)
 
 export async function POST(request: NextRequest) {
   try {
+    // Check required environment variables
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Missing Supabase environment variables')
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
     const { email } = await request.json()
 
     // Validate email
@@ -70,7 +79,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (insertError) {
-      console.error('Insert error:', insertError)
+      console.error('Insert error details:', {
+        code: insertError.code,
+        message: insertError.message,
+        details: insertError.details,
+        hint: insertError.hint
+      })
       return NextResponse.json(
         { error: 'Failed to add email to leads' },
         { status: 500 }
@@ -153,7 +167,7 @@ You're receiving this because you signed up for the Web Launch Academy waitlist.
     return NextResponse.json({
       success: true,
       message: 'Successfully joined the waitlist! Check your email for confirmation.',
-      email: newSignup.email
+      email: email.toLowerCase()
     })
 
   } catch (error) {
