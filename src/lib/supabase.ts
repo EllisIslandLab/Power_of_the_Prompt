@@ -18,9 +18,9 @@ export function getSupabase(useServiceRole: boolean = false) {
 }
 
 // Re-export types for backwards compatibility
-export type { 
-  VideoSession, 
-  StudentProfile, 
+export type {
+  VideoSession,
+  UserProfile,
   AdminProfile,
   Students,
   VideoSessions,
