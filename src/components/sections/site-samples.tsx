@@ -300,11 +300,13 @@ export function SiteSamples() {
                           {sample.title === "Winchester Therapy Services" ? (
                             <div className="w-full h-full bg-white flex flex-col overflow-hidden relative">
                               {/* Multiple screenshot service attempts */}
-                              <img 
+                              <img
                                 src={`https://mini.s-shot.ru/1024x768/JPEG/1024/Z100/?${sample.liveUrl}`}
-                                alt={`${sample.title} Preview`}
+                                alt={`${sample.title} website preview showing homepage design and layout`}
                                 className="w-full h-full object-cover absolute inset-0 z-10"
                                 loading="lazy"
+                                width={1024}
+                                height={768}
                                 onError={(e) => {
                                   // Try alternative service
                                   e.currentTarget.src = `https://image.thum.io/get/width/400/crop/600/${sample.liveUrl}`
@@ -363,11 +365,13 @@ export function SiteSamples() {
                           ) : sample.title === "Meche's Creations" ? (
                             <div className="w-full h-full bg-white flex flex-col overflow-hidden relative">
                               {/* Multiple screenshot service attempts */}
-                              <img 
+                              <img
                                 src={`https://mini.s-shot.ru/1024x768/JPEG/1024/Z100/?${sample.liveUrl}`}
-                                alt={`${sample.title} Preview`}
+                                alt={`${sample.title} website preview showing homepage design and layout`}
                                 className="w-full h-full object-cover absolute inset-0 z-10"
                                 loading="lazy"
+                                width={1024}
+                                height={768}
                                 onError={(e) => {
                                   // Try alternative service
                                   e.currentTarget.src = `https://image.thum.io/get/width/400/crop/600/${sample.liveUrl}`

@@ -1,12 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { ComingSoonBanner } from "@/components/sections/coming-soon-banner"
-import { SiteSamples } from "@/components/sections/site-samples"
-import { Testimonials } from "@/components/sections/testimonials"
 import { Footer } from "@/components/sections/footer"
 import { ScrollProgress } from "@/components/scroll-progress"
 import { ExpiredLinkModal } from "@/components/modals/ExpiredLinkModal"
+
+// Lazy load components below the fold for better performance
+const SiteSamples = dynamic(() => import("@/components/sections/site-samples").then(mod => ({ default: mod.SiteSamples })), {
+  loading: () => <div className="min-h-screen flex items-center justify-center">Loading...</div>
+})
+const Testimonials = dynamic(() => import("@/components/sections/testimonials").then(mod => ({ default: mod.Testimonials })), {
+  loading: () => <div className="min-h-64 flex items-center justify-center">Loading testimonials...</div>
+})
 
 // Commented out sections for coming soon page
 // import { NewHero } from "@/components/sections/new-hero"

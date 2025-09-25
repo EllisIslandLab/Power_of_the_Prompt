@@ -101,6 +101,8 @@ export function ComingSoonBanner() {
             </CardContent>
           </Card>
 
+          <h2 className="text-2xl font-semibold text-center mb-8">Why Web Launch Academy?</h2>
+
           <div className="grid md:grid-cols-3 gap-6 text-center">
             <div>
               <div className="text-3xl mb-2">🚀</div>

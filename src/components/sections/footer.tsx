@@ -32,13 +32,13 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <span className="text-lg">📧</span>
-                <a href="mailto:hello@weblaunchacademy.com" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="mailto:hello@weblaunchacademy.com" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                   hello@weblaunchacademy.com
                 </a>
               </div>
               <div className="flex items-start gap-3">
                 <span className="text-lg">📞</span>
-                <a href="tel:+14403549904" className="text-muted-foreground hover:text-primary transition-colors">
+                <a href="tel:+14403549904" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                   (440) 354-9904
                 </a>
               </div>
