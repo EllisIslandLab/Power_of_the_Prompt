@@ -4,19 +4,26 @@ import "./globals.css";
 import { Navigation } from "@/components/sections/navigation";
 import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
-import { AnimatedBackground } from "@/components/effects/AnimatedBackground";
+import dynamic from "next/dynamic";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
-import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
+
+// Lazy load non-critical components
+const AnimatedBackground = dynamic(() => import("@/components/effects/AnimatedBackground").then(mod => ({ default: mod.AnimatedBackground })), { ssr: false });
+const DarkModeToggle = dynamic(() => import("@/components/ui/DarkModeToggle").then(mod => ({ default: mod.DarkModeToggle })), { ssr: false });
 // Environment variables updated - triggering redeploy
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  preload: false, // Only preload primary font
 });
 
 export const metadata: Metadata = {
