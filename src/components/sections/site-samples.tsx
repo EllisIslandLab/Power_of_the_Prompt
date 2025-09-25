@@ -194,6 +194,7 @@ export function SiteSamples() {
         >
           <button
             onClick={moveToPrev}
+            aria-label="Previous site sample"
             className={`ml-2 transition-all duration-500 bg-black/80 backdrop-blur-sm border border-slate-600 hover:bg-black/90 rounded-xl shadow-2xl h-32 w-12 flex items-center justify-center group ${
               leftArrowHover ? 'opacity-90' : 'opacity-0'
             }`}
@@ -211,6 +212,7 @@ export function SiteSamples() {
         >
           <button
             onClick={moveToNext}
+            aria-label="Next site sample"
             className={`mr-2 transition-all duration-500 bg-black/80 backdrop-blur-sm border border-slate-600 hover:bg-black/90 rounded-xl shadow-2xl h-32 w-12 flex items-center justify-center group ${
               rightArrowHover ? 'opacity-90' : 'opacity-0'
             }`}
