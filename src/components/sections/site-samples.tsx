@@ -356,52 +356,6 @@ export function SiteSamples() {
                               
                             </div>
                           ) : (
-                              
-                              {/* Fallback content */}
-                              <div className="w-full h-full bg-white flex flex-col overflow-hidden relative z-0">
-                              {/* Header */}
-                              <div className="w-full h-10 bg-gradient-to-r from-purple-600 to-pink-600 flex items-center px-3">
-                                <div className="text-white font-bold text-xs">Meche's Creations</div>
-                                <div className="ml-auto flex space-x-2 text-xs text-white/80">
-                                  <span>Shop</span>
-                                  <span>Custom</span>
-                                  <span>About</span>
-                                </div>
-                              </div>
-                              
-                              {/* Hero Section */}
-                              <div className="flex-1 bg-gradient-to-br from-purple-50 to-pink-50 p-3 flex flex-col">
-                                <div className="text-center mb-3">
-                                  <h1 className="text-sm font-bold text-purple-900 mb-1">{sample.realSiteData?.tagline || "Handcrafted with Love"}</h1>
-                                  <p className="text-xs text-gray-600">Unique Artisan Jewelry & Accessories</p>
-                                </div>
-                                
-                                {/* Products */}
-                                <div className="grid grid-cols-2 gap-1 flex-1 mb-2">
-                                  <div className="bg-white rounded p-1 border border-purple-200 shadow-sm">
-                                    <div className="text-purple-600 text-xs font-semibold">💍 Handmade Jewelry</div>
-                                  </div>
-                                  <div className="bg-white rounded p-1 border border-pink-200 shadow-sm">
-                                    <div className="text-pink-600 text-xs font-semibold">✨ Custom Designs</div>
-                                  </div>
-                                  <div className="bg-white rounded p-1 border border-rose-200 shadow-sm">
-                                    <div className="text-rose-600 text-xs font-semibold">🎨 Unique Accessories</div>
-                                  </div>
-                                  <div className="bg-white rounded p-1 border border-indigo-200 shadow-sm">
-                                    <div className="text-indigo-600 text-xs font-semibold">👑 Artisan Quality</div>
-                                  </div>
-                                </div>
-                                
-                                {/* CTA */}
-                                <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded px-2 py-1 text-center">
-                                  <div className="text-xs font-semibold">Shop Unique Creations</div>
-                                  <div className="text-xs opacity-90">Custom Orders Available</div>
-                                </div>
-                              </div>
-                              
-                              </div>
-                            </div>
-                          ) : (
                             <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-200 flex flex-col p-2 rounded-sm">
                               {/* Website Header Bar */}
                               <div className="w-full h-6 bg-gradient-to-r from-gray-700 to-gray-800 rounded-t flex items-center px-2 mb-2">
