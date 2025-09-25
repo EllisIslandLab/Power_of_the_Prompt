@@ -63,19 +63,19 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
             <div className="space-y-2">
-              <Link href="/#unique-approach" className="block text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/#unique-approach" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Unique Approach
               </Link>
-              <Link href="/#site-samples" className="block text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/#site-samples" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Site Samples
               </Link>
-              <Link href="/#build-with-you" className="block text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/#build-with-you" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Learn to Build
               </Link>
-              <Link href="/#build-4-you" className="block text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/#build-4-you" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 We Build for You
               </Link>
-              <Link href="/#site-tlc" className="block text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/#site-tlc" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Site Maintenance
               </Link>
             </div>
@@ -123,13 +123,13 @@ export function Footer() {
               </p>
             </div>
             <div className="flex items-center gap-6 text-sm">
-              <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Terms of Service
               </Link>
-              <Link href="/guarantee" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/guarantee" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Guarantee Details
               </Link>
             </div>

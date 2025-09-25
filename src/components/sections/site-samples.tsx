@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import Image from "next/image"
 import { ChevronLeft, ChevronRight, X, ExternalLink, Star } from "lucide-react"
 import { siteSamples } from "@/data/site-samples"
 
@@ -305,6 +306,7 @@ export function SiteSamples() {
                                 alt={`${sample.title} website preview showing homepage design and layout`}
                                 className="w-full h-full object-cover absolute inset-0 z-10"
                                 loading="lazy"
+                                decoding="async"
                                 width={1024}
                                 height={768}
                                 onError={(e) => {
@@ -370,6 +372,7 @@ export function SiteSamples() {
                                 alt={`${sample.title} website preview showing homepage design and layout`}
                                 className="w-full h-full object-cover absolute inset-0 z-10"
                                 loading="lazy"
+                                decoding="async"
                                 width={1024}
                                 height={768}
                                 onError={(e) => {
@@ -495,7 +498,7 @@ export function SiteSamples() {
                           {isCenter && sample.testimonial && sample.studentName && (
                             <div className="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
                               <div className="bg-gradient-to-t from-black/95 via-black/80 to-transparent p-4">
-                                <h4 className="text-white font-semibold text-sm mb-1">{sample.title}</h4>
+                                <h3 className="text-white font-semibold text-sm mb-1">{sample.title}</h3>
                                 <blockquote className="text-white/90 text-xs italic mb-2 leading-relaxed">
                                   "{sample.testimonial}"
                                 </blockquote>
@@ -556,11 +559,12 @@ export function SiteSamples() {
                 {(selectedSample.title === "Winchester Therapy Services" || selectedSample.title === "Meche's Creations") ? (
                   <div className="w-full h-full rounded-xl overflow-hidden border border-border relative">
                     {/* Website screenshot preview */}
-                    <img 
+                    <img
                       src={`https://mini.s-shot.ru/1024x768/JPEG/1024/Z100/?${selectedSample.liveUrl}`}
                       alt={`${selectedSample.title} Preview`}
                       className="w-full h-full object-cover absolute inset-0 z-10"
                       loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         // Try alternative service
                         e.currentTarget.src = `https://image.thum.io/get/width/800/crop/600/${selectedSample.liveUrl}`
@@ -620,7 +624,7 @@ export function SiteSamples() {
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div>
-                  <h4 className="font-semibold text-foreground mb-4 text-lg">Key Features Built</h4>
+                  <h3 className="font-semibold text-foreground mb-4 text-lg">Key Features Built</h3>
                   <ul className="space-y-3">
                     {selectedSample.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-center gap-3 text-muted-foreground">
@@ -631,7 +635,7 @@ export function SiteSamples() {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-4 text-lg">Technology Stack</h4>
+                  <h3 className="font-semibold text-foreground mb-4 text-lg">Technology Stack</h3>
                   <p className="text-muted-foreground mb-4 leading-relaxed">{selectedSample.tech}</p>
                   <p className="text-muted-foreground leading-relaxed">{selectedSample.description}</p>
                 </div>
