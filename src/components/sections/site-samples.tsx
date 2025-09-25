@@ -300,25 +300,14 @@ export function SiteSamples() {
                     <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-900 to-black p-2">
                       <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-300 rounded-sm overflow-hidden">
                         <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden">
-                          {sample.title === "Winchester Therapy Services" ? (
+                          {(sample.title === "Winchester Therapy Services" || sample.title === "Meche's Creations") ? (
                             <div className="w-full h-full bg-white flex flex-col overflow-hidden relative">
-                              {/* Multiple screenshot service attempts */}
-                              <img
-                                src={`https://mini.s-shot.ru/1024x768/JPEG/1024/Z100/?${sample.liveUrl}`}
+                              <Image
+                                src={sample.image}
                                 alt={`${sample.title} website preview showing homepage design and layout`}
                                 className="w-full h-full object-cover absolute inset-0 z-10"
-                                loading="lazy"
-                                decoding="async"
-                                width={1024}
-                                height={768}
-                                onError={(e) => {
-                                  // Try alternative service
-                                  e.currentTarget.src = `https://image.thum.io/get/width/400/crop/600/${sample.liveUrl}`
-                                  e.currentTarget.onerror = () => {
-                                    // Both services failed, hide and show fallback
-                                    e.currentTarget.style.display = 'none'
-                                  }
-                                }}
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               />
                               
                               {/* Fallback content */}
@@ -366,26 +355,7 @@ export function SiteSamples() {
                               </div>
                               
                             </div>
-                          ) : sample.title === "Meche's Creations" ? (
-                            <div className="w-full h-full bg-white flex flex-col overflow-hidden relative">
-                              {/* Multiple screenshot service attempts */}
-                              <img
-                                src={`https://mini.s-shot.ru/1024x768/JPEG/1024/Z100/?${sample.liveUrl}`}
-                                alt={`${sample.title} website preview showing homepage design and layout`}
-                                className="w-full h-full object-cover absolute inset-0 z-10"
-                                loading="lazy"
-                                decoding="async"
-                                width={1024}
-                                height={768}
-                                onError={(e) => {
-                                  // Try alternative service
-                                  e.currentTarget.src = `https://image.thum.io/get/width/400/crop/600/${sample.liveUrl}`
-                                  e.currentTarget.onerror = () => {
-                                    // Both services failed, hide and show fallback
-                                    e.currentTarget.style.display = 'none'
-                                  }
-                                }}
-                              />
+                          ) : (
                               
                               {/* Fallback content */}
                               <div className="w-full h-full bg-white flex flex-col overflow-hidden relative z-0">
@@ -561,20 +531,12 @@ export function SiteSamples() {
                 {(selectedSample.title === "Winchester Therapy Services" || selectedSample.title === "Meche's Creations") ? (
                   <div className="w-full h-full rounded-xl overflow-hidden border border-border relative">
                     {/* Website screenshot preview */}
-                    <img
-                      src={`https://mini.s-shot.ru/1024x768/JPEG/1024/Z100/?${selectedSample.liveUrl}`}
+                    <Image
+                      src={selectedSample.image}
                       alt={`${selectedSample.title} Preview`}
                       className="w-full h-full object-cover absolute inset-0 z-10"
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => {
-                        // Try alternative service
-                        e.currentTarget.src = `https://image.thum.io/get/width/800/crop/600/${selectedSample.liveUrl}`
-                        e.currentTarget.onerror = () => {
-                          // Both services failed, show fallback
-                          e.currentTarget.style.display = 'none'
-                        }
-                      }}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 80vw"
                     />
                     
                     {/* Fallback overlay if screenshot fails */}
