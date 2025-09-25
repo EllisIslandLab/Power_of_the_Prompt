@@ -35,8 +35,8 @@ export const siteSamples: SiteSample[] = [
       "Trauma/PTSD Specialization",
       "Secure Encrypted Communications"
     ],
-    image: "https://www.winchestertherapyservices.com",
-    liveUrl: "https://www.winchestertherapyservices.com",
+    image: "https://winchester-therapy-services-blue.vercel.app/",
+    liveUrl: "https://winchester-therapy-services-blue.vercel.app/",
     category: "Service Business",
     testimonial: "I remember when I was finishing my basement, my parents came over and brought my little brother to help out. Well, he barely lifted a finger. Now, he got me a working website that saves me about $200 per year and I own my own code! Better late than never little bro.",
     studentName: "Michael E.",
