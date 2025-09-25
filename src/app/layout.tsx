@@ -8,8 +8,8 @@ import dynamic from "next/dynamic";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 
 // Lazy load non-critical components
-const AnimatedBackground = dynamic(() => import("@/components/effects/AnimatedBackground").then(mod => ({ default: mod.AnimatedBackground })), { ssr: false });
-const DarkModeToggle = dynamic(() => import("@/components/ui/DarkModeToggle").then(mod => ({ default: mod.DarkModeToggle })), { ssr: false });
+const AnimatedBackground = dynamic(() => import("@/components/effects/AnimatedBackground").then(mod => ({ default: mod.AnimatedBackground })));
+const DarkModeToggle = dynamic(() => import("@/components/ui/DarkModeToggle").then(mod => ({ default: mod.DarkModeToggle })));
 // Environment variables updated - triggering redeploy
 
 const geistSans = Geist({
