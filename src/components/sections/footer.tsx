@@ -110,17 +110,6 @@ export function Footer() {
               <p className="text-sm text-muted-foreground">
                 © 2024 Web Launch Academy. All rights reserved.
               </p>
-              <p className="text-xs text-muted-foreground">
-                Color schemes by{" "}
-                <a 
-                  href="https://coolors.co/?ref=688948e359bf39000b530ddc" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  Coolors.co
-                </a>
-              </p>
             </div>
             <div className="flex items-center gap-6 text-sm">
               <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
