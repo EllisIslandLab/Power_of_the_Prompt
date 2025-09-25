@@ -2,6 +2,13 @@
   "name": "web-launch-academy",
   "version": "0.1.0",
   "private": true,
+  "description": "A comprehensive web development coaching platform built with Next.js 15, TypeScript, and Supabase. Features include AI-powered development training, email campaign management, lead tracking, video consultations with Jitsi Meet, and a complete student portal.",
+  "keywords": ["nextjs", "typescript", "supabase", "web-development", "coaching", "education", "email-marketing", "jitsi", "stripe"],
+  "author": "Web Launch Academy",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EllisIslandLab/Power_of_the_Prompt.git"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

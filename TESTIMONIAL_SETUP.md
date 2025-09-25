@@ -31,9 +31,9 @@ Create a new table in your existing Airtable base called **"Testimonial Submissi
    - 1, 2, 3... = Display order on website
    - Set to positive number to make testimonial visible
 
-7. **Existing Waitlist User** (Single select)
+7. **Existing Lead User** (Single select)
    - Options: "Yes", "No"
-   - Tracks if user was already in waitlist
+   - Tracks if user was already in leads table
    - Auto-populated by the API
 
 8. **Updated Date** (Date)
@@ -149,7 +149,7 @@ Automatically assigns diverse emojis including:
 
 - **Email-based authentication** for updates prevents testimonial hijacking
 - **Admin-controlled visibility** through Arrangement field
-- **Waitlist conflict prevention** - existing waitlist users don't get duplicate entries
+- **Lead conflict prevention** - existing lead users don't get duplicate entries
 - **Input validation** - testimonials must be 10-1000 characters
 
 ## API Endpoints:
@@ -164,7 +164,7 @@ Automatically assigns diverse emojis including:
 ✅ **Modal display with pagination (6 per page)**
 ✅ **Prefetched data for seamless experience**
 ✅ **Security via email authentication**
-✅ **Waitlist integration**
+✅ **Lead system integration**
 ✅ **Featured testimonials (hardcoded)**
 ✅ **Random funny title assignment (30+ options)**
 ✅ **Random avatar assignment (50+ emojis)**

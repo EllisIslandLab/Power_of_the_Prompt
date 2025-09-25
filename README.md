@@ -45,12 +45,16 @@ Visit `http://localhost:3000` to see the application.
 
 ## Technology Stack
 
-- **Frontend:** Next.js 15, React 19, Tailwind CSS, Radix UI
-- **Backend:** Next.js API Routes, PostgreSQL, Prisma ORM
-- **Authentication:** NextAuth.js
+- **Framework:** Next.js 15 with App Router, React 19, TypeScript 5
+- **Styling:** Tailwind CSS v4, Radix UI components, Lucide React icons
+- **Database:** Supabase (PostgreSQL) with real-time subscriptions and RLS
+- **Authentication:** Supabase Auth with Row Level Security
+- **Email:** Resend for transactional emails and campaign management
+- **Payments:** Stripe for subscriptions and one-time payments
 - **Video:** Jitsi Meet integration for browser-based conferencing
-- **Integrations:** Airtable, Stripe, Resend
-- **Hosting:** Vercel (recommended) or Netlify
+- **CRM Integration:** Airtable for lead management and testimonials
+- **Hosting:** Vercel with serverless functions
+- **Campaign Management:** Custom email marketing system with tracking
 
 ## Video Conferencing with Jitsi Meet
 
