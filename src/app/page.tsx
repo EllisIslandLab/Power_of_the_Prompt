@@ -6,7 +6,7 @@ import { ComingSoonBanner } from "@/components/sections/coming-soon-banner"
 import { Footer } from "@/components/sections/footer"
 import { ExpiredLinkModal } from "@/components/modals/ExpiredLinkModal"
 
-// Lazy load components below the fold for better performance
+// Lazy load components below the fold for better performance - delay heavy components
 const SiteSamples = dynamic(() => import("@/components/sections/site-samples").then(mod => ({ default: mod.SiteSamples })), {
   loading: () => <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>
 })
