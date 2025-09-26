@@ -35,7 +35,7 @@ export const siteSamples: SiteSample[] = [
       "Trauma/PTSD Specialization",
       "Secure Encrypted Communications"
     ],
-    image: "/images/site-samples/screencapture-winchestertherapyservices-2025-09-25-16_22_28.png",
+    image: "/images/site-samples/screencapture-winchestertherapyservices.jpg",
     liveUrl: "https://winchester-therapy-services-blue.vercel.app/",
     category: "Service Business",
     testimonial: "I remember when I was finishing my basement, my parents came over and brought my little brother to help out. Well, he barely lifted a finger. Now, he got me a working website that saves me about $200 per year and I own my own code! Better late than never little bro.",
@@ -80,7 +80,7 @@ export const siteSamples: SiteSample[] = [
       "Quality Craftsmanship",
       "Creative Portfolio Showcase"
     ],
-    image: "/images/site-samples/screencapture-mechescreations-2025-09-25-16_27_57.png",
+    image: "/images/site-samples/screencapture-mechescreations.jpg",
     liveUrl: "https://www.mechescreations.com",
     category: "E-commerce",
     testimonial: "I've given Matt three kids; he built me this website with no hosting fees. It's a start I suppose.",
