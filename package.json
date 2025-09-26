@@ -3,7 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "description": "A comprehensive web development coaching platform built with Next.js 15, TypeScript, and Supabase. Features include AI-powered development training, email campaign management, lead tracking, video consultations with Jitsi Meet, and a complete student portal.",
-  "keywords": ["nextjs", "typescript", "supabase", "web-development", "coaching", "education", "email-marketing", "jitsi", "stripe"],
+  "keywords": [
+    "nextjs",
+    "typescript",
+    "supabase",
+    "web-development",
+    "coaching",
+    "education",
+    "email-marketing",
+    "jitsi",
+    "stripe"
+  ],
   "author": "Web Launch Academy",
   "repository": {
     "type": "git",
@@ -34,6 +44,7 @@
     "@supabase/supabase-js": "^2.54.0",
     "@types/uuid": "^10.0.0",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "airtable": "^0.12.2",
     "airtable-mcp-server": "^1.6.1",
     "bcryptjs": "^3.0.2",

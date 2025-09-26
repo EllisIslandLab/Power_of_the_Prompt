@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navigation } from "@/components/sections/navigation";
 import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import dynamic from "next/dynamic";
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
 
@@ -109,6 +110,7 @@ export default function RootLayout({
             <Navigation />
             {children}
             <Analytics />
+            <SpeedInsights />
           </Providers>
           
           {/* Dark mode toggle in bottom right */}
