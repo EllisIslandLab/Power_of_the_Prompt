@@ -1,18 +1,10 @@
 import Script from 'next/script'
-
-// TypeScript declaration for Stripe pricing table
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'stripe-pricing-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-        'pricing-table-id': string
-        'publishable-key': string
-      }
-    }
-  }
-}
+import React from 'react'
 
 export default function PricingPage() {
+  const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  const pricingTableId = "prctbl_1SBSBQIbb5TcHX6OJGPPLWRb"
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
@@ -31,10 +23,10 @@ export default function PricingPage() {
             src="https://js.stripe.com/v3/pricing-table.js"
             strategy="lazyOnload"
           />
-          <stripe-pricing-table
-            pricing-table-id="prctbl_1SBSBQIbb5TcHX6OJGPPLWRb"
-            publishable-key="pk_live_51S8uH5Ibb5TcHX6OaOqd2mzxw6f4lv6iGfpqcJBNIzgMSRAW2dInYYIG7QbbcFg3o1ghgj8my4jeWs5D5TAri7C200e0UBoWU4">
-          </stripe-pricing-table>
+          {React.createElement('stripe-pricing-table', {
+            'pricing-table-id': pricingTableId,
+            'publishable-key': stripePublishableKey || ""
+          })}
         </div>
       </div>
     </div>
