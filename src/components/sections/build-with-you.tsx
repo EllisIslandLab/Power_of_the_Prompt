@@ -60,7 +60,7 @@ export function BuildWithYou() {
             Learn to Build Professional Websites in <span className="text-primary">4 Weeks</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-4">
-            Learn by doing. In just 4 weeks, you'll build a professional website using modern web technologies, with our expert guidance every step of the way.
+            Learn by doing. In just 8 weeks, you'll build a professional website using modern web technologies, with our expert guidance every step of the way.
           </p>
           <p className="text-lg font-semibold text-primary max-w-2xl mx-auto mb-8">
             This isn't just a course—it's a comprehensive success partnership
@@ -102,7 +102,7 @@ export function BuildWithYou() {
             <div className="bg-background rounded-2xl border border-border p-8 shadow-sm">
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-foreground mb-4">
-                  4-Week Intensive Program
+                  8-Week Intensive Program
                 </h3>
                 <div className="text-4xl font-bold text-primary mb-2">$1599</div>
                 <p className="text-muted-foreground">Complete website + training</p>

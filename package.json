@@ -20,7 +20,7 @@
     "url": "https://github.com/EllisIslandLab/Power_of_the_Prompt.git"
   },
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

@@ -20,10 +20,10 @@ export function TripleGuarantee() {
             <Clock className="h-8 w-8 text-green-600" />
           </div>
           <h4 className="font-semibold text-foreground">
-            Fully-Functional Site in 4 Weeks
+            Fully-Functional Site in 8 Weeks
           </h4>
           <p className="text-sm text-muted-foreground">
-            You will own a complete, hosted website that is live on the internet with working contact forms, responsive design, and professional functionality within 4 weeks of starting our Build With You course.
+            You will own a complete, hosted website that is live on the internet with working contact forms, responsive design, and professional functionality after 8 weeks of starting our A+ Guarantee Program.
           </p>
         </div>
         
@@ -32,10 +32,10 @@ export function TripleGuarantee() {
             <Shield className="h-8 w-8 text-blue-600" />
           </div>
           <h4 className="font-semibold text-foreground">
-            Free Audits & Support for 1 Year
+            Free Audits & Support for 1/2 Year
           </h4>
           <p className="text-sm text-muted-foreground">
-            We will provide free website audits and technical support for one full year after your site goes live to help you achieve optimal performance and functionality.
+            We will provide free website audits and technical support for four months after your site goes live to help you achieve optimal performance and functionality.
           </p>
         </div>
         
@@ -47,7 +47,7 @@ export function TripleGuarantee() {
             We'll Buy Your Site After 1 Year
           </h4>
           <p className="text-sm text-muted-foreground">
-            If you're not completely satisfied with your website after one year of ownership, we will purchase it from you for the price you paid to build it using our methods.
+            If your site doesn't achieve the guaranteed outcomes after six months of the program, we will purchase it from you for the price you paid to build it using our methods.
           </p>
         </div>
       </div>
