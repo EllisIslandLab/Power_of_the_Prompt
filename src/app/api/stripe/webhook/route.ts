@@ -1,308 +1,264 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { headers } from 'next/headers'
-import Stripe from 'stripe'
-import { getStripe } from '@/lib/stripe'
-import { getAirtableBase } from '@/lib/airtable'
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import Stripe from 'stripe';
+import { Resend } from 'resend';
 
-export async function POST(request: NextRequest) {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+const resend = new Resend(process.env.RESEND_API_KEY!);
+
+export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json(
       { error: 'Stripe not configured' },
       { status: 500 }
-    )
+    );
   }
 
   try {
-    const body = await request.text()
-    const headersList = await headers()
-    const signature = headersList.get('stripe-signature')!
+    const body = await req.text();
+    const sig = req.headers.get('stripe-signature');
 
-    const stripe = getStripe()
-    const event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET
-    )
-
-    // Handle different event types
-    switch (event.type) {
-      case 'payment_intent.succeeded':
-        await handlePaymentSuccess(event.data.object as Stripe.PaymentIntent)
-        break
-      
-      case 'payment_intent.payment_failed':
-        await handlePaymentFailed(event.data.object as Stripe.PaymentIntent)
-        break
-      
-      case 'checkout.session.completed':
-        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session)
-        break
-      
-      case 'customer.subscription.created':
-        console.log('Subscription created:', event.data.object)
-        // TODO: Update user subscription status
-        break
-      
-      case 'customer.subscription.updated':
-        console.log('Subscription updated:', event.data.object)
-        // TODO: Update user subscription status
-        break
-      
-      case 'customer.subscription.deleted':
-        console.log('Subscription cancelled:', event.data.object)
-        // TODO: Update user subscription status
-        break
-      
-      default:
-        console.log(`Unhandled event type: ${event.type}`)
+    if (!sig) {
+      return NextResponse.json(
+        { error: 'Missing stripe-signature header' },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({ received: true })
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    let event: Stripe.Event;
+
+    try {
+      event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+    } catch (err: any) {
+      console.error('Webhook signature verification failed:', err.message);
+      return NextResponse.json(
+        { error: `Webhook Error: ${err.message}` },
+        { status: 400 }
+      );
+    }
+
+    // Handle the event
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const session = event.data.object as Stripe.Checkout.Session;
+        await handleCheckoutComplete(session);
+        break;
+
+      case 'payment_intent.succeeded':
+        console.log('Payment succeeded:', event.data.object.id);
+        break;
+
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+    }
+
+    return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Stripe webhook error:', error)
+    console.error('Webhook handler error:', error);
     return NextResponse.json(
       { error: 'Webhook handler failed' },
-      { status: 400 }
-    )
+      { status: 500 }
+    );
   }
 }
 
-async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
+async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
+  const customerEmail = session.customer_details?.email;
+  const customerName = session.customer_details?.name;
+
+  if (!customerEmail) {
+    console.error('No customer email in checkout session');
+    return;
+  }
+
+  console.log(`Processing payment for ${customerEmail}`);
+
   try {
-    const serviceId = paymentIntent.metadata.service_id
-    const serviceName = paymentIntent.metadata.service_name
-    const serviceType = paymentIntent.metadata.service_type
-    const customerEmail = paymentIntent.metadata.customer_email
-    const customerName = paymentIntent.metadata.customer_name
+    // Get the product details from Stripe
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+      expand: ['data.price.product'],
+    });
 
-    // Update purchase record in Airtable
-    const base = getAirtableBase()
-    const purchaseRecords = await base('Purchases').select({
-      filterByFormula: `{Stripe Payment Intent ID} = '${paymentIntent.id}'`,
-      maxRecords: 1
-    }).all()
+    const product = lineItems.data[0].price?.product as Stripe.Product;
+    const metadata = product.metadata;
 
-    if (purchaseRecords.length > 0) {
-      await base('Purchases').update(purchaseRecords[0].id, {
-        'Payment Status': 'succeeded',
-        'Completed At': new Date().toISOString(),
-        'Amount Paid': paymentIntent.amount / 100
-      })
+    console.log('Product metadata:', metadata);
+
+    // Determine user tier and sessions based on product
+    let tier = 'basic';
+    let sessionsToCredit = 0;
+    let paymentStatus = 'paid';
+
+    if (metadata.tier) {
+      // A+ Program (premium_vip tier with 12 sessions)
+      tier = metadata.tier === 'premium_vip' ? 'vip' : metadata.tier;
+      sessionsToCredit = parseInt(metadata.total_lvl_ups) || 0;
+    } else if (metadata.course_type === 'basic_course') {
+      // Basic Course (standard tier, no sessions unless they buy add-ons)
+      tier = 'basic';
+      sessionsToCredit = metadata.includes_lvl_ups === 'true' ? 3 : 0;
+    }
+
+    // 1. Check if lead exists
+    const { data: lead } = await supabase
+      .from('leads')
+      .select('*')
+      .eq('email', customerEmail)
+      .single();
+
+    // 2. Check if user already exists
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id, tier')
+      .eq('email', customerEmail)
+      .single();
+
+    let userId: string;
+
+    if (existingUser) {
+      // User already exists
+      userId = existingUser.id;
+      console.log(`User already exists: ${userId}`);
+
+      // Upgrade tier if needed (vip > premium > basic)
+      const tierHierarchy: Record<string, number> = { basic: 1, premium: 2, vip: 3 };
+      const currentTierLevel = tierHierarchy[existingUser.tier] || 0;
+      const newTierLevel = tierHierarchy[tier] || 0;
+
+      if (newTierLevel > currentTierLevel) {
+        await supabase
+          .from('users')
+          .update({
+            tier: tier,
+            payment_status: 'paid',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+        console.log(`Upgraded user tier to ${tier}`);
+      }
     } else {
-      // Create new purchase record if it doesn't exist
-      await base('Purchases').create([{
-        fields: {
-          'Service ID': serviceId,
-          'Service Name': serviceName,
-          'Customer Email': customerEmail,
-          'Customer Name': customerName || '',
-          'Amount': paymentIntent.amount / 100,
-          'Payment Status': 'succeeded',
-          'Stripe Payment Intent ID': paymentIntent.id,
-          'Purchased At': new Date().toISOString(),
-          'Completed At': new Date().toISOString(),
-          'Service Type': serviceType,
-          'Metadata': JSON.stringify(paymentIntent.metadata)
-        }
-      }])
-    }
-
-    // Generate invite token for the paying customer
-    try {
-      const inviteResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/generate-invite`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Create new user
+      const { data: newUser, error: createUserError } = await supabase
+        .from('users')
+        .insert({
           email: customerEmail,
-          fullName: customerName,
-          tier: 'full', // Paying customers get full access
-          createdBy: 'stripe-webhook',
-          expiresInDays: 7
+          full_name: lead?.name || customerName || '',
+          email_verified: false,
+          role: 'student',
+          tier: tier,
+          payment_status: paymentStatus,
         })
-      })
+        .select()
+        .single();
 
-      if (inviteResponse.ok) {
-        const inviteData = await inviteResponse.json()
-        console.log(`Invite token created for paying customer: ${customerEmail}`)
-        
-        // You could optionally send an email with the signup link here
-        // await sendInviteEmail(customerEmail, inviteData.invite.signup_url)
-      } else {
-        console.error('Failed to create invite token for paying customer:', await inviteResponse.text())
+      if (createUserError) throw createUserError;
+
+      userId = newUser.id;
+      console.log(`Created new user: ${userId}`);
+
+      // Mark lead as converted if exists
+      if (lead) {
+        await supabase
+          .from('leads')
+          .update({
+            status: 'converted',
+            converted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('email', customerEmail);
       }
-    } catch (error) {
-      console.error('Error generating invite token:', error)
     }
 
-    // Handle service-specific post-purchase actions
-    await handleServiceSpecificActions(serviceType, {
-      serviceId,
-      serviceName,
-      customerEmail,
-      customerName,
-      paymentIntentId: paymentIntent.id
-    })
+    // 3. Create session package if applicable
+    if (sessionsToCredit > 0) {
+      const expiresAt = metadata.lvl_up_expiry_months
+        ? new Date(Date.now() + parseInt(metadata.lvl_up_expiry_months) * 30 * 24 * 60 * 60 * 1000).toISOString()
+        : null;
 
-    console.log(`Payment succeeded for service: ${serviceName}`)
-  } catch (error) {
-    console.error('Error handling payment success:', error)
-  }
-}
+      const { error: sessionError } = await supabase
+        .from('sessions')
+        .insert({
+          user_id: userId,
+          package_size: sessionsToCredit,
+          sessions_total: sessionsToCredit,
+          sessions_used: 0,
+          stripe_payment_id: session.payment_intent as string,
+          status: 'active',
+          expires_at: expiresAt,
+        });
 
-async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
-  try {
-    // Update purchase record in Airtable
-    const base = getAirtableBase()
-    const purchaseRecords = await base('Purchases').select({
-      filterByFormula: `{Stripe Payment Intent ID} = '${paymentIntent.id}'`,
-      maxRecords: 1
-    }).all()
+      if (sessionError) throw sessionError;
 
-    if (purchaseRecords.length > 0) {
-      await base('Purchases').update(purchaseRecords[0].id, {
-        'Payment Status': 'failed',
-        'Failed At': new Date().toISOString()
-      })
+      console.log(`Added ${sessionsToCredit} sessions for user ${userId}`);
     }
 
-    console.log(`Payment failed for payment intent: ${paymentIntent.id}`)
+    // 4. Send welcome email
+    await sendWelcomeEmail(customerEmail, customerName || lead?.name || '', tier, sessionsToCredit);
+
+    console.log(`Successfully processed checkout for ${customerEmail}`);
+
   } catch (error) {
-    console.error('Error handling payment failure:', error)
+    console.error('Error processing checkout:', error);
+    // You might want to log this to an error tracking service like Sentry
   }
 }
 
-async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+async function sendWelcomeEmail(email: string, name: string, tier: string, sessions: number) {
   try {
-    // Handle checkout session completion
-    // This would be used if you're using Stripe Checkout instead of Payment Intents
-    console.log(`Checkout session completed: ${session.id}`)
-    
-    if (session.payment_intent) {
-      // Get the payment intent and handle it
-      const stripe = getStripe()
-      const paymentIntent = await stripe.paymentIntents.retrieve(
-        session.payment_intent as string
-      )
-      await handlePaymentSuccess(paymentIntent)
-    }
-  } catch (error) {
-    console.error('Error handling checkout completion:', error)
-  }
-}
+    const programName = tier === 'vip' ? 'A+ Program' : 'Web Launch Course';
+    const portalUrl = `${process.env.NEXT_PUBLIC_URL}/portal`;
 
-async function handleServiceSpecificActions(
-  serviceType: string,
-  data: {
-    serviceId: string
-    serviceName: string
-    customerEmail: string
-    customerName: string
-    paymentIntentId: string
-  }
-) {
-  try {
-    switch (serviceType) {
-      case 'course':
-        // Grant access to course content
-        await grantCourseAccess(data)
-        break
-      
-      case 'consultation':
-        // Create consultation booking or send booking instructions
-        await handleConsultationPurchase(data)
-        break
-      
-      case 'audit':
-        // Send audit instructions or create audit task
-        await handleAuditPurchase(data)
-        break
-      
-      case 'build':
-        // Create project kickoff or send onboarding
-        await handleBuildPurchase(data)
-        break
-      
-      default:
-        console.log(`No specific handler for service type: ${serviceType}`)
-    }
-  } catch (error) {
-    console.error(`Error in service-specific handler for ${serviceType}:`, error)
-  }
-}
+    await resend.emails.send({
+      from: 'Web Launch Academy <noreply@weblaunchacademy.com>',
+      to: email,
+      subject: `Welcome to ${programName}!`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2>Welcome to Web Launch Academy, ${name || 'there'}!</h2>
 
-async function grantCourseAccess(data: any) {
-  // Update user record to grant course access
-  // This would integrate with your user management system
-  console.log(`Granting course access to ${data.customerEmail}`)
-  
-  // Example: Update user record in database
-  // await updateUserCourseAccess(data.customerEmail, data.serviceId)
-}
+          <p>Thank you for enrolling in the ${programName}. You're about to embark on an exciting journey to build your professional website.</p>
 
-async function handleConsultationPurchase(data: any) {
-  // Create consultation booking request or send booking link
-  console.log(`Creating consultation booking for ${data.customerEmail}`)
-  
-  // Example: Create consultation record
-  try {
-    const base = getAirtableBase()
-    await base('Consultations').create([{
-      fields: {
-        'Name': data.customerName,
-        'Email': data.customerEmail,
-        'Status': 'Paid - Needs Scheduling',
-        'Notes': `Purchased ${data.serviceName} - Payment ID: ${data.paymentIntentId}`
-      }
-    }])
-  } catch (error) {
-    console.error('Error creating consultation record:', error)
-  }
-}
+          ${sessions > 0 ? `
+            <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3>Your 1-on-1 Sessions</h3>
+              <p>You have <strong>${sessions} Level Up sessions</strong> included in your program. These are personalized coaching sessions where we work together on your website.</p>
+            </div>
+          ` : ''}
 
-async function handleAuditPurchase(data: any) {
-  // Create audit task or send instructions
-  console.log(`Creating audit task for ${data.customerEmail}`)
-  
-  // Example: Create audit record
-  try {
-    const base = getAirtableBase()
-    await base('Audits').create([{
-      fields: {
-        'Customer Name': data.customerName,
-        'Customer Email': data.customerEmail,
-        'Status': 'Paid - Pending Start',
-        'Service': data.serviceName,
-        'Payment Intent ID': data.paymentIntentId,
-        'Created At': new Date().toISOString()
-      }
-    }])
-  } catch (error) {
-    // Audits table might not exist yet
-    console.log('Audits table not found, will need to be created')
-  }
-}
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>Next Steps:</h3>
+            <ol>
+              <li>Create your account at the student portal</li>
+              <li>Complete your profile setup</li>
+              <li>Access your course materials</li>
+              ${sessions > 0 ? '<li>Schedule your first 1-on-1 session</li>' : ''}
+            </ol>
+          </div>
 
-async function handleBuildPurchase(data: any) {
-  // Create build project or send onboarding
-  console.log(`Creating build project for ${data.customerEmail}`)
-  
-  // Example: Create build project record
-  try {
-    const base = getAirtableBase()
-    await base('Build Projects').create([{
-      fields: {
-        'Client Name': data.customerName,
-        'Client Email': data.customerEmail,
-        'Status': 'Paid - Onboarding',
-        'Service': data.serviceName,
-        'Payment Intent ID': data.paymentIntentId,
-        'Project Start': new Date().toISOString()
-      }
-    }])
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${portalUrl}"
+               style="background-color: #ffdb57; color: #11296b; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
+              Access Student Portal
+            </a>
+          </div>
+
+          <p>If you have any questions, simply reply to this email. I personally read and respond to every message.</p>
+
+          <p>Excited to work with you!<br>
+          Matthew Ellis<br>
+          Web Launch Academy</p>
+        </div>
+      `,
+    });
+
+    console.log(`Welcome email sent to ${email}`);
   } catch (error) {
-    // Build Projects table might not exist yet
-    console.log('Build Projects table not found, will need to be created')
+    console.error('Error sending welcome email:', error);
   }
 }
