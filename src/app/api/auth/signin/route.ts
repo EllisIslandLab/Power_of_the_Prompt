@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,9 +13,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = getSupabase()
+    // Create Supabase client with cookie handling
+    const cookieStore = await cookies()
 
-    // Simple, clean signin approach
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch {}
+          },
+        },
+      }
+    )
+
+    // Sign in with password
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.toLowerCase(),
       password: password
@@ -44,14 +65,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!data.user) {
+    if (!data.user || !data.session) {
       return NextResponse.json(
         { error: 'Invalid credentials. Please check your email and password and try again.' },
         { status: 400 }
       )
     }
 
-    // Success
+    // Success - session cookies are automatically set by the Supabase client
     return NextResponse.json({
       success: true,
       user: {

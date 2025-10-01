@@ -33,8 +33,11 @@ export default function AdminLogin() {
       const adminCheck = await fetch('/api/admin/check-role')
       const adminData = await adminCheck.json()
 
+      console.log('Admin check response:', adminData)
+
       if (!adminData.isAdmin) {
-        setError('Access denied. Admin role required.')
+        setError(`Access denied. Admin role required. ${adminData.error || ''}`)
+        console.error('Admin check failed:', adminData)
         return
       }
 
