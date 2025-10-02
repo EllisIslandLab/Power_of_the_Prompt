@@ -22,7 +22,8 @@ import {
   LogOut,
   Shield,
   ChevronDown,
-  FileText
+  FileText,
+  GraduationCap
 } from "lucide-react"
 
 export function AdminNavigation() {
@@ -141,9 +142,17 @@ export function AdminNavigation() {
                   Analytics
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Home className="h-4 w-4 mr-2" />
-                  Back to Site
+                <DropdownMenuItem asChild>
+                  <Link href="/portal">
+                    <GraduationCap className="h-4 w-4 mr-2" />
+                    View Student Portal
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/">
+                    <Home className="h-4 w-4 mr-2" />
+                    Back to Site
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-red-600">
                   <LogOut className="h-4 w-4 mr-2" />

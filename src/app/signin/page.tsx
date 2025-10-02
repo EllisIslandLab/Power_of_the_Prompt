@@ -51,8 +51,17 @@ export default function SigninPage() {
         throw new Error(data.error || 'Sign-in failed')
       }
 
-      // Success - redirect to portal
-      window.location.href = '/portal'
+      // Check user role and redirect accordingly
+      const roleCheck = await fetch('/api/admin/check-role')
+      const roleData = await roleCheck.json()
+
+      if (roleData.isAdmin) {
+        // Admin user - redirect to admin dashboard
+        window.location.href = '/admin'
+      } else {
+        // Regular user - redirect to portal
+        window.location.href = '/portal'
+      }
     } catch (err) {
       console.error('Signin error:', err)
       setError(err instanceof Error ? err.message : 'An error occurred during signin')

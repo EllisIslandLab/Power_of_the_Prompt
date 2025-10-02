@@ -1,26 +1,70 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-// import { useAuth } from "@/hooks/useAuth" // Temporarily disabled
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Zap, BookOpen, MessageSquare, Settings, Users, Plus, Video, HelpCircle, Handshake } from "lucide-react"
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+interface UserData {
+  id: string
+  email: string
+  full_name?: string
+  role: string
+  tier: string
+}
 
 export default function PortalPage() {
-  // Temporarily disable auth - allow access to portal for testing
-  const user = {
-    id: 'test-user',
-    email: 'test@weblaunchacademy.com',
-    userType: 'student' as const,
-    studentProfile: {
-      full_name: 'Test Student'
-    },
-    adminProfile: undefined as any
+  const [user, setUser] = useState<UserData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    async function loadUser() {
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+
+      if (!authUser) {
+        router.push('/signin')
+        return
+      }
+
+      const { data: userData } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authUser.id)
+        .single()
+
+      if (userData) {
+        setUser(userData)
+      }
+      setLoading(false)
+    }
+
+    loadUser()
+  }, [router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
   }
-  const loading = false
+
+  if (!user) {
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4 sm:px-6 lg:px-8">
@@ -30,7 +74,7 @@ export default function PortalPage() {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                Welcome back, {user.studentProfile?.full_name || user.adminProfile?.full_name || user.email}!
+                Welcome back, {user.full_name || user.email}!
               </h1>
               <p className="text-muted-foreground">
                 Your Web Launch Academy dashboard
