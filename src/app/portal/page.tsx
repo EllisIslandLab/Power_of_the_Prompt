@@ -142,12 +142,14 @@ export default function PortalPage() {
               <Zap className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <Badge variant={(user.userType as string) === 'admin' ? 'default' : 'secondary'}>
-                {(user.userType as string) === 'admin' ? 
-                  user.adminProfile?.role || 'Admin' : 'Student'}
+              <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                {user.role === 'admin' ? 'Admin' : 'Student'}
               </Badge>
               <p className="text-xs text-muted-foreground mt-2">
-                {(user.userType as string) === 'admin' ? 'Admin Access' : 'Student Access'}
+                {user.role === 'admin' ? 'Admin Access' : 'Student Access'}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Tier: {user.tier}
               </p>
             </CardContent>
           </Card>
