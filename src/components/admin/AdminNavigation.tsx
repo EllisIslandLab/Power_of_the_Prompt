@@ -23,7 +23,8 @@ import {
   Shield,
   ChevronDown,
   FileText,
-  GraduationCap
+  GraduationCap,
+  Video
 } from "lucide-react"
 
 export function AdminNavigation() {
@@ -37,6 +38,18 @@ export function AdminNavigation() {
       label: "Dashboard",
       icon: Home,
       description: "Overview and quick stats"
+    },
+    {
+      href: "/admin/users",
+      label: "Users",
+      icon: Users,
+      description: "User management and analytics"
+    },
+    {
+      href: "/admin/sessions",
+      label: "Sessions",
+      icon: Video,
+      description: "Video session management"
     },
     {
       href: "/admin/campaigns",
