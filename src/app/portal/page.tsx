@@ -218,7 +218,7 @@ export default function PortalPage() {
         </div>
 
         {/* Cohort Management */}
-        {(user.userType as string) === 'admin' && (
+        {user.role === 'admin' && (
           <div className="mb-8">
             <Card>
               <CardHeader>
@@ -250,7 +250,7 @@ export default function PortalPage() {
         )}
 
         {/* Student Cohort View */}
-        {(user.userType as string) === 'student' && (
+        {user.role === 'student' && (
           <div className="mb-8">
             <Card>
               <CardHeader>
@@ -294,7 +294,7 @@ export default function PortalPage() {
                   📚 Student Textbook
                 </Link>
               </Button>
-              {(user.userType as string) === 'admin' && (
+              {user.role === 'admin' && (
                 <Button variant="outline" className="w-full" asChild>
                   <Link href="/portal/cohorts">
                     <Users className="h-4 w-4 mr-2" />
@@ -325,8 +325,7 @@ export default function PortalPage() {
                 <strong>Email:</strong> {user.email}
               </div>
               <div className="text-sm">
-                <strong>Role:</strong> {(user.userType as string) === 'admin' ? 
-                  user.adminProfile?.role || 'Admin' : 'Student'}
+                <strong>Role:</strong> {user.role === 'admin' ? 'Admin' : 'Student'}
               </div>
               <Button variant="outline" size="sm" className="mt-4">
                 Update Profile
