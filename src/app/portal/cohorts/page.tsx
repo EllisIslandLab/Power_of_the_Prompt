@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Users, Calendar, UserPlus, Settings, ArrowLeft } from "lucide-react"
+import { usePresence } from "@/components/ui/online-indicator"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -32,6 +33,9 @@ export default function CohortsPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [cohorts, setCohorts] = useState<Cohort[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Track presence for current user
+  usePresence()
 
   useEffect(() => {
     async function loadData() {

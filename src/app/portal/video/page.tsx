@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Users, Video, Clock } from 'lucide-react'
+import { usePresence } from '@/components/ui/online-indicator'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,6 +22,9 @@ export default function VideoConferencePage() {
   const [roomName, setRoomName] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [participants, setParticipants] = useState<any[]>([])
+
+  // Track presence for current user
+  usePresence()
 
   useEffect(() => {
     async function loadUser() {

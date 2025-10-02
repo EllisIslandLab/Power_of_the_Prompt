@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Users, Video, Clock, Calendar } from 'lucide-react'
 import VideoSessionManager from "@/components/video/VideoSessionManager"
+import { usePresence } from "@/components/ui/online-indicator"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,6 +26,9 @@ export default function CollaborationPage() {
   const [roomName, setRoomName] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [participants, setParticipants] = useState<any[]>([])
+
+  // Track presence for current user
+  usePresence()
 
   useEffect(() => {
     async function loadUser() {

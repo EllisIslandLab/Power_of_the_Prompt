@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Zap, BookOpen, MessageSquare, Settings, Users, Plus, Video, HelpCircle, Handshake } from "lucide-react"
 import { createClient } from '@supabase/supabase-js'
+import { OnlineIndicator, usePresence } from "@/components/ui/online-indicator"
+import { SessionCounter } from "@/components/ui/session-counter"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,6 +28,9 @@ export default function PortalPage() {
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+
+  // Track presence for current user
+  usePresence()
 
   useEffect(() => {
     async function loadUser() {
@@ -73,9 +78,12 @@ export default function PortalPage() {
         <div className="mb-8 bg-card/50 backdrop-blur border rounded-lg p-8">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                Welcome back, {user.full_name || user.email}!
-              </h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold text-foreground">
+                  Welcome back, {user.full_name || user.email}!
+                </h1>
+                <OnlineIndicator userId={user.id} showLabel />
+              </div>
               <p className="text-muted-foreground">
                 Your Web Launch Academy dashboard
               </p>
@@ -154,22 +162,15 @@ export default function PortalPage() {
             </CardContent>
           </Card>
 
-          {/* COMMENTED OUT - Progress tracker may interfere with new auth system
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Course Progress</CardTitle>
+              <CardTitle className="text-sm font-medium">LVL UP Sessions</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {user.studentProfile?.progress || 0}%
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {user.studentProfile?.course_enrolled || 'Ready to start building'}
-              </p>
+              <SessionCounter userId={user.id} variant="full" />
             </CardContent>
           </Card>
-          */}
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
