@@ -28,7 +28,7 @@ export function Footer() {
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-8">
           {/* Contact Information */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Get In Touch</h4>
+            <h3 className="font-semibold text-lg mb-4">Get In Touch</h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <span className="text-lg">📧</span>
@@ -61,7 +61,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
+            <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
             <div className="space-y-2">
               <Link href="/#unique-approach" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Unique Approach
@@ -83,7 +83,7 @@ export function Footer() {
 
           {/* Business Info */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Web Launch Academy</h4>
+            <h3 className="font-semibold text-lg mb-4">Web Launch Academy</h3>
             <p className="text-muted-foreground mb-4">
               Learn to build professional websites with Fortune 500 technology. Complete ownership, no monthly fees, modern tech stack.
             </p>

@@ -326,7 +326,7 @@ export function SiteSamples() {
               <div className="flex items-start justify-between mb-8">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-3xl font-bold text-foreground">{selectedSample.title}</h3>
+                    <h2 className="text-3xl font-bold text-foreground">{selectedSample.title}</h2>
                     {selectedSample.isFeatured && (
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 text-yellow-500 fill-current" />
