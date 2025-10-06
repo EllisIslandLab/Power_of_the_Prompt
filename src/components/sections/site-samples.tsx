@@ -8,7 +8,6 @@ import { ChevronLeft, ChevronRight, X, ExternalLink, Star } from "lucide-react"
 import { siteSamples } from "@/data/site-samples"
 
 export function SiteSamples() {
-  const [activeCategory, setActiveCategory] = useState("All")
   const [selectedSample, setSelectedSample] = useState<any>(null)
   const [rotation, setRotation] = useState(0) // Current wheel rotation in degrees
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -22,16 +21,8 @@ export function SiteSamples() {
     setIsClient(true)
   }, [])
 
-  const samples = siteSamples
-
-  const categories = ["All", "E-commerce", "Service Business", "Portfolio", "Non-Profit"]
-  
-  const filteredSamples = activeCategory === "All" 
-    ? samples 
-    : samples.filter(sample => sample.category === activeCategory)
-
-  // Use base filtered samples for true infinite behavior
-  const baseSamples = filteredSamples.length > 0 ? filteredSamples : samples
+  // Use all samples directly - no filtering needed
+  const baseSamples = siteSamples
   const totalSamples = baseSamples.length
   
   // Find Winchester index in the base samples
@@ -158,23 +149,9 @@ export function SiteSamples() {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Websites Built with <span className="text-primary">Web Launch Academy</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Fully functional live websites using the techniques we teach with modern, professional web technologies: React, Next.js, TypeScript, Tailwind CSS, Vercel, and Prisma. Our clients own their code which means they start their website journey with complete control; not with lock-ins, hidden costs, or fees.
           </p>
-          
-          {/* Category Tabs */}
-          <div className="flex justify-center mb-8 overflow-x-auto">
-            <div className="inline-flex bg-muted rounded-xl p-1 min-w-fit">
-              {categories.map((category) => (
-                <div
-                  key={category}
-                  className="px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium bg-muted text-muted-foreground whitespace-nowrap"
-                >
-                  {category}
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
         
@@ -234,8 +211,8 @@ export function SiteSamples() {
             className="relative flex items-center transition-transform duration-700 ease-out"
             style={{
               transform: `translateX(${rotation}px)`,
-              width: `${totalSamples * spacing}px`, // Single cycle - no duplicates
-              transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // Spring bounce effect
+              width: `${totalSamples * spacing}px`,
+              transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}
           >
             {Array.from({ length: totalSamples }, (_, index) => {
@@ -245,11 +222,17 @@ export function SiteSamples() {
               const itemPosition = index * spacing + rotation + (spacing / 2)
               const centerPosition = isClient ? window.innerWidth / 2 : 640
               const distanceFromCenter = Math.abs(itemPosition - centerPosition)
-              
+
+              // Only render items that are within viewport + buffer
+              const viewportBuffer = spacing * 2 // Render 2 items on each side
+              if (distanceFromCenter > viewportBuffer) {
+                return null // Don't render off-screen items
+              }
+
               // Determine if this is the center item based on actual position
               const isCenter = distanceFromCenter < spacing / 4
               const isCenterZone = distanceFromCenter < spacing / 2
-              
+
               // Calculate scale based on distance from center
               const maxDistance = spacing * 1.5
               const normalizedDistance = Math.min(distanceFromCenter / maxDistance, 1)
@@ -300,105 +283,28 @@ export function SiteSamples() {
                     <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-900 to-black p-2">
                       <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-300 rounded-sm overflow-hidden">
                         <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden">
-                          {(sample.title === "Winchester Therapy Services" || sample.title === "Meche's Creations") ? (
-                            <div className="w-full h-full bg-white flex flex-col overflow-hidden relative">
+                          {/* Single unified card design */}
+                          <div className="w-full h-full bg-white flex flex-col overflow-hidden relative">
+                            {sample.image && !sample.image.includes('placeholder') ? (
                               <Image
                                 src={sample.image}
-                                alt={`${sample.title} website preview showing homepage design and layout`}
-                                className="w-full h-full object-cover absolute inset-0 z-10"
+                                alt={`${sample.title} website preview`}
+                                className="w-full h-full object-cover"
                                 fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                sizes="320px"
+                                loading={isCenter ? "eager" : "lazy"}
+                                priority={isCenter && sample.isFeatured}
                               />
-                              
-                              {/* Fallback content */}
-                              <div className="w-full h-full bg-white flex flex-col overflow-hidden relative z-0">
-                                {/* Header */}
-                                <div className="w-full h-10 bg-gradient-to-r from-blue-800 to-blue-900 flex items-center px-3">
-                                  <div className="text-white font-bold text-xs">Winchester Therapy Services</div>
-                                  <div className="ml-auto flex space-x-2 text-xs text-white/80">
-                                    <span>Home</span>
-                                    <span>About</span>
-                                    <span>Contact</span>
-                                  </div>
-                                </div>
-                                
-                                {/* Hero Section */}
-                                <div className="flex-1 bg-gradient-to-br from-blue-50 to-slate-50 p-3 flex flex-col">
-                                  <div className="text-center mb-3">
-                                    <h1 className="text-sm font-bold text-blue-900 mb-1">{sample.realSiteData?.tagline || "Renew Your Mind, Heal Your Soul"}</h1>
-                                    <p className="text-xs text-gray-600">{sample.realSiteData?.credentials?.[0] || "Licensed Clinical Social Worker"}</p>
-                                    <div className="text-xs text-blue-600 mt-1">🌐 {sample.liveUrl.replace('https://', '')}</div>
-                                  </div>
-                                  
-                                  {/* Services */}
-                                  <div className="grid grid-cols-2 gap-1 flex-1 mb-2">
-                                    <div className="bg-white rounded p-1 border border-blue-200 shadow-sm">
-                                      <div className="text-blue-600 text-xs font-semibold">🧠 Individual Therapy</div>
-                                    </div>
-                                    <div className="bg-white rounded p-1 border border-teal-200 shadow-sm">
-                                      <div className="text-teal-600 text-xs font-semibold">💭 Anxiety Treatment</div>
-                                    </div>
-                                    <div className="bg-white rounded p-1 border border-green-200 shadow-sm">
-                                      <div className="text-green-600 text-xs font-semibold">🤝 Relationship Issues</div>
-                                    </div>
-                                    <div className="bg-white rounded p-1 border border-purple-200 shadow-sm">
-                                      <div className="text-purple-600 text-xs font-semibold">🔐 PTSD/Trauma</div>
-                                    </div>
-                                  </div>
-                                  
-                                  {/* Contact Info */}
-                                  <div className="bg-blue-900 text-white rounded px-2 py-1 text-center">
-                                    <div className="text-xs font-semibold">Free 15-min Consultation</div>
-                                    <div className="text-xs opacity-90">{sample.realSiteData?.contact?.phone || "(540) 431-7376"}</div>
-                                  </div>
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-200 flex items-center justify-center">
+                                <div className="text-center p-4">
+                                  <div className="text-4xl mb-2">🌐</div>
+                                  <div className="text-sm font-medium text-gray-700">{sample.title}</div>
+                                  <div className="text-xs text-gray-500 mt-1">{sample.category}</div>
                                 </div>
                               </div>
-                              
-                            </div>
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-200 flex flex-col p-2 rounded-sm">
-                              {/* Website Header Bar */}
-                              <div className="w-full h-6 bg-gradient-to-r from-gray-700 to-gray-800 rounded-t flex items-center px-2 mb-2">
-                                <div className="flex space-x-1">
-                                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                </div>
-                                <div className="ml-4 text-xs text-white/70 truncate">{sample.title}</div>
-                              </div>
-                              
-                              {/* Website Content Area */}
-                              <div className="flex-1 bg-white rounded flex flex-col p-2">
-                                {/* Header */}
-                                <div className="w-full h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded mb-2 flex items-center px-2">
-                                  <div className="w-16 h-4 bg-white/30 rounded"></div>
-                                </div>
-                                
-                                {/* Content sections */}
-                                <div className="flex-1 space-y-1">
-                                  <div className="w-3/4 h-2 bg-gray-300 rounded"></div>
-                                  <div className="w-full h-2 bg-gray-200 rounded"></div>
-                                  <div className="w-5/6 h-2 bg-gray-200 rounded"></div>
-                                  
-                                  {/* Feature boxes */}
-                                  <div className="flex space-x-1 mt-2">
-                                    <div className="flex-1 h-6 bg-blue-100 rounded border border-blue-200"></div>
-                                    <div className="flex-1 h-6 bg-green-100 rounded border border-green-200"></div>
-                                  </div>
-                                </div>
-                                
-                                {/* Footer */}
-                                <div className="w-full h-3 bg-gray-100 rounded mt-1"></div>
-                              </div>
-                              
-                              {/* Category Icon */}
-                              <div className="absolute bottom-2 right-2 text-xs font-medium text-gray-600 bg-white/80 px-1 rounded">
-                                {sample.category === "E-commerce" ? "🛒" : 
-                                 sample.category === "Portfolio" ? "🎨" : 
-                                 sample.category === "Non-Profit" ? "❤️" : "💼"}
-                              </div>
-                            </div>
-                          )}
+                            )}
+                          </div>
                           
                           {/* Category Tag */}
                           <div className="absolute top-3 right-3">
@@ -482,42 +388,22 @@ export function SiteSamples() {
               
               {/* Live Website Preview */}
               <div className="aspect-video bg-gradient-to-br from-muted/30 to-muted/60 rounded-xl mb-8 relative overflow-hidden">
-                {(selectedSample.title === "Winchester Therapy Services" || selectedSample.title === "Meche's Creations") ? (
-                  <div className="w-full h-full rounded-xl overflow-hidden border border-border relative">
-                    {/* Website screenshot preview */}
-                    <Image
-                      src={selectedSample.image}
-                      alt={`${selectedSample.title} Preview`}
-                      className="w-full h-full object-cover absolute inset-0 z-10"
-                      fill
-                      sizes="(max-width: 768px) 100vw, 80vw"
-                    />
-                    
-                    {/* Fallback overlay if screenshot fails */}
-                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground bg-gradient-to-br from-blue-50 to-blue-100 z-0">
-                      <div className="text-center">
-                        <div className="text-6xl mb-4">🌐</div>
-                        <div className="text-xl font-medium mb-2">{selectedSample.title}</div>
-                        <div className="text-sm text-muted-foreground mb-4">Live website available</div>
-                        <a
-                          href={selectedSample.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-2 h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          Visit Live Site
-                        </a>
-                      </div>
-                    </div>
-                  </div>
+                {selectedSample.image && !selectedSample.image.includes('placeholder') ? (
+                  <Image
+                    src={selectedSample.image}
+                    alt={`${selectedSample.title} Preview`}
+                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 80vw"
+                    priority
+                  />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                     <div className="text-center">
                       <div className="text-8xl mb-4">🖥️</div>
                       <div className="text-xl font-medium">{selectedSample.category} Demo</div>
                       <div className="text-sm text-muted-foreground mt-2">Portfolio showcase example</div>
-    </div>
+                    </div>
                   </div>
                 )}
               </div>
