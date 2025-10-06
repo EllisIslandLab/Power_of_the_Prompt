@@ -221,21 +221,22 @@ export function SiteSamples() {
               // Calculate position relative to screen center
               const itemPosition = index * spacing + rotation + (spacing / 2)
               const centerPosition = isClient ? window.innerWidth / 2 : 640
-              const distanceFromCenter = Math.abs(itemPosition - centerPosition)
+              const distanceFromCenter = itemPosition - centerPosition
 
-              // Only render items that are within viewport + buffer
-              const viewportBuffer = spacing * 2 // Render 2 items on each side
-              if (distanceFromCenter > viewportBuffer) {
+              // Only render center item + 2 on each side (balanced)
+              const itemsPerSide = 2
+              const renderDistance = spacing * itemsPerSide
+              if (Math.abs(distanceFromCenter) > renderDistance + spacing / 2) {
                 return null // Don't render off-screen items
               }
 
               // Determine if this is the center item based on actual position
-              const isCenter = distanceFromCenter < spacing / 4
-              const isCenterZone = distanceFromCenter < spacing / 2
+              const isCenter = Math.abs(distanceFromCenter) < spacing / 4
+              const isCenterZone = Math.abs(distanceFromCenter) < spacing / 2
 
               // Calculate scale based on distance from center
               const maxDistance = spacing * 1.5
-              const normalizedDistance = Math.min(distanceFromCenter / maxDistance, 1)
+              const normalizedDistance = Math.min(Math.abs(distanceFromCenter) / maxDistance, 1)
               const scale = isCenter ? 1.0 : Math.max(0.7, 1 - normalizedDistance * 0.3)
               
               return (
