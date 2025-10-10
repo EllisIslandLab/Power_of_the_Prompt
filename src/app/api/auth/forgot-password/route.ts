@@ -27,17 +27,27 @@ export async function POST(request: NextRequest) {
 
     if (user) {
       // Generate password recovery link using Supabase Auth
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
       const { data, error } = await supabase.auth.admin.generateLink({
         type: 'recovery',
         email: email.toLowerCase(),
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password`
+          redirectTo: `${baseUrl}/reset-password`
         }
       })
 
       if (error) {
         console.error('Token generation error:', error)
       } else if (data.properties?.action_link) {
+        // Parse the action_link to get the token and construct our own reset URL
+        const actionLink = data.properties.action_link
+        const url = new URL(actionLink)
+        const token = url.searchParams.get('token')
+        const type = url.searchParams.get('type')
+
+        // Construct the reset link with our domain
+        const resetLink = `${baseUrl}/reset-password?token=${token}&type=${type}`
+
         // Send password reset email via Resend
         try {
           await resend.emails.send({
@@ -68,7 +78,7 @@ export async function POST(request: NextRequest) {
 
                   <!-- CTA Button -->
                   <div style="text-align: center; margin: 30px 0;">
-                    <a href="${data.properties.action_link}"
+                    <a href="${resetLink}"
                        style="background-color: #dc2626; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
                       Reset My Password
                     </a>
@@ -78,7 +88,7 @@ export async function POST(request: NextRequest) {
                     If the button doesn't work, copy and paste this link:
                   </p>
                   <p style="font-size: 14px; color: #1e40af; word-break: break-all;">
-                    ${data.properties.action_link}
+                    ${resetLink}
                   </p>
 
                   <!-- Security Notice -->

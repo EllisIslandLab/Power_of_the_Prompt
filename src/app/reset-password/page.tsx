@@ -18,15 +18,23 @@ function ResetPasswordForm() {
   const [validatingToken, setValidatingToken] = useState(true)
 
   useEffect(() => {
-    // Supabase automatically handles the token from the URL hash
-    // We just need to check if we're in a valid session
+    // Check if we have a valid recovery session from the URL hash
     const checkSession = async () => {
       try {
+        // The token is in the URL hash, Supabase client will handle it
+        // Just verify we have a session
         const response = await fetch('/api/auth/session')
         const data = await response.json()
 
         if (!data.user) {
-          setError('Invalid or expired reset link. Please request a new password reset.')
+          // Check if there's a hash with access_token (recovery flow)
+          const hashParams = new URLSearchParams(window.location.hash.substring(1))
+          const hasRecoveryToken = hashParams.has('access_token') && hashParams.get('type') === 'recovery'
+
+          if (!hasRecoveryToken) {
+            setError('Invalid or expired reset link. Please request a new password reset.')
+          }
+          // If we have a recovery token, Supabase will create the session automatically
         }
       } catch (err) {
         setError('Invalid or expired reset link. Please request a new password reset.')
