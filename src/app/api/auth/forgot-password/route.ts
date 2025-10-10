@@ -39,14 +39,8 @@ export async function POST(request: NextRequest) {
       if (error) {
         console.error('Token generation error:', error)
       } else if (data.properties?.action_link) {
-        // Parse the action_link to get the token and construct our own reset URL
-        const actionLink = data.properties.action_link
-        const url = new URL(actionLink)
-        const token = url.searchParams.get('token')
-        const type = url.searchParams.get('type')
-
-        // Construct the reset link with our domain
-        const resetLink = `${baseUrl}/reset-password?token=${token}&type=${type}`
+        // Use the action_link directly - it has the correct hash format
+        const resetLink = data.properties.action_link
 
         // Send password reset email via Resend
         try {
