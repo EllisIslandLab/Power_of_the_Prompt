@@ -25,6 +25,7 @@ export function Footer() {
         </div>
 
         {/* Footer Content */}
+        <h2 className="sr-only">Footer Information</h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-8">
           {/* Contact Information */}
           <div>

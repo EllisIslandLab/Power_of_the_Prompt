@@ -24,12 +24,24 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      // TODO: Implement password reset logic
-      // console.log('Password reset request for:', email) // Commented out for auth transition
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send reset email')
+      }
+
       setSuccess(true)
     } catch (err) {
-      // console.error('Password reset error:', err) // Commented out for auth transition
-      setError('An error occurred. Please try again.')
+      console.error('Password reset error:', err)
+      setError(err instanceof Error ? err.message : 'An error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -57,9 +69,9 @@ export default function ForgotPasswordPage() {
               <p className="text-sm text-muted-foreground">
                 Please check your email and follow the link to reset your password.
               </p>
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
-                <p className="text-sm text-amber-800">
-                  <strong>Note:</strong> Password reset functionality is coming soon. For now, please contact support if you need help accessing your account.
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-800">
+                  <strong>Tip:</strong> If you don't see the email in a few minutes, check your spam folder.
                 </p>
               </div>
             </div>
