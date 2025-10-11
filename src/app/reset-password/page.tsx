@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Lock, Check } from 'lucide-react'
+import { getSupabase } from '@/lib/supabase'
 
 function ResetPasswordForm() {
   const router = useRouter()
@@ -18,25 +19,23 @@ function ResetPasswordForm() {
   const [validatingToken, setValidatingToken] = useState(true)
 
   useEffect(() => {
-    // Check if we have a valid recovery session from the URL hash
+    // Initialize Supabase client to handle token exchange from URL hash
     const checkSession = async () => {
       try {
-        // The token is in the URL hash, Supabase client will handle it
-        // Just verify we have a session
-        const response = await fetch('/api/auth/session')
-        const data = await response.json()
+        const supabase = getSupabase()
 
-        if (!data.user) {
-          // Check if there's a hash with access_token (recovery flow)
-          const hashParams = new URLSearchParams(window.location.hash.substring(1))
-          const hasRecoveryToken = hashParams.has('access_token') && hashParams.get('type') === 'recovery'
+        // Supabase automatically exchanges the hash token for a session
+        const { data: { session }, error } = await supabase.auth.getSession()
 
-          if (!hasRecoveryToken) {
-            setError('Invalid or expired reset link. Please request a new password reset.')
-          }
-          // If we have a recovery token, Supabase will create the session automatically
+        if (error) {
+          console.error('Session error:', error)
+          setError('Invalid or expired reset link. Please request a new password reset.')
+        } else if (!session) {
+          setError('Invalid or expired reset link. Please request a new password reset.')
         }
+        // If we have a session, the user can reset their password
       } catch (err) {
+        console.error('Session check error:', err)
         setError('Invalid or expired reset link. Please request a new password reset.')
       } finally {
         setValidatingToken(false)
@@ -71,18 +70,19 @@ function ResetPasswordForm() {
     }
 
     try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password })
+      const supabase = getSupabase()
+
+      // Update password using the recovery session
+      const { data, error } = await supabase.auth.updateUser({
+        password: password
       })
 
-      const data = await response.json()
+      if (error) {
+        throw new Error(error.message || 'Failed to reset password')
+      }
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to reset password')
+      if (!data.user) {
+        throw new Error('Failed to reset password')
       }
 
       setSuccess(true)
