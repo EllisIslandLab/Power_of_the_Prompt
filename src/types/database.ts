@@ -267,6 +267,9 @@ export type Database = {
           payment_status: 'pending' | 'paid' | 'trial' | 'expired'
           invited_by: string | null
           invited_at: string | null
+          phone_number: string | null
+          sms_consent: boolean
+          sms_consent_timestamp: string | null
         }
         Insert: {
           id?: string
@@ -280,6 +283,9 @@ export type Database = {
           payment_status?: 'pending' | 'paid' | 'trial' | 'expired'
           invited_by?: string | null
           invited_at?: string | null
+          phone_number?: string | null
+          sms_consent?: boolean
+          sms_consent_timestamp?: string | null
         }
         Update: {
           id?: string
@@ -293,6 +299,9 @@ export type Database = {
           payment_status?: 'pending' | 'paid' | 'trial' | 'expired'
           invited_by?: string | null
           invited_at?: string | null
+          phone_number?: string | null
+          sms_consent?: boolean
+          sms_consent_timestamp?: string | null
         }
         Relationships: [
           {
