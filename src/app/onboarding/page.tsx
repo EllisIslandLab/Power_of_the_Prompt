@@ -18,16 +18,37 @@ export default function OnboardingPage() {
   const [success, setSuccess] = useState(false)
 
   const formatPhoneNumber = (value: string) => {
-    // Remove all non-numeric characters
-    const phoneNumber = value.replace(/\D/g, '')
+    // Remove all non-numeric characters except +
+    let cleaned = value.replace(/[^\d+]/g, '')
 
-    // Format as (XXX) XXX-XXXX
-    if (phoneNumber.length <= 3) {
-      return phoneNumber
-    } else if (phoneNumber.length <= 6) {
-      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`
+    // If starts with +1, keep it; otherwise remove any + signs
+    if (cleaned.startsWith('+1')) {
+      const phoneNumber = cleaned.slice(2)
+
+      // Format as +1 (XXX) XXX-XXXX
+      if (phoneNumber.length === 0) {
+        return '+1 '
+      } else if (phoneNumber.length <= 3) {
+        return `+1 (${phoneNumber}`
+      } else if (phoneNumber.length <= 6) {
+        return `+1 (${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`
+      } else {
+        return `+1 (${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`
+      }
+    } else if (cleaned.startsWith('+')) {
+      // Allow user to start typing +1
+      return '+'
     } else {
-      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`
+      // No country code - format as (XXX) XXX-XXXX
+      const phoneNumber = cleaned.replace(/\D/g, '')
+
+      if (phoneNumber.length <= 3) {
+        return phoneNumber
+      } else if (phoneNumber.length <= 6) {
+        return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`
+      } else {
+        return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`
+      }
     }
   }
 
@@ -37,9 +58,10 @@ export default function OnboardingPage() {
   }
 
   const validatePhoneNumber = (phone: string): boolean => {
-    // Remove formatting and check if it's 10 digits
+    // Remove formatting and check if it's 10 or 11 digits (with country code)
     const digits = phone.replace(/\D/g, '')
-    return digits.length === 10
+    // Accept either 10 digits (5551234567) or 11 digits starting with 1 (+15551234567)
+    return digits.length === 10 || (digits.length === 11 && digits.startsWith('1'))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,7 +71,7 @@ export default function OnboardingPage() {
 
     // Validate phone number if SMS consent is checked
     if (smsConsent && phoneNumber && !validatePhoneNumber(phoneNumber)) {
-      setError('Please enter a valid 10-digit phone number')
+      setError('Please enter a valid phone number (10 digits or +1 followed by 10 digits)')
       setLoading(false)
       return
     }
@@ -147,8 +169,8 @@ export default function OnboardingPage() {
                   value={phoneNumber}
                   onChange={handlePhoneChange}
                   className="h-11"
-                  placeholder="(555) 123-4567"
-                  maxLength={14}
+                  placeholder="+1 (555) 123-4567"
+                  maxLength={18}
                 />
                 <p className="text-xs text-muted-foreground">
                   Get session reminders and important updates via text message
