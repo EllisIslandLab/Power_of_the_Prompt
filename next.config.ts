@@ -41,7 +41,7 @@ const nextConfig: NextConfig = {
         message: /Serializing big strings/,
       },
       // Also suppress the PackFileCacheStrategy warning
-      (warning) => warning.message.includes('webpack.cache.PackFileCacheStrategy'),
+      (warning: any) => warning.message.includes('webpack.cache.PackFileCacheStrategy'),
     ];
 
     // Bundle optimization
