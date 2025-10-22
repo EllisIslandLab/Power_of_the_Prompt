@@ -226,7 +226,7 @@ async function sendCampaignToAll(campaign: any) {
               .insert({
                 campaign_id: campaign.id,
                 recipient_email: recipient.email,
-                recipient_name: recipient.name,
+                recipient_name: recipientName,
                 sent_at: new Date().toISOString()
               })
 

@@ -71,16 +71,16 @@ export const siteSamples: SiteSample[] = [
   {
     title: "Meche's Creations",
     description: "Creative handmade jewelry and accessories boutique with unique artisan designs and custom pieces",
-    tech: "HTML, CSS, JavaScript (in process of optimization to Next.js)",
+    tech: "Next.js hosted on Vercel",
     features: [
-      "Handmade Artisan Jewelry",
-      "Custom Design Services", 
-      "Unique Accessory Collections",
-      "Personalized Consultation",
-      "Quality Craftsmanship",
-      "Creative Portfolio Showcase"
+      "Dynamic seasonal animations",
+      "Category filtering for seasonal/holiday products",
+      "Personalized consultation booking",
+      "Payment processing with Square",
+      "Airtable integration for client data collection",
+      "Responsive mobile-first design"
     ],
-    image: "/images/site-samples/screencapture-mechescreations.jpg",
+    image: "/images/site-samples/screencapture-mechescreations-v2.jpg",
     liveUrl: "https://www.mechescreations.com",
     category: "E-commerce",
     testimonial: "I've given Matt three kids; he built me this website with no hosting fees. It's a start I suppose.",
