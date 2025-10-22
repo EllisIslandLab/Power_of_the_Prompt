@@ -54,7 +54,6 @@ export async function GET() {
         // Get all relevant metadata
         const fullMetadata = {
           ...product.metadata,
-          features: product.features?.map(f => f.name) || [],
         }
 
         return {
@@ -71,7 +70,6 @@ export async function GET() {
           // For backward compatibility, use monthly price as primary
           price: formatPrice(monthlyPrice) || formatPrice(oneTimePrice),
           metadata: fullMetadata,
-          features: product.features?.map(f => f.name) || [],
         }
       })
     )
