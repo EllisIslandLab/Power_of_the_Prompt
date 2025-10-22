@@ -160,6 +160,9 @@ export type Database = {
           id: string
           email: string
           name: string | null
+          first_name: string | null
+          last_name: string | null
+          display_name: string | null
           status: 'waitlist' | 'interested' | 'nurturing' | 'converted'
           source: string | null
           notes: string | null
@@ -179,6 +182,9 @@ export type Database = {
           id?: string
           email: string
           name?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          display_name?: string | null
           status?: 'waitlist' | 'interested' | 'nurturing' | 'converted'
           source?: string | null
           notes?: string | null
@@ -198,6 +204,9 @@ export type Database = {
           id?: string
           email?: string
           name?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          display_name?: string | null
           status?: 'waitlist' | 'interested' | 'nurturing' | 'converted'
           source?: string | null
           notes?: string | null
