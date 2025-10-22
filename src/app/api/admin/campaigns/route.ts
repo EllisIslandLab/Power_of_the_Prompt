@@ -101,13 +101,18 @@ export async function POST(request: NextRequest) {
 
 async function getRecipientCount(targetAudience: any): Promise<number> {
   try {
+    // Handle manual recipients
+    if (targetAudience?.source === 'manual' && targetAudience?.manualRecipients?.length > 0) {
+      return targetAudience.manualRecipients.length
+    }
+
     let query = supabase
       .from('leads')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'waitlist')
 
     // Apply filters based on target audience
-    if (targetAudience?.source) {
+    if (targetAudience?.source && targetAudience.source !== 'all') {
       query = query.eq('source', targetAudience.source)
     }
 

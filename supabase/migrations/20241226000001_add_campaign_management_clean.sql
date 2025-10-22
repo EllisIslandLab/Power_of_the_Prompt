@@ -161,40 +161,61 @@ INSERT INTO email_templates (name, description, category, subject_template, cont
   'Welcome new leads to Web Launch Academy',
   'welcome',
   'Welcome to Web Launch Academy, {{name}}!',
-  '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>Welcome to Web Launch Academy, {{name}}!</h2>
-
-    <p>Thank you for your interest in learning web development. You''re about to embark on an exciting journey to build your own professional website.</p>
-
-    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-      <h3>What''s Next?</h3>
-      <ul>
-        <li>🎯 Free website analysis (if you haven''t done it yet)</li>
-        <li>📚 Access to our comprehensive course materials</li>
-        <li>🤝 One-on-one coaching sessions</li>
-        <li>💼 Build a professional online presence</li>
-      </ul>
+  '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+    <!-- Header -->
+    <div style="background-color: #1e40af; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+      <h1 style="margin: 0; font-size: 24px;">Welcome to Web Launch Academy!</h1>
+      <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Let''s build your website together</p>
     </div>
 
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="https://weblaunchacademy.com/portal"
-         style="background-color: #ffdb57; color: #11296b; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-        Get Started Now
-      </a>
+    <!-- Main Content -->
+    <div style="background-color: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+        Hi {{name}}! 👋
+      </p>
+
+      <p style="font-size: 16px; color: #333; line-height: 1.6; margin-bottom: 25px;">
+        Thank you for your interest in learning web development. You''re about to embark on an exciting journey to build your own professional website while owning your code.
+      </p>
+
+      <!-- What''s Next -->
+      <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 20px; margin: 25px 0; border-radius: 4px;">
+        <h3 style="color: #1e40af; margin: 0 0 15px 0; font-size: 16px;">🚀 What''s Next?</h3>
+        <ul style="color: #333; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+          <li>🎯 Free website analysis (if you haven''t done it yet)</li>
+          <li>📚 Access to our comprehensive course materials</li>
+          <li>🤝 One-on-one coaching sessions</li>
+          <li>💼 Build a professional online presence</li>
+        </ul>
+      </div>
+
+      <!-- CTA Button -->
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://weblaunchacademy.com/portal"
+           style="background-color: #1e40af; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
+          Get Started Now
+        </a>
+      </div>
+
+      <p style="font-size: 16px; color: #333; line-height: 1.6; margin-top: 25px;">
+        If you have any questions, simply reply to this email. I personally read and respond to every message.
+      </p>
+
+      <p style="color: #333; margin-top: 25px; font-size: 16px;">
+        Best regards,<br>
+        <strong>Matthew Ellis</strong><br>
+        <em>Web Launch Academy</em>
+      </p>
     </div>
 
-    <p>If you have any questions, simply reply to this email. I personally read and respond to every message.</p>
-
-    <p>Best regards,<br>
-    Matthew Ellis<br>
-    Web Launch Academy</p>
-
-    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-
-    <p style="color: #666; font-size: 12px;">
-      You received this email because you signed up for Web Launch Academy.
-      <a href="{{unsubscribe_url}}" style="color: #666;">Unsubscribe</a>
-    </p>
+    <!-- Footer -->
+    <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
+      <p style="margin: 0;">Web Launch Academy | Professional Website Development Coaching</p>
+      <p style="margin: 10px 0 0 0;">
+        You received this email because you signed up for Web Launch Academy.
+        <a href="{{unsubscribe_url}}" style="color: #1e40af;">Unsubscribe</a>
+      </p>
+    </div>
   </div>',
   '["name", "unsubscribe_url"]'::jsonb
 ) ON CONFLICT DO NOTHING;
@@ -205,35 +226,53 @@ INSERT INTO email_templates (name, description, category, subject_template, cont
   'Announce new course or program updates',
   'announcements',
   'New Course Available: {{course_name}}',
-  '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>Exciting News: {{course_name}} is Now Available!</h2>
-
-    <p>Hi {{name}},</p>
-
-    <p>I''m thrilled to announce that our latest course, <strong>{{course_name}}</strong>, is now live and ready for you to dive in.</p>
-
-    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-      <h3>What You''ll Learn:</h3>
-      <p>{{course_description}}</p>
+  '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+    <!-- Header -->
+    <div style="background-color: #1e40af; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+      <h1 style="margin: 0; font-size: 24px;">Exciting News: New Course Available!</h1>
+      <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">{{course_name}} is ready for you</p>
     </div>
 
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="{{course_url}}"
-         style="background-color: #ffdb57; color: #11296b; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-        Access Course Now
-      </a>
+    <!-- Main Content -->
+    <div style="background-color: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+        Hi {{name}}! 👋
+      </p>
+
+      <p style="font-size: 16px; color: #333; line-height: 1.6; margin-bottom: 25px;">
+        I''m thrilled to announce that our latest course, <strong>{{course_name}}</strong>, is now live and ready for you to dive in.
+      </p>
+
+      <!-- Course Details -->
+      <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 20px; margin: 25px 0; border-radius: 4px;">
+        <h3 style="color: #1e40af; margin: 0 0 10px 0; font-size: 16px;">📚 What You''ll Learn:</h3>
+        <p style="color: #333; margin: 0; font-size: 14px; line-height: 1.5;">
+          {{course_description}}
+        </p>
+      </div>
+
+      <!-- CTA Button -->
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{{course_url}}"
+           style="background-color: #1e40af; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
+          Access Course Now
+        </a>
+      </div>
+
+      <p style="color: #333; margin-top: 25px; font-size: 16px;">
+        Happy learning!<br>
+        <strong>Matthew Ellis</strong><br>
+        <em>Web Launch Academy</em>
+      </p>
     </div>
 
-    <p>This is part of your Web Launch Academy membership, so there''s no additional cost.</p>
-
-    <p>Happy learning!<br>
-    Matthew Ellis</p>
-
-    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-
-    <p style="color: #666; font-size: 12px;">
-      <a href="{{unsubscribe_url}}" style="color: #666;">Unsubscribe</a>
-    </p>
+    <!-- Footer -->
+    <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
+      <p style="margin: 0;">Web Launch Academy | Professional Website Development Coaching</p>
+      <p style="margin: 10px 0 0 0;">
+        <a href="{{unsubscribe_url}}" style="color: #1e40af;">Unsubscribe</a>
+      </p>
+    </div>
   </div>',
   '["name", "course_name", "course_description", "course_url", "unsubscribe_url"]'::jsonb
 ) ON CONFLICT DO NOTHING;
@@ -244,37 +283,63 @@ INSERT INTO email_templates (name, description, category, subject_template, cont
   'Share student success stories and testimonials',
   'testimonials',
   'Student Success: {{student_name}} Launched Their Website!',
-  '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>🎉 Another Success Story!</h2>
-
-    <p>Hi {{name}},</p>
-
-    <p>I love sharing success stories from our Web Launch Academy community, and today I have an inspiring update from {{student_name}}.</p>
-
-    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffdb57;">
-      <p style="font-style: italic; margin: 0;">{{testimonial}}</p>
-      <p style="text-align: right; margin: 10px 0 0 0; font-weight: 600;">— {{student_name}}</p>
+  '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+    <!-- Header -->
+    <div style="background-color: #1e40af; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+      <h1 style="margin: 0; font-size: 24px;">🎉 Another Success Story!</h1>
+      <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Celebrating our community wins</p>
     </div>
 
-    <p>This is exactly why I created Web Launch Academy. When you own your code and control your online presence, amazing things happen.</p>
+    <!-- Main Content -->
+    <div style="background-color: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+        Hi {{name}}! 👋
+      </p>
 
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="https://weblaunchacademy.com/portal"
-         style="background-color: #ffdb57; color: #11296b; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-        Continue Your Journey
-      </a>
+      <p style="font-size: 16px; color: #333; line-height: 1.6; margin-bottom: 25px;">
+        I love sharing success stories from our Web Launch Academy community, and today I have an inspiring update from {{student_name}}.
+      </p>
+
+      <!-- Testimonial -->
+      <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 20px; margin: 25px 0; border-radius: 4px;">
+        <p style="color: #333; margin: 0; font-size: 14px; line-height: 1.5; font-style: italic;">
+          "{{testimonial}}"
+        </p>
+        <p style="text-align: right; margin: 15px 0 0 0; font-weight: 600; color: #1e40af;">
+          — {{student_name}}
+        </p>
+      </div>
+
+      <p style="font-size: 16px; color: #333; line-height: 1.6; margin-bottom: 25px;">
+        This is exactly why I created Web Launch Academy. When you own your code and control your online presence, amazing things happen.
+      </p>
+
+      <!-- CTA Button -->
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://weblaunchacademy.com/portal"
+           style="background-color: #1e40af; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
+          Continue Your Journey
+        </a>
+      </div>
+
+      <p style="font-size: 16px; color: #333; line-height: 1.6; margin-top: 25px;">
+        Keep up the great work, and remember — I''m here to support you every step of the way.
+      </p>
+
+      <p style="color: #333; margin-top: 25px; font-size: 16px;">
+        Best regards,<br>
+        <strong>Matthew Ellis</strong><br>
+        <em>Web Launch Academy</em>
+      </p>
     </div>
 
-    <p>Keep up the great work, and remember — I''m here to support you every step of the way.</p>
-
-    <p>Best regards,<br>
-    Matthew Ellis</p>
-
-    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-
-    <p style="color: #666; font-size: 12px;">
-      <a href="{{unsubscribe_url}}" style="color: #666;">Unsubscribe</a>
-    </p>
+    <!-- Footer -->
+    <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
+      <p style="margin: 0;">Web Launch Academy | Professional Website Development Coaching</p>
+      <p style="margin: 10px 0 0 0;">
+        <a href="{{unsubscribe_url}}" style="color: #1e40af;">Unsubscribe</a>
+      </p>
+    </div>
   </div>',
   '["name", "student_name", "testimonial", "unsubscribe_url"]'::jsonb
 ) ON CONFLICT DO NOTHING;

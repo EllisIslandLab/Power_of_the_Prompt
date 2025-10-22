@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     // Update campaign_sends table if this is from a campaign
     if (campaignId) {
-      await supabase
+      const { data: updated } = await supabase
         .from('campaign_sends')
         .update({
           opened_at: new Date().toISOString()
@@ -41,6 +41,14 @@ export async function GET(request: NextRequest) {
         .eq('campaign_id', campaignId)
         .eq('recipient_email', decodedEmail)
         .is('opened_at', null) // Only update if not already opened
+        .select()
+
+      // If this was a first-time open, increment campaign opened_count
+      if (updated && updated.length > 0) {
+        await supabase.rpc('increment_campaign_opens', {
+          campaign_id: campaignId
+        })
+      }
     }
 
     // Update leads table engagement tracking

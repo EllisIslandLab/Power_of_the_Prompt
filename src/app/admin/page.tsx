@@ -53,17 +53,18 @@ export default function AdminDashboard() {
     try {
       setLoading(true)
 
-      // Fetch campaigns
-      const campaignsResponse = await fetch('/api/admin/campaigns?limit=5')
-      const campaignsData = await campaignsResponse.json()
+      // Fetch all data in parallel for better performance
+      const [campaignsResponse, leadsResponse, servicesResponse] = await Promise.all([
+        fetch('/api/admin/campaigns?limit=5'),
+        fetch('/api/admin/leads?limit=100'),
+        fetch('/api/services')
+      ])
 
-      // Fetch leads
-      const leadsResponse = await fetch('/api/admin/leads?limit=100')
-      const leadsData = await leadsResponse.json()
-
-      // Fetch services
-      const servicesResponse = await fetch('/api/services')
-      const servicesData = await servicesResponse.json()
+      const [campaignsData, leadsData, servicesData] = await Promise.all([
+        campaignsResponse.json(),
+        leadsResponse.json(),
+        servicesResponse.json()
+      ])
 
       if (campaignsData.success && leadsData.success && servicesData.success) {
         const campaigns = campaignsData.campaigns || []

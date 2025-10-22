@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-select',
       'lucide-react'
     ],
+    // Enable Node.js runtime for middleware
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
   },
   // Compression
   compress: true,
@@ -32,21 +36,45 @@ const nextConfig: NextConfig = {
         module: /node_modules\/@supabase\/realtime-js/,
         message: /Critical dependency: the request of a dependency is an expression/,
       },
+      // Suppress webpack cache serialization warning
+      {
+        message: /Serializing big strings/,
+      },
+      // Also suppress the PackFileCacheStrategy warning
+      (warning) => warning.message.includes('webpack.cache.PackFileCacheStrategy'),
     ];
 
     // Bundle optimization
     if (!isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 10,
+            },
+            common: {
+              minChunks: 2,
+              priority: 5,
+              reuseExistingChunk: true,
+            },
           },
         },
+        // Improve module IDs for better caching
+        moduleIds: 'deterministic',
       };
     }
+
+    // Performance optimization for cache
+    config.cache = {
+      ...config.cache,
+      type: 'filesystem',
+      compression: 'gzip',
+    };
 
     return config;
   },

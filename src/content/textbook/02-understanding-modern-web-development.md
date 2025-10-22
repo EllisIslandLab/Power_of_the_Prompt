@@ -2,7 +2,11 @@
 
 ---
 
-## ⚡ 2.1 Next.js vs Traditional Web Development
+## ⚡ 2.1 Next.js® vs Traditional Web Development
+
+**[IMAGE: Next.js logo with brief description]**
+
+*Next.js is a trademark of Vercel, Inc.*
 
 ### 📈 The Evolution of Web Development
 
@@ -11,12 +15,17 @@
 HTML File → CSS File → JavaScript File → Browser
 ```
 
-**Modern Web Development (Next.js):**
+**Modern Web Development (Next.js®):**
 ```
 Components → Build Process → Optimized Files → Browser
 ```
 
-### 🚀 Why Next.js is Superior for Business Websites
+**[IMAGE: Side-by-side comparison diagram showing Traditional vs Modern web development workflows]**
+
+**AI Image Prompt:**
+*"Split-screen diagram comparing traditional web development workflow on left (HTML/CSS/JS files flowing linearly to browser) versus modern Next.js workflow on right (component-based architecture with build optimization step before browser). Clean, educational infographic style with arrows showing flow, icons representing files and processes, professional blue and white color scheme, minimalist design"*
+
+### 🚀 Why Next.js® is Superior for Business Websites
 
 **Performance Benefits:**
 - **Static Site Generation (SSG):** Pages pre-built for instant loading
@@ -70,7 +79,7 @@ Components → Build Process → Optimized Files → Browser
 </html>
 ```
 
-**Next.js Approach:**
+**Next.js® Approach:**
 ```tsx
 // app/page.tsx
 import Navigation from './components/Navigation'
@@ -92,37 +101,68 @@ export const metadata = {
 }
 ```
 
+**[IMAGE: Code comparison screenshot showing HTML file vs Next.js component file]**
+
+**AI Image Prompt:**
+*"Side-by-side code editor screenshot comparison, left showing traditional HTML/CSS code, right showing modern Next.js TypeScript component code. Clean syntax highlighting, professional code editor theme, annotations pointing out key differences like component imports, JSX syntax, and metadata exports. Educational diagram style with clear labels"*
+
 ## 🏗️ 2.2 The Professional Development Stack
+
+**[IMAGE: Technology stack diagram showing all layers]**
+
+**AI Image Prompt:**
+*"Layered architecture diagram showing web development technology stack. Four distinct layers from top to bottom: Frontend layer (Next.js, React, TypeScript, Tailwind CSS logos), Backend layer (Netlify, Airtable, Stripe logos), Development Tools layer (VS Code, Claude, Git, GitHub logos), Deployment layer (Netlify, Custom Domain icons). Clean, modern infographic style with connecting lines between layers, professional color scheme, each layer clearly labeled"*
 
 ### 🔧 Understanding the Complete Technology Stack
 
 **Frontend Layer:**
-- **Next.js** - React framework for user interface
-- **TypeScript** - Type-safe JavaScript for reliability
-- **Tailwind CSS** - Utility-first CSS framework
-- **React** - Component-based user interface library
+- **Next.js®** - React® framework for user interface (*Next.js is a trademark of Vercel, Inc.*)
+- **TypeScript®** - Type-safe JavaScript for reliability (*TypeScript is a registered trademark of Microsoft Corporation*)
+- **Tailwind CSS™** - Utility-first CSS framework
+- **React®** - Component-based user interface library (*React is a registered trademark of Meta Platforms, Inc.*)
 
 **Backend Layer:**
-- **Netlify Functions** - Serverless backend functionality
-- **Airtable API** - Database and content management
-- **Stripe API** - Payment processing
+- **Netlify® Functions** - Serverless backend functionality (*Netlify is a registered trademark of Netlify, Inc.*)
+- **Airtable® API** - Database and content management (*Airtable is a registered trademark of Formagrid, Inc.*)
+- **Stripe® API** - Payment processing (*Stripe is a registered trademark of Stripe, Inc.*)
 - **Email Services** - Automated communications
 
 **Development Tools:**
-- **VS Code** - Professional code editor
-- **Claude CLI** - AI-powered development assistant
+- **Visual Studio Code®** - Professional code editor (*Visual Studio Code is a registered trademark of Microsoft Corporation*)
+
+**[IMAGE: VS Code logo and interface screenshot]**
+
+*Visual Studio Code® is a free, open-source code editor developed by Microsoft Corporation.*
+
+- **Claude™ CLI** - AI-powered development assistant (*Claude is a trademark of Anthropic, PBC*)
+
+**[IMAGE: Claude logo and CLI interface example]**
+
+*Claude™ is an AI assistant created by Anthropic, PBC. The Claude CLI enables AI-assisted development directly in your terminal.*
+
 - **Git** - Version control and collaboration
 - **ESLint/Prettier** - Code quality and formatting
 
 **Deployment & Hosting:**
-- **GitHub** - Source code repository
-- **Netlify** - Website hosting and deployment
+- **GitHub®** - Source code repository (*GitHub is a registered trademark of GitHub, Inc., a subsidiary of Microsoft Corporation*)
+
+**[IMAGE: GitHub logo and repository interface]**
+
+*GitHub® provides cloud-based Git repository hosting and collaboration tools.*
+
+- **Netlify®** - Website hosting and deployment
 - **Custom Domain** - Professional web address
 - **SSL Certificate** - Security and trust
 
 ### 📁 Project Structure and Organization
 
-**Professional Next.js Project Structure:**
+**Professional Next.js® Project Structure:**
+
+**[IMAGE: Visual file tree diagram with icons for different file types]**
+
+**AI Image Prompt:**
+*"File system tree diagram showing Next.js project structure with colorful folder icons (blue for app, green for components, orange for lib, purple for public). Each folder expanded to show key files with appropriate icons (tsx files with React icon, css with stylesheet icon, config files with gear icon). Clean, modern design with connecting lines between nested folders, annotations explaining key directories, professional educational style"*
+
 ```
 my-business-website/
 ├── app/                    # Next.js App Router
@@ -158,10 +198,22 @@ my-business-website/
 └── next.config.js         # Next.js config
 ```
 
+**Key Folders Explained:**
+
+**[IMAGE: Annotated screenshot of VS Code explorer showing project folders]**
+
+**AI Image Prompt:**
+*"Screenshot of Visual Studio Code file explorer panel showing Next.js project folders with annotations. Callout bubbles pointing to app folder (Pages & Routes), components folder (Reusable UI), lib folder (Helper Functions), public folder (Images & Assets). Professional VS Code dark theme, clear labels with arrows, clean educational diagram style"*
+
 ### 🧩 Component-Based Architecture
 
 **Understanding Components:**
 Components are reusable pieces of your website that can be used multiple times.
+
+**[IMAGE: Component reusability diagram showing one component used in multiple places]**
+
+**AI Image Prompt:**
+*"Diagram showing React component reusability concept. Center shows a single ProductCard component template with arrows pointing outward to multiple instances of that component displayed on different pages (Products page, Homepage, Search results). Each instance slightly different (different products) but same design. Clean educational infographic style, blue and white color scheme, annotations showing 'Single Source' and 'Multiple Uses'"*
 
 **Example - Product Card Component:**
 ```tsx
@@ -215,7 +267,12 @@ export default function ProductsPage() {
 }
 ```
 
-## 🤖 2.3 AI-Assisted Development with Claude CLI
+## 🤖 2.3 AI-Assisted Development with Claude™ CLI
+
+**[IMAGE: Comparison diagram of Traditional vs AI-Assisted development workflows]**
+
+**AI Image Prompt:**
+*"Split workflow diagram comparing traditional development process (left) showing multiple complex steps with person coding manually, versus AI-assisted process (right) showing simplified workflow with person describing to AI assistant and receiving code. Use icons for each step (research, coding, debugging, testing). Clean infographic style, professional color scheme, arrows showing flow, time indicators showing AI approach is faster"*
 
 ### 🧠 Understanding AI-Powered Development
 
@@ -227,15 +284,20 @@ export default function ProductsPage() {
 5. Repeat for each feature
 
 **AI-Assisted Development Process:**
-1. Describe desired feature to Claude
+1. Describe desired feature to Claude™
 2. Review and understand generated code
 3. Customize for specific needs
 4. Test and deploy
 5. Iterate with AI assistance
 
-### 💬 Effective Communication with Claude CLI
+### 💬 Effective Communication with Claude™ CLI
 
 **Best Practices for AI Prompting:**
+
+**[IMAGE: Example of good vs poor prompts with annotations]**
+
+**AI Image Prompt:**
+*"Comparison showing poor prompt versus good prompt examples. Left side shows vague one-line prompt with red X mark, right side shows detailed, specific prompt with green checkmark. Include callout bubbles highlighting key elements of good prompt: specificity, context, technical details, requirements. Clean educational design, professional color scheme, clear typography"*
 
 **Be Specific and Detailed:**
 ```bash
@@ -256,42 +318,228 @@ claude chat "I'm building an e-commerce website for handmade crafts. Create a pr
 claude chat "Explain how this Next.js component works and what each part does: [paste component code]"
 ```
 
-### 🔄 Iterative Development with Claude
+### 🔄 Iterative Development with Claude™
 
-**Step-by-Step Development Process:**
+**The Iterative Development Philosophy:**
 
-**Step 1: Generate Initial Structure**
-```bash
-claude chat "Create a basic Next.js e-commerce website structure with the following pages: home, products, individual product, cart, checkout, and contact. Include TypeScript and Tailwind CSS configuration."
+**Traditional Approach:**
+```
+Idea → Research → Plan → Code → Debug → Test → Deploy
+(Hours to days per feature)
 ```
 
-**Step 2: Add Specific Features**
-```bash
-claude chat "Add shopping cart functionality to the e-commerce site. Include add to cart, remove from cart, update quantities, and calculate totals. Use React state management and persist cart data in localStorage."
+**AI-Assisted Approach:**
+```
+Idea → Describe to Claude → Review/Customize → Deploy
+(Minutes to hours per feature)
 ```
 
-**Step 3: Integrate with Backend**
+**[IMAGE: Workflow comparison showing time savings]**
+
+**AI Image Prompt:**
+*"Timeline comparison infographic showing traditional web development process (multiple days with many steps) versus AI-assisted development (compressed timeline with fewer steps). Use calendar/clock icons, progress bars, arrows showing workflow. Left side shows person struggling with books and complex diagrams, right side shows person collaborating with AI assistant icon. Clean, modern infographic style, professional colors"*
+
+---
+
+### 🎯 Master Prompts for Complete Projects
+
+**What is a Master Prompt?**
+
+A master prompt is a comprehensive, detailed description that generates a complete, production-ready website or feature. Think of it as a complete blueprint that includes:
+- Technical specifications (Next.js®, TypeScript®, Tailwind CSS™)
+- Business requirements (your specific needs)
+- Design guidelines (colors, layout, style)
+- Integration needs (Airtable®, Stripe®, email)
+- Performance requirements (speed, SEO, mobile)
+
+**Benefits of Master Prompts:**
+- ✅ Consistent results across projects
+- ✅ Comprehensive feature implementation
+- ✅ Reduced back-and-forth iteration
+- ✅ Professional-grade output
+- ✅ Massive time efficiency
+
+**Master Prompt Template:**
+
 ```bash
-claude chat "Integrate the product display with Airtable API. Create functions to fetch products from Airtable and display them on the products page. Include error handling and loading states."
+claude chat "Create a professional Next.js e-commerce/services website with:
+
+TECHNICAL REQUIREMENTS:
+- Next.js 14 with App Router and TypeScript
+- Tailwind CSS for responsive styling
+- ESLint and Prettier for code quality
+- Environment variables for security
+
+BUSINESS CONTEXT:
+- Business Type: [Your business type]
+- Target Audience: [Your customers]
+- Primary Goals: [Sales/Leads/Brand awareness]
+- Unique Value: [What makes you special]
+
+PAGES NEEDED:
+1. Homepage with hero, featured items, testimonials
+2. Products/Services catalog with filtering and search
+3. Individual product/service detail pages
+4. Contact page with form and business info
+5. About page with your story
+
+AIRTABLE INTEGRATION:
+- Products table: name, description, price, category, images
+- Customer Inquiries: name, email, phone, message, status
+- Store form submissions and display product data
+
+DESIGN:
+- Clean, modern, professional aesthetic
+- Mobile-first responsive design
+- [Your brand colors]
+- High-quality images with optimization
+
+FEATURES:
+- Contact forms with validation
+- Product/service showcase
+- Email notifications
+- SEO optimization
+- Fast loading and performance
+
+Generate complete website with all files and components ready for deployment."
 ```
 
-**Step 4: Optimize and Polish**
+**[IMAGE: Master prompt template visual breakdown]**
+
+**AI Image Prompt:**
+*"Annotated master prompt template showing different sections color-coded. Technical Requirements in blue, Business Context in green, Design Specifications in purple, Features in orange. Callout boxes explaining each section's purpose. Clean educational diagram style, professional typography, clear section divisions"*
+
+---
+
+### 📋 Step-by-Step Iterative Development
+
+**Phase 1: Foundation Generation**
 ```bash
-claude chat "Optimize the website for performance and SEO. Add proper meta tags, optimize images, implement lazy loading, and ensure mobile responsiveness."
+claude chat "Create the basic Next.js project structure with homepage, product listing, and contact page. Include TypeScript and Tailwind CSS setup."
+```
+
+**Phase 2: Add Functionality**
+```bash
+claude chat "Add shopping cart functionality with add to cart, cart persistence, and cart display components. Include quantity updates and item removal."
+```
+
+**Phase 3: Backend Integration**
+```bash
+claude chat "Connect to Airtable API to fetch products and save contact form submissions. Include error handling and loading states."
+```
+
+**Phase 4: Payment Integration** (if needed)
+```bash
+claude chat "Integrate Stripe payment processing with checkout flow. Include webhook handling for payment confirmations."
+```
+
+**Phase 5: Polish & Optimize**
+```bash
+claude chat "Optimize for Core Web Vitals, add loading skeletons, improve accessibility with ARIA labels, and implement error boundaries."
+```
+
+**[IMAGE: Development phases flowchart]**
+
+**AI Image Prompt:**
+*"Five-phase development flowchart showing progression from Foundation to Polish. Each phase shown as a step/level with checkmarks for completed items. Arrows connecting phases. Icons representing each phase: foundation (building blocks), functionality (gears), backend (database), payment (credit card), polish (sparkle). Modern, clean infographic style"*
+
+---
+
+### 🛠️ Progressive Enhancement Strategy
+
+**Build in Layers, Not All at Once:**
+
+**Level 1: Basic Functionality** (Week 1)
+- Static content display
+- Simple navigation
+- Basic contact form
+- Professional layout
+
+**Level 2: Dynamic Content** (Week 2)
+- Database integration with Airtable®
+- Product catalog from database
+- Search functionality
+- Form submissions to database
+
+**Level 3: Interactive Features** (Week 3)
+- Shopping cart (if e-commerce)
+- Product filtering and sorting
+- User feedback and animations
+- Email notifications
+
+**Level 4: Advanced Integration** (Week 4)
+- Payment processing with Stripe®
+- Email automation
+- Analytics tracking
+- Performance optimization
+
+**Example Progressive Prompts:**
+
+```bash
+# Level 1: Basic product display
+claude chat "Create a simple product grid displaying static product data with images, names, and prices using Tailwind CSS"
+
+# Level 2: Dynamic data
+claude chat "Modify the product grid to fetch data from Airtable API with loading states and error handling"
+
+# Level 3: Interactive features
+claude chat "Add 'Add to Cart' functionality with state management, cart icon updates, and local storage persistence"
+
+# Level 4: Advanced features
+claude chat "Integrate the cart with Stripe for secure checkout processing and order confirmation emails"
 ```
 
 ### ✅ Code Review and Quality Assurance
 
-**Using Claude for Code Review:**
+**Using Claude™ for Code Review:**
+
+**Security Review:**
 ```bash
-claude chat "Review this code for potential issues, security problems, and optimization opportunities: [paste code]"
+claude chat "Review this API integration for security vulnerabilities. Suggest improvements for input validation, authentication, and error handling: [paste code]"
 ```
 
-**Common Questions for Claude:**
-- "Is this code secure and following best practices?"
-- "How can I improve the performance of this component?"
-- "What accessibility features should I add?"
-- "How can I make this code more maintainable?"
+**Performance Optimization:**
+```bash
+claude chat "Analyze this component for performance issues and suggest optimizations. Focus on rendering efficiency and load times: [paste component code]"
+```
+
+**Accessibility Improvements:**
+```bash
+claude chat "Improve the accessibility of this component. Add proper ARIA labels, keyboard navigation, and screen reader support: [paste code]"
+```
+
+**Code Quality Checklist:**
+
+**Security:**
+- [ ] Environment variables for all sensitive data
+- [ ] Input validation on all forms
+- [ ] No hardcoded credentials
+- [ ] Proper error handling
+
+**Performance:**
+- [ ] Images optimized with Next.js® Image component
+- [ ] API calls optimized and cached
+- [ ] Loading states for better UX
+- [ ] Fast page load times
+
+**Accessibility:**
+- [ ] Proper semantic HTML
+- [ ] Alt text for all images
+- [ ] Keyboard navigation support
+- [ ] Color contrast compliance
+
+**Common Debugging Requests:**
+
+```bash
+# TypeScript errors
+claude chat "Fix these TypeScript errors: [paste error messages and code]"
+
+# Styling issues
+claude chat "The responsive design isn't working on mobile. Here's my component: [paste code]"
+
+# API problems
+claude chat "My Airtable API integration returns errors. Help debug: [paste code]"
+```
 
 ### 📝 Understanding Generated Code
 
@@ -331,7 +579,7 @@ function ProductDisplay({ product }: { product: Product }) {
 }
 ```
 
-**Tailwind CSS Classes:**
+**Tailwind CSS™ Classes:**
 ```tsx
 // Utility classes for styling
 <div className="bg-blue-500 text-white p-4 rounded-lg shadow-md">
@@ -342,3 +590,25 @@ function ProductDisplay({ product }: { product: Product }) {
   {/* shadow-md: drop shadow */}
 </div>
 ```
+
+**[IMAGE: Tailwind CSS utility class visual reference]**
+
+**AI Image Prompt:**
+*"Visual reference guide showing common Tailwind CSS utility classes with before/after examples. Grid layout showing: padding classes (p-4 example), color classes (bg-blue-500, text-white), border radius (rounded-lg), shadow effects (shadow-md). Each example shows the HTML element and resulting visual appearance. Clean, educational design with code snippets and visual results side by side"*
+
+---
+
+## 📋 Chapter 2 Summary
+
+By understanding modern web development with Next.js®, you've learned how AI-assisted development with Claude™ CLI can help you build professional websites without memorizing complex code. The component-based architecture, combined with powerful tools like TypeScript®, React®, and Tailwind CSS™, provides a solid foundation for creating business websites that are fast, secure, and easy to maintain.
+
+**Key Takeaways:**
+- Next.js® offers significant advantages over traditional web development
+- Component-based architecture promotes reusability and maintainability
+- AI assistance with Claude™ CLI accelerates development while maintaining quality
+- Modern tools like TypeScript® provide reliability and better error detection
+- Professional project structure ensures scalability and organization
+
+---
+
+**Next:** Chapter 3 will guide you through setting up your development environment and creating your first Next.js® project.

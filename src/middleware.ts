@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
-export const runtime = 'nodejs'
+// Cache admin status in cookie for better performance
+const ADMIN_CACHE_KEY = 'is_admin'
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -42,15 +44,37 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/signin', request.url))
     }
 
-    // Check if user is admin
-    const { data: userRecord } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    // Check cached admin status first
+    const cachedAdminStatus = request.cookies.get(ADMIN_CACHE_KEY)
+    let isAdmin = false
 
-    if (!userRecord || userRecord.role !== 'admin') {
-      // Not an admin - redirect to portal
+    if (cachedAdminStatus && cachedAdminStatus.value === user.id) {
+      // Use cached admin status
+      isAdmin = true
+    } else {
+      // Check database for admin role
+      const { data: userRecord } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      isAdmin = userRecord?.role === 'admin'
+
+      // Cache the result if user is admin
+      if (isAdmin) {
+        response.cookies.set(ADMIN_CACHE_KEY, user.id, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: CACHE_DURATION / 1000, // in seconds
+        })
+      }
+    }
+
+    if (!isAdmin) {
+      // Not an admin - clear cache and redirect to portal
+      response.cookies.delete(ADMIN_CACHE_KEY)
       return NextResponse.redirect(new URL('/portal', request.url))
     }
   }

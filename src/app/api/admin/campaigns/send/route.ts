@@ -48,6 +48,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
+function getRecipientName(recipient: any): string {
+  // Priority: display_name > first_name > fallback greeting
+  if (recipient.display_name) {
+    return recipient.display_name
+  }
+  if (recipient.first_name) {
+    return recipient.first_name
+  }
+  // Friendly fallback if no name available
+  return 'there'
+}
+
 async function sendTestEmail(campaign: any, testEmail: string) {
   try {
     const resendApiKey = process.env.RESEND_API_KEY
@@ -59,12 +71,24 @@ async function sendTestEmail(campaign: any, testEmail: string) {
       }
     }
 
+    // Get course data from campaign if available
+    const courseData = campaign.target_audience?.selectedCourse || {}
+
     // Replace variables in content for test
     const processedContent = processEmailContent(
       campaign.content,
       {
         name: 'Test User',
-        unsubscribe_url: `${process.env.NEXT_PUBLIC_SITE_URL}/unsubscribe?email=${testEmail}`
+        first_name: 'Test',
+        last_name: 'User',
+        unsubscribe_url: `${process.env.NEXT_PUBLIC_SITE_URL}/unsubscribe?email=${testEmail}`,
+        // Course placeholders - use selected course or fallback
+        course_name: courseData.name || process.env.NEXT_PUBLIC_COURSE_NAME || 'Our Latest Course',
+        course_description: courseData.description || process.env.NEXT_PUBLIC_COURSE_DESCRIPTION || 'Learn to build professional websites',
+        course_url: courseData.url || `${process.env.NEXT_PUBLIC_SITE_URL}/pricing`,
+        course_price: courseData.price?.formatted || 'Contact for pricing',
+        course_price_monthly: courseData.prices?.monthly?.formatted || '',
+        course_price_onetime: courseData.prices?.oneTime?.formatted || ''
       }
       // No tracking for test emails
     )
@@ -154,11 +178,26 @@ async function sendCampaignToAll(campaign: any) {
 
       await Promise.all(batch.map(async (recipient) => {
         try {
+          // Get the best available name
+          const recipientName = getRecipientName(recipient)
+
+          // Get course data from campaign if available
+          const courseData = campaign.target_audience?.selectedCourse || {}
+
           const processedContent = processEmailContent(
             campaign.content,
             {
-              name: recipient.name || 'there',
-              unsubscribe_url: `${process.env.NEXT_PUBLIC_SITE_URL}/unsubscribe?email=${recipient.email}`
+              name: recipientName,
+              first_name: recipient.first_name || recipientName,
+              last_name: recipient.last_name || '',
+              unsubscribe_url: `${process.env.NEXT_PUBLIC_SITE_URL}/unsubscribe?email=${recipient.email}`,
+              // Course placeholders - use selected course or fallback
+              course_name: courseData.name || process.env.NEXT_PUBLIC_COURSE_NAME || 'Our Latest Course',
+              course_description: courseData.description || process.env.NEXT_PUBLIC_COURSE_DESCRIPTION || 'Learn to build professional websites',
+              course_url: courseData.url || `${process.env.NEXT_PUBLIC_SITE_URL}/pricing`,
+              course_price: courseData.price?.formatted || 'Contact for pricing',
+              course_price_monthly: courseData.prices?.monthly?.formatted || '',
+              course_price_onetime: courseData.prices?.oneTime?.formatted || ''
             },
             campaign.id,
             recipient.email
@@ -245,9 +284,25 @@ async function sendCampaignToAll(campaign: any) {
 
 async function getRecipients(targetAudience: any) {
   try {
+    // Handle manual recipients
+    if (targetAudience?.source === 'manual' && targetAudience?.manualRecipients?.length > 0) {
+      const { data: recipients, error } = await supabase
+        .from('leads')
+        .select('email, first_name, last_name, display_name')
+        .in('email', targetAudience.manualRecipients)
+
+      if (error) {
+        console.error('Error fetching manual recipients:', error)
+        return []
+      }
+
+      return recipients || []
+    }
+
+    // Handle automatic audience selection
     let query = supabase
       .from('leads')
-      .select('email, name')
+      .select('email, first_name, last_name, display_name')
       .eq('status', 'waitlist') // Only active waitlist leads by default
 
     // Apply filters based on target audience
@@ -255,7 +310,7 @@ async function getRecipients(targetAudience: any) {
       query = query.eq('status', targetAudience.status)
     }
 
-    if (targetAudience?.source) {
+    if (targetAudience?.source && targetAudience.source !== 'all') {
       query = query.eq('source', targetAudience.source)
     }
 
@@ -296,6 +351,25 @@ function processEmailContent(
     const regex = new RegExp(`{{${key}}}`, 'g')
     processedContent = processedContent.replace(regex, value)
   })
+
+  // Add click tracking to all links (except unsubscribe)
+  if (campaignId && recipientEmail) {
+    // Regex to find all <a href="..."> tags
+    processedContent = processedContent.replace(
+      /<a\s+([^>]*?)href=["']([^"']+)["']([^>]*?)>/gi,
+      (match, before, url, after) => {
+        // Skip unsubscribe links and tracking URLs
+        if (url.includes('/unsubscribe') || url.includes('/api/email-tracking')) {
+          return match
+        }
+
+        // Create click tracking URL
+        const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/email-tracking/click?c=${campaignId}&e=${encodeURIComponent(recipientEmail)}&url=${encodeURIComponent(url)}`
+
+        return `<a ${before}href="${trackingUrl}"${after}>`
+      }
+    )
+  }
 
   // Add tracking pixel for email opens
   if (campaignId && recipientEmail) {

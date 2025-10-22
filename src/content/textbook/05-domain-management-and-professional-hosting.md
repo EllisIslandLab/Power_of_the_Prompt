@@ -83,7 +83,7 @@ DNS (Domain Name System) translates domain names into IP addresses. It's like a 
 - **Pros:** Affordable, excellent customer support, free privacy protection
 - **Cons:** Limited advanced features
 - **Best for:** Small businesses, first-time buyers
-- **Pricing:** ~$10-15/year for .com
+- **Pricing:** ~$10-20/year for .com
 
 **Google Domains:**
 - **Pros:** Simple interface, integrates with Google services, reliable
