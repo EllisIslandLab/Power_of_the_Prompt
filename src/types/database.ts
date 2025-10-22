@@ -391,6 +391,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_campaign_opens: {
+        Args: {
+          campaign_id: string
+        }
+        Returns: void
+      }
+      increment_campaign_clicks: {
+        Args: {
+          campaign_id: string
+        }
+        Returns: void
+      }
     }
     Enums: {
       [_ in never]: never
