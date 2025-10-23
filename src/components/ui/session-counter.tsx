@@ -1,14 +1,7 @@
 "use client"
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
 import { Activity } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 interface SessionCounterProps {
   userId: string
@@ -16,71 +9,13 @@ interface SessionCounterProps {
   variant?: 'full' | 'compact'
 }
 
-interface SessionData {
-  sessions_total: number
-  sessions_used: number
-}
-
+// TODO: Re-implement session credits using new points system
+// The old 'sessions' table was removed. Need to create a new 'session_credits' table
+// or integrate with the points system for tracking purchased consultation credits.
 export function SessionCounter({ userId, className, variant = 'full' }: SessionCounterProps) {
-  const [sessionData, setSessionData] = useState<SessionData | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (!userId) return
-
-    async function loadSessions() {
-      try {
-        const { data, error } = await supabase
-          .from('sessions')
-          .select('sessions_total, sessions_used')
-          .eq('user_id', userId)
-          .eq('status', 'active')
-          .maybeSingle()
-
-        if (error) {
-          console.error('Error loading sessions:', error)
-          setSessionData(null)
-        } else if (data) {
-          setSessionData(data)
-        } else {
-          setSessionData(null)
-        }
-      } catch (err) {
-        console.error('Error loading sessions:', err)
-        setSessionData(null)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadSessions()
-
-    // Subscribe to changes
-    const channel = supabase
-      .channel(`sessions:${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'sessions',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => {
-          if (payload.new && (payload.new as any).status === 'active') {
-            setSessionData({
-              sessions_total: (payload.new as any).sessions_total,
-              sessions_used: (payload.new as any).sessions_used
-            })
-          }
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [userId])
+  // Temporarily disabled - showing placeholder
+  const sessionData = null
+  const loading = false
 
   if (loading) {
     return (
