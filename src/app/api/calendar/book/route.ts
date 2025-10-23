@@ -165,52 +165,35 @@ async function createVideoSession(sessionData: {
     const startTime = new Date(sessionData.scheduledStart)
     const endTime = new Date(startTime.getTime() + (sessionData.duration * 60 * 1000))
 
-    // Get an admin user to host the session
-    // Note: admin_users table doesn't exist yet, using placeholder for coming soon page
-    const adminUser = { user_id: 'admin-placeholder' }
-
-    // Create video session
-    const { data: videoSession, error: sessionError } = await supabase
-      .from('video_sessions')
+    // Create course session for consultation
+    const { data: courseSession, error: sessionError } = await supabase
+      .from('course_sessions')
       .insert({
-        title: sessionData.sessionName,
-        room_name: roomId,
-        host_id: adminUser.user_id,
-        status: 'scheduled',
-        scheduled_for: startTime.toISOString(),
-        description: 'Free consultation session'
+        session_name: sessionData.sessionName,
+        session_date: startTime.toISOString(),
+        recording_url: null, // Will be added after consultation if recorded
+        live_points: 0, // Consultations don't award points
+        recording_points: 0
       })
       .select('*')
       .single()
 
     if (sessionError) {
-      throw new Error(`Failed to create video session: ${sessionError.message}`)
-    }
-
-    // Create associated consultation record
-    // Note: consultations table doesn't exist yet, using placeholder for coming soon page
-    const consultation = {
-      id: `consultation-${Date.now()}`,
-      user_id: userId,
-      scheduled_time: startTime.toISOString(),
-      status: 'SCHEDULED',
-      type: 'FREE',
-      video_session_id: videoSession?.id || 'placeholder'
+      throw new Error(`Failed to create consultation session: ${sessionError.message}`)
     }
 
     // Get Jitsi domain from environment
     const jitsiDomain = process.env.NEXT_PUBLIC_JITSI_DOMAIN || 'meet.jit.si'
-    
+
     return {
-      id: videoSession.id,
+      id: courseSession.id,
       jitsiRoomId: roomId,
       joinUrl: `https://${jitsiDomain}/${roomId}`,
       sessionName: sessionData.sessionName,
       scheduledStart: sessionData.scheduledStart,
       duration: sessionData.duration,
-      consultationId: consultation?.id || null,
-      userId: userId,
-      hostId: adminUser.user_id
+      consultationId: courseSession.id,
+      userId: userId
     }
 
   } catch (error) {

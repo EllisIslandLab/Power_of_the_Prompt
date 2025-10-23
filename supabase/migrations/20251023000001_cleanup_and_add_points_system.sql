@@ -154,7 +154,7 @@ CREATE TABLE affiliate_tiers (
 
 -- Insert default affiliate tiers
 INSERT INTO affiliate_tiers (tier_name, tier_level, max_cash_per_referral, percentage_bonus, purchase_count_limit, spend_cap_for_bonus, total_cap_percentage, requirements_description) VALUES
-('Tier 1', 1, 50.00, 5.00, 1, NULL, 10.00, 'Default tier for all affiliates'),
+('Tier 1', 1, 50.00, 5.00, 1, 2000.00, 10.00, 'Default tier for all affiliates'),
 ('Tier 2', 2, 75.00, 7.00, 2, 2400.00, 12.00, 'Unlocked after 5 successful referrals or survey participation')
 ON CONFLICT (tier_name) DO NOTHING;
 
