@@ -180,26 +180,21 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     }
 
     // 3. Create session package if applicable
+    // TODO: Re-implement session credits using new points system
+    // The old 'sessions' table was removed. Need to create a new 'session_credits' table
+    // or integrate with the points system for tracking purchased consultation credits.
     if (sessionsToCredit > 0) {
-      const expiresAt = metadata.lvl_up_expiry_months
-        ? new Date(Date.now() + parseInt(metadata.lvl_up_expiry_months) * 30 * 24 * 60 * 60 * 1000).toISOString()
-        : null;
-
-      const { error: sessionError } = await supabase
-        .from('sessions')
-        .insert({
-          user_id: userId,
-          package_size: sessionsToCredit,
-          sessions_total: sessionsToCredit,
-          sessions_used: 0,
-          stripe_payment_id: session.payment_intent as string,
-          status: 'active',
-          expires_at: expiresAt,
+      console.log(`TODO: Credit ${sessionsToCredit} LevelUp sessions for user ${userId}`);
+      // Temporary: Award bonus points instead
+      try {
+        await supabase.rpc('add_bonus_points', {
+          p_user_id: userId,
+          p_points: sessionsToCredit * 100 // 100 points per session credit
         });
-
-      if (sessionError) throw sessionError;
-
-      console.log(`Added ${sessionsToCredit} sessions for user ${userId}`);
+        console.log(`Temporarily awarded ${sessionsToCredit * 100} bonus points instead of session credits`);
+      } catch (err) {
+        console.error('Error awarding bonus points:', err);
+      }
     }
 
     // 4. Send welcome email
