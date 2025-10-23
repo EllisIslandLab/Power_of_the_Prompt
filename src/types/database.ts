@@ -279,6 +279,7 @@ export type Database = {
           phone_number: string | null
           sms_consent: boolean
           sms_consent_timestamp: string | null
+          affiliate_tier_id: string | null
         }
         Insert: {
           id?: string
@@ -295,6 +296,7 @@ export type Database = {
           phone_number?: string | null
           sms_consent?: boolean
           sms_consent_timestamp?: string | null
+          affiliate_tier_id?: string | null
         }
         Update: {
           id?: string
@@ -311,6 +313,7 @@ export type Database = {
           phone_number?: string | null
           sms_consent?: boolean
           sms_consent_timestamp?: string | null
+          affiliate_tier_id?: string | null
         }
         Relationships: [
           {
@@ -319,51 +322,384 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "users_affiliate_tier_id_fkey"
+            columns: ["affiliate_tier_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_tiers"
+            referencedColumns: ["id"]
           }
         ]
       }
-      video_sessions: {
+      student_points: {
         Row: {
           id: string
-          title: string
-          room_name: string
-          host_id: string
-          status: 'scheduled' | 'active' | 'ended'
-          scheduled_for: string | null
-          started_at: string | null
-          ended_at: string | null
+          user_id: string
+          attendance_points: number
+          engagement_points: number
+          referral_signup_points: number
+          referral_cash_points: number
+          bonus_points: number
+          total_points: number
           created_at: string
           updated_at: string
-          max_participants: number | null
-          description: string | null
         }
         Insert: {
           id?: string
-          title: string
-          room_name: string
-          host_id: string
-          status?: 'scheduled' | 'active' | 'ended'
-          scheduled_for?: string | null
-          started_at?: string | null
-          ended_at?: string | null
+          user_id: string
+          attendance_points?: number
+          engagement_points?: number
+          referral_signup_points?: number
+          referral_cash_points?: number
+          bonus_points?: number
           created_at?: string
           updated_at?: string
-          max_participants?: number | null
-          description?: string | null
         }
         Update: {
           id?: string
-          title?: string
-          room_name?: string
-          host_id?: string
-          status?: 'scheduled' | 'active' | 'ended'
-          scheduled_for?: string | null
-          started_at?: string | null
-          ended_at?: string | null
+          user_id?: string
+          attendance_points?: number
+          engagement_points?: number
+          referral_signup_points?: number
+          referral_cash_points?: number
+          bonus_points?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_points_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      badges: {
+        Row: {
+          id: string
+          badge_name: string
+          badge_description: string | null
+          badge_category: string | null
+          points_value: number
+          badge_tier: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          badge_name: string
+          badge_description?: string | null
+          badge_category?: string | null
+          points_value?: number
+          badge_tier?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          badge_name?: string
+          badge_description?: string | null
+          badge_category?: string | null
+          points_value?: number
+          badge_tier?: string | null
+        }
+        Relationships: []
+      }
+      student_badges: {
+        Row: {
+          id: string
+          user_id: string
+          badge_id: string
+          awarded_at: string
+          awarded_by: string | null
+          notes: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          badge_id: string
+          awarded_at?: string
+          awarded_by?: string | null
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          badge_id?: string
+          awarded_at?: string
+          awarded_by?: string | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_badges_awarded_by_fkey"
+            columns: ["awarded_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      course_sessions: {
+        Row: {
+          id: string
+          session_name: string
+          session_date: string
+          session_code: string | null
+          code_expires_at: string | null
+          recording_url: string | null
+          recording_available_until: string | null
+          live_points: number
+          recording_points: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          session_name: string
+          session_date: string
+          session_code?: string | null
+          code_expires_at?: string | null
+          recording_url?: string | null
+          recording_available_until?: string | null
+          live_points?: number
+          recording_points?: number
           created_at?: string
           updated_at?: string
-          max_participants?: number | null
-          description?: string | null
+        }
+        Update: {
+          id?: string
+          session_name?: string
+          session_date?: string
+          session_code?: string | null
+          code_expires_at?: string | null
+          recording_url?: string | null
+          recording_available_until?: string | null
+          live_points?: number
+          recording_points?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      attendance_log: {
+        Row: {
+          id: string
+          user_id: string
+          session_id: string
+          attendance_type: 'live' | 'recording'
+          points_awarded: number
+          checked_in_at: string
+          watch_duration_minutes: number | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          session_id: string
+          attendance_type: 'live' | 'recording'
+          points_awarded: number
+          checked_in_at?: string
+          watch_duration_minutes?: number | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          session_id?: string
+          attendance_type?: 'live' | 'recording'
+          points_awarded?: number
+          checked_in_at?: string
+          watch_duration_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "course_sessions"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      social_shares: {
+        Row: {
+          id: string
+          user_id: string
+          platform: 'twitter' | 'linkedin' | 'instagram' | 'facebook' | 'other'
+          post_url: string
+          screenshot_url: string | null
+          status: 'pending' | 'approved' | 'rejected'
+          points_awarded: number
+          submitted_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          platform: 'twitter' | 'linkedin' | 'instagram' | 'facebook' | 'other'
+          post_url: string
+          screenshot_url?: string | null
+          status?: 'pending' | 'approved' | 'rejected'
+          points_awarded?: number
+          submitted_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          platform?: 'twitter' | 'linkedin' | 'instagram' | 'facebook' | 'other'
+          post_url?: string
+          screenshot_url?: string | null
+          status?: 'pending' | 'approved' | 'rejected'
+          points_awarded?: number
+          submitted_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_shares_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_shares_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      referrals: {
+        Row: {
+          id: string
+          referrer_id: string
+          referee_id: string | null
+          referee_email: string
+          status: 'lead' | 'paid' | 'processed' | 'held'
+          signup_points_awarded: number
+          cash_convertible_points: number
+          points_held_until: string | null
+          purchase_amount: number | null
+          purchase_date: string | null
+          tier_at_referral: string | null
+          cap_bypassed: boolean
+          created_at: string
+          paid_at: string | null
+          processed_at: string | null
+        }
+        Insert: {
+          id?: string
+          referrer_id: string
+          referee_id?: string | null
+          referee_email: string
+          status?: 'lead' | 'paid' | 'processed' | 'held'
+          signup_points_awarded?: number
+          cash_convertible_points?: number
+          points_held_until?: string | null
+          purchase_amount?: number | null
+          purchase_date?: string | null
+          tier_at_referral?: string | null
+          cap_bypassed?: boolean
+          created_at?: string
+          paid_at?: string | null
+          processed_at?: string | null
+        }
+        Update: {
+          id?: string
+          referrer_id?: string
+          referee_id?: string | null
+          referee_email?: string
+          status?: 'lead' | 'paid' | 'processed' | 'held'
+          signup_points_awarded?: number
+          cash_convertible_points?: number
+          points_held_until?: string | null
+          purchase_amount?: number | null
+          purchase_date?: string | null
+          tier_at_referral?: string | null
+          cap_bypassed?: boolean
+          paid_at?: string | null
+          processed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referee_id_fkey"
+            columns: ["referee_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      affiliate_tiers: {
+        Row: {
+          id: string
+          tier_name: string
+          tier_level: number
+          max_cash_per_referral: number
+          percentage_bonus: number
+          purchase_count_limit: number | null
+          spend_cap_for_bonus: number | null
+          total_cap_percentage: number
+          requirements_description: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          tier_name: string
+          tier_level: number
+          max_cash_per_referral: number
+          percentage_bonus: number
+          purchase_count_limit?: number | null
+          spend_cap_for_bonus?: number | null
+          total_cap_percentage: number
+          requirements_description?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          tier_name?: string
+          tier_level?: number
+          max_cash_per_referral?: number
+          percentage_bonus?: number
+          purchase_count_limit?: number | null
+          spend_cap_for_bonus?: number | null
+          total_cap_percentage?: number
+          requirements_description?: string | null
         }
         Relationships: []
       }
@@ -400,6 +736,41 @@ export type Database = {
       increment_campaign_clicks: {
         Args: {
           campaign_id: string
+        }
+        Returns: void
+      }
+      add_attendance_points: {
+        Args: {
+          p_user_id: string
+          p_points: number
+        }
+        Returns: void
+      }
+      add_engagement_points: {
+        Args: {
+          p_user_id: string
+          p_points: number
+        }
+        Returns: void
+      }
+      add_referral_signup_points: {
+        Args: {
+          p_user_id: string
+          p_points: number
+        }
+        Returns: void
+      }
+      add_referral_cash_points: {
+        Args: {
+          p_user_id: string
+          p_points: number
+        }
+        Returns: void
+      }
+      add_bonus_points: {
+        Args: {
+          p_user_id: string
+          p_points: number
         }
         Returns: void
       }
@@ -499,8 +870,15 @@ export type UserProfile = Tables<"users">
 export type Lead = Tables<"leads">
 export type Campaign = Tables<"campaigns">
 export type EmailTemplate = Tables<"email_templates">
-export type VideoSession = Tables<"video_sessions">
 export type InviteToken = Tables<"invite_tokens">
+export type StudentPoints = Tables<"student_points">
+export type Badge = Tables<"badges">
+export type StudentBadge = Tables<"student_badges">
+export type CourseSession = Tables<"course_sessions">
+export type AttendanceLog = Tables<"attendance_log">
+export type SocialShare = Tables<"social_shares">
+export type Referral = Tables<"referrals">
+export type AffiliateTier = Tables<"affiliate_tiers">
 
 // Backwards compatibility
 export type Students = UserProfile // For backwards compatibility
@@ -509,4 +887,3 @@ export type AdminProfile = UserProfile // For backwards compatibility
 // New type aliases
 export type Users = UserProfile
 export type Leads = Lead
-export type VideoSessions = VideoSession
