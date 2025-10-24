@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
+import { createClientSupabase } from '@/lib/supabase'
 
 export default function SigninPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
@@ -90,36 +91,30 @@ export default function SigninPage() {
           return
         }
 
-        const response = await fetch('/api/auth/signin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password
-          })
+        // Use client-side Supabase auth for proper cookie handling
+        const supabase = createClientSupabase()
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: formData.email.toLowerCase(),
+          password: formData.password
         })
 
-        const data = await response.json()
-
-        if (!response.ok) {
-          if (data.needsVerification) {
-            setVerificationMessage(data.message || 'Please verify your email address before signing in.')
+        if (error) {
+          if (error.message.includes('Email not confirmed')) {
+            setVerificationMessage('Please verify your email address before signing in.')
+            setLoading(false)
             return
           }
-          throw new Error(data.error || 'Sign-in failed')
+          throw new Error(error.message || 'Sign-in failed')
         }
 
-        // Check user role and redirect accordingly
-        const roleCheck = await fetch('/api/admin/check-role')
-        const roleData = await roleCheck.json()
-
-        if (roleData.isAdmin) {
-          window.location.href = '/admin'
-        } else {
-          window.location.href = '/portal'
+        if (!data.user || !data.session) {
+          throw new Error('Sign-in failed')
         }
+
+        // Signin successful - redirect to portal
+        // The middleware will check the session and redirect admins if needed
+        window.location.href = '/portal'
       }
     } catch (err) {
       console.error('Auth error:', err)

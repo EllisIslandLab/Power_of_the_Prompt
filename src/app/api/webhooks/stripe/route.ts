@@ -147,24 +147,38 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         console.log(`Upgraded user tier to ${tier}`);
       }
     } else {
-      // Create new user
-      const { data: newUser, error: createUserError } = await supabase
-        .from('users')
-        .insert({
-          email: customerEmail,
+      // Create new auth user - the handle_new_user trigger will create the public.users record
+      console.log('Creating new auth user...');
+
+      // Generate a random password (user will reset via email link)
+      const tempPassword = Math.random().toString(36).slice(-12) + 'A1!';
+
+      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+        email: customerEmail.toLowerCase(),
+        password: tempPassword,
+        email_confirm: true, // Auto-confirm since they paid
+        user_metadata: {
           full_name: lead?.name || customerName || '',
-          email_verified: false,
-          role: 'student',
+        }
+      });
+
+      if (authError) {
+        console.error('Error creating auth user:', authError);
+        throw authError;
+      }
+
+      userId = authUser.user.id;
+      console.log(`Created new auth user: ${userId}`);
+
+      // Update the public.users record created by trigger with payment info
+      await supabase
+        .from('users')
+        .update({
           tier: tier,
-          payment_status: paymentStatus,
+          payment_status: 'paid',
+          updated_at: new Date().toISOString()
         })
-        .select()
-        .single();
-
-      if (createUserError) throw createUserError;
-
-      userId = newUser.id;
-      console.log(`Created new user: ${userId}`);
+        .eq('id', userId);
 
       // Mark lead as converted if exists
       if (lead) {

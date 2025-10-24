@@ -17,6 +17,18 @@ export function getSupabase(useServiceRole: boolean = false) {
   return createClient<Database>(supabaseUrl, supabaseAnonKey)
 }
 
+// Create a browser client for client-side auth with session persistence
+export function createClientSupabase() {
+  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined
+    }
+  })
+}
+
 // Re-export types for backwards compatibility
 export type {
   UserProfile,
