@@ -171,12 +171,8 @@ async function sendCampaignToAll(campaign: any) {
     let sentCount = 0
     let errors: string[] = []
 
-    // Send emails in batches to avoid rate limits
-    const batchSize = 10
-    for (let i = 0; i < recipients.length; i += batchSize) {
-      const batch = recipients.slice(i, i + batchSize)
-
-      await Promise.all(batch.map(async (recipient) => {
+    // Send emails one at a time with delay to avoid rate limits
+    for (const recipient of recipients) {
         try {
           // Get the best available name
           const recipientName = getRecipientName(recipient)
@@ -220,16 +216,22 @@ async function sendCampaignToAll(campaign: any) {
           })
 
           if (response.ok) {
-            // Record successful send
+            // Get Resend email ID from response
+            const resendResponse = await response.json()
+            const resendEmailId = resendResponse.id
+
+            // Record successful send with Resend email ID
             await supabase
               .from('campaign_sends')
               .insert({
                 campaign_id: campaign.id,
                 recipient_email: recipient.email,
                 recipient_name: recipientName,
-                sent_at: new Date().toISOString()
+                sent_at: new Date().toISOString(),
+                resend_email_id: resendEmailId // Store for webhook matching
               })
 
+            console.log(`✅ Sent email to ${recipient.email} with Resend ID: ${resendEmailId}`)
             sentCount++
           } else {
             const error = await response.text()
@@ -242,12 +244,9 @@ async function sendCampaignToAll(campaign: any) {
           console.error(`Failed to send to ${recipient.email}:`, errorMsg)
           errors.push(`${recipient.email}: ${errorMsg}`)
         }
-      }))
 
-      // Small delay between batches
-      if (i + batchSize < recipients.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      }
+        // Small delay between each email to avoid rate limits (300ms)
+        await new Promise(resolve => setTimeout(resolve, 300))
     }
 
     // Update campaign with final status

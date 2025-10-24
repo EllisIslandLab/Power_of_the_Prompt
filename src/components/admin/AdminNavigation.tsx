@@ -24,7 +24,8 @@ import {
   ChevronDown,
   FileText,
   GraduationCap,
-  Video
+  Video,
+  UserX
 } from "lucide-react"
 
 export function AdminNavigation() {
@@ -44,6 +45,12 @@ export function AdminNavigation() {
       label: "Users",
       icon: Users,
       description: "User management and analytics"
+    },
+    {
+      href: "/admin/leads",
+      label: "Leads",
+      icon: UserX,
+      description: "Lead management and unsubscribes"
     },
     {
       href: "/admin/sessions",

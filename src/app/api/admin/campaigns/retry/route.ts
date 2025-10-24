@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     const targetAudience = campaign.target_audience as any
     const courseData = targetAudience?.selectedCourse || {}
 
-    // Send emails to each recipient
+    // Send emails to each recipient with delay to avoid rate limits
     for (const lead of leads || []) {
       try {
         const recipientName = lead.display_name || lead.first_name || 'there'
@@ -137,8 +137,8 @@ export async function POST(request: NextRequest) {
         errors.push(`${lead.email}: ${errorMsg}`)
       }
 
-      // Small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 200))
+      // Small delay to avoid rate limiting (300ms between emails)
+      await new Promise(resolve => setTimeout(resolve, 300))
     }
 
     // Update campaign sent_count

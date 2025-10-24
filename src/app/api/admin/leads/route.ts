@@ -216,3 +216,56 @@ async function addLead(body: any) {
     )
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const leadId = searchParams.get('id')
+    const email = searchParams.get('email')
+
+    if (!leadId && !email) {
+      return NextResponse.json(
+        { error: 'Lead ID or email is required' },
+        { status: 400 }
+      )
+    }
+
+    let query = supabase.from('leads').delete()
+
+    if (leadId) {
+      query = query.eq('id', leadId)
+    } else if (email) {
+      query = query.eq('email', email)
+    }
+
+    const { error, data } = await query.select()
+
+    if (error) {
+      console.error('Error deleting lead:', error)
+      return NextResponse.json(
+        { error: 'Failed to delete lead', details: error.message },
+        { status: 500 }
+      )
+    }
+
+    if (!data || data.length === 0) {
+      return NextResponse.json(
+        { error: 'Lead not found' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Lead deleted successfully',
+      deletedLead: data[0]
+    })
+
+  } catch (error) {
+    console.error('Delete lead error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
