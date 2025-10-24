@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     if (user) {
       // Generate password recovery link using Supabase Auth
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
       const { data, error } = await supabase.auth.admin.generateLink({
         type: 'recovery',
         email: email.toLowerCase(),

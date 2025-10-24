@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
             </div>
 
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/portal"
+              <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/portal"
                  style="background-color: #ffdb57; color: #11296b; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">
                 Visit Your Portal
               </a>

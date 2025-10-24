@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     // Send welcome email via Resend (bypassing Supabase SMTP)
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/emails/welcome`, {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/emails/welcome`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
