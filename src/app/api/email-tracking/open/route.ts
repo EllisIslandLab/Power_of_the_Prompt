@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     // Update campaign_sends table if this is from a campaign
     if (campaignId) {
-      const { data: updated } = await supabase
+      const { data: updated, error: updateError } = await supabase
         .from('campaign_sends')
         .update({
           opened_at: new Date().toISOString()
@@ -43,11 +43,23 @@ export async function GET(request: NextRequest) {
         .is('opened_at', null) // Only update if not already opened
         .select()
 
+      if (updateError) {
+        console.error('Error updating campaign_sends:', updateError)
+      } else {
+        console.log(`Email opened: campaign=${campaignId}, email=${decodedEmail}, firstOpen=${updated && updated.length > 0}`)
+      }
+
       // If this was a first-time open, increment campaign opened_count
       if (updated && updated.length > 0) {
-        await supabase.rpc('increment_campaign_opens', {
+        const { error: rpcError } = await supabase.rpc('increment_campaign_opens', {
           campaign_id: campaignId
         })
+
+        if (rpcError) {
+          console.error('Error incrementing campaign opens:', rpcError)
+        } else {
+          console.log(`Incremented opened_count for campaign ${campaignId}`)
+        }
       }
     }
 

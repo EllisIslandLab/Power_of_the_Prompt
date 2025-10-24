@@ -11,7 +11,7 @@ const newContent = `<div style="font-family: Arial, sans-serif; max-width: 600px
 
   <div style="background-color: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
     <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
-      Hi {{name}}!
+      Hi there!
     </p>
 
     <p style="font-size: 16px; color: #333; line-height: 1.6; margin-bottom: 20px;">
@@ -35,16 +35,16 @@ const newContent = `<div style="font-family: Arial, sans-serif; max-width: 600px
         It would be great if you could at least read all of these on your own and, if possible, be able to give me an answer to the first 4 (although question no. 3 can be tricky so don't worry if you can't figure that one out).
       </p>
       <ol style="color: #333; line-height: 1.8; margin: 0; padding-left: 20px;">
-        <li style="margin-bottom: 10px;">1. What are the reasons you want a website?</li>
-        <li style="margin-bottom: 10px;">2. How would a website benefit your business/life?</li>
-        <li style="margin-bottom: 10px;">3.  What computer setup are you working with? For Windows users: in <strong>"Type here to Search"</strong>, type in <strong>"About your PC"</strong>.  For Mac users: Click the <strong>"Apple menu"</strong> in the top-left corner and select <strong>"About This Mac"</strong> (This helps me ensure you'll have a smooth development experience, so I need you to copy the specifications of your PC and send them to me so I can determine if you need to upgrade your system in order to take the course.  You can wait for our initial meeting if you're having trouble finding this out, and I can walk you through this process).</li>
-        <li style="margin-bottom: 10px;">4. Are you comfortable investing approximately $50/month in required tools during development (more if new computer equipment is needed)?</li>
-        <li style="margin-bottom: 10px;">5. What time(s) would work for 1-on-1 sessions?</li>
-        <li style="margin-bottom: 10px;">6. If you couldn't attend in person, do you think you could be consistent with just recordings?</li>
-        <li style="margin-bottom: 10px;">7. When learning something complex, do you prefer figuring things out independently or having expert guidance?</li>
-        <li style="margin-bottom: 10px;">8. What would a professional, fully-functional website be worth to your business annually?</li>
-        <li style="margin-bottom: 10px;">9. How important is having a website that scores 95+ on performance, SEO, accessibility, and best practices?</li>
-        <li style="margin-bottom: 10px;">10. Have you priced professional web development? What did you find?</li>
+        <li style="margin-bottom: 10px;">What are the reasons you want a website?</li>
+        <li style="margin-bottom: 10px;">How would a website benefit your business/life?</li>
+        <li style="margin-bottom: 10px;">What computer setup are you working with? For Windows users: in <strong>"Type here to Search"</strong>, type in <strong>"About your PC"</strong>.  For Mac users: Click the <strong>"Apple menu"</strong> in the top-left corner and select <strong>"About This Mac"</strong> (This helps me ensure you'll have a smooth development experience, so I need you to copy the specifications of your PC and send them to me so I can determine if you need to upgrade your system in order to take the course.  You can wait for our initial meeting if you're having trouble finding this out, and I can walk you through this process).</li>
+        <li style="margin-bottom: 10px;">Are you comfortable investing approximately $50/month in required tools during development (more if new computer equipment is needed)?</li>
+        <li style="margin-bottom: 10px;">What time(s) would work for 1-on-1 sessions?</li>
+        <li style="margin-bottom: 10px;">If you couldn't attend in person, do you think you could be consistent with just recordings?</li>
+        <li style="margin-bottom: 10px;">When learning something complex, do you prefer figuring things out independently or having expert guidance?</li>
+        <li style="margin-bottom: 10px;">What would a professional, fully-functional website be worth to your business annually?</li>
+        <li style="margin-bottom: 10px;">How important is having a website that scores 95+ on performance, SEO, accessibility, and best practices?</li>
+        <li style="margin-bottom: 10px;">Have you priced professional web development? What did you find?</li>
       </ol>
     </div>
 
