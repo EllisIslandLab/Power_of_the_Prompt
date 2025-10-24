@@ -233,11 +233,14 @@ async function sendCampaignToAll(campaign: any) {
             sentCount++
           } else {
             const error = await response.text()
+            console.error(`Resend API error for ${recipient.email}:`, error)
             errors.push(`${recipient.email}: ${error}`)
           }
 
         } catch (error) {
-          errors.push(`${recipient.email}: ${error}`)
+          const errorMsg = error instanceof Error ? error.message : String(error)
+          console.error(`Failed to send to ${recipient.email}:`, errorMsg)
+          errors.push(`${recipient.email}: ${errorMsg}`)
         }
       }))
 
@@ -258,12 +261,19 @@ async function sendCampaignToAll(campaign: any) {
       })
       .eq('id', campaign.id)
 
+    // Log all errors for debugging
+    if (errors.length > 0) {
+      console.error(`Campaign ${campaign.id} had ${errors.length} errors:`)
+      errors.forEach(err => console.error(`  - ${err}`))
+    }
+
     return {
       success: sentCount > 0,
-      message: `Campaign sent to ${sentCount} recipients`,
+      message: `Campaign sent to ${sentCount} of ${recipients.length} recipients`,
       sentCount,
+      totalRecipients: recipients.length,
       errorCount: errors.length,
-      errors: errors.slice(0, 10) // Limit error details
+      errors: errors // Return all errors, not just first 10
     }
 
   } catch (error) {
