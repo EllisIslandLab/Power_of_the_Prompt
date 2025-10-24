@@ -27,6 +27,7 @@ import {
   Copy,
   Trash2
 } from "lucide-react"
+import { CampaignDetails } from "./CampaignDetails"
 
 interface Campaign {
   id: string
@@ -54,6 +55,7 @@ export function CampaignHistory({ campaigns, onRefresh, onNewCampaign }: Campaig
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [sortBy, setSortBy] = useState("created_at")
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null)
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -120,6 +122,28 @@ export function CampaignHistory({ campaigns, onRefresh, onNewCampaign }: Campaig
       }
     } catch (error) {
       alert('Failed to duplicate campaign')
+    }
+  }
+
+  const handleDeleteCampaign = async (campaignId: string, campaignSubject: string) => {
+    if (!confirm(`Are you sure you want to delete "${campaignSubject}"? This action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/admin/campaigns/delete?id=${campaignId}`, {
+        method: 'DELETE'
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        alert('Campaign deleted successfully')
+        onRefresh()
+      } else {
+        alert('Failed to delete campaign: ' + data.error)
+      }
+    } catch (error) {
+      alert('Failed to delete campaign')
     }
   }
 
@@ -296,7 +320,7 @@ export function CampaignHistory({ campaigns, onRefresh, onNewCampaign }: Campaig
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setSelectedCampaignId(campaign.id)}>
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
@@ -304,12 +328,13 @@ export function CampaignHistory({ campaigns, onRefresh, onNewCampaign }: Campaig
                           <Copy className="h-4 w-4 mr-2" />
                           Duplicate
                         </DropdownMenuItem>
-                        {campaign.status === 'draft' && (
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        )}
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => handleDeleteCampaign(campaign.id, campaign.subject)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -318,6 +343,15 @@ export function CampaignHistory({ campaigns, onRefresh, onNewCampaign }: Campaig
             </Card>
           ))}
         </div>
+      )}
+
+      {/* Campaign Details Dialog */}
+      {selectedCampaignId && (
+        <CampaignDetails
+          campaignId={selectedCampaignId}
+          onClose={() => setSelectedCampaignId(null)}
+          onRefresh={onRefresh}
+        />
       )}
     </div>
   )
