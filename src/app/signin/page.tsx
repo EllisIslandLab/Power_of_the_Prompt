@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,6 +9,7 @@ import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 
 export default function SigninPage() {
+  const router = useRouter()
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [formData, setFormData] = useState({
     email: '',
@@ -80,7 +82,7 @@ export default function SigninPage() {
           setFormData({ email: formData.email, password: '', confirmPassword: '', fullName: '' })
         } else {
           // Auto sign in if email is already verified
-          window.location.href = '/portal'
+          router.push('/portal')
         }
       } else {
         // Sign-in validation
@@ -111,6 +113,9 @@ export default function SigninPage() {
           throw new Error(data.error || 'Sign-in failed')
         }
 
+        // Wait a moment for cookies to be properly set
+        await new Promise(resolve => setTimeout(resolve, 500))
+
         // Check user role and redirect accordingly
         const roleCheck = await fetch('/api/admin/check-role', {
           credentials: 'include'
@@ -118,9 +123,9 @@ export default function SigninPage() {
         const roleData = await roleCheck.json()
 
         if (roleData.isAdmin) {
-          window.location.href = '/admin'
+          router.push('/admin')
         } else {
-          window.location.href = '/portal'
+          router.push('/portal')
         }
       }
     } catch (err) {
