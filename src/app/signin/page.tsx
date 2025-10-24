@@ -112,9 +112,18 @@ export default function SigninPage() {
           throw new Error('Sign-in failed')
         }
 
-        // Signin successful - redirect to portal
-        // The middleware will check the session and redirect admins if needed
-        window.location.href = '/portal'
+        // Check if user is admin and redirect accordingly
+        const { data: userRecord } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
+
+        if (userRecord?.role === 'admin') {
+          window.location.href = '/admin'
+        } else {
+          window.location.href = '/portal'
+        }
       }
     } catch (err) {
       console.error('Auth error:', err)
