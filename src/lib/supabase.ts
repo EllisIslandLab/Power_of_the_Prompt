@@ -19,12 +19,15 @@ export function getSupabase(useServiceRole: boolean = false) {
 
 // Create a browser client for client-side auth with session persistence
 export function createClientSupabase() {
+  // Use localStorage for session storage (Supabase handles cookie sync automatically)
   return createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined
+      storageKey: 'sb-auth-token',
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      flowType: 'pkce' // Use PKCE flow for better security and cookie handling
     }
   })
 }

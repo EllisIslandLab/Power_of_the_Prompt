@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
-import { createClientSupabase } from '@/lib/supabase'
 
 export default function SigninPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
@@ -91,35 +90,34 @@ export default function SigninPage() {
           return
         }
 
-        // Use client-side Supabase auth for proper cookie handling
-        const supabase = createClientSupabase()
-
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: formData.email.toLowerCase(),
-          password: formData.password
+        const response = await fetch('/api/auth/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          })
         })
 
-        if (error) {
-          if (error.message.includes('Email not confirmed')) {
-            setVerificationMessage('Please verify your email address before signing in.')
-            setLoading(false)
+        const data = await response.json()
+
+        if (!response.ok) {
+          if (data.needsVerification) {
+            setVerificationMessage(data.message || 'Please verify your email address before signing in.')
             return
           }
-          throw new Error(error.message || 'Sign-in failed')
+          throw new Error(data.error || 'Sign-in failed')
         }
 
-        if (!data.user || !data.session) {
-          throw new Error('Sign-in failed')
-        }
+        // Check user role and redirect accordingly
+        const roleCheck = await fetch('/api/admin/check-role', {
+          credentials: 'include'
+        })
+        const roleData = await roleCheck.json()
 
-        // Check if user is admin and redirect accordingly
-        const { data: userRecord } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', data.user.id)
-          .single()
-
-        if (userRecord?.role === 'admin') {
+        if (roleData.isAdmin) {
           window.location.href = '/admin'
         } else {
           window.location.href = '/portal'
