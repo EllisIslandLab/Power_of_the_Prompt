@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function POST(request: NextRequest) {
-  let response = NextResponse.json({ success: false })
+  let response: NextResponse
 
   try {
     const { email, password } = await request.json()
