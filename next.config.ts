@@ -78,6 +78,22 @@ const nextConfig: NextConfig = {
 
     return config;
   },
+  // Redirect www to non-www to fix cookie issues
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.weblaunchacademy.com',
+          },
+        ],
+        destination: 'https://weblaunchacademy.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
   // Headers for caching and performance
   async headers() {
     return [
