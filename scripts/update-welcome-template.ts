@@ -40,7 +40,7 @@ const newContent = `<div style="font-family: Arial, sans-serif; max-width: 600px
         <li style="margin-bottom: 10px;">1. What are the reasons you want a website?</li>
         <li style="margin-bottom: 10px;">2. How would a website benefit your business/life?</li>
         <li style="margin-bottom: 10px;">3.  What computer setup are you working with? For Windows users: in <strong>"Type here to Search"</strong>, type in <strong>"About your PC"</strong>.  For Mac users: Click the <strong>"Apple menu"</strong> in the top-left corner and select <strong>"About This Mac"</strong> (This helps me ensure you'll have a smooth development experience, so I need you to copy the specifications of your PC and send them to me so I can determine if you need to upgrade your system in order to take the course.  You can wait for our initial meeting if you're having trouble finding this out, and I can walk you through this process).</li>
-        <li style="margin-bottom: 10px;">4. Are you comfortable investing approximately $50/month in required tools during development (more if new computer equipment is needed)?</li>
+        <li style="margin-bottom: 10px;">Are you comfortable investing about $50 in required tools during development ($20 + tax for 2 months of Claude Code subscription, and possibly more if new computer equipment is needed)?</li>
         <li style="margin-bottom: 10px;">5. What time(s) would work for 1-on-1 sessions?</li>
         <li style="margin-bottom: 10px;">6. If you couldn't attend in person, do you think you could be consistent with just recordings?</li>
         <li style="margin-bottom: 10px;">7. When learning something complex, do you prefer figuring things out independently or having expert guidance?</li>

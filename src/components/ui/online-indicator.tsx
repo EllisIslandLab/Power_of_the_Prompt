@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import { cn } from '@/lib/utils'
 
-const supabase = createClient(
+// Use browser client for proper cookie handling in client components
+const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )

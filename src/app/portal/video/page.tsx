@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import { JitsiMeet } from '@/components/video/JitsiMeet'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label'
 import { Users, Video, Clock } from 'lucide-react'
 import { usePresence } from '@/components/ui/online-indicator'
 
-const supabase = createClient(
+// Use browser client for proper cookie handling in client components
+const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )

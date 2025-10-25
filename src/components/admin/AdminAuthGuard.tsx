@@ -61,20 +61,29 @@ export default function AdminAuthGuard({ children }: { children: React.ReactNode
         throw new Error(data.error || 'Signin failed')
       }
 
+      // Wait for cookies to propagate and session to be established
+      await new Promise(resolve => setTimeout(resolve, 500))
+
       // Check if user is admin
       const roleCheck = await fetch('/api/admin/check-role', {
-        credentials: 'include'
+        credentials: 'include',
+        cache: 'no-store' // Force fresh check
       })
       const roleData = await roleCheck.json()
 
       if (roleData.isAdmin) {
         setIsAdmin(true)
         setShowModal(false)
+        // Clear credentials for security
+        setCredentials({ email: '', password: '' })
+      } else if (roleData.needsProfile) {
+        setError('Your account is not properly set up. Please contact support.')
       } else {
         setError('You do not have admin access. Admin credentials required.')
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Admin signin failed')
+      console.error('Admin signin error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to sign in. Please try again.')
     } finally {
       setSigningIn(false)
     }

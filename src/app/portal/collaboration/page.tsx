@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import { JitsiMeet } from '@/components/video/JitsiMeet'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,7 +14,8 @@ import { Users, Video, Clock, Calendar } from 'lucide-react'
 import VideoSessionManager from "@/components/video/VideoSessionManager"
 import { usePresence } from "@/components/ui/online-indicator"
 
-const supabase = createClient(
+// Use browser client for proper cookie handling in client components
+const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )

@@ -99,8 +99,21 @@ function SignupContent() {
       return
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long')
+    // Standardized password validation
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long')
+      setSubmitLoading(false)
+      return
+    }
+
+    if (!/[A-Z]/.test(formData.password)) {
+      setError('Password must contain at least one uppercase letter')
+      setSubmitLoading(false)
+      return
+    }
+
+    if (!/[0-9]/.test(formData.password)) {
+      setError('Password must contain at least one number')
       setSubmitLoading(false)
       return
     }
@@ -291,6 +304,9 @@ function SignupContent() {
                 className="h-11"
                 placeholder="Create a secure password"
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Min 8 characters, 1 uppercase, 1 number
+              </p>
             </div>
 
             <div className="space-y-2">

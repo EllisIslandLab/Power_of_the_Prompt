@@ -46,12 +46,22 @@ export default function AdminTemplatesPage() {
   const [templates, setTemplates] = useState<EmailTemplate[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showPreviewModal, setShowPreviewModal] = useState(false)
+  const [showOpenModal, setShowOpenModal] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
 
   const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    category: "general",
+    subjectTemplate: "",
+    contentTemplate: "",
+    variables: [] as string[]
+  })
+
+  const [editFormData, setEditFormData] = useState({
     name: "",
     description: "",
     category: "general",
@@ -144,6 +154,53 @@ export default function AdminTemplatesPage() {
     setShowCreateModal(true)
   }
 
+  const handleOpenTemplate = (template: EmailTemplate) => {
+    setSelectedTemplate(template)
+    setEditFormData({
+      name: template.name,
+      description: template.description,
+      category: template.category,
+      subjectTemplate: template.subject_template,
+      contentTemplate: template.content_template,
+      variables: template.variables
+    })
+    setIsEditMode(false)
+    setShowOpenModal(true)
+  }
+
+  const handleUpdateTemplate = async () => {
+    if (!selectedTemplate) return
+
+    try {
+      const response = await fetch('/api/admin/templates', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: selectedTemplate.id,
+          name: editFormData.name,
+          description: editFormData.description,
+          category: editFormData.category,
+          subjectTemplate: editFormData.subjectTemplate,
+          contentTemplate: editFormData.contentTemplate,
+          variables: editFormData.variables
+        })
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        setShowOpenModal(false)
+        setIsEditMode(false)
+        fetchTemplates()
+      } else {
+        alert('Failed to update template: ' + data.error)
+      }
+    } catch (error) {
+      alert('Failed to update template')
+    }
+  }
+
   const resetForm = () => {
     setFormData({
       name: "",
@@ -166,6 +223,19 @@ export default function AdminTemplatesPage() {
 
   const handleContentChange = (field: 'subjectTemplate' | 'contentTemplate', value: string) => {
     setFormData(prev => ({
+      ...prev,
+      [field]: value,
+      variables: [
+        ...new Set([
+          ...extractVariables(field === 'subjectTemplate' ? value : prev.subjectTemplate),
+          ...extractVariables(field === 'contentTemplate' ? value : prev.contentTemplate)
+        ])
+      ]
+    }))
+  }
+
+  const handleEditContentChange = (field: 'subjectTemplate' | 'contentTemplate', value: string) => {
+    setEditFormData(prev => ({
       ...prev,
       [field]: value,
       variables: [
@@ -291,14 +361,9 @@ export default function AdminTemplatesPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedTemplate(template)
-                          setShowPreviewModal(true)
-                        }}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        Preview
+                      <DropdownMenuItem onClick={() => handleOpenTemplate(template)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Open
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleDuplicateTemplate(template)}>
                         <Copy className="h-4 w-4 mr-2" />
@@ -447,43 +512,158 @@ export default function AdminTemplatesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Preview Modal */}
-      <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
-        <DialogContent className="max-w-2xl">
+      {/* Open/Edit Modal */}
+      <Dialog open={showOpenModal} onOpenChange={(open) => {
+        setShowOpenModal(open)
+        if (!open) setIsEditMode(false)
+      }}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Template Preview</DialogTitle>
-            <DialogDescription>
-              {selectedTemplate?.name} - {selectedTemplate?.category}
-            </DialogDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="flex items-center gap-2">
+                  {isEditMode ? <Edit className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {isEditMode ? 'Edit Template' : 'View Template'}
+                </DialogTitle>
+                <DialogDescription>
+                  {selectedTemplate?.name} - {selectedTemplate?.category}
+                </DialogDescription>
+              </div>
+              {!isEditMode && (
+                <Button variant="outline" onClick={() => setIsEditMode(true)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+              )}
+            </div>
           </DialogHeader>
+
           {selectedTemplate && (
-            <div className="space-y-4">
-              <div>
-                <Label className="font-semibold">Subject:</Label>
-                <div className="text-sm border rounded p-2 bg-muted mt-1">
-                  {selectedTemplate.subject_template}
-                </div>
-              </div>
-              <div>
-                <Label className="font-semibold">Content:</Label>
-                <div
-                  className="text-sm border rounded p-4 bg-white max-h-96 overflow-y-auto mt-1"
-                  dangerouslySetInnerHTML={{
-                    __html: selectedTemplate.content_template.replace(/\n/g, '<br>')
-                  }}
-                />
-              </div>
-              {selectedTemplate.variables.length > 0 && (
-                <div>
-                  <Label className="font-semibold">Variables:</Label>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {selectedTemplate.variables.map((variable) => (
-                      <Badge key={variable} variant="secondary" className="text-xs">
-                        {`{{${variable}}}`}
-                      </Badge>
-                    ))}
+            <div className="space-y-6">
+              {isEditMode ? (
+                // Edit Mode
+                <>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-name">Template Name</Label>
+                      <Input
+                        id="edit-name"
+                        value={editFormData.name}
+                        onChange={(e) => setEditFormData(prev => ({ ...prev, name: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-category">Category</Label>
+                      <Select
+                        value={editFormData.category}
+                        onValueChange={(value) => setEditFormData(prev => ({ ...prev, category: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="general">General</SelectItem>
+                          <SelectItem value="welcome">Welcome</SelectItem>
+                          <SelectItem value="announcements">Announcements</SelectItem>
+                          <SelectItem value="testimonials">Testimonials</SelectItem>
+                          <SelectItem value="marketing">Marketing</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-description">Description</Label>
+                    <Input
+                      id="edit-description"
+                      value={editFormData.description}
+                      onChange={(e) => setEditFormData(prev => ({ ...prev, description: e.target.value }))}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-subject">Subject Template</Label>
+                    <Input
+                      id="edit-subject"
+                      value={editFormData.subjectTemplate}
+                      onChange={(e) => handleEditContentChange('subjectTemplate', e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-content">Content Template</Label>
+                    <Textarea
+                      id="edit-content"
+                      value={editFormData.contentTemplate}
+                      onChange={(e) => handleEditContentChange('contentTemplate', e.target.value)}
+                      rows={15}
+                      className="font-mono text-sm"
+                    />
+                  </div>
+
+                  {editFormData.variables.length > 0 && (
+                    <div>
+                      <Label>Variables Found:</Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {editFormData.variables.map((variable) => (
+                          <Badge key={variable} variant="outline">
+                            {`{{${variable}}}`}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end gap-2 pt-4 border-t">
+                    <Button variant="outline" onClick={() => {
+                      setIsEditMode(false)
+                      setEditFormData({
+                        name: selectedTemplate.name,
+                        description: selectedTemplate.description,
+                        category: selectedTemplate.category,
+                        subjectTemplate: selectedTemplate.subject_template,
+                        contentTemplate: selectedTemplate.content_template,
+                        variables: selectedTemplate.variables
+                      })
+                    }}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleUpdateTemplate} disabled={!editFormData.name || !editFormData.subjectTemplate}>
+                      Save Changes
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                // View Mode
+                <>
+                  <div>
+                    <Label className="font-semibold">Subject:</Label>
+                    <div className="text-sm border rounded p-2 bg-muted mt-1">
+                      {selectedTemplate.subject_template}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="font-semibold">Content:</Label>
+                    <div
+                      className="text-sm border rounded p-4 bg-white max-h-96 overflow-y-auto mt-1"
+                      dangerouslySetInnerHTML={{
+                        __html: selectedTemplate.content_template.replace(/\n/g, '<br>')
+                      }}
+                    />
+                  </div>
+                  {selectedTemplate.variables.length > 0 && (
+                    <div>
+                      <Label className="font-semibold">Variables:</Label>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {selectedTemplate.variables.map((variable) => (
+                          <Badge key={variable} variant="secondary" className="text-xs">
+                            {`{{${variable}}}`}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}

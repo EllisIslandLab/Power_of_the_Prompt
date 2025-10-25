@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Zap, BookOpen, MessageSquare, Settings, Users, Plus, Video, HelpCircle, Handshake } from "lucide-react"
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import { OnlineIndicator, usePresence } from "@/components/ui/online-indicator"
 import { SessionCounter } from "@/components/ui/session-counter"
 
-const supabase = createClient(
+// Use browser client for proper cookie handling
+const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )

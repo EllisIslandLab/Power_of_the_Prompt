@@ -40,21 +40,34 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Check if user is admin in users table
+    // Check if user exists in public.users table and get their role
     const { data: userRecord, error: dbError } = await supabaseAdmin
       .from('users')
-      .select('role')
+      .select('role, email, full_name')
       .eq('id', user.id)
       .single()
 
     if (dbError || !userRecord) {
-      return NextResponse.json({ isAdmin: false, error: 'User not found in database' })
+      // User exists in auth but not in public.users - trigger may have failed
+      // This is a critical error that needs admin intervention
+      console.error('User exists in auth but not in public.users:', {
+        userId: user.id,
+        email: user.email,
+        error: dbError
+      })
+
+      return NextResponse.json({
+        isAdmin: false,
+        error: 'User profile not found. Please contact support.',
+        needsProfile: true
+      })
     }
 
     return NextResponse.json({
       isAdmin: userRecord.role === 'admin',
       role: userRecord.role,
-      userId: user.id
+      userId: user.id,
+      email: userRecord.email
     })
 
   } catch (error) {

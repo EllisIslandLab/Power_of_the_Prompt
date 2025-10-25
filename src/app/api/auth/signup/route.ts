@@ -18,9 +18,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (password.length < 6) {
+    // Standardized password validation (same as signup-open)
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters long' },
+        { error: 'Password must be at least 8 characters long' },
+        { status: 400 }
+      )
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      return NextResponse.json(
+        { error: 'Password must contain at least one uppercase letter' },
+        { status: 400 }
+      )
+    }
+
+    if (!/[0-9]/.test(password)) {
+      return NextResponse.json(
+        { error: 'Password must contain at least one number' },
         { status: 400 }
       )
     }
@@ -63,8 +78,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // console.log('🔧 Starting Supabase auth signup for:', email) // Commented out for auth transition
-
     // Use Supabase's built-in auth system
     const { data, error } = await supabase.auth.signUp({
       email: email.toLowerCase(),
@@ -76,21 +89,16 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // console.log('🔧 Supabase signup result:', { data, error }) // Commented out for auth transition
-
     if (error) {
-      // console.error('❌ Supabase signup error:', error) // Commented out for auth transition
-      
       // Handle specific error cases
       if (error.message.includes('already registered')) {
         // For existing users, update their profile and resend verification email
         try {
           // First, get the existing user to update their auth metadata
           const { data: { users }, error: listError } = await supabase.auth.admin.listUsers()
-          
+
           if (listError) {
-            // console.error('Failed to list users:', listError) // Commented out for auth transition
-            // Continue with profile update even if we can't check auth users
+            console.error('Failed to list users:', listError)
           }
           
           const existingUser = users?.find(u => u.email?.toLowerCase() === email.toLowerCase())
@@ -120,7 +128,7 @@ export async function POST(request: NextRequest) {
             .eq('email', email.toLowerCase())
 
           if (updateError) {
-            // console.error('Failed to update user profile:', updateError) // Commented out for auth transition
+            console.error('Failed to update user profile:', updateError)
           }
           
           // Resend verification email via Supabase
@@ -142,7 +150,7 @@ export async function POST(request: NextRequest) {
             isResend: true
           })
         } catch (profileErr) {
-          // console.error('Profile update error:', profileErr) // Commented out for auth transition
+          console.error('Profile update error:', profileErr)
         }
         
         return NextResponse.json(
@@ -164,38 +172,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // console.log('✅ Supabase user created:', data.user.id) // Commented out for auth transition
-    // console.log('📧 Email confirmed:', data.user.email_confirmed_at) // Commented out for auth transition
-
-    // Create user profile in our custom table
+    // Update the user profile with invite-specific data (tier, invited_by)
+    // The handle_new_user trigger creates the base profile, we enhance it here
     try {
-      const { data: userProfile, error: profileError } = await supabase
+      const { error: updateError } = await supabase
         .from('users')
-        .insert([
-          {
-            id: data.user.id, // Use the same ID as the auth user
-            full_name: fullName,
-            email: email.toLowerCase(),
-            email_verified: !!data.user.email_confirmed_at,
-            tier: invite.tier, // Set tier from invite
-            payment_status: invite.tier === 'full' ? 'paid' : 'trial',
-            invited_by: invite.created_by,
-            invited_at: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ])
-        .select()
-        .single()
+        .update({
+          tier: invite.tier,
+          payment_status: invite.tier === 'full' ? 'paid' : 'trial',
+          invited_by: invite.created_by,
+          invited_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', data.user.id)
 
-      if (profileError) {
-        // console.error('Failed to create user profile:', profileError) // Commented out for auth transition
-        // Don't fail the signup if profile creation fails - they can still verify email
-      } else {
-        // console.log('✅ User profile created:', userProfile.id) // Commented out for auth transition
+      if (updateError) {
+        console.error('Failed to update user profile with invite data:', updateError)
       }
     } catch (profileErr) {
-      // console.error('Profile creation error:', profileErr) // Commented out for auth transition
+      console.error('Profile update error:', profileErr)
     }
 
     // Mark invite token as used
@@ -208,12 +203,11 @@ export async function POST(request: NextRequest) {
         })
         .eq('token', inviteToken)
     } catch (tokenErr) {
-      // console.error('Failed to mark invite token as used:', tokenErr) // Commented out for auth transition
+      console.error('Failed to mark invite token as used:', tokenErr)
     }
 
     // Check if email verification is needed
     if (!data.user.email_confirmed_at) {
-      // console.log('📧 Email verification required - Supabase will send verification email') // Commented out for auth transition
       return NextResponse.json({
         success: true,
         message: 'Account created successfully. Please check your email for verification.',
@@ -221,7 +215,6 @@ export async function POST(request: NextRequest) {
         needsEmailVerification: true,
       })
     } else {
-      // console.log('✅ Email already verified') // Commented out for auth transition
       return NextResponse.json({
         success: true,
         message: 'Account created and verified successfully.',
@@ -231,7 +224,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    // console.error('Signup error:', error) // Commented out for auth transition
+    console.error('Signup error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
