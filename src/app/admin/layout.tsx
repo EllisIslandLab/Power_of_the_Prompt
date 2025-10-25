@@ -4,6 +4,7 @@ import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
 import { AnimatedBackground } from "@/components/effects/AnimatedBackground";
 import { AdminNavigation } from "@/components/admin/AdminNavigation";
+import AdminAuthGuard from "@/components/admin/AdminAuthGuard";
 
 export default function AdminLayout({
   children,
@@ -15,10 +16,12 @@ export default function AdminLayout({
       <AnimatedBackground />
 
       <Providers>
-        <AdminNavigation />
-        <main className="min-h-screen bg-background">
-          {children}
-        </main>
+        <AdminAuthGuard>
+          <AdminNavigation />
+          <main className="min-h-screen bg-background">
+            {children}
+          </main>
+        </AdminAuthGuard>
         <Analytics />
       </Providers>
 

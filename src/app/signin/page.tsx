@@ -113,20 +113,9 @@ export default function SigninPage() {
           throw new Error(data.error || 'Sign-in failed')
         }
 
-        // Wait a moment for cookies to be properly set
-        await new Promise(resolve => setTimeout(resolve, 500))
-
-        // Check user role and redirect accordingly
-        const roleCheck = await fetch('/api/admin/check-role', {
-          credentials: 'include'
-        })
-        const roleData = await roleCheck.json()
-
-        if (roleData.isAdmin) {
-          router.push('/admin')
-        } else {
-          router.push('/portal')
-        }
+        // Simple: All users go to portal after signin
+        // Admins can manually go to /admin
+        router.push('/portal')
       }
     } catch (err) {
       console.error('Auth error:', err)
