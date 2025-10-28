@@ -16,6 +16,7 @@ import {
   Plus,
   Send,
   Eye,
+  Edit,
   MoreHorizontal,
   Search,
   Filter,
@@ -49,9 +50,10 @@ interface CampaignHistoryProps {
   campaigns: Campaign[]
   onRefresh: () => void
   onNewCampaign: () => void
+  onEditCampaign: (campaign: Campaign) => void
 }
 
-export function CampaignHistory({ campaigns, onRefresh, onNewCampaign }: CampaignHistoryProps) {
+export function CampaignHistory({ campaigns, onRefresh, onNewCampaign, onEditCampaign }: CampaignHistoryProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [sortBy, setSortBy] = useState("created_at")
@@ -304,13 +306,23 @@ export function CampaignHistory({ campaigns, onRefresh, onNewCampaign }: Campaig
                   {/* Actions */}
                   <div className="flex items-center gap-2">
                     {campaign.status === 'draft' && (
-                      <Button
-                        onClick={() => handleSendCampaign(campaign.id)}
-                        size="sm"
-                      >
-                        <Send className="h-4 w-4 mr-1" />
-                        Send
-                      </Button>
+                      <>
+                        <Button
+                          onClick={() => onEditCampaign(campaign)}
+                          size="sm"
+                          variant="outline"
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          onClick={() => handleSendCampaign(campaign.id)}
+                          size="sm"
+                        >
+                          <Send className="h-4 w-4 mr-1" />
+                          Send
+                        </Button>
+                      </>
                     )}
 
                     <DropdownMenu>

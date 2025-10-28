@@ -99,6 +99,80 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { id, subject, content, targetAudience, scheduledAt } = body
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Campaign ID is required' },
+        { status: 400 }
+      )
+    }
+
+    // Check if campaign is in draft status
+    const { data: existingCampaign, error: fetchError } = await supabase
+      .from('campaigns')
+      .select('status')
+      .eq('id', id)
+      .single()
+
+    if (fetchError || !existingCampaign) {
+      return NextResponse.json(
+        { error: 'Campaign not found' },
+        { status: 404 }
+      )
+    }
+
+    if (existingCampaign.status !== 'draft') {
+      return NextResponse.json(
+        { error: 'Only draft campaigns can be edited' },
+        { status: 400 }
+      )
+    }
+
+    // Get updated recipient count
+    const recipientCount = targetAudience ? await getRecipientCount(targetAudience) : undefined
+
+    const updateData: any = {}
+    if (subject !== undefined) updateData.subject = subject
+    if (content !== undefined) updateData.content = content
+    if (targetAudience !== undefined) {
+      updateData.target_audience = targetAudience
+      updateData.recipient_count = recipientCount
+    }
+    if (scheduledAt !== undefined) updateData.scheduled_at = scheduledAt
+
+    const { data: campaign, error } = await supabase
+      .from('campaigns')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating campaign:', error)
+      return NextResponse.json(
+        { error: 'Failed to update campaign' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      campaign
+    })
+
+  } catch (error) {
+    console.error('Update campaign error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 async function getRecipientCount(targetAudience: any): Promise<number> {
   try {
     // Handle manual recipients

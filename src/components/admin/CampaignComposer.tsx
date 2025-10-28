@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { cleanupModalArtifacts } from "@/lib/modal-cleanup"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,9 +25,19 @@ import {
   Target
 } from "lucide-react"
 
+interface Campaign {
+  id: string
+  subject: string
+  content: string
+  status: 'draft' | 'sending' | 'sent' | 'failed'
+  target_audience: any
+  scheduled_at?: string
+}
+
 interface CampaignComposerProps {
   onClose: () => void
   onSuccess: () => void
+  editCampaign?: Campaign | null
 }
 
 interface EmailTemplate {
@@ -39,8 +50,10 @@ interface EmailTemplate {
   variables: string[]
 }
 
-export function CampaignComposer({ onClose, onSuccess }: CampaignComposerProps) {
-  const [currentStep, setCurrentStep] = useState(1)
+export function CampaignComposer({ onClose, onSuccess, editCampaign }: CampaignComposerProps) {
+  const isEditMode = !!editCampaign
+  // When editing, start at step 3 (Content) so you can directly edit text
+  const [currentStep, setCurrentStep] = useState(isEditMode ? 3 : 1)
   const [loading, setLoading] = useState(false)
   const [templates, setTemplates] = useState<EmailTemplate[]>([])
   const [recipientCount, setRecipientCount] = useState(0)
@@ -52,9 +65,9 @@ export function CampaignComposer({ onClose, onSuccess }: CampaignComposerProps) 
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null)
 
   const [campaignData, setCampaignData] = useState({
-    subject: "",
-    content: "",
-    targetAudience: {
+    subject: editCampaign?.subject || "",
+    content: editCampaign?.content || "",
+    targetAudience: editCampaign?.target_audience || {
       source: "all",
       tags: [],
       dateRange: null,
@@ -68,6 +81,11 @@ export function CampaignComposer({ onClose, onSuccess }: CampaignComposerProps) 
   useEffect(() => {
     fetchTemplates()
     fetchStripeProducts()
+
+    // Cleanup function to remove modal artifacts when component unmounts
+    return () => {
+      cleanupModalArtifacts()
+    }
   }, [])
 
   useEffect(() => {
@@ -166,27 +184,38 @@ export function CampaignComposer({ onClose, onSuccess }: CampaignComposerProps) 
         selectedCourse: selectedProduct || null
       }
 
-      const response = await fetch('/api/admin/campaigns', {
-        method: 'POST',
+      const url = '/api/admin/campaigns'
+      const method = isEditMode ? 'PUT' : 'POST'
+      const body = isEditMode
+        ? {
+            id: editCampaign!.id,
+            subject: campaignData.subject,
+            content: campaignData.content,
+            targetAudience: targetAudience
+          }
+        : {
+            subject: campaignData.subject,
+            content: campaignData.content,
+            targetAudience: targetAudience,
+            createdBy: 'admin'
+          }
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          subject: campaignData.subject,
-          content: campaignData.content,
-          targetAudience: targetAudience,
-          createdBy: 'admin'
-        })
+        body: JSON.stringify(body)
       })
 
       const data = await response.json()
       if (data.success) {
         onSuccess()
       } else {
-        alert('Failed to save campaign: ' + data.error)
+        alert(`Failed to ${isEditMode ? 'update' : 'save'} campaign: ` + data.error)
       }
     } catch (error) {
-      alert('Failed to save campaign')
+      alert(`Failed to ${isEditMode ? 'update' : 'save'} campaign`)
     } finally {
       setLoading(false)
     }
@@ -264,13 +293,17 @@ export function CampaignComposer({ onClose, onSuccess }: CampaignComposerProps) 
   }
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={true} onOpenChange={(open) => {
+      if (!open) {
+        onClose()
+      }
+    }}>
       <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Mail className="h-5 w-5" />
-              Create New Campaign
+              {isEditMode ? 'Edit Campaign' : 'Create New Campaign'}
             </div>
             {/* Compact Progress Steps */}
             <div className="flex items-center gap-2">
@@ -618,7 +651,10 @@ export function CampaignComposer({ onClose, onSuccess }: CampaignComposerProps) 
                   </Button>
                   <Button onClick={handleSaveDraft} disabled={loading}>
                     <Send className="h-4 w-4 mr-2" />
-                    {loading ? 'Creating...' : 'Create Campaign'}
+                    {loading
+                      ? (isEditMode ? 'Updating...' : 'Creating...')
+                      : (isEditMode ? 'Update Campaign' : 'Create Campaign')
+                    }
                   </Button>
                 </div>
               </div>

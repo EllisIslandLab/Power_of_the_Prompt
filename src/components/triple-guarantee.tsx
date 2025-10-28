@@ -1,6 +1,7 @@
 "use client"
 
-import { Shield, Clock, DollarSign } from "lucide-react"
+import { Shield, Clock, DollarSign, Gauge } from "lucide-react"
+import Link from "next/link"
 
 export function TripleGuarantee() {
   return (
@@ -13,41 +14,41 @@ export function TripleGuarantee() {
           We stand behind our training with these concrete commitments
         </p>
       </div>
-      
+
       <div className="grid md:grid-cols-3 gap-6">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
             <Clock className="h-8 w-8 text-green-600" />
           </div>
           <h4 className="font-semibold text-foreground">
-            Fully-Functional Site in 8 Weeks
+            Fully-Functional Site
           </h4>
           <p className="text-sm text-muted-foreground">
-            You will own a complete, hosted website that is live on the internet with working contact forms, responsive design, and professional functionality after 8 weeks of starting our A+ Guarantee Program.
+            You will have a hosted website that is live and interactive on the internet with at least one contact form for client data capture and responsive design within 2 weeks after completing the 8-week course program.
           </p>
         </div>
-        
+
         <div className="text-center space-y-4">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-            <Shield className="h-8 w-8 text-blue-600" />
+            <Gauge className="h-8 w-8 text-blue-600" />
           </div>
           <h4 className="font-semibold text-foreground">
-            Free Audits & Support for 1/2 Year
+            90+ Lighthouse Scores
           </h4>
           <p className="text-sm text-muted-foreground">
-            We will provide free website audits and technical support for four months after your site goes live to help you achieve optimal performance and functionality.
+            Your website will achieve a minimum score of 90 or higher on Google Lighthouse metrics for Performance, Accessibility, Best Practices, and SEO, ensuring your site meets industry-leading standards.
           </p>
         </div>
-        
+
         <div className="text-center space-y-4">
           <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
-            <DollarSign className="h-8 w-8 text-purple-600" />
+            <Shield className="h-8 w-8 text-purple-600" />
           </div>
           <h4 className="font-semibold text-foreground">
-            We'll Buy Your Site After 1 Year
+            1 Full Year of Basic Support
           </h4>
           <p className="text-sm text-muted-foreground">
-            If your site doesn't achieve the guaranteed outcomes after six months of the program, we will purchase it from you for the price you paid to build it using our methods.
+            Web Launch Academy provides 1 full year of basic support including SEO, Best Practices, Performance, and Accessibility testing and consultation via email/chat after your site goes live.
           </p>
         </div>
       </div>
@@ -65,10 +66,27 @@ export function TripleGuarantee() {
           <li>• Compatible with modern web browsers</li>
         </ul>
       </div>
-      
+
+      <div className="mt-6 bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent rounded-xl p-6">
+        <div className="flex items-center justify-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
+            <DollarSign className="h-7 w-7 text-accent" />
+          </div>
+          <h4 className="text-2xl font-bold text-foreground">
+            Money Back Guarantee
+          </h4>
+        </div>
+        <p className="text-center text-foreground/80 leading-relaxed">
+          If Web Launch Academy cannot deliver on all three guarantees above, you will receive a <strong>full refund</strong> of your course fee. We are committed to your success, and we stand behind our ability to help you build a professional, high-performing website.
+        </p>
+      </div>
+
       <div className="mt-4 text-center">
-        <p className="text-xs text-muted-foreground">
-          *Guarantees apply only to Build With You course participants. Terms and conditions apply.
+        <p className="text-sm text-muted-foreground mb-2">
+          *Guarantees apply to course participants who follow all recommended guidance.{' '}
+          <Link href="/guarantee" className="text-primary hover:text-primary/80 underline font-medium">
+            View full guarantee details and terms
+          </Link>
         </p>
       </div>
     </div>

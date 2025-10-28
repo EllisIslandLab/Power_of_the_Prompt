@@ -136,6 +136,27 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
+          <h2 className="text-2xl font-semibold text-foreground mb-4">SMS Data Sharing and Third-Party Use</h2>
+          <p className="text-muted-foreground mb-3">
+            We do not sell, rent, or share your SMS opt-in data (phone numbers or consent records) with third parties for marketing purposes.
+          </p>
+          <p className="text-muted-foreground mb-3">
+            Your phone number and SMS consent information are used solely by Web Launch Academy to:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
+            <li>Send you course-related communications</li>
+            <li>Deliver the services you've enrolled in</li>
+            <li>Communicate directly with you about your account</li>
+          </ul>
+          <p className="text-muted-foreground mb-3">
+            We use Nextiva as our SMS service provider to deliver text messages. This provider has access to your phone number only to perform messaging services on our behalf and is contractually obligated to protect your information and not use it for any other purpose.
+          </p>
+          <p className="text-muted-foreground">
+            Your SMS consent data is never sold to marketers, advertisers, or any other third parties.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-2xl font-semibold text-foreground mb-4">Data Security</h2>
           <p className="text-muted-foreground mb-4">
             We implement appropriate technical and organizational security measures to protect your personal information, including:

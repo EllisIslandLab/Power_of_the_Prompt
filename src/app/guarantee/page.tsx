@@ -9,7 +9,7 @@ export default function GuaranteeDetails() {
 
       <div className="bg-background border border-border rounded-2xl p-8 mb-8 shadow-lg">
         <p className="text-center text-foreground/80 mb-8 text-lg">
-          We stand behind our training with these concrete commitments
+          Web Launch Academy stands behind the methods provided with these concrete commitments
         </p>
 
         <div className="grid md:grid-cols-3 gap-8 mb-8">
@@ -21,7 +21,7 @@ export default function GuaranteeDetails() {
               Fully-Functional Site
             </h3>
             <p className="text-foreground/70 leading-relaxed">
-              You will have a hosted website that is live and interactive on the internet with at least one contact form for client data capture and responsive design within 1 week after course completion.
+              You will have a hosted website that is live and interactive on the internet with at least one contact form for client data capture and responsive design within 2 weeks after completing the 8-week course program.
             </p>
           </div>
 
@@ -30,7 +30,7 @@ export default function GuaranteeDetails() {
               <Gauge className="h-8 w-8 text-primary" />
             </div>
             <h3 className="font-bold text-foreground text-lg">
-              90+ Lighthouse Score
+              90+ Lighthouse Scores
             </h3>
             <p className="text-foreground/70 leading-relaxed">
               Your website will achieve a minimum score of 90 or higher on Google Lighthouse metrics for Performance, Accessibility, Best Practices, and SEO, ensuring your site meets industry-leading standards.
@@ -42,10 +42,10 @@ export default function GuaranteeDetails() {
               <Shield className="h-8 w-8 text-primary" />
             </div>
             <h3 className="font-bold text-foreground text-lg">
-              Basic Testing & Support 1 Year
+              1 Full Year of Basic Support
             </h3>
             <p className="text-foreground/70 leading-relaxed">
-              We provide 1 year of basic support including SEO, Best Practice, Performance, and Accessibility testing and consultation via email/chat. This covers routine site health checks and guidance. For more intensive development needs, we may recommend purchasing additional LVL UP 1-on-1 sessions.
+              Web Launch Academy provides 1 full year of basic support including SEO, Best Practices, Performance, and Accessibility testing and consultation via email/chat. This covers routine site health checks and guidance. For more intensive development needs, purchasing additional LVL UP 1-on-1 sessions may be recommended.
             </p>
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function GuaranteeDetails() {
               </li>
               <li className="flex items-start gap-3 text-foreground/80">
                 <span className="text-primary mt-1 font-bold">•</span>
-                <span>Responsive design that works on all devices</span>
+                <span>Responsive design that works on both mobile and desktop devices</span>
               </li>
               <li className="flex items-start gap-3 text-foreground/80">
                 <span className="text-primary mt-1 font-bold">•</span>
@@ -108,7 +108,7 @@ export default function GuaranteeDetails() {
           </h2>
         </div>
         <p className="text-center text-foreground/80 text-lg leading-relaxed max-w-3xl mx-auto">
-          If we cannot deliver on all three guarantees above, you will receive a <strong>full refund</strong> of your course fee. We are committed to your success, and we stand behind our ability to help you build a professional, high-performing website. Your investment is protected.
+          If Web Launch Academy cannot deliver on all three guarantees above, you will receive a <strong>full refund</strong> of your course fee. We are committed to your success, and we stand behind our ability to help you build a professional, high-performing website. Your investment is protected.
         </p>
       </div>
 
@@ -117,19 +117,28 @@ export default function GuaranteeDetails() {
           <h2 className="text-2xl font-semibold text-foreground mb-4">Terms and Conditions</h2>
           <div className="space-y-4 text-muted-foreground">
             <p>
-              <strong>Eligibility:</strong> Guarantees apply to course participants who complete the full program requirements and actively participate in scheduled sessions.
+              <strong>Eligibility:</strong> Guarantees apply to participants who accept and participate in ALL recommended changes, including pull requests, modifications to lines of code, and all instructions pertaining to external service configurations/settings. Participants must actively engage with course materials, attend scheduled sessions, and follow provided guidance.
             </p>
             <p>
-              <strong>Timeline:</strong> The 1-week delivery timeline begins after your official course completion date. Course duration varies by enrollment package.
+              <strong>Timeline:</strong> The 2-week delivery timeline begins after the official course completion date. The course program is approximately 8 weeks in duration. Course durations may vary by enrollment package and updates to course delivery. Timelines are calculated in business days (Monday-Friday, excluding federal holidays).
             </p>
             <p>
-              <strong>Lighthouse Score:</strong> We will work with you to achieve a 90+ score across all four metrics (Performance, Accessibility, Best Practices, SEO) using Google's official Lighthouse tool. Scores may vary based on network conditions and device testing.
+              <strong>Lighthouse Score:</strong> We will work with you to achieve a 90+ score across all four metrics (Performance, Accessibility, Best Practices, SEO) using Google's official Lighthouse tool. Scores may vary based on network conditions and device testing. Acceptance is required of all recommended optimizations to achieve these scores. Final testing will be conducted using standard testing conditions.
             </p>
             <p>
-              <strong>Support Scope:</strong> One-year basic support covers email/chat consultation for SEO, Best Practices, Performance, and Accessibility testing and guidance. Does not include content creation, major design changes, or feature additions. For intensive development needs, we may recommend purchasing additional LVL UP 1-on-1 sessions for elevated support.
+              <strong>Support Scope:</strong> One full year of basic support covers email/chat consultation for SEO, Best Practices, Performance, and Accessibility testing and guidance. Support begins after your site goes live. Does not include content creation, major design changes, or feature additions. For intensive development needs, purchasing additional LVL UP 1-on-1 sessions may be recommended.
             </p>
             <p>
-              <strong>Money Back Guarantee:</strong> Full refund available if we fail to deliver any of the three guarantees. Claims must be made within 30 days of the 1-week delivery deadline with documented evidence that requirements were not met.
+              <strong>Money Back Guarantee:</strong> Full refund available if we fail to deliver any of the three guarantees above. Claims must be made within 30 business days of the 2-week delivery deadline with documented evidence that requirements were not met. Refunds will be processed within 10 business days to your original payment method. This guarantee is subject to the Terms of Service, including dispute resolution procedures.
+            </p>
+            <p>
+              <strong>Force Majeure:</strong> Web Launch Academy is not liable for delays or failures to perform due to circumstances beyond reasonable control, including but not limited to natural disasters, pandemics, government actions, internet service disruptions, or instructor illness. In such cases, timelines will be extended by a reasonable period, or alternative arrangements will be made.
+            </p>
+            <p>
+              <strong>Reasonable Grievance:</strong> A reasonable grievance is defined as a documented failure to meet the stated guarantees despite full participation and adherence to course requirements. Grievances must be submitted in writing with specific evidence of non-compliance with guarantee terms.
+            </p>
+            <p>
+              <strong>Dispute Resolution:</strong> Any disputes regarding this guarantee are subject to the dispute resolution procedures outlined in our <a href="/terms" className="text-primary hover:text-primary/80 underline">Terms of Service</a>, including informal resolution and binding arbitration. All claims must comply with our <a href="/privacy" className="text-primary hover:text-primary/80 underline">Privacy Policy</a> regarding data handling.
             </p>
           </div>
         </section>

@@ -43,6 +43,7 @@ export default function AdminCampaignsPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
   const [showComposer, setShowComposer] = useState(false)
+  const [editCampaign, setEditCampaign] = useState<Campaign | null>(null)
 
   useEffect(() => {
     fetchCampaigns()
@@ -243,7 +244,14 @@ export default function AdminCampaignsPage() {
           <CampaignHistory
             campaigns={campaigns}
             onRefresh={fetchCampaigns}
-            onNewCampaign={() => setShowComposer(true)}
+            onNewCampaign={() => {
+              setEditCampaign(null)
+              setShowComposer(true)
+            }}
+            onEditCampaign={(campaign) => {
+              setEditCampaign(campaign)
+              setShowComposer(true)
+            }}
           />
         </TabsContent>
 
@@ -273,11 +281,16 @@ export default function AdminCampaignsPage() {
       {/* Campaign Composer Modal */}
       {showComposer && (
         <CampaignComposer
-          onClose={() => setShowComposer(false)}
+          onClose={() => {
+            setShowComposer(false)
+            setEditCampaign(null)
+          }}
           onSuccess={() => {
             setShowComposer(false)
+            setEditCampaign(null)
             fetchCampaigns()
           }}
+          editCampaign={editCampaign}
         />
       )}
     </div>

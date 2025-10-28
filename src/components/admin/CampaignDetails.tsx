@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { cleanupModalArtifacts } from "@/lib/modal-cleanup"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -48,6 +49,11 @@ export function CampaignDetails({ campaignId, onClose, onRefresh }: CampaignDeta
 
   useEffect(() => {
     fetchCampaignDetails()
+
+    // Cleanup function to remove modal artifacts when component unmounts
+    return () => {
+      cleanupModalArtifacts()
+    }
   }, [campaignId])
 
   const fetchCampaignDetails = async () => {
@@ -189,7 +195,11 @@ export function CampaignDetails({ campaignId, onClose, onRefresh }: CampaignDeta
 
   if (loading) {
     return (
-      <Dialog open={true} onOpenChange={onClose}>
+      <Dialog open={true} onOpenChange={(open) => {
+        if (!open) {
+          onClose()
+        }
+      }}>
         <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Loading...</DialogTitle>
@@ -204,7 +214,11 @@ export function CampaignDetails({ campaignId, onClose, onRefresh }: CampaignDeta
   }
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={true} onOpenChange={(open) => {
+      if (!open) {
+        onClose()
+      }
+    }}>
       <DialogContent className="max-w-5xl max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

@@ -98,7 +98,9 @@ export function Footer() {
               </p>
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-green-500">✓</span>
-                <span className="text-muted-foreground">Triple Guarantee Protection</span>
+                <Link href="/guarantee" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
+                  Triple Guarantee Protection
+                </Link>
               </div>
             </div>
           </div>

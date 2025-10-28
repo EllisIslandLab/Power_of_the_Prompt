@@ -75,15 +75,15 @@ const commitSavePath = [
     originalPrice: "$999",
     savings: "$200",
     label: "Your Own Pace",
-    description: "Complete 4-week program",
+    description: "Complete 8-week program",
     features: [
-      "4-week group coaching",
+      "8-week group coaching",
       "Complete textbook",
       "50% discount 1-on-1 support sessions",
       "Community access",
       "Templates included",
       "BONUS: Free consultation included",
-      "Working website guarantee - I want to see you win!"
+      "Triple Guarantee: Fully-functional site, 90+ Lighthouse scores, 1 year support"
     ],
     cta: "Build My Website",
     href: "/courses/foundation",
@@ -103,11 +103,11 @@ const commitSavePath = [
     features: [
       "Everything in Foundation Course",
       "8 FREE 1-on-1 sessions (2 hours each)",
-      "60-day post-course support",
+      "1 full year of basic support",
       "Priority scheduling",
       "Custom website review",
       "We'll cover the cost of essential tools you need including premium AI subscription and color palette tool",
-      "Working website guarantee OR money back",
+      "Triple Guarantee Protection with money-back guarantee",
       "BONUS: Free consultation included",
       "I want to see you win!"
     ],
@@ -363,22 +363,39 @@ export function SimplePricing() {
           
           {/* Guarantee Clarification Section */}
           <div className="bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg p-8 mb-12 border border-primary/10">
-            <h3 className="text-2xl font-bold text-center mb-6">Our Working Website Guarantee</h3>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="text-center">
-                <h4 className="font-semibold text-primary mb-3">For Foundation Course:</h4>
+            <h3 className="text-2xl font-bold text-center mb-6">Our Triple Guarantee</h3>
+
+            <div className="max-w-3xl mx-auto mb-6">
+              <div className="grid md:grid-cols-3 gap-6 mb-6">
+                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                  <div className="text-3xl mb-2">✓</div>
+                  <h4 className="font-semibold text-sm mb-2">Fully-Functional Site</h4>
+                  <p className="text-xs text-muted-foreground">Within 2 weeks after completing 8-week program</p>
+                </div>
+                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                  <div className="text-3xl mb-2">✓</div>
+                  <h4 className="font-semibold text-sm mb-2">90+ Lighthouse Scores</h4>
+                  <p className="text-xs text-muted-foreground">Performance, Accessibility, Best Practices, SEO</p>
+                </div>
+                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+                  <div className="text-3xl mb-2">✓</div>
+                  <h4 className="font-semibold text-sm mb-2">1 Year Basic Support</h4>
+                  <p className="text-xs text-muted-foreground">Email/chat consultation and testing</p>
+                </div>
+              </div>
+
+              <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                <h4 className="font-semibold text-primary mb-2">Money Back Guarantee</h4>
                 <p className="text-sm text-muted-foreground">
-                  I'm committed to your success. If you attend sessions and complete assignments but don't achieve a working website, I'll work with you personally until you do. <span className="italic text-primary font-bold">I want to see you win!</span>
+                  If we fail to deliver all three guarantees, you get a <strong>full refund</strong>. But here's the thing - I've never had to give a refund because <span className="italic text-primary font-bold">I want to see you win, and I'll make sure you do!</span>
                 </p>
               </div>
-              
-              <div className="text-center">
-                <h4 className="font-semibold text-primary mb-3">For Premium Course:</h4>
-                <p className="text-sm text-muted-foreground">
-                  With 8 included 1-on-1 sessions, I guarantee you'll have a working website you own completely. If not, you get your money back. But here's the thing - I've never had to give a refund because <span className="italic text-primary font-bold">I want to see you win, and I'll make sure you do!</span>
-                </p>
-              </div>
+            </div>
+
+            <div className="text-center">
+              <Link href="/guarantee" className="text-primary hover:text-primary/80 underline font-medium text-sm">
+                View complete guarantee details and terms →
+              </Link>
             </div>
           </div>
           
@@ -516,9 +533,9 @@ export function SimplePricing() {
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <Zap className="h-7 w-7 text-primary" />
                 </div>
-                <h4 className="font-semibold mb-2">Working Website Guarantee</h4>
+                <h4 className="font-semibold mb-2">Triple Guarantee Protection</h4>
                 <p className="text-sm text-muted-foreground">
-                  <span className="italic text-primary font-bold">I want to see you win!</span> Get a working website or your money back.
+                  <span className="italic text-primary font-bold">I want to see you win!</span> Fully-functional site, 90+ Lighthouse scores, 1 year support, or money back. <Link href="/guarantee" className="text-primary hover:text-primary/80 underline">Learn more</Link>
                 </p>
               </div>
               
