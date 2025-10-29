@@ -4,8 +4,11 @@ import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { validateRequest } from '@/lib/validation'
 import { signInSchema } from '@/lib/schemas'
+import { logger, logSecurity } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+
   try {
     // Validate request with Zod schema
     const validation = await validateRequest(request, signInSchema)
@@ -14,6 +17,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password } = validation.data
+
+    logger.info({ type: 'auth', email, action: 'signin_attempt' }, 'Sign-in attempt')
 
     // Create Supabase client with cookie handling
     const cookieStore = await cookies()
@@ -44,6 +49,8 @@ export async function POST(request: NextRequest) {
     if (error) {
       // Handle email not confirmed error specifically
       if (error.message.includes('Email not confirmed')) {
+        logSecurity('login_failed', 'low', { email, reason: 'email_not_confirmed' })
+
         // Try to resend verification email
         const { error: resendError } = await supabase.auth.resend({
           type: 'signup',
@@ -51,6 +58,7 @@ export async function POST(request: NextRequest) {
         })
 
         if (!resendError) {
+          logger.info({ type: 'auth', email }, 'Resent verification email')
           return NextResponse.json({
             error: 'Please verify your email address before signing in.',
             needsVerification: true,
@@ -67,6 +75,8 @@ export async function POST(request: NextRequest) {
 
       // Handle other errors with better messages
       if (error.message.includes('Invalid login credentials')) {
+        logSecurity('login_failed', 'medium', { email, reason: 'invalid_credentials' })
+        logger.warn({ type: 'auth', email, error: error.message }, 'Sign-in failed: invalid credentials')
         return NextResponse.json(
           { error: 'Invalid email or password. Please try again.' },
           { status: 400 }
@@ -74,6 +84,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Generic error
+      logSecurity('login_failed', 'medium', { email, reason: error.message })
+      logger.error({ type: 'auth', email, error: error.message }, 'Sign-in failed')
       return NextResponse.json(
         { error: error.message || 'Sign-in failed. Please try again.' },
         { status: 400 }
@@ -81,6 +93,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (!data.user || !data.session) {
+      logSecurity('login_failed', 'high', { email, reason: 'no_user_or_session' })
+      logger.error({ type: 'auth', email }, 'Sign-in failed: no user or session returned')
       return NextResponse.json(
         { error: 'Authentication failed. Please try again.' },
         { status: 400 }
@@ -103,7 +117,10 @@ export async function POST(request: NextRequest) {
 
       if (profileError || !userProfile) {
         // User missing from public.users - create profile now
-        console.warn('Creating missing user profile for:', data.user.email)
+        logger.warn(
+          { type: 'auth', userId: data.user.id, email: data.user.email },
+          'Creating missing user profile'
+        )
 
         const { error: createError } = await supabaseAdmin
           .from('users')
@@ -120,16 +137,32 @@ export async function POST(request: NextRequest) {
           })
 
         if (createError) {
-          console.error('Failed to create user profile:', createError)
+          logger.error(
+            { type: 'auth', userId: data.user.id, error: createError },
+            'Failed to create user profile'
+          )
           // Don't fail signin - user can still access portal
+        } else {
+          logger.info({ type: 'auth', userId: data.user.id }, 'Created missing user profile')
         }
       }
     } catch (profileCheckError) {
-      console.error('Error checking user profile:', profileCheckError)
+      logger.error(
+        { type: 'auth', userId: data.user.id, error: profileCheckError },
+        'Error checking user profile'
+      )
       // Don't fail signin - continue
     }
 
     // Success - cookies are automatically set by the Supabase client
+    logSecurity('login_success', 'low', { userId: data.user.id, email: data.user.email })
+
+    const duration = Date.now() - startTime
+    logger.info(
+      { type: 'auth', userId: data.user.id, email: data.user.email, duration },
+      `Sign-in successful (${duration}ms)`
+    )
+
     // Return minimal user info for security
     return NextResponse.json({
       success: true,
@@ -140,7 +173,11 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Signin error:', error)
+    const duration = Date.now() - startTime
+    logger.error(
+      { type: 'auth', error, duration },
+      'Sign-in error'
+    )
     return NextResponse.json(
       { error: 'An error occurred during sign-in' },
       { status: 500 }
