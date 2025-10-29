@@ -21,6 +21,7 @@ import {
 import { CampaignComposer } from "@/components/admin/CampaignComposer"
 import { CampaignHistory } from "@/components/admin/CampaignHistory"
 import { CampaignStats } from "@/components/admin/CampaignStats"
+import Link from "next/link"
 
 interface Campaign {
   id: string
@@ -115,6 +116,12 @@ export default function AdminCampaignsPage() {
           <p className="text-muted-foreground">Send targeted email campaigns to your leads</p>
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/admin/email-preview">
+            <Button variant="outline" size="sm">
+              <Eye className="h-4 w-4 mr-2" />
+              Email Preview
+            </Button>
+          </Link>
           <Button onClick={fetchCampaigns} variant="outline" size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
