@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { validateRequest } from '@/lib/validation'
+import { signUpSchema } from '@/lib/schemas'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -8,34 +10,18 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 export async function POST(request: NextRequest) {
   try {
-    const { fullName, email, password, inviteToken } = await request.json()
-
-    // Validate input
-    if (!fullName || !email || !password || !inviteToken) {
-      return NextResponse.json(
-        { error: 'Full name, email, password, and invite token are required' },
-        { status: 400 }
-      )
+    // Validate request with Zod schema
+    const validation = await validateRequest(request, signUpSchema)
+    if (!validation.success) {
+      return validation.error
     }
 
-    // Standardized password validation (same as signup-open)
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
-        { status: 400 }
-      )
-    }
+    const { fullName, email, password, token: inviteToken } = validation.data
 
-    if (!/[A-Z]/.test(password)) {
+    // Check if invite token is provided (required for invite-based signup)
+    if (!inviteToken) {
       return NextResponse.json(
-        { error: 'Password must contain at least one uppercase letter' },
-        { status: 400 }
-      )
-    }
-
-    if (!/[0-9]/.test(password)) {
-      return NextResponse.json(
-        { error: 'Password must contain at least one number' },
+        { error: 'Invite token is required' },
         { status: 400 }
       )
     }

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
+import { parseApiError } from '@/lib/error-parser'
 
 function SignupContent() {
   const searchParams = useSearchParams()
@@ -135,7 +136,8 @@ function SignupContent() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Signup failed')
+        // Parse Zod validation errors for user-friendly messages
+        throw new Error(parseApiError(data, 'Signup failed'))
       }
 
       setSuccess(true)
@@ -305,7 +307,7 @@ function SignupContent() {
                 placeholder="Create a secure password"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Min 8 characters, 1 uppercase, 1 number
+                Min 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
               </p>
             </div>
 

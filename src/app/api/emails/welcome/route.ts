@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { validateRequest } from '@/lib/validation'
+import { sendWelcomeEmailSchema } from '@/lib/schemas'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, fullName } = await request.json()
-
-    if (!email || !fullName) {
-      return NextResponse.json(
-        { error: 'Email and full name are required' },
-        { status: 400 }
-      )
+    // Validate request with Zod schema
+    const validation = await validateRequest(request, sendWelcomeEmailSchema)
+    if (!validation.success) {
+      return validation.error
     }
+
+    const { email, fullName } = validation.data
 
     const { data, error } = await resend.emails.send({
       from: 'Web Launch Academy <noreply@weblaunchacademy.com>',

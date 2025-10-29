@@ -2,17 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import { validateRequest } from '@/lib/validation'
+import { signInSchema } from '@/lib/schemas'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json()
-
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      )
+    // Validate request with Zod schema
+    const validation = await validateRequest(request, signInSchema)
+    if (!validation.success) {
+      return validation.error
     }
+
+    const { email, password } = validation.data
 
     // Create Supabase client with cookie handling
     const cookieStore = await cookies()

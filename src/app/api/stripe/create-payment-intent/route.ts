@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStripe } from '@/lib/stripe'
+import { validateRequest } from '@/lib/validation'
+import { createPaymentIntentSchema } from '@/lib/schemas'
 
 export async function POST(request: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -10,15 +12,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { amount, courseType, email } = await request.json()
-
-    // Validate required fields
-    if (!amount || !courseType || !email) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
+    // Validate request with Zod schema
+    const validation = await validateRequest(request, createPaymentIntentSchema)
+    if (!validation.success) {
+      return validation.error
     }
+
+    const { amount, courseType, email } = validation.data
 
     // Create payment intent
     const stripe = getStripe()

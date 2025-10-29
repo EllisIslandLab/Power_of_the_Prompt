@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import { validateRequest } from '@/lib/validation'
+import { waitlistSignupSchema } from '@/lib/schemas'
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -22,24 +24,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { email } = await request.json()
-
-    // Validate email
-    if (!email || typeof email !== 'string') {
-      return NextResponse.json(
-        { error: 'Valid email address is required' },
-        { status: 400 }
-      )
+    // Validate request with Zod schema
+    const validation = await validateRequest(request, waitlistSignupSchema)
+    if (!validation.success) {
+      return validation.error
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Please enter a valid email address' },
-        { status: 400 }
-      )
-    }
+    const { email, name, source, referrer } = validation.data
+
+    // Email is already validated and normalized by Zod schema
 
     // Check if email already exists in leads table
     const { data: existingEmail, error: checkError } = await supabase

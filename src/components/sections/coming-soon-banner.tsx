@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { parseApiError } from "@/lib/error-parser"
 
 export function ComingSoonBanner() {
   const [email, setEmail] = useState('')
@@ -28,7 +29,8 @@ export function ComingSoonBanner() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong')
+        // Parse Zod validation errors for user-friendly messages
+        throw new Error(parseApiError(data, 'Failed to sign up for waitlist'))
       }
 
       setIsSubmitted(true)
