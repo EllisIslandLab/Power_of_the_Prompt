@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
+import { renderPaymentConfirmationEmail, EmailSubjects, EMAIL_FROM } from '@/lib/email-builder';
 
 // Stripe webhook needs the raw body, so we disable body parsing
 export const dynamic = 'force-dynamic';
@@ -224,50 +225,22 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
 async function sendWelcomeEmail(email: string, name: string, tier: string, sessions: number) {
   try {
-    const programName = tier === 'vip' ? 'A+ Program' : 'Web Launch Course';
-    const portalUrl = `${process.env.NEXT_PUBLIC_URL}/portal`;
+    // Map tier to payment confirmation email tier type
+    const emailTier = (tier === 'vip' ? 'vip' : tier === 'premium' ? 'premium' : 'basic') as 'basic' | 'premium' | 'vip';
+
+    // Render payment confirmation email template
+    const html = await renderPaymentConfirmationEmail({
+      customerName: name,
+      tier: emailTier,
+      sessions,
+      portalUrl: process.env.NEXT_PUBLIC_URL
+    });
 
     await resend.emails.send({
-      from: 'Web Launch Academy <noreply@weblaunchacademy.com>',
+      from: EMAIL_FROM,
       to: email,
-      subject: `Welcome to ${programName}!`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2>Welcome to Web Launch Academy, ${name || 'there'}!</h2>
-
-          <p>Thank you for enrolling in the ${programName}. You're about to embark on an exciting journey to build your professional website.</p>
-
-          ${sessions > 0 ? `
-            <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h3>Your 1-on-1 Sessions</h3>
-              <p>You have <strong>${sessions} Level Up sessions</strong> included in your program. These are personalized coaching sessions where we work together on your website.</p>
-            </div>
-          ` : ''}
-
-          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3>Next Steps:</h3>
-            <ol>
-              <li>Create your account at the student portal</li>
-              <li>Complete your profile setup</li>
-              <li>Access your course materials</li>
-              ${sessions > 0 ? '<li>Schedule your first 1-on-1 session</li>' : ''}
-            </ol>
-          </div>
-
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${portalUrl}"
-               style="background-color: #ffdb57; color: #11296b; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600;">
-              Access Student Portal
-            </a>
-          </div>
-
-          <p>If you have any questions, simply reply to this email. I personally read and respond to every message.</p>
-
-          <p>Excited to work with you!<br>
-          Matthew Ellis<br>
-          Web Launch Academy</p>
-        </div>
-      `,
+      subject: EmailSubjects.PAYMENT_CONFIRMATION(tier),
+      html,
     });
 
     console.log(`Welcome email sent to ${email}`);
