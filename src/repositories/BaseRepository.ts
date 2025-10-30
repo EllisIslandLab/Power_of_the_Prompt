@@ -1,24 +1,31 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { logger } from '@/lib/logger'
+import { cache } from '@/lib/cache'
 
 /**
  * Base Repository
  *
  * Abstract base class providing common CRUD operations for all repositories.
- * Handles error logging, performance tracking, and consistent query patterns.
+ * Handles error logging, performance tracking, and automatic caching.
  *
  * Benefits:
  * - Centralized database access logic
  * - Consistent error handling across all repositories
  * - Performance monitoring with automatic timing
- * - Easy to add caching layer later
+ * - Automatic caching with Redis (sub-millisecond reads)
+ * - Smart cache invalidation on mutations
  * - Simplifies testing with mock implementations
+ *
+ * Caching Strategy:
+ * - findById: Cached with configurable TTL (default 300s)
+ * - create/update/delete: Automatically invalidates related cache entries
+ * - Graceful degradation if Redis not configured
  *
  * Usage:
  * ```typescript
  * class UserRepository extends BaseRepository<User> {
  *   constructor(client: SupabaseClient) {
- *     super(client, 'users')
+ *     super(client, 'users', 300) // 5 minute cache TTL
  *   }
  * }
  * ```
@@ -27,19 +34,48 @@ import { logger } from '@/lib/logger'
 export abstract class BaseRepository<T> {
   protected client: SupabaseClient
   protected tableName: string
+  protected cacheTTL: number // Cache time-to-live in seconds
 
-  constructor(client: SupabaseClient, tableName: string) {
+  constructor(client: SupabaseClient, tableName: string, cacheTTL: number = 300) {
     this.client = client
     this.tableName = tableName
+    this.cacheTTL = cacheTTL
   }
 
   /**
-   * Find a single record by ID
+   * Generate cache key for a record
+   */
+  protected getCacheKey(id: string): string {
+    return `${this.tableName}:${id}`
+  }
+
+  /**
+   * Generate cache key pattern for table
+   */
+  protected getCachePattern(): string {
+    return `${this.tableName}:*`
+  }
+
+  /**
+   * Find a single record by ID (with caching)
    */
   async findById(id: string): Promise<T | null> {
     const startTime = Date.now()
+    const cacheKey = this.getCacheKey(id)
 
     try {
+      // Try cache first
+      const cached = await cache.get<T>(cacheKey)
+      if (cached) {
+        const duration = Date.now() - startTime
+        logger.debug(
+          { type: 'database', table: this.tableName, operation: 'findById', id, cached: true, duration },
+          `Found ${this.tableName} by ID from cache (${duration}ms)`
+        )
+        return cached
+      }
+
+      // Cache miss, query database
       const { data, error } = await this.client
         .from(this.tableName)
         .select('*')
@@ -56,9 +92,14 @@ export abstract class BaseRepository<T> {
         return null
       }
 
+      // Set cache for next time
+      if (data) {
+        await cache.set(cacheKey, data as T, this.cacheTTL)
+      }
+
       logger.debug(
-        { type: 'database', table: this.tableName, operation: 'findById', id, duration },
-        `Found ${this.tableName} by ID (${duration}ms)`
+        { type: 'database', table: this.tableName, operation: 'findById', id, cached: false, duration },
+        `Found ${this.tableName} by ID from database (${duration}ms)`
       )
 
       return data as T
@@ -161,7 +202,7 @@ export abstract class BaseRepository<T> {
   }
 
   /**
-   * Create a new record
+   * Create a new record (invalidates cache)
    */
   async create(data: Partial<T>): Promise<T | null> {
     const startTime = Date.now()
@@ -183,6 +224,9 @@ export abstract class BaseRepository<T> {
         return null
       }
 
+      // Invalidate cache for this table (new record affects queries)
+      await cache.invalidate(this.getCachePattern())
+
       logger.info(
         { type: 'database', table: this.tableName, operation: 'create', duration },
         `Created ${this.tableName} (${duration}ms)`
@@ -200,7 +244,7 @@ export abstract class BaseRepository<T> {
   }
 
   /**
-   * Update a record by ID
+   * Update a record by ID (invalidates cache)
    */
   async update(id: string, data: Partial<T>): Promise<T | null> {
     const startTime = Date.now()
@@ -223,6 +267,9 @@ export abstract class BaseRepository<T> {
         return null
       }
 
+      // Invalidate cache for this specific record
+      await cache.delete(this.getCacheKey(id))
+
       logger.info(
         { type: 'database', table: this.tableName, operation: 'update', id, duration },
         `Updated ${this.tableName} (${duration}ms)`
@@ -240,7 +287,7 @@ export abstract class BaseRepository<T> {
   }
 
   /**
-   * Delete a record by ID
+   * Delete a record by ID (invalidates cache)
    */
   async delete(id: string): Promise<boolean> {
     const startTime = Date.now()
@@ -260,6 +307,10 @@ export abstract class BaseRepository<T> {
         )
         return false
       }
+
+      // Invalidate cache for this specific record and table queries
+      await cache.delete(this.getCacheKey(id))
+      await cache.invalidate(this.getCachePattern())
 
       logger.info(
         { type: 'database', table: this.tableName, operation: 'delete', id, duration },

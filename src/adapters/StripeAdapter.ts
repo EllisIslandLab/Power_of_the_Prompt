@@ -1,6 +1,7 @@
 import Stripe from 'stripe'
 import { BaseAdapter } from './BaseAdapter'
 import { logger } from '@/lib/logger'
+import { cache, CacheKeys } from '@/lib/cache'
 
 /**
  * Stripe Adapter
@@ -236,19 +237,42 @@ export class StripeAdapter extends BaseAdapter {
   }
 
   /**
-   * List products
+   * List products (with caching)
    */
   async listProducts(params?: Stripe.ProductListParams): Promise<Stripe.ApiList<Stripe.Product>> {
     const startTime = Date.now()
+    const cacheKey = CacheKeys.stripe.products()
 
     try {
+      // Check cache first (only for default params)
+      if (!params) {
+        const cached = await cache.get<Stripe.ApiList<Stripe.Product>>(cacheKey)
+        if (cached) {
+          const duration = Date.now() - startTime
+          logger.debug(
+            { type: 'service', service: 'stripe', operation: 'listProducts', cached: true, duration },
+            `Stripe products from cache (${duration}ms)`
+          )
+          return cached
+        }
+      }
+
+      // Cache miss or custom params, fetch from Stripe
       const products = await this.executeWithRetry(
         () => this.client.products.list(params),
         'listProducts'
       )
 
+      // Cache default product list for 5 minutes
+      if (!params) {
+        await cache.set(cacheKey, products, 300)
+      }
+
       const duration = Date.now() - startTime
-      this.logSuccess('listProducts', duration, { productCount: products.data.length })
+      this.logSuccess('listProducts', duration, {
+        productCount: products.data.length,
+        cached: false
+      })
 
       return products
     } catch (error) {

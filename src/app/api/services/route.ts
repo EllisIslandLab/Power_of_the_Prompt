@@ -1,12 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Service, AirtableService, ServicesResponse } from '@/types/services'
 import { getAirtableBase } from '@/lib/airtable'
+import { cache, CacheKeys } from '@/lib/cache'
+import { logger } from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
+  const startTime = Date.now()
+
   try {
     const { searchParams } = new URL(request.url)
     const serviceType = searchParams.get('type')
     const activeOnly = searchParams.get('active') !== 'false' // Default to true
+
+    // Generate cache key based on query parameters
+    const cacheKey = serviceType
+      ? CacheKeys.services.byCategory(serviceType)
+      : CacheKeys.services.all()
+
+    // Check cache first
+    const cached = await cache.get<Service[]>(cacheKey)
+    if (cached) {
+      const duration = Date.now() - startTime
+      logger.debug(
+        { type: 'api', route: '/api/services', cached: true, duration },
+        `Services fetched from cache (${duration}ms)`
+      )
+
+      const response: ServicesResponse = {
+        success: true,
+        data: cached
+      }
+
+      return NextResponse.json(response, {
+        headers: {
+          'Cache-Control': 's-maxage=300, stale-while-revalidate=59',
+          'X-Cache': 'HIT'
+        }
+      })
+    }
 
     // Build filter formula
     let filterFormula = ''
@@ -19,7 +50,7 @@ export async function GET(request: NextRequest) {
     if (serviceType) {
       const typeMap = {
         'course': 'Course',
-        'build': 'Build', 
+        'build': 'Build',
         'audit': 'Audit',
         'consultation': 'Consultation'
       }
@@ -33,7 +64,7 @@ export async function GET(request: NextRequest) {
       filterFormula = `AND(${filters.join(', ')})`
     }
 
-    // Fetch records from Airtable
+    // Fetch records from Airtable (cache miss)
     const base = getAirtableBase()
     const records = await base('Services').select({
       view: 'Grid view',
@@ -82,6 +113,15 @@ export async function GET(request: NextRequest) {
       .filter((service) => service !== null)
       .sort((a, b) => a.order - b.order)
 
+    // Set cache for future requests (5 minute TTL)
+    await cache.set(cacheKey, services, 300)
+
+    const duration = Date.now() - startTime
+    logger.info(
+      { type: 'api', route: '/api/services', cached: false, duration, count: services.length },
+      `Services fetched from Airtable (${duration}ms)`
+    )
+
     const response: ServicesResponse = {
       success: true,
       data: services
@@ -89,12 +129,17 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response, {
       headers: {
-        'Cache-Control': 's-maxage=300, stale-while-revalidate=59'
+        'Cache-Control': 's-maxage=300, stale-while-revalidate=59',
+        'X-Cache': 'MISS'
       }
     })
 
   } catch (error) {
-    console.error('Services API Error:', error)
+    const duration = Date.now() - startTime
+    logger.error(
+      { type: 'api', route: '/api/services', error, duration },
+      'Services API Error'
+    )
     
     const response: ServicesResponse = {
       success: false,
