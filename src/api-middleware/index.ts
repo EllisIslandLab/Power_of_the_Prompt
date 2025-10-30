@@ -33,6 +33,8 @@ export type {
 export { withValidation, withQueryValidation } from './withValidation'
 export { withLogging } from './withLogging'
 export { withErrorHandling } from './withErrorHandling'
+export { withRateLimit } from './withRateLimit'
+export type { RateLimitOptions } from './withRateLimit'
 
 // Error classes
 export {

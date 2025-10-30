@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import { rateLimiter, RateLimitConfigs } from '@/lib/rate-limiter'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,6 +12,34 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting - prevent email flooding attacks
+    const ip = request.headers.get('x-real-ip') ||
+              request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+              'anonymous'
+
+    const rateLimit = await rateLimiter.checkLimit('/api/auth/forgot-password', ip, RateLimitConfigs.AUTH)
+
+    if (!rateLimit.success) {
+      const retryAfter = Math.ceil((rateLimit.reset - Date.now()) / 1000)
+
+      return NextResponse.json(
+        {
+          error: 'Too many password reset attempts',
+          message: `Please try again in ${retryAfter} seconds`,
+          retryAfter,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': retryAfter.toString(),
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': rateLimit.reset.toString(),
+          },
+        }
+      )
+    }
+
     const { email } = await request.json()
 
     if (!email) {

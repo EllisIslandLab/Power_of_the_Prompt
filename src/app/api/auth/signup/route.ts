@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { validateRequest } from '@/lib/validation'
 import { signUpSchema } from '@/lib/schemas'
 import { logger, logSecurity } from '@/lib/logger'
+import { rateLimiter, RateLimitConfigs } from '@/lib/rate-limiter'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -13,6 +14,38 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
 
   try {
+    // Rate limiting - prevent automated account creation
+    const ip = request.headers.get('x-real-ip') ||
+              request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+              'anonymous'
+
+    const rateLimit = await rateLimiter.checkLimit('/api/auth/signup', ip, RateLimitConfigs.AUTH)
+
+    if (!rateLimit.success) {
+      const retryAfter = Math.ceil((rateLimit.reset - Date.now()) / 1000)
+      logger.warn(
+        { type: 'ratelimit', route: '/api/auth/signup', ip, retryAfter },
+        'Rate limit exceeded for signup'
+      )
+
+      return NextResponse.json(
+        {
+          error: 'Too many sign-up attempts',
+          message: `Please try again in ${retryAfter} seconds`,
+          retryAfter,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': retryAfter.toString(),
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': rateLimit.reset.toString(),
+          },
+        }
+      )
+    }
+
     // Validate request with Zod schema
     const validation = await validateRequest(request, signUpSchema)
     if (!validation.success) {

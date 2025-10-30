@@ -6,11 +6,45 @@ import { validateRequest } from '@/lib/validation'
 import { signInSchema } from '@/lib/schemas'
 import { logger, logSecurity } from '@/lib/logger'
 import { UserRepository } from '@/repositories'
+import { rateLimiter, RateLimitConfigs } from '@/lib/rate-limiter'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
 
   try {
+    // Rate limiting - prevent brute force attacks
+    // Extract IP address for rate limiting
+    const ip = request.headers.get('x-real-ip') ||
+              request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+              'anonymous'
+
+    const rateLimit = await rateLimiter.checkLimit('/api/auth/signin', ip, RateLimitConfigs.AUTH)
+
+    if (!rateLimit.success) {
+      const retryAfter = Math.ceil((rateLimit.reset - Date.now()) / 1000)
+      logger.warn(
+        { type: 'ratelimit', route: '/api/auth/signin', ip, retryAfter },
+        'Rate limit exceeded for signin'
+      )
+
+      return NextResponse.json(
+        {
+          error: 'Too many sign-in attempts',
+          message: `Please try again in ${retryAfter} seconds`,
+          retryAfter,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': retryAfter.toString(),
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': rateLimit.reset.toString(),
+          },
+        }
+      )
+    }
+
     // Validate request with Zod schema
     const validation = await validateRequest(request, signInSchema)
     if (!validation.success) {
