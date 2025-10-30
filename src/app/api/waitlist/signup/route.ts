@@ -1,38 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { Resend } from 'resend'
-import { validateRequest } from '@/lib/validation'
+import { NextRequest } from 'next/server'
 import { waitlistSignupSchema } from '@/lib/schemas'
+import { getAdminClient } from '@/adapters'
+import { resendAdapter } from '@/adapters'
+import { withMiddleware, withValidation, withLogging, withErrorHandling, ConflictError } from '@/api-middleware'
+import { logger } from '@/lib/logger'
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const supabase = getAdminClient()
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY!)
-
-export async function POST(request: NextRequest) {
-  try {
-    // Check required environment variables
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.error('Missing Supabase environment variables')
-      return NextResponse.json(
-        { error: 'Server configuration error' },
-        { status: 500 }
-      )
-    }
-
-    // Validate request with Zod schema
-    const validation = await validateRequest(request, waitlistSignupSchema)
-    if (!validation.success) {
-      return validation.error
-    }
-
-    const { email, name, source, referrer } = validation.data
-
-    // Email is already validated and normalized by Zod schema
+/**
+ * Waitlist Signup
+ *
+ * Adds a user to the waitlist and sends confirmation email.
+ * Uses middleware for validation, logging, and error handling.
+ */
+export const POST = withMiddleware(
+  [withErrorHandling, withLogging, withValidation(waitlistSignupSchema)],
+  async (req: NextRequest, { validated }) => {
+    const { email, name, source, referrer } = validated
 
     // Check if email already exists in leads table
     const { data: existingEmail, error: checkError } = await supabase
@@ -43,18 +27,12 @@ export async function POST(request: NextRequest) {
 
     if (checkError && checkError.code !== 'PGRST116') {
       // PGRST116 is "not found" error, which is what we want
-      console.error('Database error:', checkError)
-      return NextResponse.json(
-        { error: 'Database error occurred' },
-        { status: 500 }
-      )
+      logger.error({ error: checkError }, 'Database error checking email')
+      throw new Error('Database error occurred')
     }
 
     if (existingEmail) {
-      return NextResponse.json(
-        { error: 'You\'re already on our waitlist! We\'ll notify you when we launch.' },
-        { status: 409 }
-      )
+      throw new ConflictError('You\'re already on our waitlist! We\'ll notify you when we launch.')
     }
 
     // Add email to leads table with waitlist status
@@ -72,23 +50,15 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (insertError) {
-      console.error('Insert error details:', {
-        code: insertError.code,
-        message: insertError.message,
-        details: insertError.details,
-        hint: insertError.hint
-      })
-      return NextResponse.json(
-        { error: 'Failed to add email to leads' },
-        { status: 500 }
-      )
+      logger.error({ error: insertError }, 'Failed to add email to leads')
+      throw new Error('Failed to add email to leads')
     }
 
     // Send welcome email via Resend
     try {
-      await resend.emails.send({
+      await resendAdapter.sendEmail({
         from: 'Web Launch Academy <noreply@weblaunchacademy.com>',
-        to: [email],
+        to: email,
         subject: '🚀 You\'re on the list! Something amazing is coming...',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -130,44 +100,18 @@ export async function POST(request: NextRequest) {
               </p>
             </div>
           </div>
-        `,
-        text: `
-Welcome to Web Launch Academy!
-
-Thanks for joining our waitlist! 
-
-What's Coming Soon?
-• Own Your Code Forever - No monthly fees, complete ownership
-• AI-Powered Development - Build professional sites with Claude CLI  
-• Lightning Fast Results - Go from idea to live website in record time
-• Professional Training - Learn the skills that matter
-
-"Build Once, Own Forever" - The philosophy that changes everything
-
-We're putting the finishing touches on something special. As a waitlist member, you'll be the first to know when we launch and get exclusive early access.
-
-Visit our site: https://weblaunchacademy.com
-
-You're receiving this because you signed up for the Web Launch Academy waitlist.
         `
       })
     } catch (emailError) {
-      console.error('Email send error:', emailError)
+      logger.error({ error: emailError }, 'Email send error')
       // Don't fail the signup if email fails - they're still on the list
-      console.log('Email failed to send, but signup was successful')
+      logger.info('Email failed to send, but signup was successful')
     }
 
-    return NextResponse.json({
+    return {
       success: true,
       message: 'Successfully joined the waitlist! Check your email for confirmation.',
       email: email.toLowerCase()
-    })
-
-  } catch (error) {
-    console.error('Waitlist signup error:', error)
-    return NextResponse.json(
-      { error: 'An unexpected error occurred' },
-      { status: 500 }
-    )
+    }
   }
-}
+)

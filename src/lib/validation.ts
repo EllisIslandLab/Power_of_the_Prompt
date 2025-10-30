@@ -141,7 +141,7 @@ export function validateQueryParams<T>(
 /**
  * Format Zod errors into user-friendly messages
  */
-function formatZodErrors(error: ZodError): Record<string, string[]> {
+export function formatZodErrors(error: ZodError): Record<string, string[]> {
   const formatted: Record<string, string[]> = {}
 
   error.issues.forEach((err) => {
