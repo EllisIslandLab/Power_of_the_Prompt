@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 import { validateRequest } from '@/lib/validation'
 import { signInSchema } from '@/lib/schemas'
 import { logger, logSecurity } from '@/lib/logger'
+import { UserRepository } from '@/repositories'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
@@ -109,36 +110,29 @@ export async function POST(request: NextRequest) {
         process.env.SUPABASE_SERVICE_ROLE_KEY!
       )
 
-      const { data: userProfile, error: profileError } = await supabaseAdmin
-        .from('users')
-        .select('id')
-        .eq('id', data.user.id)
-        .single()
+      const userRepo = new UserRepository(supabaseAdmin)
+      const userProfile = await userRepo.findById(data.user.id)
 
-      if (profileError || !userProfile) {
+      if (!userProfile) {
         // User missing from public.users - create profile now
         logger.warn(
           { type: 'auth', userId: data.user.id, email: data.user.email },
           'Creating missing user profile'
         )
 
-        const { error: createError } = await supabaseAdmin
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email!,
-            full_name: data.user.user_metadata?.full_name || '',
-            email_verified: !!data.user.email_confirmed_at,
-            role: 'student',
-            tier: 'basic',
-            payment_status: 'pending',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
+        const createdUser = await userRepo.createUser({
+          id: data.user.id,
+          email: data.user.email!,
+          full_name: data.user.user_metadata?.full_name || '',
+          email_verified: !!data.user.email_confirmed_at,
+          role: 'student',
+          tier: 'basic',
+          payment_status: 'pending',
+        })
 
-        if (createError) {
+        if (!createdUser) {
           logger.error(
-            { type: 'auth', userId: data.user.id, error: createError },
+            { type: 'auth', userId: data.user.id },
             'Failed to create user profile'
           )
           // Don't fail signin - user can still access portal

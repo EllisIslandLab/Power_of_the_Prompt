@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import { Resend } from 'resend';
 import { renderPaymentConfirmationEmail, EmailSubjects, EMAIL_FROM } from '@/lib/email-builder';
 import { logger, logPayment, logService, logSecurity } from '@/lib/logger';
+import { UserRepository, LeadRepository } from '@/repositories';
 
 // Stripe webhook needs the raw body, so we disable body parsing
 export const dynamic = 'force-dynamic';
@@ -148,19 +149,15 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       sessionsToCredit = metadata.includes_lvl_ups === 'true' ? 3 : 0;
     }
 
+    // Initialize repositories
+    const userRepo = new UserRepository(supabase);
+    const leadRepo = new LeadRepository(supabase);
+
     // 1. Check if lead exists
-    const { data: lead } = await supabase
-      .from('leads')
-      .select('*')
-      .eq('email', customerEmail)
-      .single();
+    const lead = await leadRepo.findByEmail(customerEmail);
 
     // 2. Check if user already exists
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id, tier')
-      .eq('email', customerEmail)
-      .single();
+    const existingUser = await userRepo.findByEmail(customerEmail);
 
     let userId: string;
 
@@ -175,14 +172,11 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       const newTierLevel = tierHierarchy[tier] || 0;
 
       if (newTierLevel > currentTierLevel) {
-        await supabase
-          .from('users')
-          .update({
-            tier: tier,
-            payment_status: 'paid',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', userId);
+        await userRepo.updateTierAndPayment(
+          userId,
+          tier as 'basic' | 'premium' | 'vip',
+          'paid'
+        );
         checkoutLogger.info(
           { userId, oldTier: existingUser.tier, newTier: tier },
           `Upgraded user tier from ${existingUser.tier} to ${tier}`
@@ -214,25 +208,15 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       logSecurity('signup', 'low', { userId, email: customerEmail, source: 'payment' });
 
       // Update the public.users record created by trigger with payment info
-      await supabase
-        .from('users')
-        .update({
-          tier: tier,
-          payment_status: 'paid',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', userId);
+      await userRepo.updateTierAndPayment(
+        userId,
+        tier as 'basic' | 'premium' | 'vip',
+        'paid'
+      );
 
       // Mark lead as converted if exists
       if (lead) {
-        await supabase
-          .from('leads')
-          .update({
-            status: 'converted',
-            converted_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq('email', customerEmail);
+        await leadRepo.markAsConvertedByEmail(customerEmail);
       }
     }
 
