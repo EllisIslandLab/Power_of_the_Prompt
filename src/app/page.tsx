@@ -6,14 +6,18 @@ import { ComingSoonBanner } from "@/components/sections/coming-soon-banner"
 import { Footer } from "@/components/sections/footer"
 import { ExpiredLinkModal } from "@/components/modals/ExpiredLinkModal"
 
-// Lazy load components below the fold for better performance - delay heavy components
+// Lazy load components below the fold for better performance
 const SiteSamples = dynamic(() => import("@/components/sections/site-samples").then(mod => ({ default: mod.SiteSamples })), {
-  loading: () => <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>
+  loading: () => <div className="min-h-screen flex items-center justify-center text-muted-foreground" aria-label="Loading content">Loading...</div>,
+  ssr: false
 })
 const Testimonials = dynamic(() => import("@/components/sections/testimonials").then(mod => ({ default: mod.Testimonials })), {
-  loading: () => <div className="min-h-64 flex items-center justify-center text-muted-foreground">Loading testimonials...</div>
+  loading: () => <div className="min-h-64 flex items-center justify-center text-muted-foreground" aria-label="Loading testimonials">Loading testimonials...</div>,
+  ssr: false
 })
-const ScrollProgress = dynamic(() => import("@/components/scroll-progress").then(mod => ({ default: mod.ScrollProgress })))
+const ScrollProgress = dynamic(() => import("@/components/scroll-progress").then(mod => ({ default: mod.ScrollProgress })), {
+  ssr: false
+})
 
 // Commented out sections for coming soon page
 // import { NewHero } from "@/components/sections/new-hero"

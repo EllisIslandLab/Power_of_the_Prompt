@@ -15,12 +15,22 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
       '@radix-ui/react-select',
-      'lucide-react'
+      '@radix-ui/react-slot',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-tooltip',
+      'lucide-react',
+      'react-hook-form',
+      '@supabase/supabase-js',
+      'framer-motion'
     ],
     // Enable Node.js runtime for middleware
     serverActions: {
       bodySizeLimit: '2mb',
     },
+  },
+  // Modern JavaScript output
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
   // Compression
   compress: true,

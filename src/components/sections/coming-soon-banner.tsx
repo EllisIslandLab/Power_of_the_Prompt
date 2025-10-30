@@ -61,14 +61,14 @@ export function ComingSoonBanner() {
               {isSubmitted ? (
                 <div className="text-center">
                   <div className="text-2xl mb-2">🎉</div>
-                  <h3 className="font-semibold mb-2">Thanks for signing up!</h3>
+                  <h2 className="font-semibold text-lg mb-2">Thanks for signing up!</h2>
                   <p className="text-muted-foreground text-sm">
                     Check your email for confirmation. We'll notify you as soon as we launch!
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <h3 className="font-semibold text-lg">Get Early Access</h3>
+                  <h2 className="font-semibold text-lg">Get Early Access</h2>
                   {error && (
                     <div className="text-sm text-red-600 bg-red-50 p-2 rounded border">
                       {error}
@@ -108,17 +108,17 @@ export function ComingSoonBanner() {
           <div className="grid md:grid-cols-3 gap-6 text-center">
             <div>
               <div className="text-3xl mb-2">🚀</div>
-              <h3 className="font-semibold mb-1">Built for Speed</h3>
+              <h3 className="font-semibold text-lg mb-1">Built for Speed</h3>
               <p className="text-sm text-muted-foreground">Lightning fast websites that convert</p>
             </div>
             <div>
               <div className="text-3xl mb-2">🎯</div>
-              <h3 className="font-semibold mb-1">AI-Powered</h3>
+              <h3 className="font-semibold text-lg mb-1">AI-Powered</h3>
               <p className="text-sm text-muted-foreground">Smart development with Claude CLI</p>
             </div>
             <div>
               <div className="text-3xl mb-2">💎</div>
-              <h3 className="font-semibold mb-1">Own Forever</h3>
+              <h3 className="font-semibold text-lg mb-1">Own Forever</h3>
               <p className="text-sm text-muted-foreground">No monthly fees, complete ownership</p>
             </div>
           </div>
