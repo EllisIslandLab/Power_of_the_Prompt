@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
@@ -13,11 +13,38 @@ export function SiteSamples() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isClient, setIsClient] = useState(false)
   const [screenCenter, setScreenCenter] = useState(640) // Cache window dimensions
+  const [isVisible, setIsVisible] = useState(false) // Track if component is in viewport
   const wheelRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
 
   // Handle client-side rendering
   useEffect(() => {
     setIsClient(true)
+  }, [])
+
+  // Intersection Observer to only animate when visible
+  useEffect(() => {
+    if (!sectionRef.current) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsVisible(entry.isIntersecting)
+        })
+      },
+      {
+        threshold: 0.1, // Trigger when 10% visible
+        rootMargin: '50px', // Start loading slightly before visible
+      }
+    )
+
+    observer.observe(sectionRef.current)
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current)
+      }
+    }
   }, [])
 
   // Use all samples directly - no filtering needed
@@ -55,17 +82,24 @@ export function SiteSamples() {
   const [leftArrowHover, setLeftArrowHover] = useState(false)
   const [rightArrowHover, setRightArrowHover] = useState(false)
 
-  // Update cached window dimensions
+  // Update cached window dimensions with debouncing
   useEffect(() => {
     if (isClient) {
       setScreenCenter(window.innerWidth / 2)
 
+      let timeoutId: NodeJS.Timeout
       const handleResize = () => {
-        setScreenCenter(window.innerWidth / 2)
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(() => {
+          setScreenCenter(window.innerWidth / 2)
+        }, 150) // Debounce resize events
       }
 
-      window.addEventListener('resize', handleResize)
-      return () => window.removeEventListener('resize', handleResize)
+      window.addEventListener('resize', handleResize, { passive: true })
+      return () => {
+        clearTimeout(timeoutId)
+        window.removeEventListener('resize', handleResize)
+      }
     }
   }, [isClient])
 
@@ -109,7 +143,7 @@ export function SiteSamples() {
   }, [totalSamples, baseSamples, spacing, isClient, screenCenter, itemWidth])
 
   return (
-    <section id="site-samples" className="py-24 bg-muted/30">
+    <section ref={sectionRef} id="site-samples" className="py-24 bg-muted/30" style={{ contain: 'layout' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
@@ -173,11 +207,12 @@ export function SiteSamples() {
         >
           <div
             ref={wheelRef}
-            className="relative flex items-center transition-transform duration-700 ease-out"
+            className="relative flex items-center"
             style={{
               transform: `translateX(${rotation}px)`,
               width: `${totalSamples * spacing}px`,
-              transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+              transition: isVisible ? 'transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
+              willChange: isVisible ? 'transform' : 'auto',
             }}
           >
             {Array.from({ length: totalSamples }, (_, index) => {
@@ -187,8 +222,8 @@ export function SiteSamples() {
               const itemPosition = index * spacing + rotation + (spacing / 2)
               const distanceFromCenter = itemPosition - screenCenter
 
-              // Only render center item + 2 on each side (balanced)
-              const itemsPerSide = 2
+              // Only render center item + 1 on each side for better mobile performance
+              const itemsPerSide = 1
               const renderDistance = spacing * itemsPerSide
               if (Math.abs(distanceFromCenter) > renderDistance + spacing / 2) {
                 return null // Don't render off-screen items
@@ -206,11 +241,13 @@ export function SiteSamples() {
               return (
                 <div
                   key={`${sample.title}-${index}`}
-                  className="absolute transition-all duration-500 ease-out"
+                  className="absolute"
                   style={{
                     left: `${index * spacing}px`,
                     transform: `scale(${scale})`,
                     zIndex: Math.round((1 - normalizedDistance) * 10),
+                    transition: isVisible ? 'transform 500ms ease-out' : 'none',
+                    willChange: isVisible ? 'transform' : 'auto',
                   }}
                 >
                   {/* Enhanced Gallery Spotlight for Center Item */}
