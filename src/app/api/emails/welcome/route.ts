@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import { validateRequest } from '@/lib/validation'
 import { sendWelcomeEmailSchema } from '@/lib/schemas'
 import { renderWelcomeEmail, EmailSubjects, EMAIL_FROM } from '@/lib/email-builder'
-import { logger, logService } from '@/lib/logger'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { logger } from '@/lib/logger'
+import { resendAdapter } from '@/adapters'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
@@ -27,34 +25,20 @@ export async function POST(request: NextRequest) {
       portalUrl: process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_URL
     })
 
-    const sendStartTime = Date.now()
-    const { data, error } = await resend.emails.send({
+    const result = await resendAdapter.sendEmail({
       from: EMAIL_FROM,
-      to: [email],
+      to: email,
       subject: EmailSubjects.WELCOME,
       html
     })
 
-    if (error) {
-      const duration = Date.now() - sendStartTime
-      logService('resend', 'sendWelcomeEmail', false, duration, { email })
-      logger.error({ type: 'email', email, error, duration }, 'Failed to send welcome email')
-      return NextResponse.json(
-        { error: 'Failed to send welcome email' },
-        { status: 500 }
-      )
-    }
-
-    const duration = Date.now() - sendStartTime
-    logService('resend', 'sendWelcomeEmail', true, duration, { email, emailId: data?.id })
-
     const totalDuration = Date.now() - startTime
     logger.info(
-      { type: 'email', email, emailId: data?.id, totalDuration },
+      { type: 'email', email, emailId: result.id, totalDuration },
       `Welcome email sent successfully (${totalDuration}ms)`
     )
 
-    return NextResponse.json({ success: true, data })
+    return NextResponse.json({ success: true, data: result })
 
   } catch (error) {
     const duration = Date.now() - startTime

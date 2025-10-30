@@ -1,21 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
-import { Resend } from 'resend';
 import { renderPaymentConfirmationEmail, EmailSubjects, EMAIL_FROM } from '@/lib/email-builder';
 import { logger, logPayment, logService, logSecurity } from '@/lib/logger';
 import { UserRepository, LeadRepository } from '@/repositories';
+import { stripeAdapter, resendAdapter, getAdminClient } from '@/adapters';
 
 // Stripe webhook needs the raw body, so we disable body parsing
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-const resend = new Resend(process.env.RESEND_API_KEY!);
+const supabase = getAdminClient();
 
 export async function POST(req: NextRequest) {
   const startTime = Date.now();
@@ -45,7 +39,7 @@ export async function POST(req: NextRequest) {
     let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+      event = stripeAdapter.constructWebhookEvent(body, sig, webhookSecret);
     } catch (err: any) {
       logger.error(
         { type: 'stripe_webhook', error: err.message },
@@ -123,11 +117,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
   try {
     // Get the product details from Stripe
-    const stripeStartTime = Date.now();
-    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
-      expand: ['data.price.product'],
-    });
-    logService('stripe', 'listLineItems', true, Date.now() - stripeStartTime, { sessionId });
+    const lineItems = await stripeAdapter.listLineItems(session.id, ['data.price.product']);
 
     const product = lineItems.data[0].price?.product as Stripe.Product;
     const metadata = product.metadata;
@@ -288,16 +278,12 @@ async function sendWelcomeEmail(email: string, name: string, tier: string, sessi
       portalUrl: process.env.NEXT_PUBLIC_URL
     });
 
-    const sendStartTime = Date.now();
-    await resend.emails.send({
+    await resendAdapter.sendEmail({
       from: EMAIL_FROM,
       to: email,
       subject: EmailSubjects.PAYMENT_CONFIRMATION(tier),
       html,
     });
-
-    const duration = Date.now() - sendStartTime;
-    logService('resend', 'sendPaymentConfirmation', true, duration, { email, tier });
 
     logger.info(
       { type: 'email', email, tier, totalDuration: Date.now() - startTime },
@@ -309,6 +295,5 @@ async function sendWelcomeEmail(email: string, name: string, tier: string, sessi
       { type: 'email', email, tier, error, duration },
       'Failed to send payment confirmation email'
     );
-    logService('resend', 'sendPaymentConfirmation', false, duration, { email, tier });
   }
 }

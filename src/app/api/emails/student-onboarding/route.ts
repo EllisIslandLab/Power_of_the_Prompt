@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { resendAdapter } from '@/adapters'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,10 +12,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { data, error } = await resend.emails.send({
+    const result = await resendAdapter.sendEmail({
       from: 'Matthew Ellis - Web Launch Academy <noreply@weblaunchacademy.com>',
       replyTo: 'hello@weblaunchacademy.com',
-      to: [email],
+      to: email,
       subject: 'Welcome to Web Launch Academy - Let\'s Get Started!',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
@@ -104,15 +102,7 @@ export async function POST(request: NextRequest) {
       `
     })
 
-    if (error) {
-      console.error('Resend error:', error)
-      return NextResponse.json(
-        { error: 'Failed to send student onboarding email' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({ success: true, data })
+    return NextResponse.json({ success: true, data: result })
 
   } catch (error) {
     console.error('Student onboarding email error:', error)
