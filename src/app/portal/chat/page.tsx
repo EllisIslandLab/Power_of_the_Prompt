@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useAuth } from "@/hooks/useAuth"
+import { createBrowserClient } from '@supabase/ssr'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,167 +14,216 @@ import {
   Users,
   User,
   Crown,
-  ArrowLeft
+  ArrowLeft,
+  Search,
+  X,
+  Reply,
+  Code
 } from "lucide-react"
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 interface Message {
   id: string
   content: string
-  userId: string
-  userName: string
-  userRole: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN'
-  timestamp: Date
-  isRead: boolean
+  user_id: string
+  room_id: string
+  reply_to_message_id?: string
+  created_at: string
+  updated_at: string
+  is_edited: boolean
+  is_deleted: boolean
+  user?: {
+    full_name: string
+    role: string
+  }
+  reply_to?: Message
 }
 
 interface ChatRoom {
   id: string
   name: string
   description: string
-  type: 'GENERAL' | 'HELP' | 'ANNOUNCEMENTS'
-  participants: number
-  lastMessage?: Message
+  type: 'GENERAL' | 'HELP' | 'ANNOUNCEMENTS' | 'CUSTOM'
+  message_count?: number
+  participant_count?: number
 }
 
 export default function ChatPage() {
-  const { user } = useAuth()
-  const [selectedRoom, setSelectedRoom] = useState<string>('general')
+  const [user, setUser] = useState<any>(null)
+  const [selectedRoom, setSelectedRoom] = useState<string>('')
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [isConnected, setIsConnected] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Mock chat rooms - in production, these would come from your database
-  const chatRooms: ChatRoom[] = [
-    {
-      id: 'general',
-      name: 'General Discussion',
-      description: 'General chat for all students',
-      type: 'GENERAL',
-      participants: 12,
-      lastMessage: {
-        id: '1',
-        content: 'Welcome to the student chat!',
-        userId: 'instructor-1',
-        userName: 'WebLaunchCoach',
-        userRole: 'INSTRUCTOR',
-        timestamp: new Date(Date.now() - 1000 * 60 * 30),
-        isRead: true
-      }
-    },
-    {
-      id: 'help',
-      name: 'Help & Support',
-      description: 'Get help with your projects',
-      type: 'HELP',
-      participants: 8,
-      lastMessage: {
-        id: '2',
-        content: 'How do I deploy to Vercel?',
-        userId: 'student-1',
-        userName: 'John S.',
-        userRole: 'STUDENT',
-        timestamp: new Date(Date.now() - 1000 * 60 * 15),
-        isRead: false
-      }
-    },
-    {
-      id: 'announcements',
-      name: 'Announcements',
-      description: 'Important updates and news',
-      type: 'ANNOUNCEMENTS',
-      participants: 25,
-      lastMessage: {
-        id: '3',
-        content: 'New chapter added to the textbook!',
-        userId: 'instructor-1',
-        userName: 'WebLaunchCoach',
-        userRole: 'INSTRUCTOR',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-        isRead: true
-      }
-    }
-  ]
-
-  // Mock messages - in production, these would be fetched based on selected room
-  const mockMessages: Message[] = [
-    {
-      id: '1',
-      content: 'Welcome to the WebLaunchCoach student chat! This is where you can connect with fellow students and get real-time help.',
-      userId: 'instructor-1',
-      userName: 'WebLaunchCoach',
-      userRole: 'INSTRUCTOR',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-      isRead: true
-    },
-    {
-      id: '2',
-      content: 'Hi everyone! Excited to be here and start learning.',
-      userId: 'student-1',
-      userName: 'Sarah M.',
-      userRole: 'STUDENT',
-      timestamp: new Date(Date.now() - 1000 * 60 * 45),
-      isRead: true
-    },
-    {
-      id: '3',
-      content: 'Has anyone successfully deployed their first Next.js app yet? I\'m working through Chapter 5.',
-      userId: 'student-2',
-      userName: 'Mike K.',
-      userRole: 'STUDENT',
-      timestamp: new Date(Date.now() - 1000 * 60 * 30),
-      isRead: true
-    },
-    {
-      id: '4',
-      content: 'Yes! Just deployed mine yesterday. The Vercel integration works perfectly. Make sure your environment variables are set correctly.',
-      userId: 'student-3',
-      userName: 'Lisa R.',
-      userRole: 'STUDENT',
-      timestamp: new Date(Date.now() - 1000 * 60 * 25),
-      isRead: true
-    }
-  ]
-
+  // Load user and initialize
   useEffect(() => {
-    // Simulate real-time connection
-    setIsConnected(true)
-    setMessages(mockMessages)
-    
-    // In production, you would set up WebSocket connection here
-    // const ws = new WebSocket('wss://your-websocket-server.com')
-    // ws.onmessage = (event) => {
-    //   const message = JSON.parse(event.data)
-    //   setMessages(prev => [...prev, message])
-    // }
-    
-    return () => {
-      setIsConnected(false)
-    }
-  }, [selectedRoom])
+    async function loadUser() {
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) return
 
+      const { data: userData } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authUser.id)
+        .single()
+
+      setUser({ ...authUser, ...userData })
+      loadChatRooms()
+    }
+
+    loadUser()
+  }, [])
+
+  // Load chat rooms with counts
+  async function loadChatRooms() {
+    const { data: rooms, error } = await supabase
+      .from('chat_rooms')
+      .select('*')
+      .eq('is_active', true)
+      .order('type', { ascending: true })
+
+    if (rooms && !error) {
+      // Get message counts for each room
+      const roomsWithCounts = await Promise.all(
+        rooms.map(async (room) => {
+          const { count } = await supabase
+            .from('chat_messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('room_id', room.id)
+            .eq('is_deleted', false)
+
+          const { data: members } = await supabase
+            .from('chat_room_members')
+            .select('user_id')
+            .eq('room_id', room.id)
+
+          return {
+            ...room,
+            message_count: count || 0,
+            participant_count: members?.length || 0
+          }
+        })
+      )
+
+      setChatRooms(roomsWithCounts)
+
+      // Select first room by default
+      if (roomsWithCounts.length > 0 && !selectedRoom) {
+        setSelectedRoom(roomsWithCounts[0].id)
+      }
+    }
+  }
+
+  // Load messages for selected room
+  useEffect(() => {
+    if (!selectedRoom || !user) return
+
+    async function loadMessages() {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select(`
+          *,
+          user:users!chat_messages_user_id_fkey(full_name, role),
+          reply_to:chat_messages!chat_messages_reply_to_message_id_fkey(
+            id,
+            content,
+            user_id,
+            user:users!chat_messages_user_id_fkey(full_name)
+          )
+        `)
+        .eq('room_id', selectedRoom)
+        .eq('is_deleted', false)
+        .order('created_at', { ascending: true })
+
+      if (data && !error) {
+        setMessages(data as any)
+        setIsConnected(true)
+
+        // Auto-join room if not already a member
+        await supabase
+          .from('chat_room_members')
+          .upsert({
+            room_id: selectedRoom,
+            user_id: user.id,
+            last_read_at: new Date().toISOString()
+          })
+      }
+    }
+
+    loadMessages()
+
+    // Subscribe to real-time messages
+    const channel = supabase
+      .channel(`room:${selectedRoom}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: `room_id=eq.${selectedRoom}`
+        },
+        async (payload) => {
+          // Fetch the complete message with user data
+          const { data } = await supabase
+            .from('chat_messages')
+            .select(`
+              *,
+              user:users!chat_messages_user_id_fkey(full_name, role),
+              reply_to:chat_messages!chat_messages_reply_to_message_id_fkey(
+                id,
+                content,
+                user_id,
+                user:users!chat_messages_user_id_fkey(full_name)
+              )
+            `)
+            .eq('id', payload.new.id)
+            .single()
+
+          if (data) {
+            setMessages(prev => [...prev, data as any])
+            // Update room counts
+            loadChatRooms()
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [selectedRoom, user])
+
+  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const sendMessage = () => {
-    if (!newMessage.trim() || !user) return
+  // Send message
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !user || !selectedRoom) return
 
-    const message: Message = {
-      id: Date.now().toString(),
-      content: newMessage,
-      userId: user.id || 'current-user',
-      userName: user.studentProfile?.full_name || user.adminProfile?.full_name || 'You',
-      userRole: (user.userType as string) === 'admin' ? 'ADMIN' : 'STUDENT',
-      timestamp: new Date(),
-      isRead: false
+    const { error } = await supabase
+      .from('chat_messages')
+      .insert({
+        room_id: selectedRoom,
+        user_id: user.id,
+        content: newMessage.trim(),
+        reply_to_message_id: replyingTo?.id || null
+      })
+
+    if (!error) {
+      setNewMessage('')
+      setReplyingTo(null)
     }
-
-    setMessages(prev => [...prev, message])
-    setNewMessage('')
-
-    // In production, send to WebSocket server
-    // ws.send(JSON.stringify(message))
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -184,15 +233,16 @@ export default function ChatPage() {
     }
   }
 
-  const formatTime = (date: Date) => {
+  const formatTime = (dateString: string) => {
     return new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true
-    }).format(date)
+    }).format(new Date(dateString))
   }
 
-  const formatDate = (date: Date) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
     const today = new Date()
     const yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
@@ -207,24 +257,70 @@ export default function ChatPage() {
   }
 
   const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'INSTRUCTOR':
-      case 'ADMIN':
-        return <Crown className="h-3 w-3 text-yellow-500" />
-      default:
-        return <User className="h-3 w-3 text-muted-foreground" />
+    if (role === 'admin') {
+      return <Crown className="h-3 w-3 text-yellow-500" />
     }
+    return <User className="h-3 w-3 text-muted-foreground" />
   }
 
   const getRoleBadge = (role: string) => {
-    switch (role) {
-      case 'INSTRUCTOR':
-        return <Badge variant="secondary" className="text-xs">Instructor</Badge>
-      case 'ADMIN':
-        return <Badge variant="default" className="text-xs">Admin</Badge>
-      default:
-        return null
+    if (role === 'admin') {
+      return <Badge variant="default" className="text-xs">Admin</Badge>
     }
+    return null
+  }
+
+  // Format message content with code blocks
+  const formatMessageContent = (content: string) => {
+    // Split by code blocks
+    const parts = content.split(/(```[\s\S]*?```|`[^`]+`)/g)
+
+    return parts.map((part, index) => {
+      // Multi-line code block
+      if (part.startsWith('```') && part.endsWith('```')) {
+        const code = part.slice(3, -3).trim()
+        return (
+          <pre key={index} className="bg-muted p-3 rounded-md my-2 overflow-x-auto">
+            <code className="text-sm font-mono">{code}</code>
+          </pre>
+        )
+      }
+      // Inline code
+      if (part.startsWith('`') && part.endsWith('`')) {
+        return (
+          <code key={index} className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+            {part.slice(1, -1)}
+          </code>
+        )
+      }
+      // Regular text
+      return <span key={index}>{part}</span>
+    })
+  }
+
+  // Truncate reply preview
+  const truncateReply = (content: string, maxLength: number = 50) => {
+    if (content.length <= maxLength) return content
+    return content.substring(0, maxLength) + '...'
+  }
+
+  // Filter messages by search
+  const filteredMessages = searchTerm
+    ? messages.filter(msg =>
+        msg.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        msg.user?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : messages
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading chat...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -278,20 +374,16 @@ export default function ChatPage() {
                       <div className="flex items-center justify-between mb-1">
                         <h3 className="font-medium text-sm">{room.name}</h3>
                         <Badge variant="outline" className="text-xs">
-                          {room.participants}
+                          {room.message_count || 0}
                         </Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mb-2">
                         {room.description}
                       </p>
-                      {room.lastMessage && (
-                        <div className="text-xs text-muted-foreground">
-                          <span className="font-medium">{room.lastMessage.userName}:</span>{' '}
-                          <span className="truncate">
-                            {room.lastMessage.content.substring(0, 30)}...
-                          </span>
-                        </div>
-                      )}
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Users className="h-3 w-3" />
+                        {room.participant_count || 0} members
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -309,61 +401,119 @@ export default function ChatPage() {
                       {chatRooms.find(r => r.id === selectedRoom)?.name}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      {chatRooms.find(r => r.id === selectedRoom)?.participants} participants
+                      {chatRooms.find(r => r.id === selectedRoom)?.participant_count || 0} members · {chatRooms.find(r => r.id === selectedRoom)?.message_count || 0} messages
                     </p>
                   </div>
-                  <Badge variant={isConnected ? "default" : "secondary"}>
-                    {isConnected ? "Live" : "Offline"}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search messages..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-9 w-64"
+                      />
+                      {searchTerm && (
+                        <button
+                          onClick={() => setSearchTerm('')}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        >
+                          <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                        </button>
+                      )}
+                    </div>
+                    <Badge variant={isConnected ? "default" : "secondary"}>
+                      {isConnected ? "Live" : "Offline"}
+                    </Badge>
+                  </div>
                 </div>
               </CardHeader>
 
               {/* Messages */}
               <div className="flex-1 p-4 overflow-y-auto">
+                {filteredMessages.length === 0 && searchTerm && (
+                  <div className="text-center text-muted-foreground py-8">
+                    No messages found matching &quot;{searchTerm}&quot;
+                  </div>
+                )}
+                {filteredMessages.length === 0 && !searchTerm && (
+                  <div className="text-center text-muted-foreground py-8">
+                    No messages yet. Start the conversation!
+                  </div>
+                )}
                 <div className="space-y-4">
-                  {messages.map((message, index) => {
-                    const showDate = index === 0 || 
-                      formatDate(message.timestamp) !== formatDate(messages[index - 1]?.timestamp)
-                    
+                  {filteredMessages.map((message, index) => {
+                    const showDate = index === 0 ||
+                      formatDate(message.created_at) !== formatDate(filteredMessages[index - 1]?.created_at)
+
                     return (
                       <div key={message.id}>
                         {showDate && (
                           <div className="flex items-center justify-center my-4">
                             <Separator className="flex-1" />
                             <Badge variant="outline" className="mx-4 text-xs">
-                              {formatDate(message.timestamp)}
+                              {formatDate(message.created_at)}
                             </Badge>
                             <Separator className="flex-1" />
                           </div>
                         )}
-                        
-                        <div className={`flex gap-3 ${
-                          message.userId === user?.id ? 'flex-row-reverse' : ''
+
+                        <div className={`flex gap-3 group ${
+                          message.user_id === user?.id ? 'flex-row-reverse' : ''
                         }`}>
                           <div className="flex-shrink-0">
                             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              {getRoleIcon(message.userRole)}
+                              {getRoleIcon(message.user?.role || 'student')}
                             </div>
                           </div>
-                          
+
                           <div className={`flex-1 max-w-[80%] ${
-                            message.userId === user?.id ? 'text-right' : ''
+                            message.user_id === user?.id ? 'text-right' : ''
                           }`}>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-sm">{message.userName}</span>
-                              {getRoleBadge(message.userRole)}
+                            <div className={`flex items-center gap-2 mb-1 ${
+                              message.user_id === user?.id ? 'justify-end' : ''
+                            }`}>
+                              <span className="font-medium text-sm">{message.user?.full_name || 'Unknown User'}</span>
+                              {getRoleBadge(message.user?.role || 'student')}
                               <span className="text-xs text-muted-foreground">
-                                {formatTime(message.timestamp)}
+                                {formatTime(message.created_at)}
                               </span>
+                              {message.is_edited && (
+                                <span className="text-xs text-muted-foreground italic">(edited)</span>
+                              )}
                             </div>
-                            
+
+                            {/* Reply Preview */}
+                            {message.reply_to && (
+                              <div className={`mb-2 p-2 rounded-md bg-muted/50 border-l-2 border-primary text-xs ${
+                                message.user_id === user?.id ? 'text-left' : ''
+                              }`}>
+                                <div className="flex items-center gap-1 mb-1">
+                                  <Reply className="h-3 w-3" />
+                                  <span className="font-medium">@{message.reply_to.user?.full_name}</span>
+                                </div>
+                                <p className="text-muted-foreground">
+                                  {truncateReply(message.reply_to.content)}
+                                </p>
+                              </div>
+                            )}
+
                             <div className={`inline-block p-3 rounded-lg text-sm ${
-                              message.userId === user?.id
+                              message.user_id === user?.id
                                 ? 'bg-primary text-primary-foreground'
                                 : 'bg-muted'
                             }`}>
-                              {message.content}
+                              {formatMessageContent(message.content)}
                             </div>
+
+                            {/* Reply Button */}
+                            <button
+                              onClick={() => setReplyingTo(message)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                            >
+                              <Reply className="h-3 w-3" />
+                              Reply
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -375,26 +525,50 @@ export default function ChatPage() {
 
               {/* Message Input */}
               <div className="border-t p-4">
+                {/* Reply Preview */}
+                {replyingTo && (
+                  <div className="mb-3 p-3 bg-muted/50 rounded-md border-l-2 border-primary">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Reply className="h-4 w-4" />
+                        <span className="font-medium">Replying to @{replyingTo.user?.full_name}</span>
+                      </div>
+                      <button onClick={() => setReplyingTo(null)}>
+                        <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                      </button>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {truncateReply(replyingTo.content, 100)}
+                    </p>
+                  </div>
+                )}
+
                 <div className="flex gap-2">
                   <Input
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Type your message..."
+                    placeholder="Type your message... Use ` for inline code or ``` for code blocks"
                     className="flex-1"
                     disabled={!isConnected}
                   />
-                  <Button 
-                    onClick={sendMessage} 
+                  <Button
+                    onClick={sendMessage}
                     disabled={!newMessage.trim() || !isConnected}
                     size="icon"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Press Enter to send, Shift+Enter for new line
-                </p>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-muted-foreground">
+                    Press Enter to send, Shift+Enter for new line
+                  </p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Code className="h-3 w-3" />
+                    <span>Use `code` or ```code block```</span>
+                  </div>
+                </div>
               </div>
             </Card>
           </div>
@@ -413,7 +587,7 @@ export default function ChatPage() {
                   <li>• Be respectful and professional</li>
                   <li>• Help fellow students when you can</li>
                   <li>• Use appropriate chat rooms for your questions</li>
-                  <li>• Search previous messages before asking</li>
+                  <li>• Use code formatting for code snippets</li>
                 </ul>
               </div>
               <div>
