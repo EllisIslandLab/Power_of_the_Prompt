@@ -26,7 +26,9 @@ import {
   Paperclip,
   Image as ImageIcon,
   FileText,
-  Download
+  Download,
+  Copy,
+  Check
 } from "lucide-react"
 
 const supabase = createBrowserClient(
@@ -98,6 +100,7 @@ export default function ChatPage() {
   const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null)
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([])
   const [uploadingFile, setUploadingFile] = useState(false)
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -437,6 +440,20 @@ export default function ChatPage() {
     setShowReactionPicker(null)
   }
 
+  // Copy message to clipboard
+  const copyMessage = async (message: Message) => {
+    const textToCopy = `From ${message.user?.full_name} in Announcements:\n\n${message.content}`
+
+    try {
+      await navigator.clipboard.writeText(textToCopy)
+      setCopiedMessageId(message.id)
+      setTimeout(() => setCopiedMessageId(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+      alert('Failed to copy message')
+    }
+  }
+
   // Handle file upload
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -582,6 +599,12 @@ export default function ChatPage() {
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
   }
+
+  // Check if current room is announcements
+  const currentRoom = chatRooms.find(r => r.id === selectedRoom)
+  const isAnnouncementRoom = currentRoom?.type === 'ANNOUNCEMENTS'
+  const isAdmin = user?.role === 'admin'
+  const canPostInRoom = isAdmin || !isAnnouncementRoom
 
   // Filter messages by search
   const filteredMessages = searchTerm
@@ -878,24 +901,53 @@ export default function ChatPage() {
 
                                 {/* Action Buttons */}
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 flex items-center gap-2">
-                                  <button
-                                    onClick={() => setReplyingTo(message)}
-                                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-                                  >
-                                    <Reply className="h-3 w-3" />
-                                    Reply
-                                  </button>
-
-                                  <div className="relative">
+                                  {/* Copy button for announcement rooms */}
+                                  {isAnnouncementRoom && !isAdmin && (
                                     <button
-                                      onClick={() => setShowReactionPicker(
-                                        showReactionPicker === message.id ? null : message.id
+                                      onClick={() => copyMessage(message)}
+                                      className={`text-xs flex items-center gap-1 ${
+                                        copiedMessageId === message.id
+                                          ? 'text-green-600'
+                                          : 'text-muted-foreground hover:text-foreground'
+                                      }`}
+                                    >
+                                      {copiedMessageId === message.id ? (
+                                        <>
+                                          <Check className="h-3 w-3" />
+                                          Copied!
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Copy className="h-3 w-3" />
+                                          Copy to Discuss
+                                        </>
                                       )}
+                                    </button>
+                                  )}
+
+                                  {/* Reply button (hidden in announcement rooms for non-admins) */}
+                                  {canPostInRoom && (
+                                    <button
+                                      onClick={() => setReplyingTo(message)}
                                       className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
                                     >
-                                      <Smile className="h-3 w-3" />
-                                      React
+                                      <Reply className="h-3 w-3" />
+                                      Reply
                                     </button>
+                                  )}
+
+                                  {/* React button (hidden in announcement rooms for non-admins) */}
+                                  {canPostInRoom && (
+                                    <div className="relative">
+                                      <button
+                                        onClick={() => setShowReactionPicker(
+                                          showReactionPicker === message.id ? null : message.id
+                                        )}
+                                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                                      >
+                                        <Smile className="h-3 w-3" />
+                                        React
+                                      </button>
 
                                     {showReactionPicker === message.id && (
                                       <div className="absolute bottom-full mb-2 left-0 bg-popover border rounded-lg p-2 shadow-lg flex gap-1 z-10">
@@ -910,7 +962,8 @@ export default function ChatPage() {
                                         ))}
                                       </div>
                                     )}
-                                  </div>
+                                    </div>
+                                  )}
 
                                   {canEditMessage(message) && (
                                     <button
@@ -965,8 +1018,17 @@ export default function ChatPage() {
 
               {/* Message Input */}
               <div className="border-t p-4">
-                {/* Reply Preview */}
-                {replyingTo && (
+                {/* Announcement Room Notice for Students */}
+                {isAnnouncementRoom && !isAdmin ? (
+                  <div className="bg-muted/50 border border-border rounded-lg p-4 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Announcements are read-only.</strong> To discuss an announcement, use the <strong>&quot;Copy to Discuss&quot;</strong> button on any message, then paste it in <strong>General Discussion</strong> or <strong>Help & Support</strong>.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Reply Preview */}
+                    {replyingTo && (
                   <div className="mb-3 p-3 bg-muted/50 rounded-md border-l-2 border-primary">
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2 text-sm">
@@ -1033,6 +1095,8 @@ export default function ChatPage() {
                     </div>
                   </div>
                 </div>
+                  </>
+                )}
               </div>
             </Card>
           </div>
