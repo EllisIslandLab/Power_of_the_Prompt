@@ -411,7 +411,9 @@ export default function ChatPage() {
   const sendMessage = async () => {
     if (!newMessage.trim() || !user || !selectedRoom) return
 
-    const { error } = await supabase
+    console.log('Sending message:', { room_id: selectedRoom, user_id: user.id, content: newMessage.trim() })
+
+    const { data, error } = await supabase
       .from('chat_messages')
       .insert({
         room_id: selectedRoom,
@@ -419,8 +421,13 @@ export default function ChatPage() {
         content: newMessage.trim(),
         reply_to_message_id: replyingTo?.id || null
       })
+      .select()
 
-    if (!error) {
+    if (error) {
+      console.error('Error sending message:', error)
+      alert(`Failed to send message: ${error.message}`)
+    } else {
+      console.log('Message sent successfully:', data)
       setNewMessage('')
       setReplyingTo(null)
 
