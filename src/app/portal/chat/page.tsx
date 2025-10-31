@@ -258,6 +258,8 @@ export default function ChatPage() {
           filter: `room_id=eq.${selectedRoom}`
         },
         async (payload) => {
+          console.log('Real-time message received:', payload)
+
           const { data } = await supabase
             .from('chat_messages')
             .select('*')
@@ -265,12 +267,16 @@ export default function ChatPage() {
             .single()
 
           if (data) {
+            console.log('Fetched message data:', data)
+
             // Load user info
             const { data: userData } = await supabase
               .from('users')
               .select('id, full_name, role')
               .eq('id', data.user_id)
               .single()
+
+            console.log('Fetched user data:', userData)
 
             // Load reply_to message and user if exists
             let replyData = null
@@ -301,8 +307,11 @@ export default function ChatPage() {
               reply_to: replyData
             }
 
+            console.log('Adding message to state:', messageWithUser)
             setMessages(prev => [...prev, { ...messageWithUser, reactions: [] } as any])
             loadChatRooms()
+          } else {
+            console.error('No message data found for ID:', payload.new.id)
           }
         }
       )
