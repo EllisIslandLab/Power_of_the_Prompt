@@ -239,6 +239,39 @@ export async function POST(request: NextRequest) {
       logger.error({ type: 'auth', userId: data.user.id, error: profileErr }, 'Profile update error')
     }
 
+    // Auto-assign to active cohort (if exists)
+    try {
+      const { data: activeCohort } = await supabase
+        .from('cohorts')
+        .select('id')
+        .eq('is_active', true)
+        .single()
+
+      if (activeCohort) {
+        const { error: cohortError } = await supabase
+          .from('cohort_members')
+          .insert({
+            cohort_id: activeCohort.id,
+            user_id: data.user.id,
+            status: 'active'
+          })
+
+        if (cohortError) {
+          logger.error(
+            { type: 'auth', userId: data.user.id, cohortId: activeCohort.id, error: cohortError },
+            'Failed to add user to active cohort'
+          )
+        } else {
+          logger.info(
+            { type: 'auth', userId: data.user.id, cohortId: activeCohort.id },
+            'Added user to active cohort'
+          )
+        }
+      }
+    } catch (cohortErr) {
+      logger.error({ type: 'auth', userId: data.user.id, error: cohortErr }, 'Cohort assignment error')
+    }
+
     // Mark invite token as used
     try {
       await supabase
