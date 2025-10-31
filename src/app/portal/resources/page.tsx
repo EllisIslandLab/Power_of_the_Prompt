@@ -5,12 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { 
-  FileText, 
-  Code, 
-  ExternalLink, 
-  Download, 
-  Search, 
+import Link from "next/link"
+import {
+  FileText,
+  Code,
+  ExternalLink,
+  Download,
+  Search,
   BookOpen,
   Video,
   Github,
@@ -20,7 +21,8 @@ import {
   Terminal,
   Zap,
   Shield,
-  Smartphone
+  Smartphone,
+  ArrowLeft
 } from "lucide-react"
 
 interface Resource {
@@ -218,9 +220,17 @@ export default function ResourcesPage() {
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <FileText className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Student Resources</h1>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <FileText className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold">Student Resources</h1>
+            </div>
+            <Button variant="outline" asChild>
+              <Link href="/portal">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Portal
+              </Link>
+            </Button>
           </div>
           <p className="text-muted-foreground">
             Templates, guides, tools, and external resources to accelerate your web development journey

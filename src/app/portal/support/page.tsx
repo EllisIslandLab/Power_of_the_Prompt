@@ -10,16 +10,18 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { 
-  HelpCircle, 
-  MessageCircle, 
-  Calendar, 
+import Link from "next/link"
+import {
+  HelpCircle,
+  MessageCircle,
+  Calendar,
   Search,
   ChevronDown,
   ChevronUp,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from "lucide-react"
 
 interface FAQ {
@@ -193,9 +195,17 @@ export default function SupportPage() {
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <HelpCircle className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Support Center</h1>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <HelpCircle className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold">Support Center</h1>
+            </div>
+            <Button variant="outline" asChild>
+              <Link href="/portal">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Portal
+              </Link>
+            </Button>
           </div>
           <p className="text-muted-foreground">
             Get help with your web development journey - we&apos;re here to support your success

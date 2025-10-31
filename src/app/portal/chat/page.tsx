@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { 
-  MessageCircle, 
-  Send, 
+import Link from "next/link"
+import {
+  MessageCircle,
+  Send,
   Users,
   User,
-  Crown
+  Crown,
+  ArrowLeft
 } from "lucide-react"
 
 interface Message {
@@ -230,15 +232,23 @@ export default function ChatPage() {
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <MessageCircle className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Student Chat</h1>
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
-              <span className="text-sm text-muted-foreground">
-                {isConnected ? 'Connected' : 'Connecting...'}
-              </span>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <MessageCircle className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold">Student Chat</h1>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span className="text-sm text-muted-foreground">
+                  {isConnected ? 'Connected' : 'Connecting...'}
+                </span>
+              </div>
             </div>
+            <Button variant="outline" asChild>
+              <Link href="/portal">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Portal
+              </Link>
+            </Button>
           </div>
           <p className="text-muted-foreground">
             Connect with fellow students and get real-time help from instructors

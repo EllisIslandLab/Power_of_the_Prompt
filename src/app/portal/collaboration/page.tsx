@@ -10,9 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Users, Video, Clock, Calendar } from 'lucide-react'
+import { Users, Video, Clock, Calendar, ArrowLeft } from 'lucide-react'
 import VideoSessionManager from "@/components/video/VideoSessionManager"
 import { usePresence } from "@/components/ui/online-indicator"
+import Link from 'next/link'
 
 // Use browser client for proper cookie handling in client components
 const supabase = createBrowserClient(
@@ -91,7 +92,15 @@ export default function CollaborationPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Collaboration Hub</h1>
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-3xl font-bold">Collaboration Hub</h1>
+          <Button variant="outline" asChild>
+            <Link href="/portal">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Portal
+            </Link>
+          </Button>
+        </div>
         <p className="text-muted-foreground">
           Connect with your coach and fellow students through video conferences and session management
         </p>

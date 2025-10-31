@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { Zap, BookOpen, MessageSquare, Settings, Users, Plus, Video, HelpCircle, Handshake } from "lucide-react"
+import { Zap, BookOpen, MessageSquare, Settings, Users, Plus, HelpCircle, Handshake } from "lucide-react"
 import { createBrowserClient } from '@supabase/ssr'
 import { OnlineIndicator, usePresence } from "@/components/ui/online-indicator"
 import { SessionCounter } from "@/components/ui/session-counter"
@@ -97,7 +97,7 @@ export default function PortalPage() {
           </div>
 
           {/* Navigation Links */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
               <Link href="/portal/chat">
                 <MessageSquare className="h-5 w-5" />
@@ -132,12 +132,6 @@ export default function PortalPage() {
               <Link href="/portal/textbook">
                 <BookOpen className="h-5 w-5" />
                 <span className="text-sm">Textbook</span>
-              </Link>
-            </Button>
-            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
-              <Link href="/portal/video">
-                <Video className="h-5 w-5" />
-                <span className="text-sm">Video</span>
               </Link>
             </Button>
           </div>

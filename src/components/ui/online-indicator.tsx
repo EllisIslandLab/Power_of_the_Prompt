@@ -99,7 +99,7 @@ export function usePresence() {
 
       setUser(authUser)
 
-      // Update presence every 60 seconds
+      // Update presence every 30 seconds (reduced from 60 for better responsiveness)
       const updatePresence = async () => {
         await supabase
           .from('user_presence')
@@ -110,11 +110,11 @@ export function usePresence() {
           })
       }
 
-      // Initial update
+      // Initial update - happens immediately on page load
       await updatePresence()
 
-      // Set up interval
-      interval = setInterval(updatePresence, 60000)
+      // Set up interval for ongoing updates
+      interval = setInterval(updatePresence, 30000) // Changed from 60000 to 30000
 
       // Mark offline on page unload
       window.addEventListener('beforeunload', async () => {
