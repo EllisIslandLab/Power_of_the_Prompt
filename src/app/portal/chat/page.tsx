@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
 import {
   MessageCircle,
@@ -18,13 +19,30 @@ import {
   Search,
   X,
   Reply,
-  Code
+  Code,
+  Smile,
+  Edit2,
+  Trash2,
+  Paperclip,
+  Image as ImageIcon,
+  FileText,
+  Download
 } from "lucide-react"
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
+
+interface Reaction {
+  id: string
+  message_id: string
+  user_id: string
+  emoji: string
+  user?: {
+    full_name: string
+  }
+}
 
 interface Message {
   id: string
@@ -36,11 +54,16 @@ interface Message {
   updated_at: string
   is_edited: boolean
   is_deleted: boolean
+  attachment_url?: string
+  attachment_type?: string
+  attachment_name?: string
+  attachment_size?: number
   user?: {
     full_name: string
     role: string
   }
   reply_to?: Message
+  reactions?: Reaction[]
 }
 
 interface ChatRoom {
@@ -52,6 +75,15 @@ interface ChatRoom {
   participant_count?: number
 }
 
+interface TypingUser {
+  user_id: string
+  user?: {
+    full_name: string
+  }
+}
+
+const COMMON_EMOJIS = ['👍', '❤️', '😂', '🎉', '🚀', '💯']
+
 export default function ChatPage() {
   const [user, setUser] = useState<any>(null)
   const [selectedRoom, setSelectedRoom] = useState<string>('')
@@ -61,7 +93,14 @@ export default function ChatPage() {
   const [isConnected, setIsConnected] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [replyingTo, setReplyingTo] = useState<Message | null>(null)
+  const [editingMessage, setEditingMessage] = useState<Message | null>(null)
+  const [editContent, setEditContent] = useState('')
+  const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null)
+  const [typingUsers, setTypingUsers] = useState<TypingUser[]>([])
+  const [uploadingFile, setUploadingFile] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Load user and initialize
   useEffect(() => {
@@ -91,7 +130,6 @@ export default function ChatPage() {
       .order('type', { ascending: true })
 
     if (rooms && !error) {
-      // Get message counts for each room
       const roomsWithCounts = await Promise.all(
         rooms.map(async (room) => {
           const { count } = await supabase
@@ -115,10 +153,57 @@ export default function ChatPage() {
 
       setChatRooms(roomsWithCounts)
 
-      // Select first room by default
       if (roomsWithCounts.length > 0 && !selectedRoom) {
         setSelectedRoom(roomsWithCounts[0].id)
       }
+    }
+  }
+
+  // Load messages with reactions
+  async function loadMessages() {
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .select(`
+        *,
+        user:users!chat_messages_user_id_fkey(full_name, role),
+        reply_to:chat_messages!chat_messages_reply_to_message_id_fkey(
+          id,
+          content,
+          user_id,
+          user:users!chat_messages_user_id_fkey(full_name)
+        )
+      `)
+      .eq('room_id', selectedRoom)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: true })
+
+    if (data && !error) {
+      // Load reactions for all messages
+      const messagesWithReactions = await Promise.all(
+        data.map(async (msg) => {
+          const { data: reactions } = await supabase
+            .from('message_reactions')
+            .select('*, user:users!message_reactions_user_id_fkey(full_name)')
+            .eq('message_id', msg.id)
+
+          return {
+            ...msg,
+            reactions: reactions || []
+          }
+        })
+      )
+
+      setMessages(messagesWithReactions as any)
+      setIsConnected(true)
+
+      // Auto-join room
+      await supabase
+        .from('chat_room_members')
+        .upsert({
+          room_id: selectedRoom,
+          user_id: user.id,
+          last_read_at: new Date().toISOString()
+        })
     }
   }
 
@@ -126,42 +211,10 @@ export default function ChatPage() {
   useEffect(() => {
     if (!selectedRoom || !user) return
 
-    async function loadMessages() {
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select(`
-          *,
-          user:users!chat_messages_user_id_fkey(full_name, role),
-          reply_to:chat_messages!chat_messages_reply_to_message_id_fkey(
-            id,
-            content,
-            user_id,
-            user:users!chat_messages_user_id_fkey(full_name)
-          )
-        `)
-        .eq('room_id', selectedRoom)
-        .eq('is_deleted', false)
-        .order('created_at', { ascending: true })
-
-      if (data && !error) {
-        setMessages(data as any)
-        setIsConnected(true)
-
-        // Auto-join room if not already a member
-        await supabase
-          .from('chat_room_members')
-          .upsert({
-            room_id: selectedRoom,
-            user_id: user.id,
-            last_read_at: new Date().toISOString()
-          })
-      }
-    }
-
     loadMessages()
 
     // Subscribe to real-time messages
-    const channel = supabase
+    const messageChannel = supabase
       .channel(`room:${selectedRoom}`)
       .on(
         'postgres_changes',
@@ -172,7 +225,6 @@ export default function ChatPage() {
           filter: `room_id=eq.${selectedRoom}`
         },
         async (payload) => {
-          // Fetch the complete message with user data
           const { data } = await supabase
             .from('chat_messages')
             .select(`
@@ -189,16 +241,75 @@ export default function ChatPage() {
             .single()
 
           if (data) {
-            setMessages(prev => [...prev, data as any])
-            // Update room counts
+            setMessages(prev => [...prev, { ...data, reactions: [] } as any])
             loadChatRooms()
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'chat_messages',
+          filter: `room_id=eq.${selectedRoom}`
+        },
+        async (payload) => {
+          setMessages(prev => prev.map(msg =>
+            msg.id === payload.new.id
+              ? { ...msg, ...payload.new, is_edited: true }
+              : msg
+          ))
+        }
+      )
+      .subscribe()
+
+    // Subscribe to reactions
+    const reactionChannel = supabase
+      .channel(`reactions:${selectedRoom}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'message_reactions'
+        },
+        async () => {
+          // Reload messages with updated reactions
+          loadMessages()
+        }
+      )
+      .subscribe()
+
+    // Subscribe to typing indicators
+    const typingChannel = supabase
+      .channel(`typing:${selectedRoom}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'chat_typing',
+          filter: `room_id=eq.${selectedRoom}`
+        },
+        async () => {
+          const { data } = await supabase
+            .from('chat_typing')
+            .select('user_id, user:users!chat_typing_user_id_fkey(full_name)')
+            .eq('room_id', selectedRoom)
+            .gt('typing_at', new Date(Date.now() - 10000).toISOString())
+
+          if (data) {
+            setTypingUsers(data.filter(t => t.user_id !== user.id) as any)
           }
         }
       )
       .subscribe()
 
     return () => {
-      supabase.removeChannel(channel)
+      supabase.removeChannel(messageChannel)
+      supabase.removeChannel(reactionChannel)
+      supabase.removeChannel(typingChannel)
     }
   }, [selectedRoom, user])
 
@@ -206,6 +317,35 @@ export default function ChatPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Typing indicator handler
+  const handleTyping = async () => {
+    if (!user || !selectedRoom) return
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+      typingTimeoutRef.current = null
+    }
+
+    // Update typing status
+    await supabase
+      .from('chat_typing')
+      .upsert({
+        room_id: selectedRoom,
+        user_id: user.id,
+        typing_at: new Date().toISOString()
+      })
+
+    // Clear typing status after 3 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(async () => {
+      await supabase
+        .from('chat_typing')
+        .delete()
+        .eq('room_id', selectedRoom)
+        .eq('user_id', user.id)
+    }, 3000)
+  }
 
   // Send message
   const sendMessage = async () => {
@@ -223,13 +363,143 @@ export default function ChatPage() {
     if (!error) {
       setNewMessage('')
       setReplyingTo(null)
+
+      // Clear typing indicator
+      await supabase
+        .from('chat_typing')
+        .delete()
+        .eq('room_id', selectedRoom)
+        .eq('user_id', user.id)
+    }
+  }
+
+  // Edit message
+  const saveEdit = async () => {
+    if (!editingMessage || !editContent.trim()) return
+
+    const { error } = await supabase
+      .from('chat_messages')
+      .update({
+        content: editContent.trim(),
+        is_edited: true
+      })
+      .eq('id', editingMessage.id)
+
+    if (!error) {
+      setEditingMessage(null)
+      setEditContent('')
+      loadMessages()
+    }
+  }
+
+  // Delete message
+  const deleteMessage = async (messageId: string) => {
+    if (!confirm('Are you sure you want to delete this message?')) return
+
+    const { error } = await supabase
+      .from('chat_messages')
+      .update({ is_deleted: true })
+      .eq('id', messageId)
+
+    if (!error) {
+      setMessages(prev => prev.filter(msg => msg.id !== messageId))
+      loadChatRooms()
+    }
+  }
+
+  // Add reaction
+  const addReaction = async (messageId: string, emoji: string) => {
+    if (!user) return
+
+    // Check if user already reacted with this emoji
+    const message = messages.find(m => m.id === messageId)
+    const existingReaction = message?.reactions?.find(
+      r => r.user_id === user.id && r.emoji === emoji
+    )
+
+    if (existingReaction) {
+      // Remove reaction
+      await supabase
+        .from('message_reactions')
+        .delete()
+        .eq('id', existingReaction.id)
+    } else {
+      // Add reaction
+      await supabase
+        .from('message_reactions')
+        .insert({
+          message_id: messageId,
+          user_id: user.id,
+          emoji
+        })
+    }
+
+    setShowReactionPicker(null)
+  }
+
+  // Handle file upload
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !user || !selectedRoom) return
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size must be less than 10MB')
+      return
+    }
+
+    setUploadingFile(true)
+
+    try {
+      // Upload to Supabase storage
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('chat-attachments')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('chat-attachments')
+        .getPublicUrl(fileName)
+
+      // Create message with attachment
+      await supabase
+        .from('chat_messages')
+        .insert({
+          room_id: selectedRoom,
+          user_id: user.id,
+          content: `Shared ${file.type.startsWith('image/') ? 'an image' : 'a file'}: ${file.name}`,
+          attachment_url: publicUrl,
+          attachment_type: file.type,
+          attachment_name: file.name,
+          attachment_size: file.size,
+          reply_to_message_id: replyingTo?.id || null
+        })
+
+      setReplyingTo(null)
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Failed to upload file')
+    } finally {
+      setUploadingFile(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      sendMessage()
+      if (editingMessage) {
+        saveEdit()
+      } else {
+        sendMessage()
+      }
     }
   }
 
@@ -270,13 +540,19 @@ export default function ChatPage() {
     return null
   }
 
+  // Check if message can be edited (within 5 minutes)
+  const canEditMessage = (message: Message) => {
+    if (message.user_id !== user?.id) return false
+    const messageTime = new Date(message.created_at).getTime()
+    const now = Date.now()
+    return (now - messageTime) < 5 * 60 * 1000 // 5 minutes
+  }
+
   // Format message content with code blocks
   const formatMessageContent = (content: string) => {
-    // Split by code blocks
     const parts = content.split(/(```[\s\S]*?```|`[^`]+`)/g)
 
     return parts.map((part, index) => {
-      // Multi-line code block
       if (part.startsWith('```') && part.endsWith('```')) {
         const code = part.slice(3, -3).trim()
         return (
@@ -285,7 +561,6 @@ export default function ChatPage() {
           </pre>
         )
       }
-      // Inline code
       if (part.startsWith('`') && part.endsWith('`')) {
         return (
           <code key={index} className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
@@ -293,15 +568,19 @@ export default function ChatPage() {
           </code>
         )
       }
-      // Regular text
       return <span key={index}>{part}</span>
     })
   }
 
-  // Truncate reply preview
   const truncateReply = (content: string, maxLength: number = 50) => {
     if (content.length <= maxLength) return content
     return content.substring(0, maxLength) + '...'
+  }
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
   }
 
   // Filter messages by search
@@ -311,6 +590,18 @@ export default function ChatPage() {
         msg.user?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : messages
+
+  // Group reactions by emoji
+  const getGroupedReactions = (reactions: Reaction[]) => {
+    const grouped: { [emoji: string]: Reaction[] } = {}
+    reactions.forEach(reaction => {
+      if (!grouped[reaction.emoji]) {
+        grouped[reaction.emoji] = []
+      }
+      grouped[reaction.emoji].push(reaction)
+    })
+    return grouped
+  }
 
   if (!user) {
     return (
@@ -446,6 +737,9 @@ export default function ChatPage() {
                     const showDate = index === 0 ||
                       formatDate(message.created_at) !== formatDate(filteredMessages[index - 1]?.created_at)
 
+                    const isEditing = editingMessage?.id === message.id
+                    const groupedReactions = getGroupedReactions(message.reactions || [])
+
                     return (
                       <div key={message.id}>
                         {showDate && (
@@ -498,27 +792,173 @@ export default function ChatPage() {
                               </div>
                             )}
 
-                            <div className={`inline-block p-3 rounded-lg text-sm ${
-                              message.user_id === user?.id
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted'
-                            }`}>
-                              {formatMessageContent(message.content)}
-                            </div>
+                            {isEditing ? (
+                              <div className="space-y-2">
+                                <Textarea
+                                  value={editContent}
+                                  onChange={(e) => setEditContent(e.target.value)}
+                                  className="min-h-[60px]"
+                                  autoFocus
+                                />
+                                <div className="flex gap-2">
+                                  <Button size="sm" onClick={saveEdit}>Save</Button>
+                                  <Button size="sm" variant="outline" onClick={() => {
+                                    setEditingMessage(null)
+                                    setEditContent('')
+                                  }}>Cancel</Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className={`inline-block p-3 rounded-lg text-sm ${
+                                  message.user_id === user?.id
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'bg-muted'
+                                }`}>
+                                  {formatMessageContent(message.content)}
 
-                            {/* Reply Button */}
-                            <button
-                              onClick={() => setReplyingTo(message)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-                            >
-                              <Reply className="h-3 w-3" />
-                              Reply
-                            </button>
+                                  {/* File Attachment */}
+                                  {message.attachment_url && (
+                                    <div className="mt-2 pt-2 border-t border-border/50">
+                                      {message.attachment_type?.startsWith('image/') ? (
+                                        <a
+                                          href={message.attachment_url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="block"
+                                        >
+                                          <img
+                                            src={message.attachment_url}
+                                            alt={message.attachment_name}
+                                            className="max-w-full max-h-64 rounded"
+                                          />
+                                        </a>
+                                      ) : (
+                                        <a
+                                          href={message.attachment_url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="flex items-center gap-2 text-xs hover:underline"
+                                        >
+                                          <FileText className="h-4 w-4" />
+                                          <span>{message.attachment_name}</span>
+                                          <span className="text-muted-foreground">
+                                            ({formatFileSize(message.attachment_size || 0)})
+                                          </span>
+                                          <Download className="h-3 w-3" />
+                                        </a>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Reactions */}
+                                {Object.keys(groupedReactions).length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2">
+                                    {Object.entries(groupedReactions).map(([emoji, reactions]) => {
+                                      const userReacted = reactions.some(r => r.user_id === user?.id)
+                                      return (
+                                        <button
+                                          key={emoji}
+                                          onClick={() => addReaction(message.id, emoji)}
+                                          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs border ${
+                                            userReacted
+                                              ? 'bg-primary/20 border-primary'
+                                              : 'bg-muted border-border hover:border-primary'
+                                          }`}
+                                          title={reactions.map(r => r.user?.full_name).join(', ')}
+                                        >
+                                          <span>{emoji}</span>
+                                          <span>{reactions.length}</span>
+                                        </button>
+                                      )
+                                    })}
+                                  </div>
+                                )}
+
+                                {/* Action Buttons */}
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 flex items-center gap-2">
+                                  <button
+                                    onClick={() => setReplyingTo(message)}
+                                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                                  >
+                                    <Reply className="h-3 w-3" />
+                                    Reply
+                                  </button>
+
+                                  <div className="relative">
+                                    <button
+                                      onClick={() => setShowReactionPicker(
+                                        showReactionPicker === message.id ? null : message.id
+                                      )}
+                                      className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                                    >
+                                      <Smile className="h-3 w-3" />
+                                      React
+                                    </button>
+
+                                    {showReactionPicker === message.id && (
+                                      <div className="absolute bottom-full mb-2 left-0 bg-popover border rounded-lg p-2 shadow-lg flex gap-1 z-10">
+                                        {COMMON_EMOJIS.map(emoji => (
+                                          <button
+                                            key={emoji}
+                                            onClick={() => addReaction(message.id, emoji)}
+                                            className="text-xl hover:scale-125 transition-transform"
+                                          >
+                                            {emoji}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {canEditMessage(message) && (
+                                    <button
+                                      onClick={() => {
+                                        setEditingMessage(message)
+                                        setEditContent(message.content)
+                                      }}
+                                      className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                                    >
+                                      <Edit2 className="h-3 w-3" />
+                                      Edit
+                                    </button>
+                                  )}
+
+                                  {(message.user_id === user?.id || user?.role === 'admin') && (
+                                    <button
+                                      onClick={() => deleteMessage(message.id)}
+                                      className="text-xs text-destructive hover:text-destructive/80 flex items-center gap-1"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                      Delete
+                                    </button>
+                                  )}
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
                     )
                   })}
+
+                  {/* Typing Indicators */}
+                  {typingUsers.length > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground italic">
+                      <div className="flex gap-1">
+                        <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                        <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                        <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                      </div>
+                      <span>
+                        {typingUsers.length === 1
+                          ? `${typingUsers[0].user?.full_name} is typing...`
+                          : `${typingUsers.length} people are typing...`}
+                      </span>
+                    </div>
+                  )}
+
                   <div ref={messagesEndRef} />
                 </div>
               </div>
@@ -544,9 +984,27 @@ export default function ChatPage() {
                 )}
 
                 <div className="flex gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                    accept="image/*,.pdf,.doc,.docx,.txt"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingFile || !isConnected}
+                  >
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
                   <Input
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={(e) => {
+                      setNewMessage(e.target.value)
+                      handleTyping()
+                    }}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your message... Use ` for inline code or ``` for code blocks"
                     className="flex-1"
@@ -564,9 +1022,15 @@ export default function ChatPage() {
                   <p className="text-xs text-muted-foreground">
                     Press Enter to send, Shift+Enter for new line
                   </p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Code className="h-3 w-3" />
-                    <span>Use `code` or ```code block```</span>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Code className="h-3 w-3" />
+                      <span>Use `code` or ```code block```</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Paperclip className="h-3 w-3" />
+                      <span>Upload files (max 10MB)</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -588,6 +1052,7 @@ export default function ChatPage() {
                   <li>• Help fellow students when you can</li>
                   <li>• Use appropriate chat rooms for your questions</li>
                   <li>• Use code formatting for code snippets</li>
+                  <li>• React to messages to show appreciation</li>
                 </ul>
               </div>
               <div>
@@ -597,6 +1062,7 @@ export default function ChatPage() {
                   <li>• Post spam or off-topic content</li>
                   <li>• Use inappropriate language</li>
                   <li>• Share copyrighted materials</li>
+                  <li>• Edit messages to change meaning after replies</li>
                 </ul>
               </div>
             </div>
