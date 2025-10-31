@@ -168,7 +168,7 @@ export default function ChatPage() {
       .from('chat_messages')
       .select(`
         *,
-        user:users!chat_messages_user_id_fkey(full_name, role)
+        user:users(full_name, role)
       `)
       .eq('room_id', selectedRoom)
       .eq('is_deleted', false)
@@ -250,7 +250,7 @@ export default function ChatPage() {
             .from('chat_messages')
             .select(`
               *,
-              user:users!chat_messages_user_id_fkey(full_name, role)
+              user:users(full_name, role)
             `)
             .eq('id', payload.new.id)
             .single()
