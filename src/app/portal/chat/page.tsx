@@ -168,19 +168,14 @@ export default function ChatPage() {
       .from('chat_messages')
       .select(`
         *,
-        user:users!chat_messages_user_id_fkey(full_name, role),
-        reply_to:chat_messages(
-          id,
-          content,
-          user_id
-        )
+        user:users!chat_messages_user_id_fkey(full_name, role)
       `)
       .eq('room_id', selectedRoom)
       .eq('is_deleted', false)
       .order('created_at', { ascending: true })
 
     if (data && !error) {
-      // Load reactions and reply user info for all messages
+      // Load reactions and reply info for all messages
       const messagesWithReactions = await Promise.all(
         data.map(async (msg) => {
           const { data: reactions } = await supabase
@@ -188,18 +183,24 @@ export default function ChatPage() {
             .select('*, user:users!message_reactions_user_id_fkey(full_name)')
             .eq('message_id', msg.id)
 
-          // Load reply_to user info if reply exists
-          let replyWithUser = msg.reply_to
-          if (msg.reply_to?.user_id) {
-            const { data: replyUser } = await supabase
-              .from('users')
-              .select('full_name')
-              .eq('id', msg.reply_to.user_id)
+          // Load reply_to message and user if exists
+          let replyData = null
+          if (msg.reply_to_message_id) {
+            const { data: replyMsg } = await supabase
+              .from('chat_messages')
+              .select('id, content, user_id')
+              .eq('id', msg.reply_to_message_id)
               .single()
 
-            if (replyUser) {
-              replyWithUser = {
-                ...msg.reply_to,
+            if (replyMsg) {
+              const { data: replyUser } = await supabase
+                .from('users')
+                .select('full_name')
+                .eq('id', replyMsg.user_id)
+                .single()
+
+              replyData = {
+                ...replyMsg,
                 user: replyUser
               }
             }
@@ -207,7 +208,7 @@ export default function ChatPage() {
 
           return {
             ...msg,
-            reply_to: replyWithUser,
+            reply_to: replyData,
             reactions: reactions || []
           }
         })
@@ -249,35 +250,38 @@ export default function ChatPage() {
             .from('chat_messages')
             .select(`
               *,
-              user:users!chat_messages_user_id_fkey(full_name, role),
-              reply_to:chat_messages(
-                id,
-                content,
-                user_id
-              )
+              user:users!chat_messages_user_id_fkey(full_name, role)
             `)
             .eq('id', payload.new.id)
             .single()
 
           if (data) {
-            // Load reply_to user info if reply exists
-            let messageWithReply = data
-            if (data.reply_to?.user_id) {
-              const { data: replyUser } = await supabase
-                .from('users')
-                .select('full_name')
-                .eq('id', data.reply_to.user_id)
+            // Load reply_to message and user if exists
+            let replyData = null
+            if (data.reply_to_message_id) {
+              const { data: replyMsg } = await supabase
+                .from('chat_messages')
+                .select('id, content, user_id')
+                .eq('id', data.reply_to_message_id)
                 .single()
 
-              if (replyUser) {
-                messageWithReply = {
-                  ...data,
-                  reply_to: {
-                    ...data.reply_to,
-                    user: replyUser
-                  }
+              if (replyMsg) {
+                const { data: replyUser } = await supabase
+                  .from('users')
+                  .select('full_name')
+                  .eq('id', replyMsg.user_id)
+                  .single()
+
+                replyData = {
+                  ...replyMsg,
+                  user: replyUser
                 }
               }
+            }
+
+            const messageWithReply = {
+              ...data,
+              reply_to: replyData
             }
 
             setMessages(prev => [...prev, { ...messageWithReply, reactions: [] } as any])
