@@ -107,6 +107,8 @@ export function usePresence() {
             user_id: authUser.id,
             last_seen: new Date().toISOString(),
             status: 'online'
+          }, {
+            onConflict: 'user_id'
           })
       }
 
