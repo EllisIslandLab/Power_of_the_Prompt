@@ -8,27 +8,18 @@
 -- ============================================================================
 
 -- Insert default chat rooms if they don't exist
+-- Using WHERE NOT EXISTS to avoid duplicates
 INSERT INTO chat_rooms (name, description, type, is_active)
-VALUES
-  (
-    'Announcements',
-    'Important updates and announcements from instructors',
-    'ANNOUNCEMENTS',
-    true
-  ),
-  (
-    'General Discussion',
-    'Chat with fellow students about web development, projects, and more',
-    'GENERAL',
-    true
-  ),
-  (
-    'Help & Support',
-    'Get help with course material, assignments, and technical questions',
-    'HELP',
-    true
-  )
-ON CONFLICT (name) DO NOTHING;
+SELECT 'Announcements', 'Important updates and announcements from instructors', 'ANNOUNCEMENTS', true
+WHERE NOT EXISTS (SELECT 1 FROM chat_rooms WHERE name = 'Announcements');
+
+INSERT INTO chat_rooms (name, description, type, is_active)
+SELECT 'General Discussion', 'Chat with fellow students about web development, projects, and more', 'GENERAL', true
+WHERE NOT EXISTS (SELECT 1 FROM chat_rooms WHERE name = 'General Discussion');
+
+INSERT INTO chat_rooms (name, description, type, is_active)
+SELECT 'Help & Support', 'Get help with course material, assignments, and technical questions', 'HELP', true
+WHERE NOT EXISTS (SELECT 1 FROM chat_rooms WHERE name = 'Help & Support');
 
 -- Verify rooms were created
 SELECT id, name, type, description, is_active
