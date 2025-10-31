@@ -166,22 +166,38 @@ export default function ChatPage() {
   async function loadMessages() {
     const { data, error } = await supabase
       .from('chat_messages')
-      .select(`
-        *,
-        user:users(full_name, role)
-      `)
+      .select('*')
       .eq('room_id', selectedRoom)
       .eq('is_deleted', false)
       .order('created_at', { ascending: true })
 
     if (data && !error) {
+      // Get unique user IDs from messages
+      const userIds = [...new Set(data.map(msg => msg.user_id))]
+
+      // Fetch all users in one query
+      const { data: usersData } = await supabase
+        .from('users')
+        .select('id, full_name, role')
+        .in('id', userIds)
+
+      const usersMap = new Map(usersData?.map(u => [u.id, u]) || [])
+
       // Load reactions and reply info for all messages
       const messagesWithReactions = await Promise.all(
         data.map(async (msg) => {
           const { data: reactions } = await supabase
             .from('message_reactions')
-            .select('*, user:users!message_reactions_user_id_fkey(full_name)')
+            .select('*')
             .eq('message_id', msg.id)
+
+          // Add user info to reactions
+          const reactionsWithUsers = await Promise.all(
+            (reactions || []).map(async (reaction) => {
+              const user = usersMap.get(reaction.user_id)
+              return { ...reaction, user: user ? { full_name: user.full_name } : null }
+            })
+          )
 
           // Load reply_to message and user if exists
           let replyData = null
@@ -193,23 +209,19 @@ export default function ChatPage() {
               .single()
 
             if (replyMsg) {
-              const { data: replyUser } = await supabase
-                .from('users')
-                .select('full_name')
-                .eq('id', replyMsg.user_id)
-                .single()
-
+              const replyUser = usersMap.get(replyMsg.user_id)
               replyData = {
                 ...replyMsg,
-                user: replyUser
+                user: replyUser ? { full_name: replyUser.full_name } : null
               }
             }
           }
 
           return {
             ...msg,
+            user: usersMap.get(msg.user_id),
             reply_to: replyData,
-            reactions: reactions || []
+            reactions: reactionsWithUsers
           }
         })
       )
@@ -248,14 +260,18 @@ export default function ChatPage() {
         async (payload) => {
           const { data } = await supabase
             .from('chat_messages')
-            .select(`
-              *,
-              user:users(full_name, role)
-            `)
+            .select('*')
             .eq('id', payload.new.id)
             .single()
 
           if (data) {
+            // Load user info
+            const { data: userData } = await supabase
+              .from('users')
+              .select('id, full_name, role')
+              .eq('id', data.user_id)
+              .single()
+
             // Load reply_to message and user if exists
             let replyData = null
             if (data.reply_to_message_id) {
@@ -279,12 +295,13 @@ export default function ChatPage() {
               }
             }
 
-            const messageWithReply = {
+            const messageWithUser = {
               ...data,
+              user: userData,
               reply_to: replyData
             }
 
-            setMessages(prev => [...prev, { ...messageWithReply, reactions: [] } as any])
+            setMessages(prev => [...prev, { ...messageWithUser, reactions: [] } as any])
             loadChatRooms()
           }
         }
