@@ -439,13 +439,6 @@ export default function ChatPage() {
       console.log('Message sent successfully:', data)
       setNewMessage('')
       setReplyingTo(null)
-
-      // Clear typing indicator
-      await supabase
-        .from('chat_typing')
-        .delete()
-        .eq('room_id', selectedRoom)
-        .eq('user_id', user.id)
     }
   }
 
