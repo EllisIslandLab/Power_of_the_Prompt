@@ -20,15 +20,12 @@ import {
   X,
   Reply,
   Code,
-  Smile,
   Edit2,
   Trash2,
   Paperclip,
   Image as ImageIcon,
   FileText,
-  Download,
-  Copy,
-  Check
+  Download
 } from "lucide-react"
 
 const supabase = createBrowserClient(
@@ -77,13 +74,6 @@ interface ChatRoom {
   participant_count?: number
 }
 
-interface TypingUser {
-  user_id: string
-  user?: {
-    full_name: string
-  }
-}
-
 const COMMON_EMOJIS = ['👍', '❤️', '😂', '🎉', '🚀', '💯']
 
 export default function ChatPage() {
@@ -97,13 +87,10 @@ export default function ChatPage() {
   const [replyingTo, setReplyingTo] = useState<Message | null>(null)
   const [editingMessage, setEditingMessage] = useState<Message | null>(null)
   const [editContent, setEditContent] = useState('')
-  const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null)
-  const [typingUsers, setTypingUsers] = useState<TypingUser[]>([])
   const [uploadingFile, setUploadingFile] = useState(false)
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Load user and initialize
   useEffect(() => {
@@ -183,22 +170,9 @@ export default function ChatPage() {
 
       const usersMap = new Map(usersData?.map(u => [u.id, u]) || [])
 
-      // Load reactions and reply info for all messages
-      const messagesWithReactions = await Promise.all(
+      // Load reply info for all messages
+      const messagesWithData = await Promise.all(
         data.map(async (msg) => {
-          const { data: reactions } = await supabase
-            .from('message_reactions')
-            .select('*')
-            .eq('message_id', msg.id)
-
-          // Add user info to reactions
-          const reactionsWithUsers = await Promise.all(
-            (reactions || []).map(async (reaction) => {
-              const user = usersMap.get(reaction.user_id)
-              return { ...reaction, user: user ? { full_name: user.full_name } : null }
-            })
-          )
-
           // Load reply_to message and user if exists
           let replyData = null
           if (msg.reply_to_message_id) {
@@ -221,12 +195,12 @@ export default function ChatPage() {
             ...msg,
             user: usersMap.get(msg.user_id),
             reply_to: replyData,
-            reactions: reactionsWithUsers
+            reactions: []
           }
         })
       )
 
-      setMessages(messagesWithReactions as any)
+      setMessages(messagesWithData as any)
       setIsConnected(true)
 
       // Auto-join room
@@ -333,52 +307,8 @@ export default function ChatPage() {
       )
       .subscribe()
 
-    // Subscribe to reactions
-    const reactionChannel = supabase
-      .channel(`reactions:${selectedRoom}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'message_reactions'
-        },
-        async () => {
-          // Reload messages with updated reactions
-          loadMessages()
-        }
-      )
-      .subscribe()
-
-    // Subscribe to typing indicators
-    const typingChannel = supabase
-      .channel(`typing:${selectedRoom}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'chat_typing',
-          filter: `room_id=eq.${selectedRoom}`
-        },
-        async () => {
-          const { data } = await supabase
-            .from('chat_typing')
-            .select('user_id, user:users!chat_typing_user_id_fkey(full_name)')
-            .eq('room_id', selectedRoom)
-            .gt('typing_at', new Date(Date.now() - 10000).toISOString())
-
-          if (data) {
-            setTypingUsers(data.filter(t => t.user_id !== user.id) as any)
-          }
-        }
-      )
-      .subscribe()
-
     return () => {
       supabase.removeChannel(messageChannel)
-      supabase.removeChannel(reactionChannel)
-      supabase.removeChannel(typingChannel)
     }
   }, [selectedRoom, user])
 
@@ -386,35 +316,6 @@ export default function ChatPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
-
-  // Typing indicator handler
-  const handleTyping = async () => {
-    if (!user || !selectedRoom) return
-
-    // Clear existing timeout
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current)
-      typingTimeoutRef.current = null
-    }
-
-    // Update typing status
-    await supabase
-      .from('chat_typing')
-      .upsert({
-        room_id: selectedRoom,
-        user_id: user.id,
-        typing_at: new Date().toISOString()
-      })
-
-    // Clear typing status after 3 seconds of inactivity
-    typingTimeoutRef.current = setTimeout(async () => {
-      await supabase
-        .from('chat_typing')
-        .delete()
-        .eq('room_id', selectedRoom)
-        .eq('user_id', user.id)
-    }, 3000)
-  }
 
   // Send message
   const sendMessage = async () => {
@@ -461,49 +362,22 @@ export default function ChatPage() {
     }
   }
 
-  // Delete message
+  // Delete message (admin only)
   const deleteMessage = async (messageId: string) => {
-    if (!confirm('Are you sure you want to delete this message?')) return
+    if (!confirm('Are you sure you want to delete this message? This will mark it as deleted.')) return
 
     const { error } = await supabase
       .from('chat_messages')
       .update({ is_deleted: true })
       .eq('id', messageId)
 
-    if (!error) {
+    if (error) {
+      console.error('Error deleting message:', error)
+      alert(`Failed to delete message: ${error.message}`)
+    } else {
       setMessages(prev => prev.filter(msg => msg.id !== messageId))
       loadChatRooms()
     }
-  }
-
-  // Add reaction
-  const addReaction = async (messageId: string, emoji: string) => {
-    if (!user) return
-
-    // Check if user already reacted with this emoji
-    const message = messages.find(m => m.id === messageId)
-    const existingReaction = message?.reactions?.find(
-      r => r.user_id === user.id && r.emoji === emoji
-    )
-
-    if (existingReaction) {
-      // Remove reaction
-      await supabase
-        .from('message_reactions')
-        .delete()
-        .eq('id', existingReaction.id)
-    } else {
-      // Add reaction
-      await supabase
-        .from('message_reactions')
-        .insert({
-          message_id: messageId,
-          user_id: user.id,
-          emoji
-        })
-    }
-
-    setShowReactionPicker(null)
   }
 
   // Copy message to clipboard
@@ -677,18 +551,6 @@ export default function ChatPage() {
       )
     : messages
 
-  // Group reactions by emoji
-  const getGroupedReactions = (reactions: Reaction[]) => {
-    const grouped: { [emoji: string]: Reaction[] } = {}
-    reactions.forEach(reaction => {
-      if (!grouped[reaction.emoji]) {
-        grouped[reaction.emoji] = []
-      }
-      grouped[reaction.emoji].push(reaction)
-    })
-    return grouped
-  }
-
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -824,7 +686,6 @@ export default function ChatPage() {
                       formatDate(message.created_at) !== formatDate(filteredMessages[index - 1]?.created_at)
 
                     const isEditing = editingMessage?.id === message.id
-                    const groupedReactions = getGroupedReactions(message.reactions || [])
 
                     return (
                       <div key={message.id}>
@@ -938,30 +799,6 @@ export default function ChatPage() {
                                   )}
                                 </div>
 
-                                {/* Reactions */}
-                                {Object.keys(groupedReactions).length > 0 && (
-                                  <div className="flex flex-wrap gap-1 mt-2">
-                                    {Object.entries(groupedReactions).map(([emoji, reactions]) => {
-                                      const userReacted = reactions.some(r => r.user_id === user?.id)
-                                      return (
-                                        <button
-                                          key={emoji}
-                                          onClick={() => addReaction(message.id, emoji)}
-                                          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs border ${
-                                            userReacted
-                                              ? 'bg-primary/20 border-primary'
-                                              : 'bg-muted border-border hover:border-primary'
-                                          }`}
-                                          title={reactions.map(r => r.user?.full_name).join(', ')}
-                                        >
-                                          <span>{emoji}</span>
-                                          <span>{reactions.length}</span>
-                                        </button>
-                                      )
-                                    })}
-                                  </div>
-                                )}
-
                                 {/* Action Buttons */}
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity mt-1 flex items-center gap-2">
                                   {/* Reply button */}
@@ -972,37 +809,6 @@ export default function ChatPage() {
                                     <Reply className="h-3 w-3" />
                                     Reply
                                   </button>
-
-                                  {/* React button */}
-                                  <div className="relative">
-                                    <button
-                                      onClick={() => setShowReactionPicker(
-                                        showReactionPicker === message.id ? null : message.id
-                                      )}
-                                      className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-                                    >
-                                      <Smile className="h-3 w-3" />
-                                      React
-                                    </button>
-
-                                    {/* Reaction Picker */}
-                                    {showReactionPicker === message.id && (
-                                      <div className="absolute bottom-full left-0 mb-2 bg-background border rounded-lg p-2 shadow-lg flex gap-1 z-10">
-                                        {['👍', '❤️', '😂', '🎉', '🤔', '👀'].map(emoji => (
-                                          <button
-                                            key={emoji}
-                                            onClick={() => {
-                                              addReaction(message.id, emoji)
-                                              setShowReactionPicker(null)
-                                            }}
-                                            className="hover:bg-muted p-1 rounded text-lg"
-                                          >
-                                            {emoji}
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
 
                                   {/* Edit button for own messages */}
                                   {message.user_id === user?.id && (
@@ -1018,7 +824,8 @@ export default function ChatPage() {
                                     </button>
                                   )}
 
-                                  {(message.user_id === user?.id || user?.role === 'admin') && (
+                                  {/* Only admins can delete messages (preserves evidence for disputes) */}
+                                  {user?.role === 'admin' && (
                                     <button
                                       onClick={() => deleteMessage(message.id)}
                                       className="text-xs text-destructive hover:text-destructive/80 flex items-center gap-1"
@@ -1035,22 +842,6 @@ export default function ChatPage() {
                       </div>
                     )
                   })}
-
-                  {/* Typing Indicators */}
-                  {typingUsers.length > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground italic">
-                      <div className="flex gap-1">
-                        <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                        <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                        <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                      </div>
-                      <span>
-                        {typingUsers.length === 1
-                          ? `${typingUsers[0].user?.full_name} is typing...`
-                          : `${typingUsers.length} people are typing...`}
-                      </span>
-                    </div>
-                  )}
 
                   <div ref={messagesEndRef} />
                 </div>
@@ -1094,10 +885,7 @@ export default function ChatPage() {
                   </Button>
                   <Input
                     value={newMessage}
-                    onChange={(e) => {
-                      setNewMessage(e.target.value)
-                      handleTyping()
-                    }}
+                    onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your message... Use ` for inline code or ``` for code blocks"
                     className="flex-1"

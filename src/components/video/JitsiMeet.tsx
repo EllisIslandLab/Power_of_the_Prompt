@@ -68,7 +68,7 @@ export function JitsiMeet({
             startWithVideoMuted: false,
             enableWelcomePage: false,
             enableClosePage: false,
-            prejoinPageEnabled: false,
+            prejoinPageEnabled: true, // Enable prejoin page to request permissions properly
           },
           interfaceConfigOverwrite: {
             TOOLBAR_BUTTONS: [

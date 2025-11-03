@@ -44,100 +44,16 @@ export default function ResourcesPage() {
 
   const resources: Resource[] = [
     {
-      id: '1',
-      title: 'Next.js Starter Template',
-      description: 'Complete Next.js project template with TypeScript, Tailwind CSS, and best practices setup',
-      category: 'TEMPLATES',
+      id: 'architecture-toolkit',
+      title: 'Architecture Mastery Toolkit',
+      description: 'Professional implementation patterns and architectural knowledge that typically takes years to accumulate. Get the exact solutions used by senior developers, pre-configured for your stack with ready-to-use commands.',
+      category: 'PREMIUM',
       type: 'TEMPLATE',
-      url: '/downloads/nextjs-starter.zip',
+      url: '/portal/products/architecture-toolkit',
       isExternal: false,
-      tags: ['Next.js', 'TypeScript', 'Tailwind'],
-      difficulty: 'BEGINNER',
-      featured: true
-    },
-    {
-      id: '2',
-      title: 'Airtable Database Schema Guide',
-      description: 'Complete guide to setting up your business database with Airtable, including field types and relationships',
-      category: 'GUIDES',
-      type: 'GUIDE',
-      url: '/downloads/airtable-guide.pdf',
-      isExternal: false,
-      tags: ['Airtable', 'Database', 'Setup'],
-      difficulty: 'BEGINNER',
-      featured: true
-    },
-    {
-      id: '3',
-      title: 'Vercel Deployment Checklist',
-      description: 'Step-by-step checklist for deploying your Next.js application to Vercel production',
-      category: 'GUIDES',
-      type: 'GUIDE',
-      url: '/downloads/vercel-deployment.pdf',
-      isExternal: false,
-      tags: ['Vercel', 'Deployment', 'Production'],
-      difficulty: 'INTERMEDIATE',
-      featured: false
-    },
-    {
-      id: '4',
-      title: 'Claude CLI Master Prompts',
-      description: 'Collection of powerful prompts for different types of web development projects',
-      category: 'TEMPLATES',
-      type: 'TEMPLATE',
-      url: '/downloads/claude-prompts.txt',
-      isExternal: false,
-      tags: ['Claude', 'AI', 'Prompts'],
+      tags: ['Architecture', 'Patterns', 'Professional'],
       difficulty: 'INTERMEDIATE',
       featured: true
-    },
-    {
-      id: '5',
-      title: 'Component Library Examples',
-      description: 'Ready-to-use React components with Tailwind CSS styling for common business needs',
-      category: 'TEMPLATES',
-      type: 'TEMPLATE',
-      url: '/downloads/components.zip',
-      isExternal: false,
-      tags: ['React', 'Components', 'Tailwind'],
-      difficulty: 'INTERMEDIATE',
-      featured: false
-    },
-    {
-      id: '6',
-      title: 'VS Code Extensions Pack',
-      description: 'Recommended VS Code extensions for web development with installation instructions',
-      category: 'TOOLS',
-      type: 'GUIDE',
-      url: '/downloads/vscode-extensions.pdf',
-      isExternal: false,
-      tags: ['VS Code', 'Extensions', 'Development'],
-      difficulty: 'BEGINNER',
-      featured: false
-    },
-    {
-      id: '7',
-      title: 'Git Workflow Cheat Sheet',
-      description: 'Essential Git commands and workflows for professional development',
-      category: 'GUIDES',
-      type: 'GUIDE',
-      url: '/downloads/git-cheatsheet.pdf',
-      isExternal: false,
-      tags: ['Git', 'Version Control', 'Workflow'],
-      difficulty: 'BEGINNER',
-      featured: false
-    },
-    {
-      id: '8',
-      title: 'Tailwind CSS Design System',
-      description: 'Pre-built design system with colors, typography, and component patterns',
-      category: 'TEMPLATES',
-      type: 'TEMPLATE',
-      url: '/downloads/tailwind-design-system.zip',
-      isExternal: false,
-      tags: ['Tailwind', 'Design', 'System'],
-      difficulty: 'ADVANCED',
-      featured: false
     },
     {
       id: '9',
@@ -167,9 +83,7 @@ export default function ResourcesPage() {
 
   const categories = [
     { id: 'ALL', name: 'All Resources', icon: FileText },
-    { id: 'TEMPLATES', name: 'Templates', icon: Code },
-    { id: 'GUIDES', name: 'Guides', icon: BookOpen },
-    { id: 'TOOLS', name: 'Tools', icon: Terminal },
+    { id: 'PREMIUM', name: 'Premium Bundle', icon: Code },
     { id: 'EXTERNAL', name: 'External Links', icon: ExternalLink }
   ]
 
@@ -303,8 +217,8 @@ export default function ResourcesPage() {
                       </div>
                       
                       <Button size="sm" asChild>
-                        <a 
-                          href={resource.url} 
+                        <a
+                          href={resource.url}
                           target={resource.isExternal ? "_blank" : undefined}
                           rel={resource.isExternal ? "noopener noreferrer" : undefined}
                         >
@@ -312,6 +226,10 @@ export default function ResourcesPage() {
                             <>
                               <ExternalLink className="mr-2 h-4 w-4" />
                               Open
+                            </>
+                          ) : resource.category === 'PREMIUM' ? (
+                            <>
+                              View Details - $497
                             </>
                           ) : (
                             <>
@@ -371,8 +289,8 @@ export default function ResourcesPage() {
                     </div>
                     
                     <Button variant="outline" size="sm" asChild>
-                      <a 
-                        href={resource.url} 
+                      <a
+                        href={resource.url}
                         target={resource.isExternal ? "_blank" : undefined}
                         rel={resource.isExternal ? "noopener noreferrer" : undefined}
                       >
@@ -380,6 +298,10 @@ export default function ResourcesPage() {
                           <>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Open
+                          </>
+                        ) : resource.category === 'PREMIUM' ? (
+                          <>
+                            View Details - $497
                           </>
                         ) : (
                           <>

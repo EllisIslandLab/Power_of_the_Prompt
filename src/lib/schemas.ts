@@ -107,7 +107,7 @@ export const studentOnboardingEmailSchema = z.object({
 
 export const waitlistSignupSchema = z.object({
   email: z.string().email('Invalid email address').toLowerCase(),
-  name: z.string().min(2, 'Name must be at least 2 characters').max(100),
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100).optional(),
   source: z.string().optional(),
   referrer: z.string().optional(),
 })

@@ -8,6 +8,7 @@ import { parseApiError } from "@/lib/error-parser"
 
 export function ComingSoonBanner() {
   const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState('')
@@ -23,7 +24,7 @@ export function ComingSoonBanner() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, name: name.trim() || undefined }),
       })
 
       const data = await response.json()
@@ -35,6 +36,7 @@ export function ComingSoonBanner() {
 
       setIsSubmitted(true)
       setEmail('')
+      setName('')
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Something went wrong')
     } finally {
@@ -74,26 +76,44 @@ export function ComingSoonBanner() {
                       {error}
                     </div>
                   )}
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Input
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value)
-                        if (error) setError('') // Clear error when user starts typing
-                      }}
-                      required
-                      className="flex-1 w-full"
-                      disabled={isSubmitting}
-                    />
-                    <Button 
-                      type="submit" 
-                      disabled={isSubmitting || !email.trim()}
-                      className="w-full sm:w-auto"
-                    >
-                      {isSubmitting ? 'Signing up...' : 'Notify Me'}
-                    </Button>
+                  <div className="space-y-3">
+                    <div>
+                      <Input
+                        type="text"
+                        placeholder="Your name (optional)"
+                        value={name}
+                        onChange={(e) => {
+                          setName(e.target.value)
+                          if (error) setError('')
+                        }}
+                        className="w-full"
+                        disabled={isSubmitting}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Optional - helps us greet you properly in emails
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value)
+                          if (error) setError('') // Clear error when user starts typing
+                        }}
+                        required
+                        className="flex-1 w-full"
+                        disabled={isSubmitting}
+                      />
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting || !email.trim()}
+                        className="w-full sm:w-auto"
+                      >
+                        {isSubmitting ? 'Signing up...' : 'Notify Me'}
+                      </Button>
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     No spam, just updates on our launch.

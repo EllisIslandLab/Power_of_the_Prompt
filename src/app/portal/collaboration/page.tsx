@@ -9,9 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Users, Video, Clock, Calendar, ArrowLeft } from 'lucide-react'
-import VideoSessionManager from "@/components/video/VideoSessionManager"
+import { Users, Video, Clock, ArrowLeft } from 'lucide-react'
 import { usePresence } from "@/components/ui/online-indicator"
 import Link from 'next/link'
 
@@ -102,17 +100,11 @@ export default function CollaborationPage() {
           </Button>
         </div>
         <p className="text-muted-foreground">
-          Connect with your coach and fellow students through video conferences and session management
+          Connect with your coach and fellow students through video conferences
         </p>
       </div>
 
-      <Tabs defaultValue="video-conference" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="video-conference">Video Conference</TabsTrigger>
-          <TabsTrigger value="session-manager">Session Manager</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="video-conference" className="space-y-6">
+      <div className="space-y-6">
           {!currentRoom ? (
             <div className="grid gap-6 md:grid-cols-2">
               {/* Join Room Card */}
@@ -231,25 +223,7 @@ export default function CollaborationPage() {
               </div>
             </div>
           )}
-        </TabsContent>
-
-        <TabsContent value="session-manager" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Session Management
-              </CardTitle>
-              <CardDescription>
-                Manage scheduled coaching sessions and workshops
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <VideoSessionManager />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      </div>
     </div>
   )
 }
