@@ -249,7 +249,26 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
     })
 
     if (authError) {
-      checkoutLogger.error({ error: authError, code: authError.code, message: authError.message }, 'Failed to create auth user')
+      checkoutLogger.error({
+        error: authError,
+        code: authError.code,
+        message: authError.message,
+        status: authError.status,
+        name: authError.name,
+        customerEmail
+      }, 'Failed to create auth user')
+
+      // Send detailed alert about the specific failure
+      await alertCriticalError(
+        authError,
+        'Auth User Creation Failed During Purchase',
+        {
+          customerEmail,
+          errorCode: authError.code,
+          errorMessage: authError.message,
+          leadExists: !!lead
+        }
+      )
 
       // Check if error is due to user already existing
       if (authError.message?.includes('already') || authError.code === 'user_already_exists' || authError.message?.includes('Database error')) {
