@@ -32,12 +32,14 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
       console.error('Root Error Boundary caught an error:', error)
     }
 
-    // TODO: Send to error tracking service (Sentry, LogRocket, etc.)
-    // Example:
-    // Sentry.captureException(error, {
-    //   tags: { errorBoundary: 'root' },
-    //   contexts: { digest: error.digest }
-    // })
+    // Send to Sentry if configured
+    // To enable: Add NEXT_PUBLIC_SENTRY_DSN to .env.local and uncomment in sentry.client.config.ts
+    if (typeof window !== 'undefined' && (window as any).Sentry) {
+      (window as any).Sentry.captureException(error, {
+        tags: { errorBoundary: 'root' },
+        contexts: { digest: error.digest }
+      })
+    }
   }, [error])
 
   return (

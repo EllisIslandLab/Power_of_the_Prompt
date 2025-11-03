@@ -2,12 +2,15 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { alertCriticalError } from '@/lib/error-alerts'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-06-30.basil',
 })
 
 export async function POST(request: Request) {
+  let productSlug: string = 'unknown'
+
   try {
     const cookieStore = await cookies()
 
@@ -37,7 +40,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { productSlug, stripeProductId } = await request.json()
+    const body = await request.json()
+    productSlug = body.productSlug
+    const stripeProductId = body.stripeProductId
 
     // Get product from database
     const { data: product, error: productError } = await supabase
@@ -90,6 +95,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: session.url })
   } catch (error) {
     console.error('Error creating checkout session:', error)
+
+    // Send critical alert for checkout failures
+    await alertCriticalError(
+      error instanceof Error ? error : new Error('Unknown checkout error'),
+      'Stripe Checkout Creation Failed',
+      {
+        productSlug,
+        timestamp: new Date().toISOString()
+      }
+    )
+
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

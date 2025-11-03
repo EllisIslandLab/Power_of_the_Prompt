@@ -4,6 +4,7 @@ import { getAdminClient } from '@/adapters'
 import { resendAdapter } from '@/adapters'
 import { withMiddleware, withValidation, withLogging, withErrorHandling, ConflictError } from '@/api-middleware'
 import { logger } from '@/lib/logger'
+import { alertCriticalError } from '@/lib/error-alerts'
 
 const supabase = getAdminClient()
 
@@ -28,6 +29,11 @@ export const POST = withMiddleware(
     if (checkError && checkError.code !== 'PGRST116') {
       // PGRST116 is "not found" error, which is what we want
       logger.error({ error: checkError }, 'Database error checking email')
+      await alertCriticalError(
+        new Error('Database error in waitlist signup'),
+        'Waitlist Signup - Database Check',
+        { email, errorCode: checkError.code }
+      )
       throw new Error('Database error occurred')
     }
 
@@ -51,6 +57,11 @@ export const POST = withMiddleware(
 
     if (insertError) {
       logger.error({ error: insertError }, 'Failed to add email to leads')
+      await alertCriticalError(
+        insertError,
+        'Waitlist Signup - Database Insert Failed',
+        { email, name }
+      )
       throw new Error('Failed to add email to leads')
     }
 
