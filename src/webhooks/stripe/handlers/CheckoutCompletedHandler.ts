@@ -4,6 +4,7 @@ import { renderPaymentConfirmationEmail, EmailSubjects, EMAIL_FROM } from '@/lib
 import { logger, logPayment, logSecurity } from '@/lib/logger'
 import { UserRepository, LeadRepository } from '@/repositories'
 import { stripeAdapter, resendAdapter, getAdminClient } from '@/adapters'
+import { alertCriticalError } from '@/lib/error-alerts'
 
 /**
  * Checkout Completed Handler
@@ -50,10 +51,15 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
       // Get the product details from Stripe
       const lineItems = await stripeAdapter.listLineItems(session.id, ['data.price.product'])
 
-      const product = lineItems.data[0].price?.product as Stripe.Product
-      const metadata = product.metadata
+      const product = lineItems.data[0]?.price?.product as Stripe.Product | undefined
+      const metadata = product?.metadata || {}
 
-      checkoutLogger.debug({ metadata }, 'Retrieved product metadata')
+      checkoutLogger.info({
+        metadata,
+        hasProduct: !!product,
+        lineItemsCount: lineItems.data.length,
+        productName: product?.name
+      }, 'Retrieved product details')
 
       // Determine user tier and sessions based on product
       const { tier, sessionsToCredit, paymentStatus } = this.parseProductMetadata(metadata)
@@ -127,6 +133,18 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         { error, duration },
         'Failed to process checkout'
       )
+
+      // Send critical alert for checkout processing failures
+      await alertCriticalError(
+        error instanceof Error ? error : new Error('Unknown checkout processing error'),
+        'Stripe Checkout Processing Failed',
+        {
+          sessionId,
+          customerEmail,
+          duration
+        }
+      )
+
       // Re-throw to trigger webhook retry
       throw error
     }
@@ -144,14 +162,24 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
     let sessionsToCredit = 0
     let paymentStatus = 'paid'
 
+    // Log what metadata we received for debugging
+    logger.debug({ metadata }, 'Parsing product metadata')
+
     if (metadata.tier) {
       // A+ Program (premium_vip tier with 12 sessions)
       tier = metadata.tier === 'premium_vip' ? 'vip' : metadata.tier
       sessionsToCredit = parseInt(metadata.total_lvl_ups) || 0
+      logger.info({ tier, sessionsToCredit }, 'Parsed from metadata.tier')
     } else if (metadata.course_type === 'basic_course') {
       // Basic Course (standard tier, no sessions unless they buy add-ons)
       tier = 'basic'
       sessionsToCredit = metadata.includes_lvl_ups === 'true' ? 3 : 0
+      logger.info({ tier, sessionsToCredit }, 'Parsed from metadata.course_type')
+    } else {
+      // Default: treat as basic course if no metadata
+      logger.warn({ metadata }, 'No recognized metadata - defaulting to basic tier')
+      tier = 'basic'
+      sessionsToCredit = 0
     }
 
     return { tier, sessionsToCredit, paymentStatus }
@@ -204,7 +232,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
     supabase: any,
     checkoutLogger: any
   ): Promise<string> {
-    checkoutLogger.info('Creating new auth user')
+    checkoutLogger.info({ customerEmail, customerName, leadName: lead?.name }, 'Creating new auth user')
 
     // Generate a random password (user will reset via email link)
     const tempPassword = Math.random().toString(36).slice(-12) + 'A1!'
@@ -219,13 +247,49 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
     })
 
     if (authError) {
-      checkoutLogger.error({ error: authError }, 'Failed to create auth user')
+      checkoutLogger.error({ error: authError, code: authError.code, message: authError.message }, 'Failed to create auth user')
       throw authError
     }
 
     const userId = authUser.user.id
-    checkoutLogger.info({ userId }, 'Created new auth user')
+    checkoutLogger.info({ userId, email: customerEmail }, 'Created new auth user successfully')
     logSecurity('signup', 'low', { userId, email: customerEmail, source: 'payment' })
+
+    // Wait a moment for the trigger to fire
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    // Verify the public.users record was created by trigger
+    const { data: publicUser, error: publicUserError } = await supabase
+      .from('users')
+      .select('id, email, tier, payment_status')
+      .eq('id', userId)
+      .single()
+
+    if (publicUserError) {
+      checkoutLogger.error({ error: publicUserError, userId }, 'public.users record not found - trigger may not have fired!')
+      // Create it manually if trigger failed
+      checkoutLogger.warn({ userId }, 'Attempting to manually create public.users record')
+      const { error: manualInsertError } = await supabase
+        .from('users')
+        .insert({
+          id: userId,
+          email: customerEmail.toLowerCase(),
+          full_name: lead?.name || customerName || '',
+          email_verified: true,
+          role: 'student',
+          tier: 'basic',
+          payment_status: 'pending'
+        })
+
+      if (manualInsertError) {
+        checkoutLogger.error({ error: manualInsertError }, 'Failed to manually create public.users record')
+        throw new Error(`Failed to create user profile for ${userId}`)
+      } else {
+        checkoutLogger.info({ userId }, 'Successfully created public.users record manually')
+      }
+    } else {
+      checkoutLogger.info({ userId, publicUser }, 'Confirmed public.users record exists')
+    }
 
     // Update the public.users record created by trigger with payment info
     await userRepo.updateTierAndPayment(

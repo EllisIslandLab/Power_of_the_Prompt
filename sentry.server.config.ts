@@ -13,7 +13,7 @@
 import * as Sentry from '@sentry/nextjs'
 
 // Uncomment this when you have your Sentry DSN
-/*
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
 
@@ -31,4 +31,4 @@ Sentry.init({
     'PGRST116', // Supabase "not found" errors (expected)
   ],
 })
-*/
+

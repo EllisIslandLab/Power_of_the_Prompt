@@ -14,7 +14,7 @@
 import * as Sentry from '@sentry/nextjs'
 
 // Uncomment this when you have your Sentry DSN
-/*
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
@@ -61,4 +61,4 @@ Sentry.init({
     'ResizeObserver loop limit exceeded',
   ],
 })
-*/
+
