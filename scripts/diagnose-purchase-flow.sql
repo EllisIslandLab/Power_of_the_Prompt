@@ -56,12 +56,12 @@ SELECT
   p.amount_paid,
   p.status,
   p.access_granted,
-  p.created_at,
+  p.purchased_at,
   pr.name as product_name
 FROM purchases p
 LEFT JOIN products pr ON p.product_id = pr.id
-WHERE p.created_at > NOW() - INTERVAL '24 hours'
-ORDER BY p.created_at DESC;
+WHERE p.purchased_at > NOW() - INTERVAL '24 hours'
+ORDER BY p.purchased_at DESC;
 
 -- 6. Check leads who haven't been converted yet
 SELECT
