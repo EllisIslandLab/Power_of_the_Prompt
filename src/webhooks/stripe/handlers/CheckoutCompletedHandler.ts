@@ -78,6 +78,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
 
       if (existingUser) {
         // User already exists - handle upgrade
+        checkoutLogger.info({ userId: existingUser.id }, 'User already exists, handling as upgrade')
         userId = await this.handleExistingUser(
           existingUser,
           tier,
@@ -87,6 +88,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         )
       } else {
         // Create new user
+        checkoutLogger.info({ customerEmail }, 'No existing user found, creating new user')
         userId = await this.handleNewUser(
           customerEmail,
           customerName ?? null,
@@ -248,7 +250,26 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
 
     if (authError) {
       checkoutLogger.error({ error: authError, code: authError.code, message: authError.message }, 'Failed to create auth user')
-      throw authError
+
+      // Check if error is due to user already existing
+      if (authError.message?.includes('already') || authError.code === 'user_already_exists' || authError.message?.includes('Database error')) {
+        checkoutLogger.warn({ customerEmail }, 'User might already exist, attempting to find existing user')
+
+        // Try to find existing user
+        const { data: { users }, error: listError } = await supabase.auth.admin.listUsers()
+        const existingAuthUser = users?.find((u: any) => u.email?.toLowerCase() === customerEmail.toLowerCase())
+
+        if (existingAuthUser) {
+          checkoutLogger.info({ userId: existingAuthUser.id }, 'Found existing auth user, will treat as upgrade')
+          // Return the existing user's ID and let handleExistingUser handle it
+          return existingAuthUser.id
+        } else {
+          checkoutLogger.error({ error: authError }, 'Could not create or find auth user')
+          throw authError
+        }
+      } else {
+        throw authError
+      }
     }
 
     const userId = authUser.user.id
