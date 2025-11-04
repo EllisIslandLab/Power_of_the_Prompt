@@ -19,6 +19,26 @@ export const POST = withMiddleware(
   async (req: NextRequest, { validated }) => {
     const { email, name, source, referrer } = validated
 
+    // Split name into first_name and last_name if provided
+    // ALWAYS populate first_name, even with single name
+    let firstName = ''
+    let lastName = ''
+    let fullName = name || ''
+
+    if (name && name.trim()) {
+      const nameParts = name.trim().split(/\s+/)
+      if (nameParts.length === 1) {
+        // Single name: use for both first_name and name
+        firstName = nameParts[0]
+        fullName = nameParts[0]
+      } else if (nameParts.length >= 2) {
+        // Multiple parts: split into first and last
+        firstName = nameParts[0]
+        lastName = nameParts.slice(1).join(' ') // Handle middle names
+        fullName = name.trim()
+      }
+    }
+
     // Check if email already exists in leads table
     const { data: existingEmail, error: checkError } = await supabase
       .from('leads')
@@ -47,6 +67,10 @@ export const POST = withMiddleware(
       .insert([
         {
           email: email.toLowerCase(),
+          name: fullName || null,
+          first_name: firstName || null,
+          last_name: lastName || null,
+          wants_ownership: validated.wantsOwnership ?? true, // Default to true if not provided
           status: 'waitlist',
           source: 'coming-soon-page',
           signup_date: new Date().toISOString()
@@ -66,20 +90,21 @@ export const POST = withMiddleware(
     }
 
     // Send welcome email via Resend
+    const displayName = firstName || 'there'
     try {
       await resendAdapter.sendEmail({
-        from: 'Web Launch Academy <noreply@weblaunchacademy.com>',
+        from: 'Web Launch Academy <hello@weblaunchacademy.com>',
         to: email,
-        subject: '🚀 You\'re on the list! Something amazing is coming...',
+        subject: `🚀 Welcome${firstName ? `, ${firstName}` : ''}! Let's get started...`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #2563eb; font-size: 28px; margin-bottom: 10px;">Welcome to Web Launch Academy!</h1>
-              <p style="color: #64748b; font-size: 16px;">Thanks for joining our waitlist ✨</p>
+              <h1 style="color: #2563eb; font-size: 28px; margin-bottom: 10px;">Welcome to Web Launch Academy${firstName ? `, ${firstName}` : ''}!</h1>
+              <p style="color: #64748b; font-size: 16px;">Thanks for signing up for updates ✨</p>
             </div>
-            
+
             <div style="background: #f8fafc; padding: 25px; border-radius: 10px; border-left: 4px solid #2563eb; margin-bottom: 25px;">
-              <h2 style="color: #1e293b; font-size: 20px; margin-bottom: 15px;">What's Coming Soon?</h2>
+              <h2 style="color: #1e293b; font-size: 20px; margin-bottom: 15px;">What You'll Learn</h2>
               <ul style="color: #475569; line-height: 1.6; padding-left: 20px;">
                 <li><strong>Own Your Code Forever</strong> - No monthly fees, complete ownership</li>
                 <li><strong>AI-Powered Development</strong> - Build professional sites with Claude CLI</li>
@@ -88,26 +113,40 @@ export const POST = withMiddleware(
               </ul>
             </div>
 
+            <div style="background: #ffdb57; padding: 25px; border-radius: 10px; margin-bottom: 25px; text-align: center;">
+              <h3 style="color: #11296b; font-size: 20px; margin-bottom: 15px;">🎁 Free 1-on-1 Introduction Session</h3>
+              <p style="color: #11296b; margin-bottom: 15px; line-height: 1.6;">
+                Want to learn more about what to expect in the course? Reply to this email or send a message to
+                <a href="mailto:hello@weblaunchacademy.com" style="color: #2563eb; text-decoration: none; font-weight: 600;">hello@weblaunchacademy.com</a>
+                to schedule your free 1-on-1 session with Matthew!
+              </p>
+            </div>
+
             <div style="background: #fef3c7; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
               <p style="color: #92400e; margin: 0; font-style: italic; text-align: center;">
                 "Build Once, Own Forever" - The philosophy that changes everything
               </p>
             </div>
 
-            <div style="text-align: center; margin-bottom: 25px;">
-              <p style="color: #475569; font-size: 16px; line-height: 1.6;">
-                We're putting the finishing touches on something special. As a waitlist member, you'll be the first to know when we launch and get exclusive early access.
+            <div style="text-align: center; margin-bottom: 30px;">
+              <a href="https://weblaunchacademy.com" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; display: inline-block;">Explore Our Courses</a>
+            </div>
+
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 30px;">
+              <p style="color: #475569; font-size: 14px; margin-bottom: 10px;">
+                Questions? Just reply to this email - I personally read and respond to every message.
+              </p>
+              <p style="color: #475569; font-size: 14px; margin: 0;">
+                Best regards,<br>
+                <strong>Matthew Ellis</strong><br>
+                Founder, Web Launch Academy
               </p>
             </div>
 
-            <div style="text-align: center; margin-bottom: 30px;">
-              <a href="https://weblaunchacademy.com" style="background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600;">Visit Our Site</a>
-            </div>
-
-            <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center;">
-              <p style="color: #94a3b8; font-size: 14px; margin: 0;">
-                You're receiving this because you signed up for the Web Launch Academy waitlist.<br>
-                <a href="#" style="color: #64748b;">Unsubscribe</a> | <a href="#" style="color: #64748b;">Update Preferences</a>
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px; text-align: center;">
+              <p style="color: #94a3b8; font-size: 12px; margin: 0;">
+                You're receiving this because you signed up for Web Launch Academy updates.<br>
+                Questions or feedback? Email us at <a href="mailto:hello@weblaunchacademy.com" style="color: #64748b;">hello@weblaunchacademy.com</a>
               </p>
             </div>
           </div>

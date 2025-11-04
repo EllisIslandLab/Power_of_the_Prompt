@@ -110,6 +110,7 @@ export const waitlistSignupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100).optional(),
   source: z.string().optional(),
   referrer: z.string().optional(),
+  wantsOwnership: z.boolean().optional().default(true),
 })
 
 export const storeLeadSchema = z.object({
