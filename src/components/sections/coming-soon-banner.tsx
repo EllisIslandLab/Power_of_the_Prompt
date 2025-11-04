@@ -9,7 +9,7 @@ import { parseApiError } from "@/lib/error-parser"
 export function ComingSoonBanner() {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
-  const [wantsOwnership, setWantsOwnership] = useState(true) // Default checked
+  const [wantsOwnership, setWantsOwnership] = useState(false) // Default unchecked for conversion psychology
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState('')
