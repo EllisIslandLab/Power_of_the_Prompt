@@ -51,26 +51,38 @@ export function PaymentConfirmationEmail({
         </Section>
       )}
 
+      {/* Account Setup */}
+      <Section style={accountSetupBox}>
+        <Heading as="h3" style={accountSetupHeading}>
+          🔐 Set Up Your Account Password
+        </Heading>
+        <Text style={accountSetupText}>
+          We've created your student account! To access the portal, you'll need to set up your password first.
+        </Text>
+        <Section style={buttonSection}>
+          <Button style={passwordButton} href={`${portalUrl.replace('/portal', '')}/forgot-password`}>
+            Set Up My Password
+          </Button>
+        </Section>
+        <Text style={smallText}>
+          Click the button above to receive a password setup email. This is a one-time setup to secure your account.
+        </Text>
+      </Section>
+
       {/* Next Steps */}
       <Section style={nextStepsBox}>
         <Heading as="h3" style={nextStepsHeading}>
-          Next Steps:
+          What's Next:
         </Heading>
         <ol style={list}>
-          <li style={listItem}>Create your account at the student portal</li>
+          <li style={listItem}>Set up your password using the button above</li>
+          <li style={listItem}>Sign in to the student portal</li>
           <li style={listItem}>Complete your profile setup</li>
-          <li style={listItem}>Access your course materials</li>
+          <li style={listItem}>Start accessing your course materials</li>
           {sessions > 0 && (
             <li style={listItem}>Schedule your first 1-on-1 session</li>
           )}
         </ol>
-      </Section>
-
-      {/* CTA Button */}
-      <Section style={buttonSection}>
-        <Button style={button} href={portalUrl}>
-          Access Student Portal
-        </Button>
       </Section>
 
       <Text style={paragraph}>
@@ -126,6 +138,48 @@ const sessionsParagraph = {
   lineHeight: '24px',
   color: '#333333',
   margin: '0',
+}
+
+const accountSetupBox = {
+  backgroundColor: '#fef3c7',
+  padding: '24px',
+  margin: '24px 0',
+  borderRadius: '8px',
+  border: '2px solid #fbbf24',
+}
+
+const accountSetupHeading = {
+  fontSize: '20px',
+  fontWeight: 'bold',
+  color: '#92400e',
+  marginTop: '0',
+  marginBottom: '12px',
+}
+
+const accountSetupText = {
+  fontSize: '16px',
+  lineHeight: '24px',
+  color: '#78350f',
+  marginBottom: '16px',
+}
+
+const passwordButton = {
+  backgroundColor: '#11296b',
+  color: '#ffffff',
+  padding: '15px 30px',
+  textDecoration: 'none',
+  borderRadius: '6px',
+  fontWeight: '600',
+  fontSize: '16px',
+  display: 'inline-block',
+}
+
+const smallText = {
+  fontSize: '14px',
+  lineHeight: '20px',
+  color: '#78350f',
+  marginTop: '12px',
+  marginBottom: '0',
 }
 
 const nextStepsBox = {

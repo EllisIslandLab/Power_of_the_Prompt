@@ -236,8 +236,8 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
   ): Promise<string> {
     checkoutLogger.info({ customerEmail, customerName, leadName: lead?.name }, 'Creating new auth user')
 
-    // Generate a random password (user will reset via email link)
-    const tempPassword = Math.random().toString(36).slice(-12) + 'A1!'
+    // Generate a secure random password (user will be prompted to reset it)
+    const tempPassword = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12) + 'A1!'
 
     const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
       email: customerEmail.toLowerCase(),
