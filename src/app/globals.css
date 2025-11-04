@@ -3,8 +3,9 @@
 :root {
   --background: #ededed;
   --foreground: #11296b;
-  --primary: #11296b;
+  --primary: #0a1840;
   --primary-foreground: #ffffff;
+  --primary-hover: #0d2055;
   --secondary: #00509d;
   --secondary-foreground: #ffffff;
   --accent: #ffdb57;
@@ -25,6 +26,7 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-accent: var(--accent);
