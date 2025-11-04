@@ -253,24 +253,76 @@ git config --global init.defaultBranch main
 ```
 
 **SSH Key Generation for GitHub:**
+
+**Step 1: Generate SSH Key**
 ```bash
 ssh-keygen -t ed25519 -C "your-business@email.com"
-# Press Enter for all prompts (use default location and no passphrase)
+```
 
-# Copy public key to clipboard
+**Step 2: Press Enter for All Prompts**
+```bash
+Enter file in which to save the key (/home/username/.ssh/id_ed25519): [Press Enter]
+Enter passphrase (empty for no passphrase): [Press Enter]
+Enter same passphrase again: [Press Enter]
+```
+
+You'll see output like this:
+```bash
+Your identification has been saved in /home/username/.ssh/id_ed25519
+Your public key has been saved in /home/username/.ssh/id_ed25519.pub
+The key fingerprint is:
+SHA256:nswXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX your-business@email.com
+```
+
+**⚠️ IMPORTANT: The "SHA256:..." fingerprint is NOT what you copy to GitHub!**
+
+**Step 3: Display and Copy Your ACTUAL Public Key**
+```bash
 cat ~/.ssh/id_ed25519.pub
 ```
 
-**Add SSH Key to GitHub:**
-1. Go to GitHub → Settings → SSH and GPG keys
-2. Click "New SSH key"
-3. Paste the public key
-4. Give it a descriptive title: "Development Machine - [Date]"
+**This will show your ACTUAL public key that looks like this:**
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJqJ your-business@email.com
+```
 
-**Test SSH Connection:**
+**✅ Copy this ENTIRE line** (from `ssh-ed25519` all the way to your email)
+
+**Your SSH key has three parts:**
+1. **Key type:** `ssh-ed25519`
+2. **The actual key:** Long random string like `AAAAC3Nza...`
+3. **Your email:** `your-business@email.com` (identifies this key)
+
+**Step 4: Add SSH Key to GitHub**
+1. Go to GitHub.com and sign in
+2. Click your profile picture (top-right) → Settings
+3. In the left sidebar, click "SSH and GPG keys"
+4. Click green "New SSH key" button
+5. Title: "Development Machine - November 2025" (or current date)
+6. Key type: Keep as "Authentication Key"
+7. **Paste your entire public key** (the one from `cat ~/.ssh/id_ed25519.pub`)
+8. Click "Add SSH key"
+
+**Step 5: Test SSH Connection**
 ```bash
 ssh -T git@github.com
 ```
+
+**First time, you'll see:**
+```
+The authenticity of host 'github.com (IP)' can't be established.
+ED25519 key fingerprint is SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU.
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
+```
+
+**Type `yes` and press Enter**
+
+**Success message:**
+```
+Hi YourUsername! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
+✅ **Perfect! Your SSH key is set up correctly.**
 
 ### 🤖 6. Claude CLI Installation
 
