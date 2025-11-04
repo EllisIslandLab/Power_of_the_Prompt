@@ -64,10 +64,10 @@ export default function ForgotPasswordPage() {
             
             <div className="space-y-4">
               <p className="text-muted-foreground">
-                We've sent password reset instructions to <span className="font-semibold text-foreground">{email}</span>
+                We've sent password setup instructions to <span className="font-semibold text-foreground">{email}</span>
               </p>
               <p className="text-sm text-muted-foreground">
-                Please check your email and follow the link to reset your password.
+                Please check your email and follow the link to set up your password.
               </p>
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
                 <p className="text-sm text-blue-800">
@@ -92,10 +92,10 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-foreground">
-            Forgot Password?
+            Create New Password
           </h1>
           <p className="text-xl text-muted-foreground">
-            Enter your email to reset your password
+            Enter your email to set up or reset your password
           </p>
         </div>
         

@@ -13,6 +13,7 @@ interface PaymentConfirmationEmailProps {
   sessions?: number
   portalUrl?: string
   email?: string
+  passwordResetUrl?: string
 }
 
 /**
@@ -24,10 +25,12 @@ export function PaymentConfirmationEmail({
   tier,
   sessions = 0,
   portalUrl = 'https://www.weblaunchacademy.com',
-  email = ''
+  email = '',
+  passwordResetUrl = ''
 }: PaymentConfirmationEmailProps) {
   const programName = tier === 'vip' ? 'A+ Program' : 'Web Launch Course'
   const siteUrl = portalUrl.includes('localhost') ? 'https://www.weblaunchacademy.com' : portalUrl.replace('/portal', '')
+  const resetUrl = passwordResetUrl || `${siteUrl}/forgot-password`
 
   return (
     <EmailLayout previewText={`Welcome to ${programName}!`}>
@@ -57,18 +60,18 @@ export function PaymentConfirmationEmail({
       {/* Account Setup */}
       <Section style={accountSetupBox}>
         <Heading as="h3" style={accountSetupHeading}>
-          🔐 Create Your Account
+          🔐 Set Up Your Password
         </Heading>
         <Text style={accountSetupText}>
-          Your enrollment is complete! Now it's time to create your account and set up your password to access the student portal.
+          Your enrollment is complete! Click the button below to create your password and access the student portal.
         </Text>
         <Section style={buttonSection}>
-          <Button style={passwordButton} href={`${siteUrl}/signin`}>
-            Create an Account
+          <Button style={passwordButton} href={resetUrl}>
+            Create New Password
           </Button>
         </Section>
         <Text style={smallText}>
-          Click "Create an Account" on the sign-in page, then use your email ({email}) to set up your password.
+          This secure link will let you set your password for {email}. The link expires in 24 hours.
         </Text>
       </Section>
 
@@ -78,7 +81,7 @@ export function PaymentConfirmationEmail({
           What's Next:
         </Heading>
         <ol style={list}>
-          <li style={listItem}>Click "Create an Account" above to set your password</li>
+          <li style={listItem}>Click "Create New Password" above to set your password</li>
           <li style={listItem}>Sign in to the student portal</li>
           <li style={listItem}>Complete your profile and generate an anonymous username if desired</li>
           <li style={listItem}>Start accessing your course materials</li>

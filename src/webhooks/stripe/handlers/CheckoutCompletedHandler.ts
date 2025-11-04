@@ -75,6 +75,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
       const existingUser = await userRepo.findByEmail(customerEmail)
 
       let userId: string
+      let passwordResetUrl = ''
 
       if (existingUser) {
         // User already exists - handle upgrade
@@ -89,7 +90,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
       } else {
         // Create new user
         checkoutLogger.info({ customerEmail }, 'No existing user found, creating new user')
-        userId = await this.handleNewUser(
+        const result = await this.handleNewUser(
           customerEmail,
           customerName ?? null,
           lead,
@@ -100,6 +101,8 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
           supabase,
           checkoutLogger
         )
+        userId = result.userId
+        passwordResetUrl = result.passwordResetUrl
       }
 
       // 3. Credit session packages if applicable
@@ -121,7 +124,8 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         customerName || lead?.name || '',
         tier,
         sessionsToCredit,
-        customerEmail
+        customerEmail,
+        passwordResetUrl
       )
 
       const duration = Date.now() - startTime
@@ -234,7 +238,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
     leadRepo: LeadRepository,
     supabase: any,
     checkoutLogger: any
-  ): Promise<string> {
+  ): Promise<{ userId: string; passwordResetUrl: string }> {
     checkoutLogger.info({ customerEmail, customerName, leadName: lead?.name }, 'Creating new auth user')
 
     // Generate a secure random password (user will be prompted to reset it)
@@ -296,6 +300,24 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
     checkoutLogger.info({ userId, email: customerEmail }, 'Created new auth user successfully')
     logSecurity('signup', 'low', { userId, email: customerEmail, source: 'payment' })
 
+    // Generate password reset link for user to set their password
+    let passwordResetUrl = ''
+    try {
+      const { data: resetData, error: resetError } = await supabase.auth.admin.generateLink({
+        type: 'recovery',
+        email: customerEmail.toLowerCase(),
+      })
+
+      if (resetError) {
+        checkoutLogger.error({ error: resetError }, 'Failed to generate password reset link')
+      } else if (resetData?.properties?.action_link) {
+        passwordResetUrl = resetData.properties.action_link
+        checkoutLogger.info({ userId }, 'Password reset link generated successfully')
+      }
+    } catch (resetErr) {
+      checkoutLogger.error({ error: resetErr }, 'Exception generating password reset link')
+    }
+
     // Wait a moment for the trigger to fire
     await new Promise(resolve => setTimeout(resolve, 500))
 
@@ -344,7 +366,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
       await leadRepo.markAsConvertedByEmail(customerEmail)
     }
 
-    return userId
+    return { userId, passwordResetUrl }
   }
 
   /**
@@ -388,7 +410,8 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
     name: string,
     tier: string,
     sessions: number,
-    customerEmail: string
+    customerEmail: string,
+    passwordResetUrl: string
   ): Promise<void> {
     const startTime = Date.now()
 
@@ -402,7 +425,8 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         tier: emailTier,
         sessions,
         portalUrl: process.env.NEXT_PUBLIC_URL || 'https://www.weblaunchacademy.com',
-        email: customerEmail
+        email: customerEmail,
+        passwordResetUrl
       })
 
       await resendAdapter.sendEmail({

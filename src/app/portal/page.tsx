@@ -323,8 +323,10 @@ export default function PortalPage() {
               <div className="text-sm">
                 <strong>Role:</strong> {user.role === 'admin' ? 'Admin' : 'Student'}
               </div>
-              <Button variant="outline" size="sm" className="mt-4">
-                Update Profile
+              <Button variant="outline" size="sm" className="mt-4" asChild>
+                <Link href="/portal/settings">
+                  Update Profile
+                </Link>
               </Button>
             </CardContent>
           </Card>
