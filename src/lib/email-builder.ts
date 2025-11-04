@@ -60,6 +60,7 @@ export interface PaymentConfirmationEmailProps {
   tier: 'basic' | 'premium' | 'vip'
   sessions?: number
   portalUrl?: string
+  email?: string
 }
 
 /**
@@ -68,14 +69,15 @@ export interface PaymentConfirmationEmailProps {
 export async function renderPaymentConfirmationEmail(
   props: PaymentConfirmationEmailProps
 ): Promise<string> {
-  const { customerName, tier, sessions = 0, portalUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000' } = props
+  const { customerName, tier, sessions = 0, portalUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000', email = '' } = props
 
   return render(
     React.createElement(PaymentConfirmationEmail, {
       customerName,
       tier,
       sessions,
-      portalUrl: `${portalUrl}/portal`
+      portalUrl,
+      email
     })
   )
 }
