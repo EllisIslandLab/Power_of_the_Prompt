@@ -58,13 +58,11 @@ export function ComingSoonBanner() {
       <div className="container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            Something Amazing is
-            <span className="block text-primary">Coming Soon</span>
+            <span className="block text-primary">Build Once, Own Forever</span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            We're putting the finishing touches on our new platform. 
-            Be the first to know when we launch!
+            Build a startup website where you own the code - no hosting fees, no hidden costs, just pure creativity.
           </p>
 
           <Card className="max-w-md mx-auto mb-8">
