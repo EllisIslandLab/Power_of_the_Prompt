@@ -120,7 +120,8 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         customerEmail,
         customerName || lead?.name || '',
         tier,
-        sessionsToCredit
+        sessionsToCredit,
+        customerEmail
       )
 
       const duration = Date.now() - startTime
@@ -386,7 +387,8 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
     email: string,
     name: string,
     tier: string,
-    sessions: number
+    sessions: number,
+    customerEmail: string
   ): Promise<void> {
     const startTime = Date.now()
 
@@ -399,7 +401,8 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         customerName: name,
         tier: emailTier,
         sessions,
-        portalUrl: process.env.NEXT_PUBLIC_URL
+        portalUrl: process.env.NEXT_PUBLIC_URL || 'https://www.weblaunchacademy.com',
+        email: customerEmail
       })
 
       await resendAdapter.sendEmail({

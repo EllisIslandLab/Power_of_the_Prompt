@@ -12,6 +12,7 @@ interface PaymentConfirmationEmailProps {
   tier: 'basic' | 'premium' | 'vip'
   sessions?: number
   portalUrl?: string
+  email?: string
 }
 
 /**
@@ -22,9 +23,11 @@ export function PaymentConfirmationEmail({
   customerName,
   tier,
   sessions = 0,
-  portalUrl = 'http://localhost:3000/portal'
+  portalUrl = 'https://www.weblaunchacademy.com',
+  email = ''
 }: PaymentConfirmationEmailProps) {
   const programName = tier === 'vip' ? 'A+ Program' : 'Web Launch Course'
+  const siteUrl = portalUrl.includes('localhost') ? 'https://www.weblaunchacademy.com' : portalUrl.replace('/portal', '')
 
   return (
     <EmailLayout previewText={`Welcome to ${programName}!`}>
@@ -54,18 +57,18 @@ export function PaymentConfirmationEmail({
       {/* Account Setup */}
       <Section style={accountSetupBox}>
         <Heading as="h3" style={accountSetupHeading}>
-          🔐 Set Up Your Account Password
+          🔐 Create Your Account
         </Heading>
         <Text style={accountSetupText}>
-          We've created your student account! To access the portal, you'll need to set up your password first.
+          Your enrollment is complete! Now it's time to create your account and set up your password to access the student portal.
         </Text>
         <Section style={buttonSection}>
-          <Button style={passwordButton} href={`${portalUrl.replace('/portal', '')}/forgot-password`}>
-            Set Up My Password
+          <Button style={passwordButton} href={`${siteUrl}/signin`}>
+            Create an Account
           </Button>
         </Section>
         <Text style={smallText}>
-          Click the button above to receive a password setup email. This is a one-time setup to secure your account.
+          Click "Create an Account" on the sign-in page, then use your email ({email}) to set up your password.
         </Text>
       </Section>
 
@@ -75,9 +78,9 @@ export function PaymentConfirmationEmail({
           What's Next:
         </Heading>
         <ol style={list}>
-          <li style={listItem}>Set up your password using the button above</li>
+          <li style={listItem}>Click "Create an Account" above to set your password</li>
           <li style={listItem}>Sign in to the student portal</li>
-          <li style={listItem}>Complete your profile setup</li>
+          <li style={listItem}>Complete your profile and generate an anonymous username if desired</li>
           <li style={listItem}>Start accessing your course materials</li>
           {sessions > 0 && (
             <li style={listItem}>Schedule your first 1-on-1 session</li>
