@@ -106,6 +106,36 @@ const nextConfig: NextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              // Scripts: Allow self, Stripe, Jitsi, and inline scripts (required for Next.js)
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.jitsi.net https://8x8.vc https://*.sentry.io",
+              // Styles: Allow self and inline styles (required for styled-components/emotion)
+              "style-src 'self' 'unsafe-inline'",
+              // Images: Allow self, data URIs, Supabase, Stripe
+              "img-src 'self' data: https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co https://lh3.googleusercontent.com",
+              // Fonts: Allow self and data URIs
+              "font-src 'self' data:",
+              // Connect: Allow API calls to Supabase, Stripe, Jitsi, Sentry
+              "connect-src 'self' https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co wss://qaaautcjhztvjhizklxr.supabase.co https://api.stripe.com https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc https://*.sentry.io",
+              // Frames: Allow Stripe checkout and Jitsi video
+              "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.jitsi.net https://8x8.vc",
+              // Media: Allow Jitsi for video/audio
+              "media-src 'self' https://*.jitsi.net https://8x8.vc",
+              // Objects: Disallow plugins
+              "object-src 'none'",
+              // Base URI: Restrict to self
+              "base-uri 'self'",
+              // Form actions: Allow self and Stripe
+              "form-action 'self' https://js.stripe.com",
+              // Frame ancestors: None (covered by X-Frame-Options but good to include)
+              "frame-ancestors 'none'",
+              // Upgrade insecure requests in production
+              process.env.NODE_ENV === 'production' ? 'upgrade-insecure-requests' : '',
+            ].filter(Boolean).join('; '),
+          },
         ],
       },
       {
