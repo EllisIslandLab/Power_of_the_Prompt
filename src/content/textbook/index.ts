@@ -13,6 +13,89 @@ export interface Section {
 
 export const textbookChapters: Chapter[] = [
   {
+    id: "00",
+    title: "Business Foundation Before Building",
+    filePath: "/textbook/00-business-foundation",
+    sections: [
+      {
+        id: "0.1",
+        title: "Business Structure: LLC Formation",
+        subsections: [
+          "Why Form an LLC",
+          "How to Form Your LLC",
+          "LLC Operating Agreement",
+          "State-Specific Considerations"
+        ]
+      },
+      {
+        id: "0.2",
+        title: "Employer Identification Number (EIN)",
+        subsections: [
+          "Why You Need an EIN",
+          "How to Get Your EIN (It's Free!)",
+          "What Information You'll Need",
+          "Using Your EIN"
+        ]
+      },
+      {
+        id: "0.3",
+        title: "Business Banking",
+        subsections: [
+          "Why Separate Business Banking Matters",
+          "Choosing a Business Bank",
+          "What You'll Need to Open an Account",
+          "Best Practices for Business Banking"
+        ]
+      },
+      {
+        id: "0.4",
+        title: "Professional Email and Communication",
+        subsections: [
+          "Why Professional Email Matters",
+          "Domain-Based Email Setup",
+          "Free vs. Paid Email Solutions",
+          "Email Best Practices"
+        ]
+      },
+      {
+        id: "0.5",
+        title: "Phone System",
+        subsections: [
+          "Why a Dedicated Business Number Matters",
+          "Professional Phone Options",
+          "Best Practices"
+        ]
+      },
+      {
+        id: "0.6",
+        title: "Domain Registration Strategy",
+        subsections: [
+          "Choosing Your Domain Name",
+          "Domain Registration Best Practices",
+          "Where to Register Your Domain"
+        ]
+      },
+      {
+        id: "0.7",
+        title: "Payment Processing Setup",
+        subsections: [
+          "Why You Need Payment Processing",
+          "Stripe Account Setup",
+          "Best Practices"
+        ]
+      },
+      {
+        id: "0.8",
+        title: "The Complete Business Foundation Checklist",
+        subsections: [
+          "Your Business Foundation Roadmap",
+          "Cost Breakdown",
+          "Timeline Expectations"
+        ]
+      }
+    ]
+  },
+  {
     id: "01",
     title: "Accounts and Installations",
     filePath: "/textbook/01-accounts-and-installations",
