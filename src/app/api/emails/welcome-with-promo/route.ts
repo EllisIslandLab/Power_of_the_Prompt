@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
       .eq('email', userEmail)
       .single()
 
-    const currentTags = existingLead?.tags || []
+    const currentTags = Array.isArray(existingLead?.tags) ? existingLead.tags as string[] : []
     const updatedTags = currentTags.includes('welcome_sent')
       ? currentTags
       : [...currentTags, 'welcome_sent']
