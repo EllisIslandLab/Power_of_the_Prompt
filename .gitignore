@@ -49,5 +49,8 @@ next-env.d.ts
 docs/toolkit/
 scripts/update-architecture-toolkit-resources.sql
 
+# Internal development roadmap - contains strategy and progress
+IMPLEMENTATION_ROADMAP.md
+
 # Keep these files private and secure
 # Store them in Supabase Storage or private S3 bucket instead
