@@ -192,11 +192,22 @@ export async function POST(request: NextRequest) {
     // ============================================
 
     // Update lead record if exists
+    const { data: existingLead } = await supabase
+      .from('leads')
+      .select('tags')
+      .eq('email', userEmail)
+      .single()
+
+    const currentTags = existingLead?.tags || []
+    const updatedTags = currentTags.includes('welcome_sent')
+      ? currentTags
+      : [...currentTags, 'welcome_sent']
+
     await supabase
       .from('leads')
       .update({
         last_engagement: new Date().toISOString(),
-        tags: supabase.rpc('array_append', { arr: 'tags', elem: 'welcome_sent' })
+        tags: updatedTags
       })
       .eq('email', userEmail)
 
