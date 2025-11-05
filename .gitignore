@@ -41,3 +41,13 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# ============================================
+# PRIVATE TOOLKIT DOCUMENTATION
+# These are valuable paid resources - DO NOT COMMIT
+# ============================================
+docs/toolkit/
+scripts/update-architecture-toolkit-resources.sql
+
+# Keep these files private and secure
+# Store them in Supabase Storage or private S3 bucket instead
