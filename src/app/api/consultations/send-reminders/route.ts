@@ -10,7 +10,7 @@ import { ResendAdapter } from '@/adapters/ResendAdapter'
  * 2. 1-hour reminders (for consultations 0.5-1.5 hours away)
  *
  * Setup Cron Job:
- * - Vercel Cron: vercel.json with schedule "*/15 * * * *" (every 15 min)
+ * - Vercel Cron: vercel.json with schedule (every 15 min)
  * - External: Call this endpoint every 15-30 minutes
  * - Auth: Use CRON_SECRET header for security
  */
