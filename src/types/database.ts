@@ -703,6 +703,247 @@ export type Database = {
         }
         Relationships: []
       }
+      consultations: {
+        Row: {
+          id: string
+          user_id: string | null
+          full_name: string
+          email: string
+          phone: string
+          business_name: string | null
+          scheduled_date: string
+          duration_minutes: number
+          timezone: string
+          status: string
+          jitsi_room_id: string | null
+          jitsi_join_url: string | null
+          video_session_id: string | null
+          website_description: string | null
+          notes: string | null
+          cancelled_at: string | null
+          cancellation_reason: string | null
+          rescheduled_from: string | null
+          reminder_24h_sent: boolean
+          reminder_24h_sent_at: string | null
+          reminder_1h_sent: boolean
+          reminder_1h_sent_at: string | null
+          confirmation_sent: boolean
+          confirmation_sent_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          full_name: string
+          email: string
+          phone: string
+          business_name?: string | null
+          scheduled_date: string
+          duration_minutes?: number
+          timezone?: string
+          status?: string
+          jitsi_room_id?: string | null
+          jitsi_join_url?: string | null
+          video_session_id?: string | null
+          website_description?: string | null
+          notes?: string | null
+          cancelled_at?: string | null
+          cancellation_reason?: string | null
+          rescheduled_from?: string | null
+          reminder_24h_sent?: boolean
+          reminder_24h_sent_at?: string | null
+          reminder_1h_sent?: boolean
+          reminder_1h_sent_at?: string | null
+          confirmation_sent?: boolean
+          confirmation_sent_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          full_name?: string
+          email?: string
+          phone?: string
+          business_name?: string | null
+          scheduled_date?: string
+          duration_minutes?: number
+          timezone?: string
+          status?: string
+          jitsi_room_id?: string | null
+          jitsi_join_url?: string | null
+          video_session_id?: string | null
+          website_description?: string | null
+          notes?: string | null
+          cancelled_at?: string | null
+          cancellation_reason?: string | null
+          rescheduled_from?: string | null
+          reminder_24h_sent?: boolean
+          reminder_24h_sent_at?: string | null
+          reminder_1h_sent?: boolean
+          reminder_1h_sent_at?: string | null
+          confirmation_sent?: boolean
+          confirmation_sent_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultations_rescheduled_from_fkey"
+            columns: ["rescheduled_from"]
+            isOneToOne: false
+            referencedRelation: "consultations"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      promo_codes: {
+        Row: {
+          id: string
+          code: string
+          stripe_promo_code_id: string | null
+          stripe_coupon_id: string | null
+          product_id: string
+          discount_type: string
+          discount_amount: number
+          user_email: string
+          user_id: string | null
+          expires_at: string
+          used: boolean
+          used_at: string | null
+          used_in_session_id: string | null
+          campaign_type: string
+          sent_via_email_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          code: string
+          stripe_promo_code_id?: string | null
+          stripe_coupon_id?: string | null
+          product_id: string
+          discount_type: string
+          discount_amount: number
+          user_email: string
+          user_id?: string | null
+          expires_at: string
+          used?: boolean
+          used_at?: string | null
+          used_in_session_id?: string | null
+          campaign_type?: string
+          sent_via_email_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          code?: string
+          stripe_promo_code_id?: string | null
+          stripe_coupon_id?: string | null
+          product_id?: string
+          discount_type?: string
+          discount_amount?: number
+          user_email?: string
+          user_id?: string | null
+          expires_at?: string
+          used?: boolean
+          used_at?: string | null
+          used_in_session_id?: string | null
+          campaign_type?: string
+          sent_via_email_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_codes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      consultation_blocks: {
+        Row: {
+          id: string
+          start_time: string
+          end_time: string
+          reason: string | null
+          block_type: string
+          consultation_id: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          start_time: string
+          end_time: string
+          reason?: string | null
+          block_type?: string
+          consultation_id?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          start_time?: string
+          end_time?: string
+          reason?: string | null
+          block_type?: string
+          consultation_id?: string | null
+          created_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_blocks_consultation_id_fkey"
+            columns: ["consultation_id"]
+            isOneToOne: false
+            referencedRelation: "consultations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_blocks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      federal_holidays: {
+        Row: {
+          id: string
+          holiday_name: string
+          holiday_date: string
+          year: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          holiday_name: string
+          holiday_date: string
+          year: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          holiday_name?: string
+          holiday_date?: string
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -879,6 +1120,10 @@ export type AttendanceLog = Tables<"attendance_log">
 export type SocialShare = Tables<"social_shares">
 export type Referral = Tables<"referrals">
 export type AffiliateTier = Tables<"affiliate_tiers">
+export type Consultation = Tables<"consultations">
+export type PromoCode = Tables<"promo_codes">
+export type ConsultationBlock = Tables<"consultation_blocks">
+export type FederalHoliday = Tables<"federal_holidays">
 
 // Backwards compatibility
 export type Students = UserProfile // For backwards compatibility
