@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabase } from '@/lib/supabase'
-import { getAirtableBase } from '@/lib/airtable'
+import { ResendAdapter } from '@/adapters/ResendAdapter'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
+
     // Validate required fields for calendar booking
     const { fullName, email, phone, selectedSlot, websiteDescription } = body
-    
+
     if (!fullName || !email || !phone || !selectedSlot) {
       return NextResponse.json(
         { error: 'Missing required fields: Name, Email, Phone, and Selected Time Slot are required' },
@@ -25,70 +25,130 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if slot is still available (not in the past, meets minimum notice)
+    // Check if slot is still available (not in the past)
     const now = new Date()
-    const minBookingTime = new Date(now.getTime() + (3 * 60 * 60 * 1000))
-    
-    if (slotDate < minBookingTime) {
+
+    if (slotDate < now) {
       return NextResponse.json(
-        { error: 'Selected time slot requires at least 3 hours notice' },
+        { error: 'Selected time slot is in the past' },
         { status: 400 }
       )
     }
 
-    // Create video session in Supabase
+    const supabase = getSupabase(true) // Use service role
+
+    // Check if slot is already booked
+    const slotEnd = new Date(slotDate.getTime() + (60 * 60 * 1000))
+    const { data: existingBlocks } = await supabase
+      .from('consultation_blocks')
+      .select('*')
+      .or(`and(start_time.lte.${slotDate.toISOString()},end_time.gt.${slotDate.toISOString()}),and(start_time.lt.${slotEnd.toISOString()},end_time.gte.${slotEnd.toISOString()})`)
+
+    if (existingBlocks && existingBlocks.length > 0) {
+      return NextResponse.json(
+        { error: 'This time slot has just been booked. Please select another time.' },
+        { status: 409 }
+      )
+    }
+
+    // Create video session
     const videoSession = await createVideoSession({
       sessionName: `Free Consultation with ${fullName}`,
       scheduledStart: selectedSlot.timestamp,
-      duration: 30,
+      duration: 60,
       userEmail: email,
       userName: fullName
     })
 
-    // Prepare record for Airtable - using flexible typing for dynamic fields
-    const record: any = {
-      fields: {
-        'Name': fullName,
-        'Email': email,
-        'Phone': phone,
-        'Business Name': body.businessName || 'Not provided',
-        'Status': 'Confirmed',
-        'Appointment Date': slotDate.toISOString(),
-        'Appointment Time': selectedSlot.formatted,
-        'Meeting Type': 'Calendar Booking',
-        'Jitsi Room ID': videoSession.jitsiRoomId,
-        'Jitsi Join URL': videoSession.joinUrl,
-        'Video Session ID': videoSession.id,
-        'Notes': `Website Type: ${websiteDescription || 'Not specified'} | Booked: ${new Date().toISOString()}`
-      }
+    // Create consultation in Supabase
+    const { data: consultation, error: consultationError } = await supabase
+      .from('consultations')
+      .insert({
+        full_name: fullName,
+        email: email,
+        phone: phone,
+        business_name: body.businessName || null,
+        scheduled_date: slotDate.toISOString(),
+        duration_minutes: 60,
+        timezone: 'America/New_York',
+        status: 'scheduled',
+        jitsi_room_id: videoSession.jitsiRoomId,
+        jitsi_join_url: videoSession.joinUrl,
+        video_session_id: videoSession.id,
+        website_description: websiteDescription || null,
+        notes: `Booked via calendar at ${new Date().toISOString()}`
+      })
+      .select()
+      .single()
+
+    if (consultationError) {
+      console.error('Error creating consultation:', consultationError)
+      throw new Error(`Failed to create consultation: ${consultationError.message}`)
     }
 
-    // Add optional fields
-    if (body.businessType) {
-      const businessTypeMap: Record<string, string> = {
-        'service': 'Service-based',
-        'product': 'Product-based', 
-        'nonprofit': 'Non-profit',
-        'other': 'Other'
+    // Send confirmation email
+    try {
+      const resend = ResendAdapter.getInstance()
+
+      // Get email template
+      const { data: template } = await supabase
+        .from('email_templates')
+        .select('*')
+        .eq('name', 'Consultation Confirmation')
+        .single()
+
+      if (template) {
+        let emailContent = template.content_template
+          .replace(/{{name}}/g, fullName)
+          .replace(/{{formatted_date}}/g, selectedSlot.formatted)
+          .replace(/{{join_url}}/g, videoSession.joinUrl)
+
+        let emailSubject = template.subject_template
+          .replace(/{{formatted_date}}/g, selectedSlot.formatted)
+
+        await resend.sendEmail({
+          to: email,
+          from: 'Web Launch Academy <hello@weblaunchacademy.com>',
+          subject: emailSubject,
+          html: emailContent
+        })
+
+        // Update consultation to mark confirmation sent
+        await supabase
+          .from('consultations')
+          .update({
+            confirmation_sent: true,
+            confirmation_sent_at: new Date().toISOString()
+          })
+          .eq('id', consultation.id)
+
+        // Send copy to admin
+        await resend.sendEmail({
+          to: 'hello@weblaunchacademy.com',
+          from: 'Web Launch Academy <hello@weblaunchacademy.com>',
+          subject: `New Consultation Booked: ${fullName} - ${selectedSlot.formatted}`,
+          html: `
+            <h2>New Consultation Booked</h2>
+            <p><strong>Name:</strong> ${fullName}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Business:</strong> ${body.businessName || 'Not provided'}</p>
+            <p><strong>Time:</strong> ${selectedSlot.formatted}</p>
+            <p><strong>Website Description:</strong> ${websiteDescription || 'Not provided'}</p>
+            <p><strong>Join URL:</strong> <a href="${videoSession.joinUrl}">${videoSession.joinUrl}</a></p>
+          `
+        })
       }
-      record.fields['Business Type'] = businessTypeMap[body.businessType as string] || 'Other'
-    }
-    
-    if (body.currentWebsite) {
-      record.fields['Current Website'] = body.currentWebsite
+    } catch (emailError) {
+      console.error('Error sending confirmation email:', emailError)
+      // Don't fail the booking if email fails
     }
 
-    // Create record in Airtable
-    const base = getAirtableBase()
-    const createdRecord = await base('Consultations').create([record])
-    
-    // TODO: Send confirmation email with calendar invite
-    
     return NextResponse.json({
       success: true,
       message: 'Appointment booked successfully',
       booking: {
-        id: createdRecord[0].id,
+        id: consultation.id,
         appointment_time: selectedSlot.formatted,
         jitsi_join_url: videoSession.joinUrl,
         confirmation_sent: true
@@ -97,9 +157,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Booking API Error:', error)
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to book appointment',
         details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
       },
