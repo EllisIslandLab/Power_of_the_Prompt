@@ -15,7 +15,6 @@ import {
   Zap,
   Clock,
   Download,
-  Play,
   ChevronDown,
   ChevronRight
 } from 'lucide-react'
@@ -275,8 +274,8 @@ export default function ArchitectureToolkitPage() {
                     <div className="flex items-start gap-3">
                       <Check className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
-                        <p className="font-medium">Video Walkthroughs</p>
-                        <p className="text-sm text-muted-foreground">Watch exactly how to implement each solution</p>
+                        <p className="font-medium">Implementation Roadmap</p>
+                        <p className="text-sm text-muted-foreground">Strategic guide to implementing patterns in your codebase</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -416,24 +415,16 @@ export default function ArchitectureToolkitPage() {
                                 </div>
                               )}
 
-                              <div className="flex gap-3">
-                                {content.video_url && (
-                                  <Button size="sm" variant="default" asChild>
-                                    <a href={content.video_url} target="_blank" rel="noopener noreferrer">
-                                      <Play className="h-4 w-4 mr-2" />
-                                      Watch Video
-                                    </a>
-                                  </Button>
-                                )}
-                                {content.file_urls && content.file_urls.length > 0 && (
+                              {content.file_urls && content.file_urls.length > 0 && (
+                                <div>
                                   <Button size="sm" variant="outline" asChild>
                                     <a href={content.file_urls[0]} download>
                                       <Download className="h-4 w-4 mr-2" />
                                       Download Files
                                     </a>
                                   </Button>
-                                )}
-                              </div>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
