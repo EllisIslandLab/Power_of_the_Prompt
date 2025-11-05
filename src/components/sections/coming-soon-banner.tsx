@@ -58,7 +58,8 @@ export function ComingSoonBanner() {
       <div className="container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="block text-primary">Build Once, Own Forever</span>
+            Build Once,
+            <span className="block text-primary">Own Forever</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -157,7 +158,7 @@ export function ComingSoonBanner() {
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground text-center">
-                    No spam, just updates on our launch.
+                    No spam, just updates on the next launch.
                   </p>
                 </form>
               )}
@@ -175,12 +176,12 @@ export function ComingSoonBanner() {
             <div>
               <div className="text-3xl mb-2">🎯</div>
               <h3 className="font-semibold text-lg mb-1">AI-Powered</h3>
-              <p className="text-sm text-muted-foreground">Smart development with Claude CLI</p>
+              <p className="text-sm text-muted-foreground">Smart development with Claude Code</p>
             </div>
             <div>
               <div className="text-3xl mb-2">💎</div>
               <h3 className="font-semibold text-lg mb-1">Own Forever</h3>
-              <p className="text-sm text-muted-foreground">No monthly fees, complete ownership</p>
+              <p className="text-sm text-muted-foreground">No startup subscription fees, complete ownership</p>
             </div>
           </div>
         </div>

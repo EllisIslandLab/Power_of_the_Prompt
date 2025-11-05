@@ -12,7 +12,7 @@ export function Footer() {
         {/* Final CTA Section */}
         <div className="text-center mb-16 py-12 bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl border border-border">
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Ready to Own Your <span className="text-primary">Website?</span>
+            Ready to Own <span className="text-primary">Your Website?</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Stop paying monthly fees for limited control. Build a professional website with modern web technologies that you actually own.
@@ -64,6 +64,7 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
             <div className="space-y-2">
+              {/* Commented out - no longer available
               <Link href="/#unique-approach" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Unique Approach
               </Link>
@@ -78,6 +79,16 @@ export function Footer() {
               </Link>
               <Link href="/#site-tlc" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Site Maintenance
+              </Link>
+              */}
+              <Link href="#top" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
+                Back to the Top
+              </Link>
+              <Link href="/#website-samples-gallery" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
+                Website Samples Gallery
+              </Link>
+              <Link href="/#testimonials" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
+                Testimonials
               </Link>
             </div>
           </div>
