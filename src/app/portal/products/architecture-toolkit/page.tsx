@@ -440,7 +440,7 @@ export default function ArchitectureToolkitPage() {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => downloadFile(content.file_urls[0])}
+                                    onClick={() => content.file_urls?.[0] && downloadFile(content.file_urls[0])}
                                   >
                                     <Download className="h-4 w-4 mr-2" />
                                     Download Guide
