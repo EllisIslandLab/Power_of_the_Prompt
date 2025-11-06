@@ -137,6 +137,22 @@ export function Footer() {
               </Link>
             </div>
           </div>
+
+          {/* Website Certification Badge */}
+          <div className="mt-6 flex justify-center">
+            <a
+              href="https://yourwebsitescore.com/certified-websites/weblaunchacademy.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-opacity hover:opacity-80"
+            >
+              <img
+                src="https://yourwebsitescore.com/api/badge/weblaunchacademy.com"
+                alt="Monitor your website with YourWebsiteScore"
+                style={{height: '54px', width: 'auto'}}
+              />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
