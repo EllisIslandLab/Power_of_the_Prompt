@@ -81,239 +81,38 @@ A master prompt is a comprehensive, detailed description that generates a comple
 - Comprehensive feature implementation
 - Reduced back-and-forth iteration
 - Professional-grade output
-- Time efficiency
+- Time efficiency (saves 20-40 hours per project)
 
-### Universal E-commerce/Services Master Prompt
+**Master Prompt Structure:**
+A well-crafted master prompt typically includes:
+1. **Technical Stack** - Framework, libraries, and tools
+2. **Business Context** - Industry, audience, and goals
+3. **Feature Requirements** - Specific functionality needed
+4. **Design Specifications** - Visual and UX guidelines
+5. **Integration Needs** - Database, payments, email
+6. **Security Requirements** - Authentication, data protection
+7. **Deployment Configuration** - Hosting and environment setup
 
-**Complete Master Prompt Template:**
+**🔒 Premium Content:** Complete master prompt templates for e-commerce, service businesses, SaaS applications, and portfolio sites are available in the [Architecture Mastery Toolkit](#). These battle-tested templates have generated dozens of production websites and save 20-40 hours per project.
 
-```
-Create a professional Next.js e-commerce/services website with the following specifications:
+### Writing Effective Prompts
 
-## TECHNICAL REQUIREMENTS
-- Next.js 14 with App Router and TypeScript
-- Tailwind CSS for responsive styling
-- ESLint and Prettier for code quality
-- Environment variables for security
-- Professional file structure and organization
+**Basic Prompt Structure:**
+When working with Claude CLI, structure your prompts to include:
 
-## BUSINESS CONTEXT
-[Customize this section for each business]
-- Business Type: [Handmade crafts/Professional services/Digital products]
-- Target Audience: [Demographics and preferences]
-- Primary Goals: [Lead generation/Sales/Brand awareness]
-- Unique Value Proposition: [What makes this business special]
+1. **Context:** What are you building and why?
+2. **Requirements:** What specific features do you need?
+3. **Constraints:** Any technical or business limitations?
+4. **Expected Output:** What should the end result look like?
 
-## WEBSITE STRUCTURE
-### Homepage
-- Hero section with compelling headline and call-to-action
-- Featured products/services showcase (4-6 items)
-- About section with business story and values
-- Testimonials/reviews section
-- Newsletter signup
-- Contact information and business hours
-
-### Products/Services Catalog
-- Grid layout with filtering by category
-- Search functionality
-- Product/service cards with images, descriptions, prices
-- "Quick view" modal for detailed information
-- Add to cart/inquiry functionality
-- Pagination for large catalogs
-
-### Individual Product/Service Pages
-- High-quality image gallery
-- Detailed descriptions and specifications
-- Pricing and availability information
-- Related products/services
-- Customer reviews section
-- Add to cart/contact form
-
-### Shopping Cart (E-commerce)
-- Item list with quantities and prices
-- Update quantities and remove items
-- Subtotal, tax, and shipping calculations
-- Secure checkout process
-- Guest checkout option
-
-### Checkout Process
-- Customer information form
-- Shipping address collection
-- Payment method selection
-- Order review and confirmation
-- Email confirmation setup
-
-### Contact/About Pages
-- Company story and mission
-- Team member profiles
-- Contact form with multiple topics
-- Business location and hours
-- FAQ section
-
-## AIRTABLE INTEGRATION
-### Database Schema
-- Products/Services table: name, description, price, category, images, availability, featured
-- Customer Inquiries table: name, email, phone, message, product_interest, source, status
-- Orders table: customer_info, items, quantities, subtotal, tax, shipping, total, payment_status, order_status
-
-### API Integration
-- Fetch products/services for display
-- Submit contact forms to Customer Inquiries
-- Create orders in Orders table
-- Real-time inventory checking
-- Error handling for API failures
-
-## DESIGN SPECIFICATIONS
-### Visual Design
-- Clean, modern aesthetic appropriate for business type
-- Professional color scheme (provide 3-4 colors)
-- Consistent typography hierarchy
-- High-quality placeholder images
-- Accessible design with proper contrast
-
-### User Experience
-- Mobile-first responsive design
-- Intuitive navigation with breadcrumbs
-- Loading states for all async operations
-- Error messages and user feedback
-- Smooth animations and transitions
-
-### Performance Optimization
-- Image optimization with Next.js Image component
-- Lazy loading for better performance
-- Static generation for catalog pages
-- Code splitting for optimal loading
-- Core Web Vitals optimization
-
-## SEO OPTIMIZATION
-- Dynamic meta tags for all pages
-- Open Graph and Twitter Card implementation
-- Structured data for products/services
-- XML sitemap generation
-- Proper heading hierarchy (H1, H2, H3)
-- Alt text for all images
-
-## SECURITY AND BEST PRACTICES
-- Environment variables for all API keys
-- Input validation and sanitization
-- CSRF protection for forms
-- Secure payment processing
-- Rate limiting for API endpoints
-- Error logging and monitoring
-
-## INTERACTIVE FEATURES
-### Shopping Cart (if e-commerce)
-- Add/remove items with visual feedback
-- Persistent cart across sessions
-- Cart icon with item count
-- Quick cart preview dropdown
-
-### Contact Forms
-- Multi-step forms for complex inquiries
-- Form validation with error messages
-- Success confirmations
-- Spam protection
-
-### Search and Filtering
-- Product/service search functionality
-- Category and price filtering
-- Sort by relevance, price, date
-- "No results" handling with suggestions
-
-## BUSINESS AUTOMATION
-### Email Integration
-- Welcome emails for new customers
-- Order confirmations and receipts
-- Inquiry acknowledgments
-- Newsletter subscription confirmations
-
-### Analytics Setup
-- Google Analytics 4 integration
-- Conversion tracking for sales/leads
-- User behavior analytics
-- Performance monitoring
-
-## DEPLOYMENT CONFIGURATION
-- Netlify deployment optimization
-- Environment variable setup
-- Custom domain configuration
-- SSL certificate implementation
-- Performance monitoring setup
-
-## FILE STRUCTURE
-Create a professional project structure with:
-- app/ directory for Next.js App Router pages
-- components/ for reusable UI components
-- lib/ for utility functions and API integrations
-- types/ for TypeScript type definitions
-- public/ for static assets
-- Configuration files for all tools
-
-## ADDITIONAL REQUIREMENTS
-- Comprehensive TypeScript types for all data
-- Accessibility compliance (WCAG 2.1 AA)
-- Cross-browser compatibility
-- Progressive Web App features
-- Error boundaries for graceful error handling
-
-Please generate the complete website with all files, components, and configuration needed for immediate development and deployment.
+**Example Simple Prompt:**
+```bash
+claude chat "Create a contact form component with name, email, and message fields. Include validation and submit to /api/contact endpoint."
 ```
 
-### Customizing Master Prompts for Different Business Types
-
-**For Service-Based Businesses:**
-Add these modifications to the master prompt:
-
-```
-## SERVICE-SPECIFIC FEATURES
-### Appointment Booking
-- Calendar integration for availability
-- Service duration and pricing tiers
-- Customer intake forms
-- Appointment confirmation emails
-- Cancellation and rescheduling policies
-
-### Service Portfolio
-- Case studies and before/after examples
-- Client testimonials with photos
-- Service packages and pricing tiers
-- Consultation booking forms
-```
-
-**For Product-Based Businesses:**
-Add these modifications:
-
-```
-## E-COMMERCE SPECIFIC FEATURES
-### Inventory Management
-- Stock level tracking and display
-- "Out of stock" notifications
-- Backorder handling
-- Inventory alerts for low stock
-
-### Product Variations
-- Size, color, material options
-- Variant pricing and images
-- SKU management
-- Bulk pricing tiers
-```
-
-**For Digital Product Businesses:**
-Add these modifications:
-
-```
-## DIGITAL PRODUCT FEATURES
-### Digital Delivery
-- Secure download links
-- License key generation
-- Digital receipt and instructions
-- Access management and expiration
-
-### Content Protection
-- Download attempt limiting
-- Watermarking for preview content
-- License verification
-- Piracy protection measures
+**More Complex Prompt:**
+```bash
+claude chat "Create a responsive product card component that displays image, title, price, and add-to-cart button. Include hover effects and loading states."
 ```
 
 ## 4.3 Iterative Development with Claude
