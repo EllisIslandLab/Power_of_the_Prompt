@@ -15,7 +15,6 @@ import {
   Zap,
   Clock,
   Download,
-  Play,
   ChevronDown,
   ChevronRight
 } from 'lucide-react'
@@ -178,6 +177,26 @@ export default function ArchitectureToolkitPage() {
     setExpandedContent(newExpanded)
   }
 
+  async function downloadFile(fileName: string) {
+    try {
+      const { data, error } = await supabase.storage
+        .from('toolkit-files')
+        .createSignedUrl(fileName, 3600) // 1 hour expiry
+
+      if (error) {
+        console.error('Error creating signed URL:', error)
+        alert('Failed to download file. Please try again.')
+        return
+      }
+
+      // Open download in new tab
+      window.open(data.signedUrl, '_blank')
+    } catch (error) {
+      console.error('Download error:', error)
+      alert('Failed to download file.')
+    }
+  }
+
   // Group contents by category
   const groupedContents = contents.reduce((acc, content) => {
     if (!acc[content.category]) {
@@ -275,8 +294,8 @@ export default function ArchitectureToolkitPage() {
                     <div className="flex items-start gap-3">
                       <Check className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
-                        <p className="font-medium">Video Walkthroughs</p>
-                        <p className="text-sm text-muted-foreground">Watch exactly how to implement each solution</p>
+                        <p className="font-medium">Implementation Roadmap</p>
+                        <p className="text-sm text-muted-foreground">Strategic guide to implementing patterns in your codebase</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -416,24 +435,18 @@ export default function ArchitectureToolkitPage() {
                                 </div>
                               )}
 
-                              <div className="flex gap-3">
-                                {content.video_url && (
-                                  <Button size="sm" variant="default" asChild>
-                                    <a href={content.video_url} target="_blank" rel="noopener noreferrer">
-                                      <Play className="h-4 w-4 mr-2" />
-                                      Watch Video
-                                    </a>
+                              {content.file_urls && content.file_urls.length > 0 && (
+                                <div>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => downloadFile(content.file_urls[0])}
+                                  >
+                                    <Download className="h-4 w-4 mr-2" />
+                                    Download Guide
                                   </Button>
-                                )}
-                                {content.file_urls && content.file_urls.length > 0 && (
-                                  <Button size="sm" variant="outline" asChild>
-                                    <a href={content.file_urls[0]} download>
-                                      <Download className="h-4 w-4 mr-2" />
-                                      Download Files
-                                    </a>
-                                  </Button>
-                                )}
-                              </div>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
