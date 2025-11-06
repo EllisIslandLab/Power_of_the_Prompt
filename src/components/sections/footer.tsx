@@ -57,6 +57,26 @@ export function Footer() {
                   </a>
                 </Button>
               </div>
+
+              {/* Website Certification Badge */}
+              <div className="mt-4 flex justify-center">
+                <a
+                  href="https://yourwebsitescore.com/certified-websites/weblaunchacademy.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-opacity hover:opacity-80 inline-block"
+                  title="View our website certification"
+                >
+                  <img
+                    src="https://yourwebsitescore.com/api/badge/weblaunchacademy.com"
+                    alt="YourWebsiteScore Certification Badge"
+                    height="54"
+                    width="auto"
+                    loading="lazy"
+                    className="h-[54px] w-auto"
+                  />
+                </a>
+              </div>
             </div>
           </div>
 
@@ -136,22 +156,6 @@ export function Footer() {
                 Guarantee Details
               </Link>
             </div>
-          </div>
-
-          {/* Website Certification Badge */}
-          <div className="mt-6 flex justify-center">
-            <a
-              href="https://yourwebsitescore.com/certified-websites/weblaunchacademy.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-opacity hover:opacity-80"
-            >
-              <img
-                src="https://yourwebsitescore.com/api/badge/weblaunchacademy.com"
-                alt="Monitor your website with YourWebsiteScore"
-                style={{height: '54px', width: 'auto'}}
-              />
-            </a>
           </div>
         </div>
       </div>
