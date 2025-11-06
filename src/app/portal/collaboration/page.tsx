@@ -67,13 +67,38 @@ export default function CollaborationPage() {
     setParticipants(prev => prev.filter(p => p.id !== participant.id))
   }
 
-  // Quick room options
-  const quickRooms = [
-    { name: 'Office Hours', id: 'office-hours' },
-    { name: 'Group Coaching', id: 'group-coaching' },
-    { name: 'Workshop', id: 'workshop' },
-    { name: 'Study Hall', id: 'study-hall' },
-    { name: 'Q&A Session', id: 'qa-session' }
+  // Session types with descriptions and time limits
+  const sessionTypes = [
+    {
+      name: 'Group Coaching',
+      id: 'group-coaching',
+      description: 'Interactive group class learning sessions with your coach and fellow students. Perfect for collaborative learning, Q&A, and building together.',
+      timeLimit: 'Unlimited',
+      typicalDuration: 'Usually ~1 hour',
+      icon: '👥',
+      color: 'border-blue-500 bg-blue-50 dark:bg-blue-950',
+      isPremium: false
+    },
+    {
+      name: 'LVL UP Session',
+      id: 'lvl-up-session',
+      description: 'One-on-one video session dedicated to improving your website, fixing issues, or learning new techniques. Focused, personalized guidance for your project.',
+      timeLimit: '1 hour',
+      typicalDuration: '1 hour maximum',
+      icon: '🚀',
+      color: 'border-green-500 bg-green-50 dark:bg-green-950',
+      isPremium: true
+    },
+    {
+      name: 'Check-In',
+      id: 'check-in',
+      description: 'Quick, free surface-level consultation for minor questions, brief code reviews, or quick troubleshooting. Great for getting unstuck fast.',
+      timeLimit: '15 minutes',
+      typicalDuration: '15 mins maximum',
+      icon: '⚡',
+      color: 'border-purple-500 bg-purple-50 dark:bg-purple-950',
+      isPremium: false
+    }
   ]
 
   if (!user) {
@@ -148,31 +173,55 @@ export default function CollaborationPage() {
                 </CardContent>
               </Card>
 
-              {/* Quick Rooms */}
-              <Card>
+              {/* Session Types */}
+              <Card className="md:col-span-2">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
-                    Quick Join
+                    Session Types
                   </CardTitle>
                   <CardDescription>
-                    Common rooms for Web Launch Academy activities
+                    Choose the type of session that fits your needs
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  {quickRooms.map((room) => (
-                    <Button
-                      key={room.id}
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => {
-                        setRoomName(room.id)
-                        setCurrentRoom(room.id)
-                      }}
-                    >
-                      {room.name}
-                    </Button>
-                  ))}
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {sessionTypes.map((session) => (
+                      <Card
+                        key={session.id}
+                        className={`border-2 ${session.color} transition-all hover:shadow-lg cursor-pointer`}
+                        onClick={() => {
+                          setRoomName(session.id)
+                          setCurrentRoom(session.id)
+                        }}
+                      >
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
+                            <span className="text-3xl">{session.icon}</span>
+                            {session.isPremium && (
+                              <span className="text-xs bg-yellow-500 text-yellow-950 px-2 py-1 rounded-full font-semibold">
+                                PREMIUM
+                              </span>
+                            )}
+                          </div>
+                          <CardTitle className="text-lg mt-2">{session.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {session.description}
+                          </p>
+                          <div className="flex items-center gap-2 text-sm pt-2 border-t">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-semibold">{session.timeLimit}</span>
+                            <span className="text-muted-foreground text-xs">({session.typicalDuration})</span>
+                          </div>
+                          <Button className="w-full" variant="default" size="sm">
+                            Join {session.name}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
 
