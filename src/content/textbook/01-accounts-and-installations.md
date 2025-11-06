@@ -486,22 +486,6 @@ claude chat "Hello! Can you help me test that Claude CLI is working properly?"
 - Upgrade to Pro plan if needed (after free trial)
 - Set workspace permissions appropriately
 
-**🤖 AI Integration for Database Management:**
-To get Claude CLI assistance with Airtable database design and data management, install the MCP server:
-
-```bash
-npm install airtable-mcp-server
-```
-
-**Benefits of Airtable MCP Integration:**
-- Get AI help designing optimal table structures
-- Automatically validate field configurations
-- Receive suggestions for data relationships
-- Debug API integration issues
-- Optimize database performance
-
-**💡 Pro Tip:** After setting up your Airtable base, you can ask Claude to review your table structure and suggest improvements based on your business needs!
-
 ### 💳 5. Stripe Account (Optional - Payment Processing)
 **Purpose:** Payment processing for e-commerce  
 **URL:** https://stripe.com  
