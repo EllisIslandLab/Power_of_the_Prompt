@@ -289,151 +289,20 @@ NODE_ENV=development
 
 ## ⚙️ 6.3 Automated Deployment and CI/CD
 
-### 🚀 GitHub Actions for Professional Deployment
+### 🚀 Understanding CI/CD Benefits
 
-**Understanding CI/CD Benefits:**
+**Continuous Integration and Deployment (CI/CD)** automates your development workflow:
 - **Continuous Integration (CI):** Automatically test every change
 - **Continuous Deployment (CD):** Automatically deploy successful changes
 - **Quality Assurance:** Prevent broken code from reaching production
 - **Time Savings:** Eliminate manual deployment steps
 
-**Professional GitHub Actions Workflow:**
+**CI/CD Tools:**
+- **GitHub Actions** - Native GitHub automation
+- **Vercel** - Automatic deployments for Next.js
+- **CircleCI / Travis CI** - Alternative CI platforms
 
-Create `.github/workflows/deploy.yml`:
-```yaml
-name: Deploy to Vercel
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  lint-and-test:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run linting
-      run: npm run lint
-    
-    - name: Run type checking
-      run: npm run type-check
-    
-    - name: Run tests
-      run: npm run test
-    
-    - name: Build project
-      run: npm run build
-      env:
-        AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
-        AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
-        STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
-        NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-
-  deploy:
-    needs: lint-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Deploy to Vercel
-      uses: amondnet/vercel-action@v25
-      with:
-        vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-        vercel-args: '--prod'
-```
-
-**Setting Up GitHub Secrets:**
-1. Go to repository Settings → Secrets and variables → Actions
-2. Add required secrets:
-   - `AIRTABLE_API_KEY`: Your Airtable API key
-   - `AIRTABLE_BASE_ID`: Your Airtable base ID  
-   - `STRIPE_PUBLISHABLE_KEY`: Your Stripe public key
-   - `VERCEL_TOKEN`: Vercel deployment token
-   - `VERCEL_ORG_ID`: Your Vercel organization ID
-   - `VERCEL_PROJECT_ID`: Your Vercel project ID
-
-### 🔧 Vercel Deployment Configuration
-
-**vercel.json Configuration:**
-```json
-{
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm ci",
-  "devCommand": "npm run dev",
-  "regions": ["iad1"],
-  "functions": {
-    "src/app/api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-Content-Type-Options", 
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=()"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/old-page",
-      "destination": "/new-page",
-      "permanent": true
-    }
-  ]
-}
-```
-
-### 🔍 Deploy Preview and Testing Strategy
-
-**Automatic Deploy Previews:**
-- Every pull request gets a unique preview URL
-- Test changes before merging to main branch
-- Share preview URLs with stakeholders for approval
-- Automatic cleanup when PR is merged or closed
-
-**Quality Gates in CI/CD:**
-1. **Linting:** Code style and formatting checks
-2. **Type Checking:** TypeScript compilation verification  
-3. **Testing:** Unit and integration tests
-4. **Build Verification:** Ensure production build succeeds
-5. **Security Scanning:** Dependency vulnerability checks
+**🔒 Premium Content:** Complete GitHub Actions workflows, deployment configurations, and quality gate setups are available in the [Architecture Mastery Toolkit](#) for students who want to implement professional CI/CD pipelines.
 
 ## 💼 6.4 Professional Development Practices
 
