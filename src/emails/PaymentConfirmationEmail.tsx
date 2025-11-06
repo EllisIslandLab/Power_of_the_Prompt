@@ -71,7 +71,7 @@ export function PaymentConfirmationEmail({
           </Button>
         </Section>
         <Text style={smallText}>
-          This secure link will let you set your password for {email}. The link expires in 24 hours.
+          This secure link will let you set your password for {email}. The link expires in 1 hour for your security.
         </Text>
       </Section>
 
