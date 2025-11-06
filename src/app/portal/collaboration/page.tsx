@@ -281,7 +281,7 @@ export default function CollaborationPage() {
                     />
                   </div>
                   <Button
-                    onClick={handleJoinRoom}
+                    onClick={() => handleJoinRoom()}
                     disabled={!roomName.trim()}
                     className="w-full"
                   >
