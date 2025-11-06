@@ -106,16 +106,21 @@ const nextConfig: NextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
+          // HSTS - Force HTTPS for 2 years
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
               // Scripts: Allow self, Stripe, Jitsi, and inline scripts (required for Next.js)
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.jitsi.net https://8x8.vc https://*.sentry.io",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.jitsi.net https://8x8.vc https://*.sentry.io https://yourwebsitescore.com",
               // Styles: Allow self and inline styles (required for styled-components/emotion)
               "style-src 'self' 'unsafe-inline'",
-              // Images: Allow self, data URIs, Supabase, Stripe
-              "img-src 'self' data: https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co https://lh3.googleusercontent.com",
+              // Images: Allow self, data URIs, Supabase, Stripe, YourWebsiteScore badge
+              "img-src 'self' data: https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co https://lh3.googleusercontent.com https://yourwebsitescore.com",
               // Fonts: Allow self and data URIs
               "font-src 'self' data:",
               // Connect: Allow API calls to Supabase, Stripe, Jitsi, Sentry
