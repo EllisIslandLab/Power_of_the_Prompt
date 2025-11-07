@@ -56,3 +56,9 @@ IMPLEMENTATION_ROADMAP.md
 
 # Keep these files private and secure
 # Store them in Supabase Storage or private S3 bucket instead
+
+# Source images (optimized versions are used in src/app)
+public/Favicon 10.png
+public/Social Image 3.jpg
+public/Social Image 3v2.jpg
+*:Zone.Identifier
