@@ -303,31 +303,34 @@ export default function CollaborationPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-3">
-                    {sessionTypes.map((session) => (
-                      <Card
-                        key={session.id}
-                        className={`border-2 ${session.color} transition-all hover:shadow-lg`}
-                      >
-                        <CardHeader className="pb-3">
-                          <div className="flex items-start justify-between">
-                            <span className="text-3xl">{session.icon}</span>
-                            {session.isPremium && (
-                              <span className="text-xs bg-yellow-500 text-yellow-950 px-2 py-1 rounded-full font-semibold">
-                                PREMIUM
-                              </span>
-                            )}
-                          </div>
-                          <CardTitle className="text-lg mt-2">{session.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {session.description}
-                          </p>
-                          <div className="flex items-center gap-2 text-sm pt-2 border-t">
-                            <Clock className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-semibold">{session.timeLimit}</span>
-                            <span className="text-muted-foreground text-xs">({session.typicalDuration})</span>
-                          </div>
+                    {sessionTypes.map((session) => {
+                      // Extract just the border color from the session.color
+                      const borderColor = session.color.split(' ')[0]
+                      return (
+                        <Card
+                          key={session.id}
+                          className={`border-2 ${borderColor} transition-all hover:shadow-lg`}
+                        >
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between">
+                              <span className="text-3xl">{session.icon}</span>
+                              {session.isPremium && (
+                                <span className="text-xs bg-yellow-500 text-yellow-950 px-2 py-1 rounded-full font-semibold">
+                                  PREMIUM
+                                </span>
+                              )}
+                            </div>
+                            <CardTitle className="text-lg mt-2">{session.name}</CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            <p className="text-sm leading-relaxed">
+                              {session.description}
+                            </p>
+                            <div className="flex items-center gap-2 text-sm pt-2 border-t">
+                              <Clock className="h-4 w-4" />
+                              <span className="font-semibold">{session.timeLimit}</span>
+                              <span className="text-xs opacity-70">({session.typicalDuration})</span>
+                            </div>
                           <Button
                             className="w-full"
                             variant="default"
@@ -341,13 +344,14 @@ export default function CollaborationPage() {
                           </Button>
                         </CardContent>
                       </Card>
-                    ))}
+                    )
+                  })}
                   </div>
                 </CardContent>
               </Card>
 
               {/* Schedule Sessions CTA */}
-              <Card className="md:col-span-2 border-2 border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+              <Card className="md:col-span-2 border-2 border-blue-500">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calendar className="h-5 w-5" />
@@ -360,10 +364,10 @@ export default function CollaborationPage() {
                 <CardContent>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm">
                         📅 View available time slots • ⏰ Get email reminders • 📱 Add to your calendar
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs opacity-70">
                         Perfect for LVL UP sessions, workshops, and planned Group Coaching
                       </p>
                     </div>
