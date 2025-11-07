@@ -112,12 +112,17 @@ export default function CollaborationPage() {
 
   // Pre-session setup check
   const checkMediaPermissions = async () => {
+    // Reset to pending before checking
+    setMicPermission('pending')
+    setCameraPermission('pending')
+
     try {
       // Check microphone
       const micStream = await navigator.mediaDevices.getUserMedia({ audio: true })
       setMicPermission('granted')
       micStream.getTracks().forEach(track => track.stop())
     } catch (error) {
+      console.error('Microphone permission error:', error)
       setMicPermission('denied')
     }
 
@@ -127,8 +132,13 @@ export default function CollaborationPage() {
       setCameraPermission('granted')
       cameraStream.getTracks().forEach(track => track.stop())
     } catch (error) {
+      console.error('Camera permission error:', error)
       setCameraPermission('denied')
     }
+  }
+
+  const retryPermissions = () => {
+    checkMediaPermissions()
   }
 
   const handleStartSetupCheck = () => {
@@ -516,6 +526,11 @@ export default function CollaborationPage() {
                   </p>
                 </div>
               </div>
+              {micPermission === 'denied' && (
+                <Button size="sm" variant="outline" onClick={retryPermissions}>
+                  Retry
+                </Button>
+              )}
             </div>
 
             {/* Camera Check */}
@@ -539,6 +554,11 @@ export default function CollaborationPage() {
                   </p>
                 </div>
               </div>
+              {cameraPermission === 'denied' && (
+                <Button size="sm" variant="outline" onClick={retryPermissions}>
+                  Retry
+                </Button>
+              )}
             </div>
 
             {/* Permissions Denied Warning */}
@@ -546,7 +566,15 @@ export default function CollaborationPage() {
               <Alert className="border-orange-500 bg-orange-50 dark:bg-orange-950">
                 <AlertTriangle className="h-4 w-4 text-orange-600" />
                 <AlertDescription className="text-orange-800 dark:text-orange-200">
-                  <strong>Permission denied.</strong> You can still join, but you'll need to enable permissions in your browser settings to use {micPermission === 'denied' && cameraPermission === 'denied' ? 'microphone and camera' : micPermission === 'denied' ? 'microphone' : 'camera'}.
+                  <div className="space-y-2">
+                    <p><strong>Permission denied.</strong> To enable access:</p>
+                    <ul className="text-xs space-y-1 ml-4">
+                      <li>• Click the lock icon 🔒 in your browser's address bar</li>
+                      <li>• Allow access to {micPermission === 'denied' && cameraPermission === 'denied' ? 'microphone and camera' : micPermission === 'denied' ? 'microphone' : 'camera'}</li>
+                      <li>• Click "Retry" button above to check again</li>
+                    </ul>
+                    <p className="text-xs mt-2">You can still join without permissions, but won't be able to use {micPermission === 'denied' && cameraPermission === 'denied' ? 'mic/camera' : micPermission === 'denied' ? 'microphone' : 'camera'} until enabled.</p>
+                  </div>
                 </AlertDescription>
               </Alert>
             )}
