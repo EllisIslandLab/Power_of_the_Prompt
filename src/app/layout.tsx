@@ -42,10 +42,10 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://weblaunchacademy.com/og-image.png',
+        url: 'https://weblaunchacademy.com/og-image-space.jpg',
         width: 1200,
         height: 630,
-        alt: 'Web Launch Academy - Learn to Build Your Own Website',
+        alt: 'Web Launch Academy - Launch Your Digital Presence Into The Future',
       },
     ],
   },
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Own Your Code, Take Back Control - Web Launch Academy",
     description: "Learn to create professional websites with AI assistance - no monthly fees, complete ownership. Build your digital presence with Web Launch Academy.",
-    images: ['https://weblaunchacademy.com/og-image.png'],
+    images: ['https://weblaunchacademy.com/og-image-space.jpg'],
   },
 };
 
