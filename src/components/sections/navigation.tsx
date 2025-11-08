@@ -26,7 +26,7 @@ export function Navigation() {
           {/* Left: Logo and Brand */}
           <div className="flex items-center gap-3">
             <Image
-              src="/Favicon 12v2.png"
+              src="/favicon-logo.png"
               alt="Web Launch Academy Logo"
               width={32}
               height={32}
