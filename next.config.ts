@@ -115,16 +115,16 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // Scripts: Allow self, Stripe, Jitsi, and inline scripts (required for Next.js)
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.jitsi.net https://8x8.vc https://*.sentry.io https://yourwebsitescore.com",
+              // Scripts: Allow self, Stripe, Jitsi, Vercel Analytics, and inline scripts (required for Next.js)
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.jitsi.net https://8x8.vc https://*.sentry.io https://yourwebsitescore.com https://va.vercel-scripts.com",
               // Styles: Allow self and inline styles (required for styled-components/emotion)
               "style-src 'self' 'unsafe-inline'",
               // Images: Allow self, data URIs, Supabase, Stripe, YourWebsiteScore badge
               "img-src 'self' data: https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co https://lh3.googleusercontent.com https://yourwebsitescore.com",
               // Fonts: Allow self and data URIs
               "font-src 'self' data:",
-              // Connect: Allow API calls to Supabase, Stripe, Jitsi, Sentry
-              "connect-src 'self' https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co wss://qaaautcjhztvjhizklxr.supabase.co https://api.stripe.com https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc https://*.sentry.io",
+              // Connect: Allow API calls to Supabase, Stripe, Jitsi, Sentry, Vercel Analytics
+              "connect-src 'self' https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co wss://qaaautcjhztvjhizklxr.supabase.co https://api.stripe.com https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc https://*.sentry.io https://va.vercel-scripts.com https://vitals.vercel-insights.com",
               // Frames: Allow Stripe checkout and Jitsi video
               "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.jitsi.net https://8x8.vc",
               // Media: Allow Jitsi for video/audio

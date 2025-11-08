@@ -174,7 +174,7 @@ export function ComingSoonBanner() {
               <p className="text-sm text-muted-foreground">Lightning fast websites that convert</p>
             </div>
             <div>
-              <div className="text-3xl mb-2">🎯</div>
+              <div className="text-3xl mb-2">⚡</div>
               <h3 className="font-semibold text-lg mb-1">AI-Powered</h3>
               <p className="text-sm text-muted-foreground">Smart development with Claude Code</p>
             </div>

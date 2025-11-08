@@ -25,15 +25,15 @@ export interface SiteSample {
 export const siteSamples: SiteSample[] = [
   {
     title: "Winchester Therapy Services",
-    description: "Professional therapy practice with licensed clinical social worker offering individual therapy and specialized treatment",
-    tech: "HTML, CSS, JavaScript (in process of optimization to Next.js)",
+    description: "Clean, straightforward therapy practice website with HIPAA-compliant consultation and appointment booking",
+    tech: "Next.js, TypeScript, Vercel, PostCSS, ESLint, Airtable API Integration",
     features: [
-      "Licensed Clinical Social Worker (LCSW)", 
-      "Individual Therapy Sessions", 
-      "Free 15-minute Consultations", 
-      "Anxiety & Depression Treatment",
-      "Trauma/PTSD Specialization",
-      "Secure Encrypted Communications"
+      "Simple, confusion-free design with clear user flows",
+      "Straightforward call-to-action buttons",
+      "HIPAA-compliant consultation booking integration",
+      "Calendar appointment booking modal",
+      "Airtable integration for secure client data collection",
+      "Mobile-responsive professional design"
     ],
     image: "/images/site-samples/screencapture-winchestertherapyservices.jpg",
     liveUrl: "https://winchester-therapy-services-blue.vercel.app/",

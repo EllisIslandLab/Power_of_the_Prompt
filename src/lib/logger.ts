@@ -58,17 +58,9 @@ export const logger = pino({
   },
 
   // Pretty printing in development, JSON in production
-  transport: isDevelopment
-    ? {
-        target: 'pino-pretty',
-        options: {
-          colorize: true,
-          translateTime: 'HH:MM:ss',
-          ignore: 'pid,hostname',
-          singleLine: false,
-        },
-      }
-    : undefined,
+  // Note: pino-pretty uses worker threads which can cause "worker has exited" errors
+  // Disabled for now to prevent crashes - using JSON output in development
+  transport: undefined,
 
   // Base fields included in every log
   base: {

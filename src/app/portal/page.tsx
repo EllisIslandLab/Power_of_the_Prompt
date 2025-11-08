@@ -299,8 +299,8 @@ export default function PortalPage() {
                 </Button>
               )}
               <Button variant="outline" className="w-full" asChild>
-                <Link href="/consultation">
-                  Schedule Strategy Call
+                <Link href="/portal/schedule">
+                  Schedule Session
                 </Link>
               </Button>
             </CardContent>

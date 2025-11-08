@@ -136,7 +136,9 @@ export function JitsiMeet({
         apiRef.current = null
       }
     }
-  }, [roomName, displayName, user, onReady, onParticipantJoined, onParticipantLeft, onVideoConferenceJoined, onVideoConferenceLeft])
+    // Only re-initialize when room, display name, or user changes
+    // Callback functions are just event handlers and shouldn't trigger re-initialization
+  }, [roomName, displayName, user])
 
   if (!user) {
     return (

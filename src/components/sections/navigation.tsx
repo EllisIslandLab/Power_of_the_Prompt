@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { MessageCircle, BookOpen, Video, FileText, HelpCircle, Settings, Crown, Monitor } from "lucide-react"
@@ -21,14 +22,23 @@ export function Navigation() {
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+        <div className="relative flex items-center h-16">
+          {/* Left: Logo and Brand */}
+          <div className="flex items-center gap-3">
+            <Image
+              src="/Favicon 12v2.png"
+              alt="Web Launch Academy Logo"
+              width={32}
+              height={32}
+              className="h-8 w-8"
+            />
             <Link href={user && isInPortal ? "/portal" : "/"} className="text-2xl font-bold text-primary">
               {isInPortal ? "Web Launch Academy Portal" : "Web Launch Academy"}
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center space-x-6">
+          {/* Center: Navigation Links - Absolutely centered */}
+          <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center space-x-6">
             {user && isInPortal ? (
               // Student Portal Navigation
               <>
@@ -78,7 +88,8 @@ export function Navigation() {
             )}
           </div>
 
-          <div className="flex items-center space-x-4">
+          {/* Right: Sign In Button */}
+          <div className="ml-auto flex items-center space-x-4">
             {/* COMMENTED OUT - User auth disabled during transition */}
             {false ? (
               <></>

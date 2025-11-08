@@ -49,21 +49,19 @@ export function Footer() {
                   Painesville, Ohio | Available nationwide via video call
                 </span>
               </div>
-              {/* Join Mailing List Button and Badge - Side by Side */}
-              <div className="mt-4 flex flex-col sm:flex-row items-center gap-3">
-                <Button asChild variant="outline" size="sm" className="w-full sm:w-auto flex-shrink-0">
+              {/* Join Mailing List Button & Website Certification Badge - Same Line */}
+              <div className="mt-4 flex flex-col sm:flex-row items-center gap-3 justify-center">
+                <Button asChild variant="outline" size="sm">
                   <a href="/#email-signup">
                     <ArrowRight className="h-4 w-4 mr-2" />
                     Join Mailing List
                   </a>
                 </Button>
-
-                {/* Website Certification Badge */}
                 <a
                   href="https://yourwebsitescore.com/certified-websites/weblaunchacademy.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition-opacity hover:opacity-80 inline-block flex-shrink-0"
+                  className="transition-opacity hover:opacity-80 inline-block"
                   title="View our website certification"
                 >
                   <img
