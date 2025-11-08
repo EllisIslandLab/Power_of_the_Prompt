@@ -102,23 +102,24 @@
 
 /* Dark mode - manually controlled with .dark class */
 .dark {
-  --background: #0f172a;
+  --background: #0a1840;
   --foreground: #f1f5f9;
-  --primary: #3b82f6;
-  --primary-foreground: #f1f5f9;
-  --secondary: #1e293b;
-  --secondary-foreground: #f1f5f9;
-  --accent: #fbbf24;
-  --accent-foreground: #0f172a;
-  --muted: #1e293b;
+  --primary: #00509d;
+  --primary-foreground: #ffffff;
+  --primary-hover: #0076e4;
+  --secondary: #11296b;
+  --secondary-foreground: #ffffff;
+  --accent: #ffdb57;
+  --accent-foreground: #0a1840;
+  --muted: #0d2055;
   --muted-foreground: #cbd5e1;
-  --border: #334155;
-  --input: #1e293b;
-  --ring: #3b82f6;
-  --card: #1e293b;
+  --border: #1b42ad;
+  --input: #0d2055;
+  --ring: #00509d;
+  --card: #0d2055;
   --card-foreground: #f1f5f9;
   --destructive: #ef4444;
-  --destructive-foreground: #f1f5f9;
+  --destructive-foreground: #ffffff;
 }
 
 body {
@@ -141,6 +142,21 @@ body {
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Ensure all interactive elements have pointer cursor */
+a, button, [role="button"], [type="button"], [type="submit"], [type="reset"],
+input[type="checkbox"], input[type="radio"], select, label[for] {
+  cursor: pointer;
+}
+
+/* Subtle hover animations for links */
+a {
+  transition: all 0.2s ease-in-out;
+}
+
+a:hover:not(.no-hover) {
+  opacity: 0.85;
 }
 
 /* Hide scrollbar while keeping functionality */

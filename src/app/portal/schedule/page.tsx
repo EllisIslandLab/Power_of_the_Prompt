@@ -330,14 +330,11 @@ export default function SchedulePage() {
                     <button
                       key={type.id}
                       onClick={() => setSelectedType(type.id)}
-                      className={`group relative text-left transition-all duration-200 rounded-xl p-5 shadow-lg hover:shadow-xl cursor-pointer ${
+                      className={`group relative text-left transition-all duration-200 rounded-xl p-5 shadow-lg cursor-pointer ${
                         selectedType === type.id
-                          ? 'border-2 border-yellow-400 bg-gradient-to-br from-blue-400 to-blue-500 text-white'
-                          : 'border-4 border-yellow-300 bg-gradient-to-br from-blue-600 to-blue-700 text-white hover:border-yellow-400'
+                          ? 'border-2 border-yellow-400 bg-gradient-to-br from-royal-blue-600 to-polynesian-blue-600 text-white shadow-xl'
+                          : 'border-4 border-yellow-300 bg-gradient-to-br from-royal-blue-800 to-polynesian-blue-800 text-white hover:border-yellow-400 hover:shadow-xl hover:translate-y-[-1px] active:translate-y-0'
                       }`}
-                      style={{
-                        animation: selectedType === type.id ? 'subtle-bounce 2s ease-in-out infinite' : undefined
-                      }}
                     >
                       <div className="relative flex items-start gap-3">
                         <div className="text-white drop-shadow-lg">{type.icon}</div>
@@ -366,13 +363,6 @@ export default function SchedulePage() {
                 </div>
               </CardContent>
             </Card>
-
-            <style jsx>{`
-              @keyframes subtle-bounce {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-2px); }
-              }
-            `}</style>
 
             {/* Step 2: Select Date & Notes */}
             {selectedType && (
@@ -439,14 +429,14 @@ export default function SchedulePage() {
                           key={index}
                           onClick={() => slot.available && handleBookSlot(slot)}
                           disabled={!slot.available || loading}
-                          className={`flex flex-col items-center gap-2 h-auto py-4 px-3 rounded-lg border-2 transition-all font-semibold ${
+                          className={`flex flex-col items-center gap-2 h-auto py-4 px-3 rounded-lg border-2 transition-all duration-200 font-semibold ${
                             slot.available
-                              ? 'border-blue-500 bg-gradient-to-b from-blue-100 to-blue-200 dark:from-blue-950 dark:to-blue-900 hover:border-blue-600 hover:shadow-lg hover:scale-105 cursor-pointer text-slate-800 dark:text-slate-200'
+                              ? 'border-royal-blue-600 bg-gradient-to-b from-royal-blue-50 to-polynesian-blue-100 dark:from-royal-blue-900 dark:to-polynesian-blue-900 hover:border-royal-blue-700 hover:shadow-lg hover:translate-y-[-1px] active:translate-y-0 cursor-pointer text-royal-blue-900 dark:text-slate-200'
                               : 'border-slate-300 dark:border-slate-700 bg-slate-200 dark:bg-slate-800 opacity-50 cursor-not-allowed'
                           }`}
                         >
-                          <Clock className={`h-5 w-5 ${slot.available ? 'text-blue-700 dark:text-blue-400' : 'text-slate-400'}`} />
-                          <span className={`text-sm font-bold ${slot.available ? 'text-slate-900 dark:text-slate-100' : 'text-muted-foreground line-through'}`}>
+                          <Clock className={`h-5 w-5 ${slot.available ? 'text-royal-blue-800 dark:text-polynesian-blue-400' : 'text-slate-400'}`} />
+                          <span className={`text-sm font-bold ${slot.available ? 'text-royal-blue-900 dark:text-slate-100' : 'text-muted-foreground line-through'}`}>
                             {new Date(slot.start_time).toLocaleTimeString([], {
                               hour: '2-digit',
                               minute: '2-digit'
