@@ -1,24 +1,13 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { BookOpen, Clock, CheckCircle, ArrowRight, FileText, Users } from "lucide-react"
+import { BookOpen, Clock, ArrowRight, FileText, Users } from "lucide-react"
 import { textbookChapters } from "@/content/textbook/index"
 
 export default function TextbookPortalPage() {
-  const [completedChapters, setCompletedChapters] = useState<string[]>([])
-  
-  const toggleChapterComplete = (chapterId: string) => {
-    setCompletedChapters(prev => 
-      prev.includes(chapterId) 
-        ? prev.filter(id => id !== chapterId)
-        : [...prev, chapterId]
-    )
-  }
-
   // Add safety check for textbookChapters
   if (!textbookChapters || !Array.isArray(textbookChapters) || textbookChapters.length === 0) {
     return (
@@ -30,8 +19,6 @@ export default function TextbookPortalPage() {
       </div>
     )
   }
-
-  const progressPercentage = Math.round((completedChapters.length / textbookChapters.length) * 100)
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-8 px-4 sm:px-6 lg:px-8">
@@ -46,26 +33,9 @@ export default function TextbookPortalPage() {
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
             WebLaunchCoach Student Textbook
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
 &quot;Build Once, Own Forever&quot; - Complete Guide to Professional Web Development
           </p>
-          
-          {/* Progress Indicator */}
-          <div className="max-w-md mx-auto">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-muted-foreground">Progress</span>
-              <span className="text-sm font-medium text-primary">{progressPercentage}%</span>
-            </div>
-            <div className="w-full bg-secondary rounded-full h-2">
-              <div 
-                className="bg-primary h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              {completedChapters.length} of {textbookChapters.length} chapters completed
-            </p>
-          </div>
         </div>
 
         {/* Introduction Card */}
@@ -105,31 +75,15 @@ export default function TextbookPortalPage() {
 
         {/* Chapter Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {textbookChapters.map((chapter, index) => {
-            const isCompleted = completedChapters.includes(chapter.id)
-            const isAccessible = index === 0 || completedChapters.includes(textbookChapters[index - 1].id)
-            
-            return (
-              <Card 
-                key={chapter.id} 
-                className={`relative transition-all duration-200 ${
-                  isCompleted 
-                    ? 'border-green-200 bg-green-50/50' 
-                    : isAccessible 
-                      ? 'hover:shadow-lg cursor-pointer border-primary/20' 
-                      : 'opacity-60 cursor-not-allowed'
-                }`}
+          {textbookChapters.map((chapter) => (
+              <Card
+                key={chapter.id}
+                className="relative transition-all duration-200 hover:shadow-lg cursor-pointer border-primary/20"
               >
                 {/* Chapter Number Badge */}
                 <div className="absolute -top-3 -left-3 z-10">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    isCompleted 
-                      ? 'bg-green-500 text-white' 
-                      : isAccessible 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {isCompleted ? <CheckCircle className="h-4 w-4" /> : chapter.id}
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-primary text-primary-foreground">
+                    {chapter.id}
                   </div>
                 </div>
 
@@ -169,39 +123,15 @@ export default function TextbookPortalPage() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center gap-2">
-                    {isAccessible ? (
-                      <>
-                        <Button asChild className="flex-1" size="sm">
-                          <Link href={`/portal/textbook/${chapter.filePath}`}>
-                            {isCompleted ? 'Review' : 'Start Reading'}
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </Link>
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => toggleChapterComplete(chapter.id)}
-                          className={isCompleted ? 'border-green-200 text-green-700' : ''}
-                        >
-                          {isCompleted ? (
-                            <CheckCircle className="h-4 w-4" />
-                          ) : (
-                            <div className="w-4 h-4 border-2 border-current rounded-full" />
-                          )}
-                        </Button>
-                      </>
-                    ) : (
-                      <Button disabled className="flex-1" size="sm">
-                        Complete Previous Chapter
-                      </Button>
-                    )}
-                  </div>
+                  <Button asChild className="w-full" size="sm">
+                    <Link href={`/portal/textbook/${chapter.filePath}`}>
+                      Start Reading
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
                 </CardContent>
               </Card>
-            )
-          })}
+          ))}
         </div>
 
         {/* Quick Access Links */}
@@ -219,8 +149,8 @@ export default function TextbookPortalPage() {
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/consultation">
-                Get Help
+              <Link href="/portal/schedule">
+                Schedule Session
               </Link>
             </Button>
             <Button variant="outline" asChild>
