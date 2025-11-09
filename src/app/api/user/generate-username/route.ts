@@ -68,7 +68,7 @@ export async function POST() {
         .from('users')
         .select('id')
         .eq('username', username)
-        .single()
+        .maybeSingle()
 
       if (!existing) {
         // Username is unique, update user

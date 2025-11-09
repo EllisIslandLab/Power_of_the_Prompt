@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       }
     )
 
-    const { username } = await request.json()
+    const { email, makePrimary } = await request.json()
 
     // Get current user
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -35,59 +35,62 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate username
-    if (!username) {
+    // Validate email
+    if (!email) {
       return NextResponse.json(
-        { error: 'Username is required' },
+        { error: 'Email is required' },
         { status: 400 }
       )
     }
 
-    if (username.length < 3 || username.length > 50) {
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+    if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { error: 'Username must be between 3 and 50 characters' },
+        { error: 'Invalid email format' },
         { status: 400 }
       )
     }
 
-    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-      return NextResponse.json(
-        { error: 'Username can only contain letters, numbers, hyphens, and underscores' },
-        { status: 400 }
-      )
-    }
-
-    // Check if username is already taken
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', username)
-      .neq('id', user.id)
+    // Check if email already exists
+    const { data: existingEmail } = await supabase
+      .from('user_emails')
+      .select('id, user_id')
+      .eq('email', email)
       .maybeSingle()
 
-    if (existingUser) {
+    if (existingEmail) {
       return NextResponse.json(
-        { error: 'This username is already taken' },
+        { error: 'This email is already in use' },
         { status: 400 }
       )
     }
 
-    // Update username
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({ username })
-      .eq('id', user.id)
+    // Add the email
+    const { error: insertError } = await supabase
+      .from('user_emails')
+      .insert({
+        user_id: user.id,
+        email,
+        is_primary: makePrimary || false,
+        verified: false
+      })
 
-    if (updateError) {
+    if (insertError) {
+      console.error('Insert error:', insertError)
       return NextResponse.json(
-        { error: 'Failed to update username' },
+        { error: 'Failed to add email' },
         { status: 500 }
       )
     }
 
-    return NextResponse.json({ success: true, username })
+    // TODO: Send verification email
+
+    return NextResponse.json({
+      success: true,
+      message: 'Email added successfully. Please check your email for verification.'
+    })
   } catch (error) {
-    console.error('Username update error:', error)
+    console.error('Add email error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
