@@ -254,6 +254,21 @@ git config --global init.defaultBranch main
 
 **SSH Key Generation for GitHub:**
 
+**⚠️ WINDOWS USERS - CRITICAL:** You MUST run these commands in Ubuntu/WSL, NOT in Windows PowerShell!
+
+**For Windows Users - Open Ubuntu Terminal:**
+1. Press Windows key
+2. Type "Ubuntu"
+3. Click "Ubuntu 22.04 LTS" (or your installed version)
+4. Wait for Ubuntu terminal to open
+5. Run all commands below in this Ubuntu terminal
+
+**Why Ubuntu/WSL for SSH Keys?**
+- Claude CLI runs in the Linux (Ubuntu) environment on Windows
+- Git operations in VS Code use the WSL environment
+- SSH keys MUST be in Ubuntu's home directory (`~/.ssh/`) not Windows (`C:\Users\...`)
+- If you generate keys in Windows PowerShell instead of Ubuntu, they won't work with Claude CLI
+
 **Step 1: Generate SSH Key**
 ```bash
 ssh-keygen -t ed25519 -C "your-business@email.com"
