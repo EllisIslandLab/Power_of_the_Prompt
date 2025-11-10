@@ -1,57 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { parseApiError } from "@/lib/error-parser"
+import { Sparkles, ArrowRight, CheckCircle2 } from "lucide-react"
 
 export function ComingSoonBanner() {
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [wantsOwnership, setWantsOwnership] = useState(false) // Default unchecked for conversion psychology
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [error, setError] = useState('')
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError('')
-
-    try {
-      const response = await fetch('/api/waitlist/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          name: name.trim() || undefined,
-          wantsOwnership
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        // Parse Zod validation errors for user-friendly messages
-        throw new Error(parseApiError(data, 'Failed to sign up for waitlist'))
-      }
-
-      // Success - show confirmation message
-      console.log('Signup successful:', data)
-      setIsSubmitted(true)
-      setEmail('')
-      setName('')
-      setWantsOwnership(true)
-    } catch (error) {
-      console.error('Signup error:', error)
-      setError(error instanceof Error ? error.message : 'Something went wrong. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
   return (
     <section id="email-signup" className="py-24 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
@@ -66,102 +20,61 @@ export function ComingSoonBanner() {
             Build a startup website where you own the code - no hosting fees, no hidden costs, just pure creativity.
           </p>
 
-          <Card className="max-w-md mx-auto mb-8">
-            <CardContent className="p-6">
-              {isSubmitted ? (
-                <div className="text-center py-6">
-                  <div className="text-6xl mb-4">🎉</div>
-                  <h2 className="font-bold text-2xl mb-3 text-green-600">You're all set!</h2>
-                  <p className="text-lg mb-2 font-semibold">
-                    Check your email inbox
-                  </p>
-                  <p className="text-muted-foreground text-sm mb-4">
-                    We just sent you a welcome message with next steps.
-                    <br />
-                    Don't see it? Check your spam folder.
-                  </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsSubmitted(false)}
-                    className="mt-2"
-                  >
-                    Sign up another email
-                  </Button>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <h2 className="font-semibold text-lg">Get Early Access</h2>
-                  {error && (
-                    <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
-                      <div className="font-semibold mb-1">⚠️ Signup Failed</div>
-                      {error}
-                    </div>
-                  )}
-                  <div className="space-y-3">
-                    <div>
-                      <Input
-                        type="text"
-                        placeholder="Your name (optional)"
-                        value={name}
-                        onChange={(e) => {
-                          setName(e.target.value)
-                          if (error) setError('')
-                        }}
-                        className="w-full"
-                        disabled={isSubmitting}
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Optional - helps us greet you properly in emails
-                      </p>
-                    </div>
-                    <Input
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value)
-                        if (error) setError('') // Clear error when user starts typing
-                      }}
-                      required
-                      className="w-full"
-                      disabled={isSubmitting}
-                    />
-                    <div className="flex items-start gap-2 py-2">
-                      <input
-                        type="checkbox"
-                        id="wantsOwnership"
-                        checked={wantsOwnership}
-                        onChange={(e) => setWantsOwnership(e.target.checked)}
-                        className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                        disabled={isSubmitting}
-                      />
-                      <label
-                        htmlFor="wantsOwnership"
-                        className="text-sm font-medium leading-tight cursor-pointer select-none"
-                      >
-                        Yes, I want a website I actually OWN.
-                      </label>
-                    </div>
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting || !email.trim()}
-                      className="w-full relative"
-                    >
-                      {isSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <span className="animate-spin">⏳</span>
-                          Signing you up...
-                        </span>
-                      ) : (
-                        'Notify Me'
-                      )}
-                    </Button>
+          {/* Demo CTA Section */}
+          <Card className="max-w-2xl mx-auto mb-8 border-2 border-primary/20 shadow-lg">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+                <h2 className="font-bold text-2xl">Create Your Free Website Preview</h2>
+                <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+              </div>
+
+              <p className="text-lg text-muted-foreground mb-6 max-w-xl mx-auto">
+                See your website come to life in minutes. No credit card required, no commitment - just a beautiful preview of what your business website could look like.
+              </p>
+
+              {/* Feature highlights */}
+              <div className="grid md:grid-cols-3 gap-4 mb-8 text-left">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm">100% Free Demo</p>
+                    <p className="text-xs text-muted-foreground">No payment needed</p>
                   </div>
-                  <p className="text-xs text-muted-foreground text-center">
-                    No spam, just updates on the next launch.
-                  </p>
-                </form>
-              )}
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm">Ready in Minutes</p>
+                    <p className="text-xs text-muted-foreground">Fast & easy setup</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-sm">Professional Design</p>
+                    <p className="text-xs text-muted-foreground">Customized for you</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <Link href="/get-started">
+                <Button
+                  size="lg"
+                  className="w-full md:w-auto text-lg px-8 py-6 font-semibold group relative overflow-hidden"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    Get Your Free Website Preview
+                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Button>
+              </Link>
+
+              <p className="text-xs text-muted-foreground mt-4">
+                ✨ Takes less than 5 minutes • No technical skills required
+              </p>
             </CardContent>
           </Card>
 
