@@ -98,7 +98,7 @@ export default function PreviewModal({ isOpen, onClose, previewData }: PreviewMo
               srcDoc={previewData.html}
               className="w-full h-full"
               title="Website Preview"
-              sandbox="allow-same-origin"
+              sandbox="allow-same-origin allow-scripts allow-forms"
             />
           </div>
 

@@ -48,7 +48,7 @@ export function generateRamseyCoachHTML(data: TemplateData): string {
           <h4>${day}</h4>
           <div class="time-slots">
             ${times.map(time => `
-              <button class="time-slot" onclick="alert('This is a demo calendar. Book a call with us to get a real booking system!')">
+              <button class="time-slot" onclick="showFeatureModal()">
                 ${time}
               </button>
             `).join('')}
@@ -495,7 +495,7 @@ export function generateRamseyCoachHTML(data: TemplateData): string {
       </div>
 
       <div class="contact-form">
-        <form onsubmit="alert('This is a demo form. Contact functionality will be added to your real website!'); return false;">
+        <form onsubmit="showFeatureModal(); return false;">
           <div class="form-group">
             <label for="name">Name</label>
             <input type="text" id="name" required>
@@ -514,13 +514,184 @@ export function generateRamseyCoachHTML(data: TemplateData): string {
     </div>
   </section>
 
+  <!-- Feature Upgrade Modal -->
+  <div id="featureModal" class="feature-modal" style="display: none;">
+    <div class="feature-modal-overlay" onclick="closeFeatureModal()"></div>
+    <div class="feature-modal-content">
+      <button class="feature-modal-close" onclick="closeFeatureModal()">&times;</button>
+      <div class="feature-modal-icon">🚀</div>
+      <h3>Unlock Full Functionality</h3>
+      <p class="feature-modal-text">
+        These features require further services to connect to your business systems
+        (calendars, email, client databases, and more).
+      </p>
+      <p class="feature-modal-highlight">
+        <strong>📌 Important:</strong> This demo preview is stored for a limited time only!
+      </p>
+      <p class="feature-modal-subtext">
+        To see this site with full functionality and keep it reserved for our call,
+        book your free consultation now.
+      </p>
+      <button class="cta-button" style="width: 100%; margin-top: 1rem; animation: pulse 2s infinite;" onclick="window.open('https://calendly.com/weblaunchacademy', '_blank')">
+        📅 Book Free Consultation Now
+      </button>
+      <p style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.7; text-align: center;">
+        30-minute call • No commitment required
+      </p>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
     <p>&copy; ${new Date().getFullYear()} ${businessName}. All rights reserved.</p>
     <p style="margin-top: 0.5rem; opacity: 0.8;">Ramsey Preferred Coach</p>
   </footer>
 
+  <style>
+    /* Feature Modal Styles */
+    .feature-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+      50% { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    }
+
+    .feature-modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+    }
+
+    .feature-modal-content {
+      position: relative;
+      background: white;
+      border-radius: 20px;
+      padding: 3rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: slideUp 0.3s ease;
+      text-align: center;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .feature-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #999;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+
+    .feature-modal-close:hover {
+      background: #f5f5f5;
+      color: #333;
+      transform: rotate(90deg);
+    }
+
+    .feature-modal-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-modal-content h3 {
+      color: var(--primary);
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .feature-modal-text {
+      color: var(--text-light);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+
+    .feature-modal-highlight {
+      background: var(--secondary);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      border: 2px solid var(--accent);
+    }
+
+    .feature-modal-subtext {
+      color: var(--text-dark);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .feature-modal-content {
+        padding: 2rem 1.5rem;
+      }
+
+      .feature-modal-icon {
+        font-size: 3rem;
+      }
+
+      .feature-modal-content h3 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+
   <script>
+    // Feature modal functions
+    function showFeatureModal() {
+      document.getElementById('featureModal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeFeatureModal() {
+      document.getElementById('featureModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeFeatureModal();
+      }
+    });
+
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {

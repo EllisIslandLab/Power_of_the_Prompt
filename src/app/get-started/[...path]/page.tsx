@@ -1,5 +1,4 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import DemoSiteGeneratorForm from '@/components/demo-generator/DemoSiteGeneratorForm'
 
@@ -43,23 +42,10 @@ type TemplateWithCategories = {
 }
 
 async function getActiveTemplate(): Promise<TemplateWithCategories | null> {
-  const cookieStore = await cookies()
-
-  const supabase = createServerClient(
+  // Use simple client for public data - no auth needed
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options)
-          })
-        },
-      },
-    }
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
   // Get active template with category information
