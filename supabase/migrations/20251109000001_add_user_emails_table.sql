@@ -60,9 +60,13 @@ BEGIN
   IF OLD.is_primary = true THEN
     UPDATE user_emails
     SET is_primary = true
-    WHERE user_id = OLD.user_id
-    AND id != OLD.id
-    LIMIT 1;
+    WHERE id = (
+      SELECT id
+      FROM user_emails
+      WHERE user_id = OLD.user_id
+      AND id != OLD.id
+      LIMIT 1
+    );
   END IF;
 
   RETURN OLD;
