@@ -34,6 +34,12 @@ const demoFormSchema = z.object({
   // Step 2: Services (1-5 services)
   services: z.array(serviceSchema).min(1, 'Add at least 1 service').max(5, 'Maximum 5 services allowed'),
 
+  // Step 2.5: Additional Details (for Claude AI)
+  additionalDetails: z.string()
+    .min(20, 'Please provide at least 20 characters describing your vision')
+    .max(2000, 'Description too long (max 2000 characters)')
+    .optional(),
+
   // Step 3: Colors
   primaryColor: z.string().regex(/^#[0-9A-F]{6}$/i, 'Invalid color format'),
   secondaryColor: z.string().regex(/^#[0-9A-F]{6}$/i, 'Invalid color format'),
@@ -57,7 +63,7 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
   const [showPreview, setShowPreview] = useState(false)
   const [previewData, setPreviewData] = useState<any>(null)
 
-  const totalSteps = 4
+  const totalSteps = 5
 
   // Get default colors from template config
   const defaultColors = template.html_generator_config?.defaultColors || {
@@ -86,6 +92,7 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
       zip: '',
       businessContactEmail: '',
       services: [{ title: '', description: '' }],
+      additionalDetails: '',
       primaryColor: defaultColors.primary,
       secondaryColor: defaultColors.secondary,
       accentColor: defaultColors.accent,
@@ -135,8 +142,10 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
     } else if (currentStep === 2) {
       fieldsToValidate = ['services']
     } else if (currentStep === 3) {
-      fieldsToValidate = ['primaryColor', 'secondaryColor', 'accentColor']
+      fieldsToValidate = ['additionalDetails']
     } else if (currentStep === 4) {
+      fieldsToValidate = ['primaryColor', 'secondaryColor', 'accentColor']
+    } else if (currentStep === 5) {
       fieldsToValidate = ['userEmail']
     }
 
@@ -210,14 +219,16 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
               <CardTitle>
                 {currentStep === 1 && 'Business Information'}
                 {currentStep === 2 && 'Your Services'}
-                {currentStep === 3 && 'Customize Colors'}
-                {currentStep === 4 && 'Your Contact Information'}
+                {currentStep === 3 && 'Describe Your Vision'}
+                {currentStep === 4 && 'Customize Colors'}
+                {currentStep === 5 && 'Your Contact Information'}
               </CardTitle>
               <CardDescription>
                 {currentStep === 1 && 'Tell us about your business'}
                 {currentStep === 2 && 'Add 1-5 services you offer'}
-                {currentStep === 3 && 'Choose your brand colors'}
-                {currentStep === 4 && 'Where should we send your preview?'}
+                {currentStep === 3 && 'Help us create a website tailored to your unique needs'}
+                {currentStep === 4 && 'Choose your brand colors'}
+                {currentStep === 5 && 'Where should we send your preview?'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -400,8 +411,63 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
                 </>
               )}
 
-              {/* Step 3: Colors */}
+              {/* Step 3: Additional Details (Vision) */}
               {currentStep === 3 && (
+                <>
+                  <div className="space-y-4">
+                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-4">
+                      <h3 className="font-semibold text-primary mb-2 flex items-center gap-2">
+                        <span className="text-2xl">✨</span>
+                        Tell Us Your Vision
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Our AI will use your description to create a unique, customized website just for you.
+                        The more detail you provide, the better we can tailor the design to your needs.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="additionalDetails">Describe Your Website Vision (Optional but Recommended)</Label>
+                      <Textarea
+                        id="additionalDetails"
+                        {...register('additionalDetails')}
+                        placeholder="Example: I want a modern, professional site that emphasizes trust and personal connection. My ideal client is someone who's overwhelmed by debt and needs compassionate guidance. I'd like prominent testimonials, a warm color scheme, and an easy way to book consultations. I want the services section to feel inviting, not salesy..."
+                        rows={8}
+                        className="resize-y"
+                      />
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <p>
+                          {watchedData.additionalDetails?.length || 0} / 2000 characters
+                        </p>
+                        <p>
+                          💡 Tip: Mention your ideal client, desired atmosphere, and key features
+                        </p>
+                      </div>
+                      {errors.additionalDetails && (
+                        <p className="text-sm text-destructive">{errors.additionalDetails.message}</p>
+                      )}
+                    </div>
+
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <h4 className="font-medium text-sm mb-2">What to include in your description:</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                        <li>Your target audience or ideal client</li>
+                        <li>The feeling or atmosphere you want (professional, warm, modern, etc.)</li>
+                        <li>Special features you need (testimonials, booking calendar, contact forms)</li>
+                        <li>How you want to differentiate from competitors</li>
+                        <li>Any specific sections or content you want highlighted</li>
+                      </ul>
+                    </div>
+
+                    <p className="text-xs text-center text-muted-foreground italic">
+                      You can skip this step, but providing details will result in a more personalized website
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {/* Step 4: Colors */}
+              {currentStep === 4 && (
                 <>
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -508,8 +574,8 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
                 </>
               )}
 
-              {/* Step 4: User Contact */}
-              {currentStep === 4 && (
+              {/* Step 5: User Contact */}
+              {currentStep === 5 && (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="userEmail">Your Email Address *</Label>
