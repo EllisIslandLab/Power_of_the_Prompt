@@ -944,6 +944,208 @@ export type Database = {
         }
         Relationships: []
       }
+      template_categories: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          description: string | null
+          level: number
+          parent_id: string | null
+          display_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          description?: string | null
+          level: number
+          parent_id?: string | null
+          display_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          description?: string | null
+          level?: number
+          parent_id?: string | null
+          display_order?: number
+          is_active?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "template_categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      niche_templates: {
+        Row: {
+          id: string
+          category_id: string
+          name: string
+          slug: string
+          description: string | null
+          is_active: boolean
+          form_steps: Json
+          html_generator_config: Json | null
+          preview_thumbnail_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          category_id: string
+          name: string
+          slug: string
+          description?: string | null
+          is_active?: boolean
+          form_steps: Json
+          html_generator_config?: Json | null
+          preview_thumbnail_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          category_id?: string
+          name?: string
+          slug?: string
+          description?: string | null
+          is_active?: boolean
+          form_steps?: Json
+          html_generator_config?: Json | null
+          preview_thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "niche_templates_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "template_categories"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      demo_projects: {
+        Row: {
+          id: string
+          template_id: string
+          user_email: string
+          business_contact_email: string | null
+          business_name: string
+          tagline: string | null
+          phone: string | null
+          address: string | null
+          city: string | null
+          state: string | null
+          zip: string | null
+          services: Json
+          colors: Json | null
+          custom_fields: Json
+          generated_html: string | null
+          preview_url: string | null
+          status: string
+          viewed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          template_id: string
+          user_email: string
+          business_contact_email?: string | null
+          business_name: string
+          tagline?: string | null
+          phone?: string | null
+          address?: string | null
+          city?: string | null
+          state?: string | null
+          zip?: string | null
+          services: Json
+          colors?: Json | null
+          custom_fields?: Json
+          generated_html?: string | null
+          preview_url?: string | null
+          status?: string
+          viewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          template_id?: string
+          user_email?: string
+          business_contact_email?: string | null
+          business_name?: string
+          tagline?: string | null
+          phone?: string | null
+          address?: string | null
+          city?: string | null
+          state?: string | null
+          zip?: string | null
+          services?: Json
+          colors?: Json | null
+          custom_fields?: Json
+          generated_html?: string | null
+          preview_url?: string | null
+          status?: string
+          viewed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_projects_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "niche_templates"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      demo_interactions: {
+        Row: {
+          id: string
+          demo_project_id: string
+          interaction_type: string
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          demo_project_id: string
+          interaction_type: string
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          demo_project_id?: string
+          interaction_type?: string
+          metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_interactions_demo_project_id_fkey"
+            columns: ["demo_project_id"]
+            isOneToOne: false
+            referencedRelation: "demo_projects"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1132,3 +1334,7 @@ export type AdminProfile = UserProfile // For backwards compatibility
 // New type aliases
 export type Users = UserProfile
 export type Leads = Lead
+export type TemplateCategory = Tables<"template_categories">
+export type NicheTemplate = Tables<"niche_templates">
+export type DemoProject = Tables<"demo_projects">
+export type DemoInteraction = Tables<"demo_interactions">
