@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabase } from '@/lib/supabase'
 import { generateRamseyCoachHTML } from '@/lib/demo-generator/ramsey-coach-template'
+import { generateWithClaude } from '@/lib/demo-generator/claude-generator'
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,23 +26,68 @@ export async function POST(req: NextRequest) {
     // Get Supabase client with service role
     const supabase = getSupabase(true)
 
-    // Generate HTML using the template generator
-    const generatedHTML = generateRamseyCoachHTML({
-      businessName: formData.businessName,
-      tagline: formData.tagline || '',
-      phone: formData.phone || '',
-      address: formData.address || '',
-      city: formData.city || '',
-      state: formData.state || '',
-      zip: formData.zip || '',
-      businessContactEmail: formData.businessContactEmail || '',
-      services: formData.services,
-      colors: {
-        primary: formData.primaryColor,
-        secondary: formData.secondaryColor,
-        accent: formData.accentColor,
-      },
-    })
+    // Generate HTML - use Claude if additional details provided, otherwise use static template
+    let generatedHTML: string
+
+    if (formData.additionalDetails && formData.additionalDetails.trim().length >= 20) {
+      console.log('Using Claude AI to generate custom HTML based on user vision...')
+      try {
+        generatedHTML = await generateWithClaude({
+          businessName: formData.businessName,
+          tagline: formData.tagline,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zip: formData.zip,
+          businessContactEmail: formData.businessContactEmail,
+          services: formData.services,
+          additionalDetails: formData.additionalDetails,
+          colors: {
+            primary: formData.primaryColor,
+            secondary: formData.secondaryColor,
+            accent: formData.accentColor,
+          },
+        })
+      } catch (claudeError) {
+        console.error('Claude generation failed, falling back to static template:', claudeError)
+        // Fall back to static template if Claude fails
+        generatedHTML = generateRamseyCoachHTML({
+          businessName: formData.businessName,
+          tagline: formData.tagline || '',
+          phone: formData.phone || '',
+          address: formData.address || '',
+          city: formData.city || '',
+          state: formData.state || '',
+          zip: formData.zip || '',
+          businessContactEmail: formData.businessContactEmail || '',
+          services: formData.services,
+          colors: {
+            primary: formData.primaryColor,
+            secondary: formData.secondaryColor,
+            accent: formData.accentColor,
+          },
+        })
+      }
+    } else {
+      console.log('Using static template (no additional details provided)')
+      generatedHTML = generateRamseyCoachHTML({
+        businessName: formData.businessName,
+        tagline: formData.tagline || '',
+        phone: formData.phone || '',
+        address: formData.address || '',
+        city: formData.city || '',
+        state: formData.state || '',
+        zip: formData.zip || '',
+        businessContactEmail: formData.businessContactEmail || '',
+        services: formData.services,
+        colors: {
+          primary: formData.primaryColor,
+          secondary: formData.secondaryColor,
+          accent: formData.accentColor,
+        },
+      })
+    }
 
     // Create demo project in database
     const { data: demoProject, error: dbError } = await supabase
