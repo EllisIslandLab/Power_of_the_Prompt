@@ -4,12 +4,6 @@ import DemoSiteGeneratorForm from '@/components/demo-generator/DemoSiteGenerator
 
 export const dynamic = 'force-dynamic'
 
-interface GetStartedPageProps {
-  params: Promise<{
-    path?: string[]
-  }>
-}
-
 // Type for the nested category structure
 type CategoryWithParent = {
   id: string
@@ -88,7 +82,7 @@ async function getActiveTemplate(): Promise<TemplateWithCategories | null> {
   return data as TemplateWithCategories | null
 }
 
-export default async function GetStartedPage({ params }: GetStartedPageProps) {
+export default async function GetStartedPage() {
   const template = await getActiveTemplate()
 
   if (!template) {
