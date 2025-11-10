@@ -665,6 +665,11 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
         <PreviewModal
           isOpen={showPreview}
           onClose={() => setShowPreview(false)}
+          onBack={() => {
+            setShowPreview(false)
+            // Don't clear form data - let user edit and resubmit
+          }}
+          hasAdditionalDetails={!!(watchedData.additionalDetails && watchedData.additionalDetails.trim().length >= 20)}
           previewData={previewData}
         />
       )}

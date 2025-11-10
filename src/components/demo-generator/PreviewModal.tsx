@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ExternalLink, BookOpen, Calendar, Loader2 } from 'lucide-react'
+import { ExternalLink, BookOpen, Calendar, Loader2, ArrowLeft, RefreshCw, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface PreviewModalProps {
   isOpen: boolean
   onClose: () => void
+  onBack: () => void
+  hasAdditionalDetails: boolean
   previewData: {
     demoProjectId: string
     html: string
@@ -17,8 +19,11 @@ interface PreviewModalProps {
   }
 }
 
-export default function PreviewModal({ isOpen, onClose, previewData }: PreviewModalProps) {
+export default function PreviewModal({ isOpen, onClose, onBack, hasAdditionalDetails, previewData }: PreviewModalProps) {
   const [trackingViewed, setTrackingViewed] = useState(false)
+  const [isCustomizing, setIsCustomizing] = useState(false)
+  const [isRegenerating, setIsRegenerating] = useState(false)
+  const [customizedHTML, setCustomizedHTML] = useState<string | null>(null)
 
   // Track preview view when modal opens
   useEffect(() => {
@@ -81,21 +86,142 @@ export default function PreviewModal({ isOpen, onClose, previewData }: PreviewMo
     }
   }
 
+  const handleAICustomize = async () => {
+    if (!hasAdditionalDetails) {
+      toast.error('Please go back and add details about your vision in Step 3 to use AI customization')
+      return
+    }
+
+    setIsCustomizing(true)
+    try {
+      const response = await fetch('/api/demo-generator/customize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          demoProjectId: previewData.demoProjectId,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'AI customization failed')
+      }
+
+      const result = await response.json()
+      setCustomizedHTML(result.html)
+      toast.success('Your site has been AI-customized based on your vision!')
+    } catch (error: any) {
+      console.error('AI customization error:', error)
+      toast.error(error.message || 'Failed to customize with AI. Please try again.')
+    } finally {
+      setIsCustomizing(false)
+    }
+  }
+
+  const handleRegenerate = async () => {
+    setIsRegenerating(true)
+    try {
+      // Regenerate by calling customize again if already customized, or just reload
+      if (customizedHTML) {
+        await handleAICustomize()
+      } else {
+        // Reload the original preview
+        setCustomizedHTML(null)
+        toast.info('Preview reloaded')
+      }
+    } finally {
+      setIsRegenerating(false)
+    }
+  }
+
+  const displayHTML = customizedHTML || previewData.html
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-7xl h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Your Website Preview is Ready!</DialogTitle>
+          <DialogTitle>
+            {customizedHTML ? '✨ AI-Customized Preview' : 'Your Website Preview is Ready!'}
+          </DialogTitle>
           <DialogDescription>
-            Check your email for the full preview link. Below is a live preview of your website.
+            {customizedHTML
+              ? 'This preview has been AI-customized based on your vision. Check your email for the link.'
+              : 'Below is a live preview of your website. Upgrade with AI customization for a unique design tailored to your vision.'}
           </DialogDescription>
         </DialogHeader>
 
+        {/* Action Buttons Row */}
+        <div className="flex flex-wrap gap-2 pb-4 border-b">
+          <Button
+            variant="outline"
+            onClick={onBack}
+            disabled={isCustomizing || isRegenerating}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Edit
+          </Button>
+
+          {!customizedHTML && (
+            <Button
+              onClick={handleAICustomize}
+              disabled={isCustomizing || isRegenerating || !hasAdditionalDetails}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            >
+              {isCustomizing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Customizing with AI...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  AI Customize (Premium)
+                </>
+              )}
+            </Button>
+          )}
+
+          <Button
+            variant="outline"
+            onClick={handleRegenerate}
+            disabled={isCustomizing || isRegenerating}
+          >
+            {isRegenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Regenerating...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Regenerate
+              </>
+            )}
+          </Button>
+
+          {!hasAdditionalDetails && (
+            <p className="text-xs text-muted-foreground flex items-center ml-auto">
+              💡 Add your vision in Step 3 to enable AI customization
+            </p>
+          )}
+        </div>
+
         <div className="flex-1 flex flex-col lg:flex-row gap-6 overflow-hidden">
           {/* Preview Iframe */}
-          <div className="flex-1 overflow-auto border rounded-lg bg-white">
+          <div className="flex-1 overflow-auto border rounded-lg bg-white relative">
+            {(isCustomizing || isRegenerating) && (
+              <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10">
+                <div className="text-center">
+                  <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+                  <p className="text-lg font-semibold">
+                    {isCustomizing ? 'AI is customizing your site...' : 'Regenerating...'}
+                  </p>
+                  <p className="text-sm text-muted-foreground">This may take 10-30 seconds</p>
+                </div>
+              </div>
+            )}
             <iframe
-              srcDoc={previewData.html}
+              srcDoc={displayHTML}
               className="w-full h-full"
               title="Website Preview"
               sandbox="allow-same-origin allow-scripts allow-forms"
