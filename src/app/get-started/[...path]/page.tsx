@@ -6,9 +6,9 @@ import DemoSiteGeneratorForm from '@/components/demo-generator/DemoSiteGenerator
 export const dynamic = 'force-dynamic'
 
 interface GetStartedPageProps {
-  params: {
+  params: Promise<{
     path?: string[]
-  }
+  }>
 }
 
 async function getActiveTemplate() {
