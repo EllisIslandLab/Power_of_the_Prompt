@@ -112,18 +112,26 @@ export default function PreviewModal({ isOpen, onClose, previewData }: PreviewMo
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Option 1: Buy Textbook */}
-                <Card className="border-muted hover:border-primary transition-colors cursor-pointer">
+                {/* Option 1: Buy Walkthrough Guide + Code Access */}
+                <Card className="border-primary/30 border-2 bg-primary/5 hover:border-primary transition-colors cursor-pointer">
                   <CardContent className="pt-6">
+                    <div className="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 rounded-full">
+                      INCLUDES YOUR CODE
+                    </div>
                     <div className="flex items-start gap-3 mb-3">
                       <div className="p-2 bg-primary/10 rounded-lg">
                         <BookOpen className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold mb-1">Learn to Build It Yourself</h3>
+                        <h3 className="font-semibold mb-1">Get Your Code + Walkthrough Guide</h3>
                         <p className="text-sm text-muted-foreground mb-3">
-                          Get our comprehensive textbook and build your professional website step-by-step
+                          Download the exact HTML/CSS code from your preview PLUS our step-by-step walkthrough guide to deploy and customize it
                         </p>
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-2 mb-3">
+                          <p className="text-xs font-semibold text-yellow-800">
+                            ⏰ Your code expires in 24 hours!
+                          </p>
+                        </div>
                         <div className="flex items-baseline gap-2 mb-3">
                           <span className="text-2xl font-bold text-primary">$9</span>
                           <span className="text-sm text-muted-foreground">one-time</span>
@@ -131,7 +139,7 @@ export default function PreviewModal({ isOpen, onClose, previewData }: PreviewMo
                       </div>
                     </div>
                     <Button onClick={handleTextbookClick} className="w-full">
-                      Buy Textbook
+                      Get Code & Guide
                       <ExternalLink className="h-4 w-4 ml-2" />
                     </Button>
                   </CardContent>

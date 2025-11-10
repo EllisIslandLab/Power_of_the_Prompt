@@ -522,21 +522,28 @@ export function generateRamseyCoachHTML(data: TemplateData): string {
       <div class="feature-modal-icon">🚀</div>
       <h3>Unlock Full Functionality</h3>
       <p class="feature-modal-text">
-        These features require further services to connect to your business systems
-        (calendars, email, client databases, and more).
+        These features require connection to external services (calendars, email, Airtable databases, and more).
       </p>
       <p class="feature-modal-highlight">
-        <strong>📌 Important:</strong> This demo preview is stored for a limited time only!
+        <strong>📌 Important:</strong> Your demo code is stored for only 24 hours!
       </p>
       <p class="feature-modal-subtext">
-        To see this site with full functionality and keep it reserved for our call,
-        book your free consultation now.
+        Full functionality can be achieved by following the steps in our <strong>Walkthrough Guide</strong>.
+        Purchase the guide to get your generated code and learn how to deploy it with real integrations.
       </p>
-      <button class="cta-button" style="width: 100%; margin-top: 1rem; animation: pulse 2s infinite;" onclick="window.open('https://calendly.com/weblaunchacademy', '_blank')">
-        📅 Book Free Consultation Now
-      </button>
+      <p class="feature-modal-subtext" style="margin-top: 0.5rem; font-size: 0.9rem;">
+        Or book a free consultation to discuss having us build it for you with everything connected.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+        <button class="cta-button" style="width: 100%; background: var(--primary); color: white;" onclick="window.open('/portal/store', '_blank')">
+          📚 Get Code & Walkthrough Guide ($9)
+        </button>
+        <button class="cta-button" style="width: 100%; animation: pulse 2s infinite;" onclick="window.open('https://calendly.com/weblaunchacademy', '_blank')">
+          📅 Book Free Consultation
+        </button>
+      </div>
       <p style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.7; text-align: center;">
-        30-minute call • No commitment required
+        Code expires in 24 hours • Guide shows you how to deploy & connect everything
       </p>
     </div>
   </div>

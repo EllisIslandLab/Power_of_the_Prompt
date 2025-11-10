@@ -1059,6 +1059,7 @@ export type Database = {
           preview_url: string | null
           status: string
           viewed_at: string | null
+          expires_at: string
           created_at: string
           updated_at: string
         }
@@ -1081,6 +1082,7 @@ export type Database = {
           preview_url?: string | null
           status?: string
           viewed_at?: string | null
+          expires_at?: string
           created_at?: string
           updated_at?: string
         }
@@ -1103,6 +1105,7 @@ export type Database = {
           preview_url?: string | null
           status?: string
           viewed_at?: string | null
+          expires_at?: string
           updated_at?: string
         }
         Relationships: [
