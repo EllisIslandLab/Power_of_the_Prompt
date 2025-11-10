@@ -11,7 +11,38 @@ interface GetStartedPageProps {
   }>
 }
 
-async function getActiveTemplate() {
+// Type for the nested category structure
+type CategoryWithParent = {
+  id: string
+  name: string
+  slug: string
+  level: number
+  parent?: {
+    id: string
+    name: string
+    slug: string
+    level: number
+    parent?: {
+      id: string
+      name: string
+      slug: string
+      level: number
+    }
+  }
+}
+
+// Type for template with nested categories
+type TemplateWithCategories = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  form_steps: any
+  html_generator_config: any
+  category?: CategoryWithParent
+}
+
+async function getActiveTemplate(): Promise<TemplateWithCategories | null> {
   const cookieStore = await cookies()
 
   const supabase = createServerClient(
@@ -68,7 +99,7 @@ async function getActiveTemplate() {
     return null
   }
 
-  return data
+  return data as TemplateWithCategories | null
 }
 
 export default async function GetStartedPage({ params }: GetStartedPageProps) {
