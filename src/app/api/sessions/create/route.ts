@@ -38,8 +38,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      sessionId: session.id,
-      builderType: session.builder_type
+      sessionId: (session as any).id,
+      builderType: (session as any).builder_type
     })
 
   } catch (error) {
