@@ -163,6 +163,7 @@ export type Database = {
           first_name: string | null
           last_name: string | null
           display_name: string | null
+          wants_ownership: boolean | null
           status: 'waitlist' | 'interested' | 'nurturing' | 'converted'
           source: string | null
           notes: string | null
@@ -185,6 +186,7 @@ export type Database = {
           first_name?: string | null
           last_name?: string | null
           display_name?: string | null
+          wants_ownership?: boolean | null
           status?: 'waitlist' | 'interested' | 'nurturing' | 'converted'
           source?: string | null
           notes?: string | null
@@ -207,6 +209,7 @@ export type Database = {
           first_name?: string | null
           last_name?: string | null
           display_name?: string | null
+          wants_ownership?: boolean | null
           status?: 'waitlist' | 'interested' | 'nurturing' | 'converted'
           source?: string | null
           notes?: string | null
