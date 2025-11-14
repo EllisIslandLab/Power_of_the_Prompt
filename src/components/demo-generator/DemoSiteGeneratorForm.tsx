@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -11,8 +12,18 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { ChevronLeft, ChevronRight, Plus, Trash2, Loader2, Eye } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Trash2, Loader2, Eye, Save } from 'lucide-react'
 import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import PreviewModal from './PreviewModal'
 
 // Predetermined tools list
@@ -68,10 +79,13 @@ interface DemoSiteGeneratorFormProps {
 const STORAGE_KEY = 'demo_generator_form_data'
 
 export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFormProps) {
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [previewData, setPreviewData] = useState<any>(null)
+  const [showExitDialog, setShowExitDialog] = useState(false)
+  const [hasFormData, setHasFormData] = useState(false)
 
   const totalSteps = 4
 
@@ -127,7 +141,11 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
         Object.keys(data).forEach((key) => {
           setValue(key as any, data[key])
         })
-        toast.success('Restored your previous progress')
+        toast.success('Restored your previous progress', {
+          description: 'Your progress is auto-saved until you leave weblaunchacademy.com',
+          icon: <Save className="h-4 w-4" />,
+        })
+        setHasFormData(true)
       } catch (error) {
         console.error('Failed to load saved data:', error)
       }
@@ -138,10 +156,39 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
   useEffect(() => {
     const timer = setTimeout(() => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(watchedData))
+
+      // Check if user has entered any meaningful data
+      const hasData = watchedData.businessName?.trim().length > 0 ||
+                      watchedData.services.some(s => s.title?.trim().length > 0)
+      setHasFormData(hasData)
     }, 1000)
 
     return () => clearTimeout(timer)
   }, [watchedData])
+
+  // Warn before leaving the site with unsaved data
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasFormData && !showPreview) {
+        e.preventDefault()
+        e.returnValue = '' // Chrome requires returnValue to be set
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [hasFormData, showPreview])
+
+  // Show save notification on first meaningful input
+  useEffect(() => {
+    if (hasFormData && currentStep === 1 && watchedData.businessName?.trim().length === 1) {
+      toast.info('Your progress is being saved', {
+        description: 'Changes will be saved until you leave weblaunchacademy.com',
+        icon: <Save className="h-4 w-4" />,
+        duration: 5000,
+      })
+    }
+  }, [hasFormData, watchedData.businessName, currentStep])
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof DemoFormData)[] = []
@@ -168,7 +215,25 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1)
       window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      // On step 1, go back to main page
+      if (hasFormData) {
+        // Show confirmation dialog
+        setShowExitDialog(true)
+      } else {
+        // No data, just go back
+        router.back()
+      }
     }
+  }
+
+  const handleConfirmExit = () => {
+    setShowExitDialog(false)
+    router.back()
+  }
+
+  const handleCancelExit = () => {
+    setShowExitDialog(false)
   }
 
   const onSubmit = async (data: DemoFormData) => {
@@ -638,10 +703,10 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
               type="button"
               variant="outline"
               onClick={handleBack}
-              disabled={currentStep === 1 || isSubmitting}
+              disabled={isSubmitting}
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
-              Back
+              {currentStep === 1 ? 'Back to Home' : 'Back'}
             </Button>
 
             {currentStep < totalSteps ? (
@@ -684,6 +749,27 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
           previewData={previewData}
         />
       )}
+
+      {/* Exit Confirmation Dialog */}
+      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave without finishing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your progress has been saved and will be available when you return to this page.
+              You can continue building your website preview anytime before leaving weblaunchacademy.com.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelExit}>
+              Stay and Continue
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmExit}>
+              Leave (Progress Saved)
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
