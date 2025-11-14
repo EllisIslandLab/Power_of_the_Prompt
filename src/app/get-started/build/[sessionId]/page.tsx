@@ -38,8 +38,8 @@ export default async function BuilderPage({ params }: PageProps) {
 
   return (
     <FormContainer
-      sessionId={session.id}
-      builderType={session.builder_type}
+      sessionId={(session as any).id}
+      builderType={(session as any).builder_type}
     />
   )
 }
