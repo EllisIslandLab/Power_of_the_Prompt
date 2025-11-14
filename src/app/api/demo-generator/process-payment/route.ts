@@ -126,23 +126,9 @@ export async function POST(req: NextRequest) {
       // Don't fail here - we already charged them, just log the error
     }
 
-    // Generate download token for magic link
+    // TODO: Generate download token for magic link
+    // This will be implemented in Phase 1 completion
     let downloadToken: string | null = null
-    try {
-      const { data: tokenData, error: tokenError } = await supabase
-        .rpc('generate_download_token', {
-          p_demo_project_id: demoProjectId,
-          p_user_email: demoProject.user_email,
-        })
-
-      if (!tokenError && tokenData) {
-        downloadToken = tokenData
-      } else {
-        console.error('Failed to generate download token:', tokenError)
-      }
-    } catch (tokenErr) {
-      console.error('Error generating download token:', tokenErr)
-    }
 
     // Send email confirmation based on tier
     try {
