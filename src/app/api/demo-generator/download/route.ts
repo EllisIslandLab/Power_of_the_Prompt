@@ -22,19 +22,11 @@ export async function GET(req: NextRequest) {
 
     // Option 1: Download via magic link token
     if (token) {
-      const { data: tokenData, error: tokenError } = await supabase
-        .rpc('use_download_token', { p_token: token })
-        .single()
-
-      if (tokenError || !tokenData || !tokenData.is_valid) {
-        return NextResponse.json(
-          { error: 'Invalid or expired download link' },
-          { status: 403 }
-        )
-      }
-
-      demoProjectId = tokenData.demo_project_id
-      userEmail = tokenData.user_email
+      // Temporarily disabled - will be implemented with Phase 1 migration
+      return NextResponse.json(
+        { error: 'Token-based downloads will be available soon' },
+        { status: 501 }
+      )
     }
     // Option 2: Download immediately after payment via Stripe session
     else if (sessionId) {
@@ -154,30 +146,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Generate download token
-    const { data: token, error: tokenError } = await supabase
-      .rpc('generate_download_token', {
-        p_demo_project_id: demoProjectId,
-        p_user_email: userEmail,
-      })
-
-    if (tokenError || !token) {
-      console.error('Error generating token:', tokenError)
-      return NextResponse.json(
-        { error: 'Failed to generate download link' },
-        { status: 500 }
-      )
-    }
-
-    // Construct download URL
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const downloadUrl = `${baseUrl}/api/demo-generator/download?token=${token}`
-
-    return NextResponse.json({
-      success: true,
-      downloadUrl,
-      expiresIn: '7 days',
-    })
+    // Temporarily disabled - will be implemented with Phase 1 migration
+    return NextResponse.json(
+      { error: 'Token generation will be available soon' },
+      { status: 501 }
+    )
   } catch (error: any) {
     console.error('Error creating download link:', error)
     return NextResponse.json(
