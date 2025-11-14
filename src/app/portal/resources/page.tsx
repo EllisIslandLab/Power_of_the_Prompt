@@ -44,12 +44,12 @@ export default function ResourcesPage() {
 
   const resources: Resource[] = [
     {
-      id: 'architecture-toolkit',
+      id: 'architecture-mastery-toolkit',
       title: 'Architecture Mastery Toolkit',
       description: 'Professional implementation patterns and architectural knowledge that typically takes years to accumulate. Get the exact solutions used by senior developers, pre-configured for your stack with ready-to-use commands.',
       category: 'PREMIUM',
       type: 'TEMPLATE',
-      url: '/portal/products/architecture-toolkit',
+      url: '/portal/products/architecture-mastery-toolkit',
       isExternal: false,
       tags: ['Architecture', 'Patterns', 'Professional'],
       difficulty: 'INTERMEDIATE',
@@ -229,7 +229,7 @@ export default function ResourcesPage() {
                             </>
                           ) : resource.category === 'PREMIUM' ? (
                             <>
-                              View Details - $497
+                              View Details - $190
                             </>
                           ) : (
                             <>
@@ -301,7 +301,7 @@ export default function ResourcesPage() {
                           </>
                         ) : resource.category === 'PREMIUM' ? (
                           <>
-                            View Details - $497
+                            View Details - $190
                           </>
                         ) : (
                           <>
