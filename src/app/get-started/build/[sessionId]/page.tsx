@@ -5,9 +5,9 @@ import { FormContainer } from '@/components/builder/FormContainer'
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     sessionId: string
-  }
+  }>
 }
 
 async function getSession(sessionId: string) {
@@ -27,7 +27,8 @@ async function getSession(sessionId: string) {
 }
 
 export default async function BuilderPage({ params }: PageProps) {
-  const session = await getSession(params.sessionId)
+  const { sessionId } = await params
+  const session = await getSession(sessionId)
 
   if (!session) {
     // Session not found, redirect to start

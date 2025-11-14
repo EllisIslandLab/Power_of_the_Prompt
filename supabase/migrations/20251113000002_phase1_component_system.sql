@@ -332,9 +332,19 @@ CREATE INDEX IF NOT EXISTS idx_referral_clicks_code ON referral_clicks(referral_
 -- ROW LEVEL SECURITY (RLS)
 -- ============================================
 
-ALTER TABLE demo_sessions ENABLE ROW LEVEL SECURITY;
+-- Enable RLS on all tables
+ALTER TABLE boilerplate_versions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE business_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE components ENABLE ROW LEVEL SECURITY;
+ALTER TABLE component_versions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE component_ratings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE template_submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE demo_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contest_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referrals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referral_clicks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referral_payouts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_purchases ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies if they exist
 DROP POLICY IF EXISTS "Admin full access demo_sessions" ON demo_sessions;
@@ -379,6 +389,120 @@ CREATE POLICY "Anyone can submit templates" ON template_submissions
 -- Everyone can view approved templates
 CREATE POLICY "View approved templates" ON template_submissions
   FOR SELECT USING (status = 'approved' OR auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com');
+
+-- ============================================
+-- Additional RLS Policies for Security
+-- ============================================
+
+-- Boilerplate versions - read-only for everyone, admin can modify
+CREATE POLICY "Public read boilerplate" ON boilerplate_versions
+  FOR SELECT USING (true);
+
+CREATE POLICY "Admin manage boilerplate" ON boilerplate_versions
+  FOR ALL USING (
+    CASE
+      WHEN auth.jwt() IS NOT NULL THEN auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com'
+      ELSE false
+    END
+  );
+
+-- Business categories - read-only for everyone, admin can modify
+CREATE POLICY "Public read categories" ON business_categories
+  FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Admin manage categories" ON business_categories
+  FOR ALL USING (
+    CASE
+      WHEN auth.jwt() IS NOT NULL THEN auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com'
+      ELSE false
+    END
+  );
+
+-- Components - everyone can read, anyone can create, admin can modify
+CREATE POLICY "Public read components" ON components
+  FOR SELECT USING (true);
+
+CREATE POLICY "Anyone create components" ON components
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Admin manage components" ON components
+  FOR UPDATE USING (
+    CASE
+      WHEN auth.jwt() IS NOT NULL THEN auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com'
+      ELSE false
+    END
+  );
+
+-- Component versions - everyone can read approved, anyone can create, admin reviews
+CREATE POLICY "Public read approved component versions" ON component_versions
+  FOR SELECT USING (status = 'approved' OR auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com');
+
+CREATE POLICY "Anyone create component versions" ON component_versions
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Admin manage component versions" ON component_versions
+  FOR UPDATE USING (
+    CASE
+      WHEN auth.jwt() IS NOT NULL THEN auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com'
+      ELSE false
+    END
+  );
+
+-- Component ratings - users can create and view their own ratings
+CREATE POLICY "Create component ratings" ON component_ratings
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "View component ratings" ON component_ratings
+  FOR SELECT USING (true);
+
+-- Referrals - users can view their own, create their own
+CREATE POLICY "View own referrals" ON referrals
+  FOR SELECT USING (
+    user_email = COALESCE(auth.jwt() ->> 'email', user_email) OR
+    auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com'
+  );
+
+CREATE POLICY "Create referrals" ON referrals
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Admin manage referrals" ON referrals
+  FOR ALL USING (
+    CASE
+      WHEN auth.jwt() IS NOT NULL THEN auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com'
+      ELSE false
+    END
+  );
+
+-- Referral clicks - public insert, admin view
+CREATE POLICY "Track referral clicks" ON referral_clicks
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Admin view clicks" ON referral_clicks
+  FOR SELECT USING (
+    CASE
+      WHEN auth.jwt() IS NOT NULL THEN auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com'
+      ELSE false
+    END
+  );
+
+-- Referral payouts - admin only
+CREATE POLICY "Admin manage payouts" ON referral_payouts
+  FOR ALL USING (
+    CASE
+      WHEN auth.jwt() IS NOT NULL THEN auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com'
+      ELSE false
+    END
+  );
+
+-- User purchases - users can view their own, admin can view all
+CREATE POLICY "View own purchases" ON user_purchases
+  FOR SELECT USING (
+    user_email = COALESCE(auth.jwt() ->> 'email', user_email) OR
+    auth.jwt() ->> 'email' = 'hello@weblaunchacademy.com'
+  );
+
+CREATE POLICY "Track purchases" ON user_purchases
+  FOR INSERT WITH CHECK (true);
 
 -- ============================================
 -- HELPER FUNCTIONS
