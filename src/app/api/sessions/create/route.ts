@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
 
     // Create new demo session
     const sessionId = nanoid()
+    // @ts-ignore - demo_sessions table will be created by migration
     const { data: session, error } = await supabase
       .from('demo_sessions')
       .insert({

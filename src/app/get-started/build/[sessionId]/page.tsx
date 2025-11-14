@@ -13,6 +13,7 @@ interface PageProps {
 async function getSession(sessionId: string) {
   const supabase = getSupabase(true)
 
+  // @ts-ignore - demo_sessions table will be created by migration
   const { data: session, error } = await supabase
     .from('demo_sessions')
     .select('*')

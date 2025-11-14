@@ -12,6 +12,7 @@ export async function POST(
     const supabase = getSupabase(true)
 
     // Update the session
+    // @ts-ignore - demo_sessions table will be created by migration
     const { error } = await supabase
       .from('demo_sessions')
       .update({
