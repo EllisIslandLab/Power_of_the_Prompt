@@ -24,7 +24,7 @@ export class ToolkitPurchaseHandler extends BaseWebhookHandler {
 
     // Check if this is a toolkit purchase
     const productSlug = session.metadata?.product_slug
-    if (productSlug !== 'architecture-toolkit') {
+    if (productSlug !== 'architecture-mastery-toolkit') {
       // Not a toolkit purchase, skip
       return
     }

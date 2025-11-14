@@ -81,7 +81,7 @@ export default function ArchitectureToolkitPage() {
       const { data: productData } = await supabase
         .from('products')
         .select('*')
-        .eq('slug', 'architecture-toolkit')
+        .eq('slug', 'architecture-mastery-toolkit')
         .single()
 
       setProduct(productData)
@@ -143,7 +143,7 @@ export default function ArchitectureToolkitPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          productSlug: 'architecture-toolkit',
+          productSlug: 'architecture-mastery-toolkit',
           stripeProductId: 'prod_TLpZ1AjXFUXzBT'
         })
       })
