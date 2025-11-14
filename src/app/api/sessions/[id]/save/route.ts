@@ -12,8 +12,8 @@ export async function POST(
     const supabase = getSupabase(true)
 
     // Update the session
-    // @ts-ignore - demo_sessions table will be created by migration
     const { error } = await supabase
+      // @ts-expect-error - demo_sessions table exists but not in generated types yet
       .from('demo_sessions')
       .update({
         current_step: currentStep,

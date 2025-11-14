@@ -13,8 +13,8 @@ interface PageProps {
 async function getSession(sessionId: string) {
   const supabase = getSupabase(true)
 
-  // @ts-ignore - demo_sessions table will be created by migration
   const { data: session, error } = await supabase
+    // @ts-expect-error - demo_sessions table exists but not in generated types yet
     .from('demo_sessions')
     .select('*')
     .eq('id', sessionId)
