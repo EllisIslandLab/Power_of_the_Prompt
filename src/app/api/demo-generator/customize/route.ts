@@ -39,12 +39,15 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Get additional details from custom_fields
-    const additionalDetails = demoProject.custom_fields?.additionalDetails
+    // Check if any service has enhancement details
+    const services = demoProject.services as any[]
+    const hasEnhancementDetails = services.some(
+      (s: any) => s.additionalDetails && s.additionalDetails.trim().length > 0
+    )
 
-    if (!additionalDetails || additionalDetails.trim().length < 20) {
+    if (!hasEnhancementDetails) {
       return NextResponse.json(
-        { error: 'Additional details are required for AI customization. Please provide a description of your vision.' },
+        { error: 'Please add AI enhancement details to at least one service to enable AI customization.' },
         { status: 400 }
       )
     }
@@ -56,15 +59,14 @@ export async function POST(req: NextRequest) {
     try {
       customHTML = await generateWithClaude({
         businessName: demoProject.business_name,
-        tagline: demoProject.tagline,
-        phone: demoProject.phone,
-        address: demoProject.address,
-        city: demoProject.city,
-        state: demoProject.state,
-        zip: demoProject.zip,
-        businessContactEmail: demoProject.business_contact_email,
+        tagline: demoProject.tagline ?? undefined,
+        phone: demoProject.phone ?? undefined,
+        address: demoProject.address ?? undefined,
+        city: demoProject.city ?? undefined,
+        state: demoProject.state ?? undefined,
+        zip: demoProject.zip ?? undefined,
+        businessContactEmail: demoProject.business_contact_email ?? undefined,
         services: demoProject.services as any,
-        additionalDetails: additionalDetails,
         colors: demoProject.colors as any,
       })
     } catch (claudeError: any) {

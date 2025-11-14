@@ -115,8 +115,8 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // Scripts: Allow self, Stripe, Jitsi, Vercel Analytics, and inline scripts (required for Next.js)
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.jitsi.net https://8x8.vc https://*.sentry.io https://yourwebsitescore.com https://va.vercel-scripts.com",
+              // Scripts: Allow self, Stripe, Jitsi, Vercel Analytics, Vercel Live, and inline scripts (required for Next.js)
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.jitsi.net https://8x8.vc https://*.sentry.io https://yourwebsitescore.com https://va.vercel-scripts.com https://vercel.live",
               // Styles: Allow self and inline styles (required for styled-components/emotion)
               "style-src 'self' 'unsafe-inline'",
               // Images: Allow self, data URIs, Supabase, Stripe, YourWebsiteScore badge

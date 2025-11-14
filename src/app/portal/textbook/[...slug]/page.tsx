@@ -128,10 +128,10 @@ export default function TextbookChapterPage() {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
+    <div className={`min-h-screen ${darkMode ? 'dark bg-gray-950' : 'bg-gray-50'}`}>
       {/* Reading Progress Bar */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        <div 
+        <div
           className="h-1 bg-primary transition-all duration-300"
           style={{ width: `${readingProgress}%` }}
         />
@@ -232,7 +232,7 @@ export default function TextbookChapterPage() {
         {/* Main Content */}
         <main className="flex-1 lg:ml-0">
           {/* Header */}
-          <header className="sticky top-1 z-20 bg-background/95 backdrop-blur border-b p-4 lg:px-8">
+          <header className={`sticky top-1 z-20 backdrop-blur border-b p-4 lg:px-8 ${darkMode ? 'bg-gray-900/95' : 'bg-white/95'}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 min-w-0">
                 <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
@@ -262,7 +262,7 @@ export default function TextbookChapterPage() {
           </header>
 
           {/* Content */}
-          <div className="max-w-4xl mx-auto px-4 lg:px-8 py-8">
+          <div className={`max-w-4xl mx-auto px-4 lg:px-8 py-8 ${darkMode ? 'bg-gray-950' : 'bg-white'} rounded-lg shadow-sm`}>
             {/* Chapter Header */}
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4">
@@ -301,10 +301,10 @@ export default function TextbookChapterPage() {
 
             {/* Markdown Content */}
             {!loading && (
-              <article className="prose prose-lg max-w-none">
-                <div 
+              <article className={`prose prose-xl max-w-none ${!darkMode ? 'prose-slate' : 'prose-invert'}`}>
+                <div
                   dangerouslySetInnerHTML={{ __html: content }}
-                  className="markdown-content"
+                  className={`markdown-content ${!darkMode ? 'text-black' : ''}`}
                 />
               </article>
             )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -8,16 +9,42 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { ChevronLeft, ChevronRight, Plus, Trash2, Loader2, Eye } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Trash2, Loader2, Eye, Save } from 'lucide-react'
 import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import PreviewModal from './PreviewModal'
+
+// Predetermined tools list
+const PREDETERMINED_TOOLS = [
+  { id: 'booking', label: 'Free consultation booking modal', description: 'Calendar integration with Airtable' },
+  { id: 'budgeting', label: 'Budgeting tool/calculator', description: 'Interactive budget calculator' },
+  { id: 'upload', label: 'Document upload functionality', description: 'File upload for client documents' },
+  { id: 'progress', label: 'Progress tracking', description: 'Client progress dashboard' },
+  { id: 'email', label: 'Email signup', description: 'Newsletter/updates signup form' },
+  { id: 'signin', label: 'Sign-in button', description: 'User authentication (initial signup page)' },
+] as const
 
 // Zod schema for form validation
 const serviceSchema = z.object({
   title: z.string().min(1, 'Service title is required').max(100, 'Title too long'),
   description: z.string().min(1, 'Service description is required').max(500, 'Description too long'),
+  tools: z.array(z.string()).optional(),
+  additionalDetails: z.string()
+    .max(1000, 'Additional details too long (max 1000 characters)')
+    .optional()
+    .or(z.literal('')),
 })
 
 const demoFormSchema = z.object({
@@ -33,12 +60,6 @@ const demoFormSchema = z.object({
 
   // Step 2: Services (1-5 services)
   services: z.array(serviceSchema).min(1, 'Add at least 1 service').max(5, 'Maximum 5 services allowed'),
-
-  // Step 2.5: Additional Details (for Claude AI)
-  additionalDetails: z.string()
-    .min(20, 'Please provide at least 20 characters describing your vision')
-    .max(2000, 'Description too long (max 2000 characters)')
-    .optional(),
 
   // Step 3: Colors
   primaryColor: z.string().regex(/^#[0-9A-F]{6}$/i, 'Invalid color format'),
@@ -58,12 +79,15 @@ interface DemoSiteGeneratorFormProps {
 const STORAGE_KEY = 'demo_generator_form_data'
 
 export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFormProps) {
+  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [previewData, setPreviewData] = useState<any>(null)
+  const [showExitDialog, setShowExitDialog] = useState(false)
+  const [hasFormData, setHasFormData] = useState(false)
 
-  const totalSteps = 5
+  const totalSteps = 4
 
   // Get default colors from template config
   const defaultColors = template.html_generator_config?.defaultColors || {
@@ -91,8 +115,7 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
       state: '',
       zip: '',
       businessContactEmail: '',
-      services: [{ title: '', description: '' }],
-      additionalDetails: '',
+      services: [{ title: '', description: '', tools: [], additionalDetails: '' }],
       primaryColor: defaultColors.primary,
       secondaryColor: defaultColors.secondary,
       accentColor: defaultColors.accent,
@@ -118,7 +141,11 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
         Object.keys(data).forEach((key) => {
           setValue(key as any, data[key])
         })
-        toast.success('Restored your previous progress')
+        toast.success('Restored your previous progress', {
+          description: 'Your progress is auto-saved until you leave weblaunchacademy.com',
+          icon: <Save className="h-4 w-4" />,
+        })
+        setHasFormData(true)
       } catch (error) {
         console.error('Failed to load saved data:', error)
       }
@@ -129,10 +156,39 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
   useEffect(() => {
     const timer = setTimeout(() => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(watchedData))
+
+      // Check if user has entered any meaningful data
+      const hasData = watchedData.businessName?.trim().length > 0 ||
+                      watchedData.services.some(s => s.title?.trim().length > 0)
+      setHasFormData(hasData)
     }, 1000)
 
     return () => clearTimeout(timer)
   }, [watchedData])
+
+  // Warn before leaving the site with unsaved data
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasFormData && !showPreview) {
+        e.preventDefault()
+        e.returnValue = '' // Chrome requires returnValue to be set
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [hasFormData, showPreview])
+
+  // Show save notification on first meaningful input
+  useEffect(() => {
+    if (hasFormData && currentStep === 1 && watchedData.businessName?.trim().length === 1) {
+      toast.info('Your progress is being saved', {
+        description: 'Changes will be saved until you leave weblaunchacademy.com',
+        icon: <Save className="h-4 w-4" />,
+        duration: 5000,
+      })
+    }
+  }, [hasFormData, watchedData.businessName, currentStep])
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof DemoFormData)[] = []
@@ -142,10 +198,8 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
     } else if (currentStep === 2) {
       fieldsToValidate = ['services']
     } else if (currentStep === 3) {
-      fieldsToValidate = ['additionalDetails']
-    } else if (currentStep === 4) {
       fieldsToValidate = ['primaryColor', 'secondaryColor', 'accentColor']
-    } else if (currentStep === 5) {
+    } else if (currentStep === 4) {
       fieldsToValidate = ['userEmail']
     }
 
@@ -161,7 +215,25 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1)
       window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      // On step 1, go back to main page
+      if (hasFormData) {
+        // Show confirmation dialog
+        setShowExitDialog(true)
+      } else {
+        // No data, just go back
+        router.back()
+      }
     }
+  }
+
+  const handleConfirmExit = () => {
+    setShowExitDialog(false)
+    router.back()
+  }
+
+  const handleCancelExit = () => {
+    setShowExitDialog(false)
   }
 
   const onSubmit = async (data: DemoFormData) => {
@@ -219,16 +291,14 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
               <CardTitle>
                 {currentStep === 1 && 'Business Information'}
                 {currentStep === 2 && 'Your Services'}
-                {currentStep === 3 && 'Describe Your Vision'}
-                {currentStep === 4 && 'Customize Colors'}
-                {currentStep === 5 && 'Your Contact Information'}
+                {currentStep === 3 && 'Customize Colors'}
+                {currentStep === 4 && 'Your Contact Information'}
               </CardTitle>
               <CardDescription>
                 {currentStep === 1 && 'Tell us about your business'}
-                {currentStep === 2 && 'Add 1-5 services you offer'}
-                {currentStep === 3 && 'Help us create a website tailored to your unique needs'}
-                {currentStep === 4 && 'Choose your brand colors'}
-                {currentStep === 5 && 'Where should we send your preview?'}
+                {currentStep === 2 && 'Add 1-5 services you offer (with optional AI enhancement details)'}
+                {currentStep === 3 && 'Choose your brand colors'}
+                {currentStep === 4 && 'Where should we send your preview?'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -388,6 +458,64 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
                               </p>
                             )}
                           </div>
+
+                          <div className="space-y-3">
+                            <Label>Predetermined Tools (Optional)</Label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {PREDETERMINED_TOOLS.map((tool) => {
+                                const currentTools = watch(`services.${index}.tools`) || []
+                                const isChecked = currentTools.includes(tool.id)
+
+                                return (
+                                  <div key={tool.id} className="flex items-start space-x-2 p-2 border rounded-md hover:bg-accent/5 transition-colors">
+                                    <Checkbox
+                                      id={`services.${index}.tools.${tool.id}`}
+                                      checked={isChecked}
+                                      onCheckedChange={(checked) => {
+                                        const current = watch(`services.${index}.tools`) || []
+                                        if (checked) {
+                                          setValue(`services.${index}.tools`, [...current, tool.id])
+                                        } else {
+                                          setValue(`services.${index}.tools`, current.filter(t => t !== tool.id))
+                                        }
+                                      }}
+                                    />
+                                    <div className="grid gap-0.5 leading-none">
+                                      <label
+                                        htmlFor={`services.${index}.tools.${tool.id}`}
+                                        className="text-sm font-medium cursor-pointer"
+                                      >
+                                        {tool.label}
+                                      </label>
+                                      <p className="text-xs text-muted-foreground">
+                                        {tool.description}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor={`services.${index}.additionalDetails`}>
+                              AI Enhancement Details (Optional)
+                            </Label>
+                            <Textarea
+                              {...register(`services.${index}.additionalDetails` as const)}
+                              placeholder="Optional: Describe any custom functionality or specific requirements for this service..."
+                              rows={2}
+                              className="text-sm"
+                            />
+                            <p className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md p-2">
+                              ⚡ <strong>Note:</strong> This field requires the AI-enhanced premium preview. The AI will use these details to implement custom features beyond the predetermined tools above.
+                            </p>
+                            {errors.services?.[index]?.additionalDetails && (
+                              <p className="text-sm text-destructive">
+                                {errors.services[index]?.additionalDetails?.message}
+                              </p>
+                            )}
+                          </div>
                         </CardContent>
                       </Card>
                     ))}
@@ -396,7 +524,7 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => append({ title: '', description: '' })}
+                        onClick={() => append({ title: '', description: '', tools: [], additionalDetails: '' })}
                         className="w-full"
                       >
                         <Plus className="h-4 w-4 mr-2" />
@@ -411,63 +539,8 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
                 </>
               )}
 
-              {/* Step 3: Additional Details (Vision) */}
+              {/* Step 3: Colors */}
               {currentStep === 3 && (
-                <>
-                  <div className="space-y-4">
-                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-4">
-                      <h3 className="font-semibold text-primary mb-2 flex items-center gap-2">
-                        <span className="text-2xl">✨</span>
-                        Tell Us Your Vision
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Our AI will use your description to create a unique, customized website just for you.
-                        The more detail you provide, the better we can tailor the design to your needs.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="additionalDetails">Describe Your Website Vision (Optional but Recommended)</Label>
-                      <Textarea
-                        id="additionalDetails"
-                        {...register('additionalDetails')}
-                        placeholder="Example: I want a modern, professional site that emphasizes trust and personal connection. My ideal client is someone who's overwhelmed by debt and needs compassionate guidance. I'd like prominent testimonials, a warm color scheme, and an easy way to book consultations. I want the services section to feel inviting, not salesy..."
-                        rows={8}
-                        className="resize-y"
-                      />
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <p>
-                          {watchedData.additionalDetails?.length || 0} / 2000 characters
-                        </p>
-                        <p>
-                          💡 Tip: Mention your ideal client, desired atmosphere, and key features
-                        </p>
-                      </div>
-                      {errors.additionalDetails && (
-                        <p className="text-sm text-destructive">{errors.additionalDetails.message}</p>
-                      )}
-                    </div>
-
-                    <div className="bg-muted/50 rounded-lg p-4">
-                      <h4 className="font-medium text-sm mb-2">What to include in your description:</h4>
-                      <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                        <li>Your target audience or ideal client</li>
-                        <li>The feeling or atmosphere you want (professional, warm, modern, etc.)</li>
-                        <li>Special features you need (testimonials, booking calendar, contact forms)</li>
-                        <li>How you want to differentiate from competitors</li>
-                        <li>Any specific sections or content you want highlighted</li>
-                      </ul>
-                    </div>
-
-                    <p className="text-xs text-center text-muted-foreground italic">
-                      You can skip this step, but providing details will result in a more personalized website
-                    </p>
-                  </div>
-                </>
-              )}
-
-              {/* Step 4: Colors */}
-              {currentStep === 4 && (
                 <>
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -574,8 +647,8 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
                 </>
               )}
 
-              {/* Step 5: User Contact */}
-              {currentStep === 5 && (
+              {/* Step 4: User Contact */}
+              {currentStep === 4 && (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="userEmail">Your Email Address *</Label>
@@ -630,10 +703,10 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
               type="button"
               variant="outline"
               onClick={handleBack}
-              disabled={currentStep === 1 || isSubmitting}
+              disabled={isSubmitting}
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
-              Back
+              {currentStep === 1 ? 'Back to Home' : 'Back'}
             </Button>
 
             {currentStep < totalSteps ? (
@@ -669,10 +742,34 @@ export default function DemoSiteGeneratorForm({ template }: DemoSiteGeneratorFor
             setShowPreview(false)
             // Don't clear form data - let user edit and resubmit
           }}
-          hasAdditionalDetails={!!(watchedData.additionalDetails && watchedData.additionalDetails.trim().length >= 20)}
+          hasAdditionalDetails={watchedData.services.some(s =>
+            (s.additionalDetails && s.additionalDetails.trim().length > 0) ||
+            (s.tools && s.tools.length > 0)
+          )}
           previewData={previewData}
         />
       )}
+
+      {/* Exit Confirmation Dialog */}
+      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave without finishing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your progress has been saved and will be available when you return to this page.
+              You can continue building your website preview anytime before leaving weblaunchacademy.com.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelExit}>
+              Stay and Continue
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmExit}>
+              Leave (Progress Saved)
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
