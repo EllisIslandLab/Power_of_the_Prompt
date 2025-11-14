@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ExternalLink, BookOpen, Calendar, Loader2, ArrowLeft, RefreshCw, Sparkles } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { ExternalLink, BookOpen, Calendar, Loader2, ArrowLeft, RefreshCw, Sparkles, Lightbulb, Mail, ChevronDown, ChevronUp } from 'lucide-react'
 import { toast } from 'sonner'
 import PaymentModal from './PaymentModal'
 
@@ -26,6 +28,10 @@ export default function PreviewModal({ isOpen, onClose, onBack, hasAdditionalDet
   const [isRegenerating, setIsRegenerating] = useState(false)
   const [customizedHTML, setCustomizedHTML] = useState<string | null>(null)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showTipsSection, setShowTipsSection] = useState(false)
+  const [showGeneralTips, setShowGeneralTips] = useState(false)
+  const [tipsEmail, setTipsEmail] = useState('')
+  const [isSendingTips, setIsSendingTips] = useState(false)
 
   // Track preview view when modal opens
   useEffect(() => {
@@ -114,6 +120,34 @@ export default function PreviewModal({ isOpen, onClose, onBack, hasAdditionalDet
     }
   }
 
+  const handleSendPersonalizedTips = async () => {
+    if (!tipsEmail || !tipsEmail.includes('@')) {
+      toast.error('Please enter a valid email address')
+      return
+    }
+
+    setIsSendingTips(true)
+    try {
+      // TODO: Call API to send personalized tips email
+      await fetch('/api/demo-generator/send-tips', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: tipsEmail,
+          demoProjectId: previewData.demoProjectId,
+        }),
+      })
+
+      toast.success('Personalized tips sent to your email!')
+      setTipsEmail('')
+    } catch (error) {
+      console.error('Failed to send tips:', error)
+      toast.error('Failed to send tips. Please try again.')
+    } finally {
+      setIsSendingTips(false)
+    }
+  }
+
   const displayHTML = customizedHTML || previewData.html
 
   return (
@@ -125,8 +159,8 @@ export default function PreviewModal({ isOpen, onClose, onBack, hasAdditionalDet
           </DialogTitle>
           <DialogDescription>
             {customizedHTML
-              ? 'This preview has been AI-customized based on your vision. Check your email for the link.'
-              : 'Below is a live preview of your website. Upgrade with AI customization for a unique design tailored to your vision.'}
+              ? 'This preview has been AI-customized based on your vision. Purchase the code below to receive it via email.'
+              : 'Below is a live preview of your website. Make changes by going back, or upgrade with AI customization for a unique design tailored to your vision.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -289,10 +323,118 @@ export default function PreviewModal({ isOpen, onClose, onBack, hasAdditionalDet
           </div>
         </div>
 
-        <div className="flex justify-end pt-4 border-t">
-          <Button variant="outline" onClick={onClose}>
-            Close Preview
-          </Button>
+        {/* Tips Section */}
+        <div className="pt-4 border-t space-y-3">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowGeneralTips(!showGeneralTips)}
+              className="gap-2"
+            >
+              <Lightbulb className="h-4 w-4" />
+              General Tips to Improve Your Preview
+              {showGeneralTips ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowTipsSection(!showTipsSection)}
+              className="gap-2"
+            >
+              <Mail className="h-4 w-4" />
+              Get Personalized Tips
+              {showTipsSection ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </div>
+
+          {/* General Tips Dropdown */}
+          {showGeneralTips && (
+            <Card className="border-muted bg-blue-50/50 dark:bg-blue-950/20">
+              <CardContent className="pt-6 space-y-3">
+                <h4 className="font-semibold flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-yellow-500" />
+                  Tips to Improve Your Website Preview
+                </h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Refine your services:</strong> Add specific, actionable descriptions that highlight the value you provide to clients.</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Choose contrasting colors:</strong> Ensure your primary and accent colors have good contrast for readability.</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Add tools wisely:</strong> Select predetermined tools that align with your business goals and customer needs.</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Include contact info:</strong> Make it easy for potential clients to reach you with clear phone and email.</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Use AI customization:</strong> For advanced features, consider upgrading to AI Premium with your specific requirements.</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Personalized Tips Email Input */}
+          {showTipsSection && (
+            <Card className="border-muted bg-green-50/50 dark:bg-green-950/20">
+              <CardContent className="pt-6 space-y-3">
+                <h4 className="font-semibold flex items-center gap-2">
+                  <Mail className="h-5 w-5 text-green-600" />
+                  Get Personalized Tips via Email
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Enter your email to receive personalized recommendations on how to improve your website preview based on your specific business and services.
+                </p>
+                <div className="flex gap-2">
+                  <div className="flex-1 space-y-1">
+                    <Label htmlFor="tips-email" className="sr-only">Email address</Label>
+                    <Input
+                      id="tips-email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={tipsEmail}
+                      onChange={(e) => setTipsEmail(e.target.value)}
+                      disabled={isSendingTips}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleSendPersonalizedTips}
+                    disabled={isSendingTips || !tipsEmail}
+                  >
+                    {isSendingTips ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="h-4 w-4 mr-2" />
+                        Send Tips
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Optional: We'll analyze your preview and send tailored suggestions to help you create a better website.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" onClick={onClose}>
+              Close Preview
+            </Button>
+          </div>
         </div>
       </DialogContent>
 
