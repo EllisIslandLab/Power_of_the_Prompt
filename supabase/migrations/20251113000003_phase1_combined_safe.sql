@@ -26,9 +26,20 @@ EXCEPTION WHEN OTHERS THEN
     NULL;
 END $$;
 
--- Drop all triggers
-DROP TRIGGER IF EXISTS trigger_reset_demo_expiry_on_update ON demo_projects CASCADE;
-DROP TRIGGER IF EXISTS trigger_update_session_activity ON demo_sessions CASCADE;
+-- Drop all triggers (wrapped in DO block to handle missing tables)
+DO $$
+BEGIN
+    DROP TRIGGER IF EXISTS trigger_reset_demo_expiry_on_update ON demo_projects;
+EXCEPTION WHEN undefined_table THEN
+    NULL;
+END $$;
+
+DO $$
+BEGIN
+    DROP TRIGGER IF EXISTS trigger_update_session_activity ON demo_sessions;
+EXCEPTION WHEN undefined_table THEN
+    NULL;
+END $$;
 
 -- Drop all functions
 DROP FUNCTION IF EXISTS reset_demo_expiry_on_update() CASCADE;
