@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ExternalLink, BookOpen, Calendar, Loader2, ArrowLeft, RefreshCw, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
+import PaymentModal from './PaymentModal'
 
 interface PreviewModalProps {
   isOpen: boolean
@@ -24,6 +25,7 @@ export default function PreviewModal({ isOpen, onClose, onBack, hasAdditionalDet
   const [isCustomizing, setIsCustomizing] = useState(false)
   const [isRegenerating, setIsRegenerating] = useState(false)
   const [customizedHTML, setCustomizedHTML] = useState<string | null>(null)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
 
   // Track preview view when modal opens
   useEffect(() => {
@@ -86,36 +88,14 @@ export default function PreviewModal({ isOpen, onClose, onBack, hasAdditionalDet
     }
   }
 
-  const handleAICustomize = async () => {
+  const handleAICustomize = () => {
     if (!hasAdditionalDetails) {
-      toast.error('Please go back and add details about your vision in Step 3 to use AI customization')
+      toast.error('Please go back and add enhancement details or select tools for at least one service to use AI customization')
       return
     }
 
-    setIsCustomizing(true)
-    try {
-      const response = await fetch('/api/demo-generator/customize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          demoProjectId: previewData.demoProjectId,
-        }),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'AI customization failed')
-      }
-
-      const result = await response.json()
-      setCustomizedHTML(result.html)
-      toast.success('Your site has been AI-customized based on your vision!')
-    } catch (error: any) {
-      console.error('AI customization error:', error)
-      toast.error(error.message || 'Failed to customize with AI. Please try again.')
-    } finally {
-      setIsCustomizing(false)
-    }
+    // Open payment modal instead of calling API directly
+    setShowPaymentModal(true)
   }
 
   const handleRegenerate = async () => {
@@ -315,6 +295,13 @@ export default function PreviewModal({ isOpen, onClose, onBack, hasAdditionalDet
           </Button>
         </div>
       </DialogContent>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        demoProjectId={previewData.demoProjectId}
+      />
     </Dialog>
   )
 }

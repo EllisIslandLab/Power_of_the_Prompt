@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 interface Service {
   title: string
   description: string
+  additionalDetails?: string
 }
 
 interface ClaudeGeneratorInput {
@@ -15,7 +16,6 @@ interface ClaudeGeneratorInput {
   zip?: string
   businessContactEmail?: string
   services: Service[]
-  additionalDetails?: string
   colors: {
     primary: string
     secondary: string
@@ -38,7 +38,6 @@ export async function generateWithClaude(data: ClaudeGeneratorInput): Promise<st
     zip,
     businessContactEmail,
     services,
-    additionalDetails,
     colors,
   } = data
 
@@ -53,16 +52,13 @@ ${phone ? `- Phone: ${phone}` : ''}
 ${businessContactEmail ? `- Email: ${businessContactEmail}` : ''}
 ${fullAddress ? `- Address: ${fullAddress}` : ''}
 
-SERVICES:
-${services.map((s, i) => `${i + 1}. ${s.title}: ${s.description}`).join('\n')}
+SERVICES WITH ENHANCEMENT DETAILS:
+${services.map((s, i) => `${i + 1}. ${s.title}: ${s.description}${s.additionalDetails ? `\n   ✨ AI Enhancement: ${s.additionalDetails}` : ''}`).join('\n')}
 
 COLOR SCHEME:
 - Primary: ${colors.primary}
 - Secondary: ${colors.secondary}
 - Accent: ${colors.accent}
-
-CUSTOM VISION FROM CLIENT:
-${additionalDetails || 'Create a professional, modern website that builds trust and makes it easy for clients to book consultations.'}
 
 REQUIREMENTS:
 1. Create a complete, modern, responsive HTML page with embedded CSS and JavaScript
@@ -78,11 +74,11 @@ REQUIREMENTS:
 4. For the calendar section: Create time slot buttons that call showFeatureModal() when clicked
 5. For the contact form: Set onsubmit="showFeatureModal(); return false;"
 6. Make the services section engaging - each service should have visual appeal and connect to booking
-7. Use the client's vision to customize the design, layout, tone, and features
+7. Pay special attention to services with AI Enhancement details - implement those specific features and functionality requests (calendar modals, booking systems, payment processing hints, database integration references, etc.)
 8. Add smooth scrolling for navigation links
 9. Make it mobile-responsive
 10. Use modern CSS with gradients, shadows, and animations where appropriate
-11. The design should feel UNIQUE and tailored to this specific business based on their vision
+11. The design should feel UNIQUE and tailored to this specific business based on the service enhancement details provided
 
 IMPORTANT: Return ONLY the complete HTML code, no explanations or markdown. Start with <!DOCTYPE html> and end with </html>. The HTML must be complete and ready to display in an iframe.`
 
