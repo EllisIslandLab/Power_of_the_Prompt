@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
 
     let demoProjectId: string
     let userEmail: string
-    let html: string
 
     // Option 1: Download via magic link token
     if (token) {
@@ -84,7 +83,7 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    html = demoProject.generated_html
+    const html = demoProject.generated_html
 
     if (!html) {
       return NextResponse.json(

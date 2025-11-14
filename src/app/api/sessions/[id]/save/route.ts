@@ -3,9 +3,10 @@ import { getSupabase } from '@/lib/supabase'
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { currentStep, formData } = await req.json()
 
     const supabase = getSupabase(true)
@@ -20,7 +21,7 @@ export async function POST(
         business_name: formData.businessName || '',
         last_activity: new Date().toISOString()
       })
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       console.error('Error saving session:', error)
