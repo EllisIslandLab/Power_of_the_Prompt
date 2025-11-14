@@ -102,25 +102,8 @@ export async function POST(req: NextRequest) {
       console.error('Failed to send admin notification email:', emailError)
     }
 
-    // Send confirmation email to user
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/emails/send`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: formData.userEmail,
-          subject: 'Your Website Preview is Ready!',
-          type: 'demo_confirmation',
-          data: {
-            businessName: formData.businessName,
-            demoProjectId: demoProject.id,
-          },
-        }),
-      })
-    } catch (emailError) {
-      // Log but don't fail the request if email fails
-      console.error('Failed to send confirmation email:', emailError)
-    }
+    // NOTE: User confirmation email removed - preview is shown in-app
+    // Email will only be sent after purchase
 
     return NextResponse.json({
       success: true,
