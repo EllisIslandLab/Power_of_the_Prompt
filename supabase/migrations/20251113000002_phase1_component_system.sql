@@ -4,6 +4,9 @@
 -- Web Launch Academy - Revolutionary component-based website builder
 -- with AI enhancement, contest gamification, and referral system
 
+-- NOTE: The cleanup migration (20251113000001) should run first
+-- to drop all existing tables. This migration creates them fresh.
+
 -- ============================================
 -- BOILERPLATE VERSIONS
 -- ============================================
