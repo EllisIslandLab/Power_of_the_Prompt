@@ -47,25 +47,43 @@ export async function POST(request: Request) {
     // Get product from database
     const { data: product, error: productError } = await supabase
       .from('products')
-      .select('stripe_lookup_key, name')
+      .select('stripe_price_id, name, price')
       .eq('slug', productSlug)
       .single()
 
     if (productError || !product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+      console.error('Product not found in database:', productSlug, productError)
+      return NextResponse.json({ error: 'Product not found in database' }, { status: 404 })
     }
 
-    // Retrieve price from Stripe using lookup key
-    const prices = await stripe.prices.list({
-      lookup_keys: [product.stripe_lookup_key],
-      expand: ['data.product']
-    })
-
-    if (prices.data.length === 0) {
-      return NextResponse.json({ error: 'Price not found in Stripe' }, { status: 404 })
+    // Check if stripe_price_id is set
+    if (!product.stripe_price_id) {
+      console.error('Stripe price not configured for product:', productSlug)
+      return NextResponse.json({
+        error: 'Stripe price not configured. Please create the $190 price in Stripe Dashboard first.',
+        details: {
+          productSlug,
+          productName: product.name,
+          expectedPrice: product.price,
+          instructions: 'Create a $190 price in Stripe and update the product.stripe_price_id'
+        }
+      }, { status: 400 })
     }
 
-    const price = prices.data[0]
+    // Get the price from Stripe to verify it exists
+    let price
+    try {
+      price = await stripe.prices.retrieve(product.stripe_price_id)
+    } catch (err) {
+      console.error('Failed to retrieve Stripe price:', product.stripe_price_id, err)
+      return NextResponse.json({
+        error: 'Invalid Stripe price ID',
+        details: {
+          priceId: product.stripe_price_id,
+          message: 'The price ID in the database does not exist in Stripe'
+        }
+      }, { status: 400 })
+    }
 
     // Get user email
     const { data: userData } = await supabase
