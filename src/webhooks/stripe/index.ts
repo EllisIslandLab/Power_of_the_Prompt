@@ -33,10 +33,12 @@ export function createStripeWebhookRegistry(): WebhookRegistry {
   const registry = new WebhookRegistry()
 
   // Register all handlers
+  // NOTE: Later registrations overwrite earlier ones for the same event type
+  // ToolkitPurchaseHandler must be registered LAST to take precedence
   registry.registerAll([
-    new ToolkitPurchaseHandler(), // Check toolkit purchases first
-    new CheckoutCompletedHandler(), // Then course/tier purchases
+    new CheckoutCompletedHandler(), // Handles course/tier purchases
     new PaymentSucceededHandler(),
+    new ToolkitPurchaseHandler(), // Must be last - overrides CheckoutCompletedHandler
   ])
 
   return registry
