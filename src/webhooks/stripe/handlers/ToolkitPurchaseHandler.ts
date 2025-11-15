@@ -64,12 +64,14 @@ export class ToolkitPurchaseHandler extends BaseWebhookHandler {
       }
 
       // Check if purchase already recorded (idempotency)
+      // Use payment_intent if available, otherwise use session.id for $0 purchases
+      const idempotencyKey = session.payment_intent || session.id
       const { data: existingPurchase } = await supabase
         .from('purchases')
         .select('id')
         .eq('user_id', userId)
         .eq('product_id', product.id)
-        .eq('stripe_payment_intent', session.payment_intent)
+        .eq('stripe_payment_intent', idempotencyKey)
         .maybeSingle()
 
       if (existingPurchase) {
@@ -86,7 +88,7 @@ export class ToolkitPurchaseHandler extends BaseWebhookHandler {
         .insert({
           user_id: userId,
           product_id: product.id,
-          stripe_payment_intent: session.payment_intent,
+          stripe_payment_intent: idempotencyKey, // Use session.id for $0 purchases
           amount_paid: (session.amount_total || 0) / 100, // Convert cents to dollars
           status: 'completed',
           access_granted: true,
