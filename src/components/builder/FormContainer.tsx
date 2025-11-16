@@ -110,12 +110,12 @@ export function FormContainer({ sessionId, builderType }: FormContainerProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-950 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Build Your Website</h1>
+            <h1 className="text-2xl font-bold text-foreground">Build Your Website</h1>
             <SaveIndicator
               isSaving={isSaving}
               lastSaved={lastSaved}
@@ -128,7 +128,7 @@ export function FormContainer({ sessionId, builderType }: FormContainerProps) {
         </div>
 
         {/* Step Content */}
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-card rounded-lg shadow-lg p-8 border border-border">
           {currentStep === 1 && (
             <Step1BasicInfo
               data={formData}
@@ -166,14 +166,14 @@ export function FormContainer({ sessionId, builderType }: FormContainerProps) {
           <button
             onClick={handleBack}
             disabled={currentStep === 1}
-            className="px-6 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 border border-border rounded-lg font-semibold text-foreground hover:bg-accent/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             ← Back
           </button>
 
           <button
             onClick={handleNext}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 shadow-md transition-colors"
           >
             {currentStep === totalSteps ? 'Generate Preview →' : 'Next →'}
           </button>
