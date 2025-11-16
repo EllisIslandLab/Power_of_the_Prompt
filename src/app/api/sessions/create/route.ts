@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
     // Create new demo session
     const sessionId = randomUUID()
     const { data: session, error } = await supabase
+      // @ts-expect-error - demo_sessions table exists but not in generated types
       .from('demo_sessions')
+      // @ts-expect-error - inserting into demo_sessions
       .insert({
         id: sessionId,
         builder_type: builderType,
@@ -50,8 +52,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      sessionId: session.id,
-      builderType: session.builder_type
+      sessionId: (session as any).id,
+      builderType: (session as any).builder_type
     })
 
   } catch (error) {
