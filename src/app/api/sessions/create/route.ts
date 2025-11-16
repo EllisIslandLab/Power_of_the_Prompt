@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabase } from '@/lib/supabase'
-import { nanoid } from 'nanoid'
+import { randomUUID } from 'crypto'
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,19 +24,22 @@ export async function POST(req: NextRequest) {
     const supabase = getSupabase(true)
 
     // Create new demo session
-    const sessionId = nanoid()
+    const sessionId = randomUUID()
     const { data: session, error } = await supabase
-      // @ts-expect-error - demo_sessions table exists but not in generated types yet
       .from('demo_sessions')
-      // @ts-expect-error - demo_sessions fields not in generated types yet
       .insert({
         id: sessionId,
         builder_type: builderType,
-        ai_premium_paid: builderType === 'ai_premium' ? isPaid : null,
+        ai_premium_paid: builderType === 'ai_premium' ? isPaid : false,
+        ai_premium_payment_intent: stripeSessionId || null,
         ai_credits_total: builderType === 'ai_premium' ? 30 : 0,
-        stripe_session_id: stripeSessionId || null,
+        ai_credits_used: 0,
+        current_step: 1,
         status: 'building',
-        user_email: '' // Will be filled in Step 1
+        user_email: '', // Will be filled in Step 1
+        form_data: {},
+        selected_components: [],
+        ai_interactions: []
       })
       .select()
       .single()
@@ -47,8 +50,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      sessionId: (session as any).id,
-      builderType: (session as any).builder_type
+      sessionId: session.id,
+      builderType: session.builder_type
     })
 
   } catch (error) {
