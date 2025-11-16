@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BuilderLanding } from '@/components/builder/BuilderLanding'
+import { AnimatedBackground } from '@/components/effects/AnimatedBackground'
 
 export default function GetStartedPage() {
   const router = useRouter()
@@ -35,13 +36,15 @@ export default function GetStartedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white dark:from-green-950 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-16">
+    <div className="relative min-h-screen bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-950">
+      <AnimatedBackground />
+
+      <div className="relative z-10 container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4 text-gray-900 dark:text-white">
+          <h1 className="text-5xl font-bold mb-4 text-foreground">
             Build Your Professional Website
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Choose your path: Free template builder or AI-powered precision
           </p>
         </div>
@@ -51,7 +54,7 @@ export default function GetStartedPage() {
           isLoading={isCreating}
         />
 
-        <div className="mt-16 text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-16 text-center text-sm text-muted-foreground">
           <p>No credit card required to start. Build your site first, purchase when ready.</p>
         </div>
       </div>
