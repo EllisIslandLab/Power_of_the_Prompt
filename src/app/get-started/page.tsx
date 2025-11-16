@@ -13,7 +13,26 @@ export default function GetStartedPage() {
     setIsCreating(true)
 
     try {
-      // Create new demo session
+      if (type === 'ai_premium') {
+        // For AI Premium: Go to Stripe checkout first
+        const response = await fetch('/api/demo-generator/create-ai-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: '' }) // Optional: collect email first
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to create checkout')
+        }
+
+        const { url } = await response.json()
+
+        // Redirect to Stripe checkout
+        window.location.href = url
+        return
+      }
+
+      // For Free builder: Create session immediately
       const response = await fetch('/api/sessions/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -30,7 +49,7 @@ export default function GetStartedPage() {
       router.push(`/get-started/build/${sessionId}`)
     } catch (error) {
       console.error('Error creating session:', error)
-      alert('Failed to create session. Please try again.')
+      alert('Failed to start builder. Please try again.')
       setIsCreating(false)
     }
   }

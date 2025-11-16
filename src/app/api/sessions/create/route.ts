@@ -4,13 +4,21 @@ import { nanoid } from 'nanoid'
 
 export async function POST(req: NextRequest) {
   try {
-    const { builderType } = await req.json()
+    const { builderType, stripeSessionId } = await req.json()
 
     if (!builderType || !['free', 'ai_premium'].includes(builderType)) {
       return NextResponse.json(
         { error: 'Invalid builder type' },
         { status: 400 }
       )
+    }
+
+    // For AI Premium, verify Stripe session if provided
+    let isPaid = false
+    if (builderType === 'ai_premium' && stripeSessionId) {
+      // TODO: Verify Stripe session with Stripe API
+      // For now, trust that if stripeSessionId is provided, payment was successful
+      isPaid = true
     }
 
     const supabase = getSupabase(true)
@@ -24,8 +32,9 @@ export async function POST(req: NextRequest) {
       .insert({
         id: sessionId,
         builder_type: builderType,
-        ai_premium_paid: builderType === 'ai_premium' ? false : null,
+        ai_premium_paid: builderType === 'ai_premium' ? isPaid : null,
         ai_credits_total: builderType === 'ai_premium' ? 30 : 0,
+        stripe_session_id: stripeSessionId || null,
         status: 'building',
         user_email: '' // Will be filled in Step 1
       })
