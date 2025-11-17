@@ -21,7 +21,7 @@ export const POST = withMiddleware(
     // Render email template
     const html = await renderWelcomeEmail({
       fullName,
-      portalUrl: process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_URL
+      portalUrl: process.env.NEXT_PUBLIC_SITE_URL
     })
 
     // Send email

@@ -71,8 +71,8 @@ export async function POST(request) {
       price: price.id,  // Use the dynamic price ID
       quantity: 1,
     }],
-    success_url: `${process.env.NEXT_PUBLIC_URL}/portal/products/${productSlug}?success=true`,
-    cancel_url: `${process.env.NEXT_PUBLIC_URL}/portal/resources?canceled=true`,
+    success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/portal/products/${productSlug}?success=true`,
+    cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/portal/resources?canceled=true`,
   });
 
   return Response.json({ url: session.url });

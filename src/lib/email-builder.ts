@@ -41,7 +41,7 @@ export interface WelcomeEmailProps {
  * Render welcome email for new user signups
  */
 export async function renderWelcomeEmail(props: WelcomeEmailProps): Promise<string> {
-  const { fullName, portalUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000' } = props
+  const { fullName, portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' } = props
 
   return render(
     React.createElement(WelcomeEmail, {
@@ -70,7 +70,7 @@ export interface PaymentConfirmationEmailProps {
 export async function renderPaymentConfirmationEmail(
   props: PaymentConfirmationEmailProps
 ): Promise<string> {
-  const { customerName, tier, sessions = 0, portalUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000', email = '', passwordResetUrl = '' } = props
+  const { customerName, tier, sessions = 0, portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000', email = '', passwordResetUrl = '' } = props
 
   return render(
     React.createElement(PaymentConfirmationEmail, {

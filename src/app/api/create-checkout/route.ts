@@ -103,8 +103,8 @@ export async function POST(request: Request) {
         },
       ],
       allow_promotion_codes: true, // Enable coupon/promo code entry
-      success_url: `${process.env.NEXT_PUBLIC_URL}/portal/products/${productSlug}?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL}/portal/products/${productSlug}?canceled=true`,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/portal/products/${productSlug}?success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/portal/products/${productSlug}?canceled=true`,
       metadata: {
         user_id: user.id,
         product_slug: productSlug,

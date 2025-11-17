@@ -52,7 +52,7 @@
 ```bash
 STRIPE_SECRET_KEY=sk_test_... # or sk_live_... for production
 STRIPE_WEBHOOK_SECRET=whsec_... # from step 3
-NEXT_PUBLIC_URL=https://your-domain.com # or http://localhost:3000 for dev
+NEXT_PUBLIC_SITE_URL=https://your-domain.com # or http://localhost:3000 for dev
 ```
 
 ---

@@ -327,7 +327,7 @@ The webhook handler (`ToolkitPurchaseHandler`) verifies:
    ```bash
    STRIPE_SECRET_KEY=sk_live_...  # Not sk_test_
    STRIPE_WEBHOOK_SECRET=whsec_... # From live webhook
-   NEXT_PUBLIC_URL=https://www.weblaunchacademy.com
+   NEXT_PUBLIC_SITE_URL=https://www.weblaunchacademy.com
    ```
 
 3. **Update Supabase Product:**

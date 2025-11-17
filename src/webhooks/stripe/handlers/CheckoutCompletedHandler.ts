@@ -424,7 +424,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         customerName: name,
         tier: emailTier,
         sessions,
-        portalUrl: process.env.NEXT_PUBLIC_URL || 'https://www.weblaunchacademy.com',
+        portalUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.weblaunchacademy.com',
         email: customerEmail,
         passwordResetUrl
       })

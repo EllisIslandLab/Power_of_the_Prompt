@@ -63,7 +63,7 @@ const html = await renderPaymentConfirmationEmail({
   customerName: name,
   tier: emailTier,
   sessions,
-  portalUrl: process.env.NEXT_PUBLIC_URL
+  portalUrl: process.env.NEXT_PUBLIC_SITE_URL
 })
 
 await resend.emails.send({
