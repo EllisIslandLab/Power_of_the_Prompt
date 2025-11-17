@@ -16,11 +16,16 @@ async function runMigration() {
   const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
   // Database connection (use direct connection, not pooler)
-  // Convert: aws-0-us-east-2.pooler.supabase.com:6543 -> qaaautcjhztvjhizklxr.supabase.co:5432
+  // Convert: aws-0-us-east-2.pooler.supabase.com:6543 -> direct connection
   const connectionString = process.env.DATABASE_URL
     ?.replace('aws-0-us-east-2.pooler.supabase.com:6543', 'qaaautcjhztvjhizklxr.supabase.co:5432')
-    .replace('?pgbouncer=true', '')
-    || 'postgresql://postgres.qaaautcjhztvjhizklxr:LetsgoBrandon314$@qaaautcjhztvjhizklxr.supabase.co:5432/postgres';
+    .replace('?pgbouncer=true', '');
+
+  if (!connectionString) {
+    console.error('❌ ERROR: DATABASE_URL environment variable is not set.');
+    console.error('Please set DATABASE_URL in your .env file or environment.');
+    process.exit(1);
+  }
 
   console.log('🔌 Connecting to database...');
   const pool = new Pool({
