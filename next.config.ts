@@ -40,18 +40,37 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 31536000, // 1 year
   },
   webpack: (config, { isServer }) => {
-    // Suppress Supabase realtime dependency warning
+    // Suppress warnings
     config.ignoreWarnings = [
+      // Supabase realtime warnings
       {
         module: /node_modules\/@supabase\/realtime-js/,
         message: /Critical dependency: the request of a dependency is an expression/,
       },
-      // Suppress webpack cache serialization warning
+      {
+        module: /node_modules\/@supabase\/realtime-js/,
+      },
+      // Webpack cache serialization warnings
       {
         message: /Serializing big strings/,
       },
-      // Also suppress the PackFileCacheStrategy warning
-      (warning: any) => warning.message.includes('webpack.cache.PackFileCacheStrategy'),
+      {
+        message: /webpack\.cache\.PackFileCacheStrategy/,
+      },
+      // Edge Runtime warnings for Node.js APIs (safe to ignore if using Node.js runtime)
+      {
+        message: /A Node\.js API is used.*which is not supported in the Edge Runtime/,
+      },
+      // Generic warning filter
+      (warning: any) => {
+        if (!warning.message) return false;
+        return (
+          warning.message.includes('PackFileCacheStrategy') ||
+          warning.message.includes('Serializing big strings') ||
+          warning.message.includes('Edge Runtime') ||
+          warning.message.includes('process.versions')
+        );
+      },
     ];
 
     // Bundle optimization
