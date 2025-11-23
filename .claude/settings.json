@@ -1,0 +1,56 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/config-schema.json",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Bash(npm run:*)",
+      "Bash(npx:*)",
+      "Bash(git:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(node:*)",
+      "Bash(tsx:*)",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(sudo:*)",
+      "Bash(chmod 777:*)"
+    ]
+  },
+  "model": "claude-sonnet-4-5-20250929",
+  "customInstructions": "## Power of the Prompt - Project Guidelines\n\n### Architecture Mastery Toolkit\nThis project uses senior-level design patterns documented in `.claudeconfig/`:\n- Read `.claudeconfig/instructions.md` for coding standards\n- Use patterns from `.claudeconfig/patterns.md`\n- Apply templates from `.claudeconfig/templates/`\n- Follow diagnostics in `.claudeconfig/diagnostics.md`\n\n### Tech Stack\n- Next.js 15 (App Router) with TypeScript\n- React 19, Tailwind CSS v4, Radix UI\n- Supabase (PostgreSQL + Auth + Realtime)\n- Stripe for payments\n- Jitsi Meet for video\n- Resend for emails\n- Anthropic Claude for AI features\n- Upstash Redis for caching/rate limiting\n\n### Code Conventions\n1. Use existing utilities from `src/lib/` before creating new ones\n2. Validate all API inputs with Zod schemas from `src/lib/schemas.ts`\n3. Use Pino logger from `src/lib/logger.ts` for structured logging\n4. Follow Repository Pattern for data access\n5. Apply rate limiting to sensitive API endpoints\n6. Respect Row-Level Security (RLS) policies\n\n### File Organization\n- API routes: `src/app/api/[feature]/route.ts`\n- Components: `src/components/[category]/[Component].tsx`\n- Utilities: `src/lib/[utility].ts`\n- Types: `src/types/[domain].ts`\n\n### Security Requirements\n- Never expose service role keys to client\n- Validate all user inputs server-side\n- Use parameterized queries (Supabase handles this)\n- Check user permissions before sensitive operations\n- Rate limit authentication and sensitive endpoints\n\n### Styling\n- Use Tailwind CSS utility classes\n- Follow existing component patterns in `src/components/ui/`\n- Prefer Radix UI primitives for accessible components\n- Support dark mode via DarkModeContext",
+  "mcpServers": {
+    "airtable": {
+      "command": "npx",
+      "args": ["-y", "@airtable/mcp-server"]
+    }
+  },
+  "contextPaths": [
+    ".claudeconfig/instructions.md",
+    ".claude/message.md",
+    "src/lib/schemas.ts",
+    "src/types/database.ts",
+    "src/middleware.ts"
+  ],
+  "ignorePatterns": [
+    "node_modules",
+    ".next",
+    ".git",
+    "*.log",
+    ".env*",
+    "coverage",
+    "dist",
+    ".vercel",
+    ".supabase"
+  ]
+}
