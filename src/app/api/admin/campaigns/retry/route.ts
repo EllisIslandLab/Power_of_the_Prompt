@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     let errors: string[] = []
 
     // Get course data from campaign if available
-    const targetAudience = campaign.target_audience as any
+    const targetAudience = (campaign as any).target_audience
     const courseData = targetAudience?.selectedCourse || {}
 
     // Send emails to each recipient with delay to avoid rate limits
@@ -65,7 +65,8 @@ export async function POST(request: NextRequest) {
         const recipientName = lead.display_name || lead.first_name || 'there'
 
         // Process email content with variables
-        let processedContent = campaign.content
+        const campaignData = campaign as any
+        let processedContent = campaignData.content
 
         // Replace variables
         const variables = {
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
         const emailData = {
           from: 'Web Launch Academy <hello@weblaunchacademy.com>',
           to: [lead.email],
-          subject: campaign.subject,
+          subject: campaignData.subject,
           html: processedContent,
         }
 
@@ -146,7 +147,7 @@ export async function POST(request: NextRequest) {
       await supabase
         .from('campaigns' as any)
         .update({
-          sent_count: campaign.sent_count + sentCount
+          sent_count: (campaign as any).sent_count + sentCount
         })
         .eq('id', campaignId)
     }
