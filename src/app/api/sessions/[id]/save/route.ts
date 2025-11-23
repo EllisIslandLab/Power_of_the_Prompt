@@ -13,8 +13,7 @@ export async function POST(
 
     // Update the session
     const { error } = await supabase
-      // @ts-expect-error - demo_projects table exists but not in generated types yet
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .update({
         current_step: currentStep,
         form_data: formData,
