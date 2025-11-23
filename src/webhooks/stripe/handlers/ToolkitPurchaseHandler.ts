@@ -53,7 +53,7 @@ export class ToolkitPurchaseHandler extends BaseWebhookHandler {
     try {
       // Get product from database
       const { data: product, error: productError } = await supabase
-        .from('products')
+        .from('products' as any)
         .select('id, name, price')
         .eq('slug', productSlug)
         .single()
@@ -67,7 +67,7 @@ export class ToolkitPurchaseHandler extends BaseWebhookHandler {
       // Use payment_intent if available, otherwise use session.id for $0 purchases
       const idempotencyKey = session.payment_intent || session.id
       const { data: existingPurchase } = await supabase
-        .from('purchases')
+        .from('purchases' as any)
         .select('id')
         .eq('user_id', userId)
         .eq('product_id', product.id)
@@ -84,7 +84,7 @@ export class ToolkitPurchaseHandler extends BaseWebhookHandler {
 
       // Create purchase record
       const { data: purchase, error: purchaseError } = await supabase
-        .from('purchases')
+        .from('purchases' as any)
         .insert({
           user_id: userId,
           product_id: product.id,

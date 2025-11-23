@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     let targetCoachId = coach_id
     if (!targetCoachId) {
       const { data: adminUsers } = await supabase
-        .from('users')
+        .from('users' as any)
         .select('id')
         .eq('role', 'admin')
         .limit(1)
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     const bookingEnd = new Date(bookingStart.getTime() + duration * 60 * 1000)
 
     const { data: conflicts, error: conflictError } = await supabase
-      .from('session_bookings')
+      .from('session_bookings' as any)
       .select('id')
       .eq('coach_id', targetCoachId)
       .eq('booking_date', booking_date)
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     // Create the booking
     const { data: booking, error: bookingError } = await supabase
-      .from('session_bookings')
+      .from('session_bookings' as any)
       .insert({
         user_id: user.id,
         coach_id: targetCoachId,
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
 
     // Get user details for email
     const { data: userData } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('email, full_name')
       .eq('id', user.id)
       .single()
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
 
       // Update booking to mark email sent
       await supabase
-        .from('session_bookings')
+        .from('session_bookings' as any)
         .update({ confirmation_email_sent: true })
         .eq('id', booking.id)
 

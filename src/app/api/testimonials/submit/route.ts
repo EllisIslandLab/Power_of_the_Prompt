@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
 
       // Check if email already exists in leads table
       const { data: existingEmail, error: checkError } = await supabase
-        .from('leads')
+        .from('leads' as any)
         .select('email, status')
         .eq('email', emailToCheck)
         .single()

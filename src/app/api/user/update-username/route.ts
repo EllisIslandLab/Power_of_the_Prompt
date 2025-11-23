@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     // Check if username is already taken
     const { data: existingUser } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('id')
       .eq('username', username)
       .neq('id', user.id)
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     // Update username
     const { error: updateError } = await supabase
-      .from('users')
+      .from('users' as any)
       .update({ username })
       .eq('id', user.id)
 

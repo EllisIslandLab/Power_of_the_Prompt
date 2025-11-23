@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Find user with this email
     const { data: user, error } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('*')
       .eq('email', email.toLowerCase())
       .single()
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Update verification token
     const { error: updateError } = await supabase
-      .from('users')
+      .from('users' as any)
       .update({
         email_verification_token: verificationToken,
         email_verification_expires_at: verificationExpires.toISOString(),

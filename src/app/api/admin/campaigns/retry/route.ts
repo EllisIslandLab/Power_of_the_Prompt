@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     // Get campaign details
     const { data: campaign, error: campaignError } = await supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .select('*')
       .eq('id', campaignId)
       .single()
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Get lead details for the recipients
     const { data: leads, error: leadsError } = await supabase
-      .from('leads')
+      .from('leads' as any)
       .select('email, first_name, last_name, display_name')
       .in('email', recipients)
 
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         if (response.ok) {
           // Record successful send
           await supabase
-            .from('campaign_sends')
+            .from('campaign_sends' as any)
             .insert({
               campaign_id: campaignId,
               recipient_email: lead.email,
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     // Update campaign sent_count
     if (sentCount > 0) {
       await supabase
-        .from('campaigns')
+        .from('campaigns' as any)
         .update({
           sent_count: campaign.sent_count + sentCount
         })

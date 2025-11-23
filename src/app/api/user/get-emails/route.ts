@@ -35,7 +35,7 @@ export async function GET() {
 
     // Get all emails for the user
     const { data: emails, error: emailsError } = await supabase
-      .from('user_emails')
+      .from('user_emails' as any)
       .select('id, email, is_primary, verified, created_at')
       .eq('user_id', user.id)
       .order('is_primary', { ascending: false })

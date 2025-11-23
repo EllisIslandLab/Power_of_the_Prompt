@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     // Fetch the demo project to verify it exists and isn't expired
     const { data: demoProject, error: fetchError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .select('*')
       .eq('id', demoProjectId)
       .single()

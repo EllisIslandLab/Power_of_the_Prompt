@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Check if email already exists
     const { data: existingEmail } = await supabase
-      .from('user_emails')
+      .from('user_emails' as any)
       .select('id, user_id')
       .eq('email', email)
       .maybeSingle()
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Add the email
     const { error: insertError } = await supabase
-      .from('user_emails')
+      .from('user_emails' as any)
       .insert({
         user_id: user.id,
         email,

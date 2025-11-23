@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Verify the email belongs to the user
     const { data: emailRecord } = await supabase
-      .from('user_emails')
+      .from('user_emails' as any)
       .select('id, user_id, is_primary')
       .eq('id', emailId)
       .eq('user_id', user.id)
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     // Check if this is the last email (the trigger will prevent deletion, but we can provide a better error message)
     const { count } = await supabase
-      .from('user_emails')
+      .from('user_emails' as any)
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id)
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     // Delete the email (trigger will handle making another email primary if needed)
     const { error: deleteError } = await supabase
-      .from('user_emails')
+      .from('user_emails' as any)
       .delete()
       .eq('id', emailId)
 

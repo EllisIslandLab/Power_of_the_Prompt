@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     if (type === 'database') {
       // Fetch template from database
       const { data: dbTemplate, error } = await supabase
-        .from('email_templates')
+        .from('email_templates' as any)
         .select('*')
         .eq('id', template)
         .single()

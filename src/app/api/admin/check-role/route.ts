@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user exists in public.users table and get their role
     const { data: userRecord, error: dbError } = await supabaseAdmin
-      .from('users')
+      .from('users' as any)
       .select('role, email, full_name')
       .eq('id', user.id)
       .single()

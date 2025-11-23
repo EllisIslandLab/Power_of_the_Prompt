@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Update the user's profile in the public.users table
     const { error: updateError } = await supabase
-      .from('users')
+      .from('users' as any)
       .update({
         phone_number: phoneNumber || null,
         sms_consent: smsConsent,

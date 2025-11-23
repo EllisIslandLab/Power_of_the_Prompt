@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100')
 
     let query = supabase
-      .from('leads')
+      .from('leads' as any)
       .select('*')
       .eq('status', status)
       .order('signup_date', { ascending: false })
@@ -100,7 +100,7 @@ async function migrateFromAirtable() {
 
         // Check if lead already exists
         const { data: existingLead } = await supabase
-          .from('leads')
+          .from('leads' as any)
           .select('id')
           .eq('email', email.toLowerCase())
           .single()
@@ -111,7 +111,7 @@ async function migrateFromAirtable() {
 
         // Insert new lead
         const { error: insertError } = await supabase
-          .from('leads')
+          .from('leads' as any)
           .insert({
             email: email.toLowerCase(),
             name: name || null,
@@ -170,7 +170,7 @@ async function addLead(body: any) {
 
     // Check if lead already exists
     const { data: existingLead } = await supabase
-      .from('leads')
+      .from('leads' as any)
       .select('id')
       .eq('email', email.toLowerCase())
       .single()
@@ -183,7 +183,7 @@ async function addLead(body: any) {
     }
 
     const { data: lead, error } = await supabase
-      .from('leads')
+      .from('leads' as any)
       .insert({
         email: email.toLowerCase(),
         name: name || null,
@@ -230,7 +230,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    let query = supabase.from('leads').delete()
+    let query = supabase.from('leads' as any).delete()
 
     if (leadId) {
       query = query.eq('id', leadId)

@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     // Update campaign_sends table if this is from a campaign
     if (campaignId) {
       const { data: updated, error: updateError } = await supabase
-        .from('campaign_sends')
+        .from('campaign_sends' as any)
         .update({
           opened_at: new Date().toISOString()
         })
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     // Update leads table engagement tracking
     if (source === 'waitlist' || !campaignId) {
       await supabase
-        .from('leads')
+        .from('leads' as any)
         .update({
           last_engagement: new Date().toISOString()
         })

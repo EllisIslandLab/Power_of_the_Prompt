@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Check if email is already taken
     const { data: existingUser } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('id')
       .eq('email', newEmail.toLowerCase())
       .single()

@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
     // Build query
     let query = supabase
-      .from('session_bookings')
+      .from('session_bookings' as any)
       .select(`
         *,
         user:user_id(id, email, full_name),
@@ -147,7 +147,7 @@ export async function PATCH(request: NextRequest) {
 
     // Verify the booking belongs to the user
     const { data: booking, error: verifyError } = await supabase
-      .from('session_bookings')
+      .from('session_bookings' as any)
       .select('*')
       .eq('id', booking_id)
       .eq('user_id', user.id)
@@ -162,7 +162,7 @@ export async function PATCH(request: NextRequest) {
 
     // Update the booking
     const { data: updated, error: updateError } = await supabase
-      .from('session_bookings')
+      .from('session_bookings' as any)
       .update({ status })
       .eq('id', booking_id)
       .select()

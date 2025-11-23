@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
     // Check if user already exists
     const { data: existingUser } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('*')
       .eq('email', adminEmail)
       .single();
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     if (existingUser) {
       // Update existing user to admin
       const { error: updateError } = await supabase
-        .from('users')
+        .from('users' as any)
         .update({
           role: 'admin',
           tier: 'vip',
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     } else {
       // Create new admin user
       const { data: newUser, error: insertError } = await supabase
-        .from('users')
+        .from('users' as any)
         .insert({
           email: adminEmail,
           full_name: 'Matthew Ellis',

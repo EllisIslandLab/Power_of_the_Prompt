@@ -51,7 +51,7 @@ export class AIPremiumHandler extends BaseWebhookHandler {
 
       if (!userId) {
         const { data: existingUser } = await supabase
-          .from('users')
+          .from('users' as any)
           .select('id')
           .eq('email', userEmail)
           .single()
@@ -60,7 +60,7 @@ export class AIPremiumHandler extends BaseWebhookHandler {
           userId = existingUser.id
         } else {
           const { data: newUser, error } = await supabase
-            .from('users')
+            .from('users' as any)
             .insert({
               email: userEmail,
               full_name: session.customer_details?.name || '',
@@ -83,7 +83,7 @@ export class AIPremiumHandler extends BaseWebhookHandler {
 
       // 3. Create purchase record
       await supabase
-        .from('purchases')
+        .from('purchases' as any)
         .insert({
           user_id: userId,
           product_slug: 'ai_premium',
@@ -95,7 +95,7 @@ export class AIPremiumHandler extends BaseWebhookHandler {
       // 4. Update demo_projects if this was purchased during demo building
       if (returnState.sessionId) {
         await supabase
-          .from('demo_projects')
+          .from('demo_projects' as any)
           .update({
             ai_premium_paid: true,
             ai_premium_payment_intent: session.payment_intent as string,
@@ -123,7 +123,7 @@ export class AIPremiumHandler extends BaseWebhookHandler {
 
       // 6. Log email
       await supabase
-        .from('email_logs')
+        .from('email_logs' as any)
         .insert({
           user_id: userId,
           demo_project_id: returnState.sessionId || null,
@@ -135,7 +135,7 @@ export class AIPremiumHandler extends BaseWebhookHandler {
 
       // 7. Update checkout session status
       await supabase
-        .from('stripe_checkout_sessions')
+        .from('stripe_checkout_sessions' as any)
         .update({ status: 'completed' })
         .eq('session_id', session.id)
 

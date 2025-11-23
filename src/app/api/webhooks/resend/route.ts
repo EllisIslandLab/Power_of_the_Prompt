@@ -119,7 +119,7 @@ async function handleEmailOpened(payload: ResendWebhookPayload) {
 
   // Find the campaign_send record
   const { data: campaignSend, error: findError } = await supabase
-    .from('campaign_sends')
+    .from('campaign_sends' as any)
     .select('id, campaign_id, opened_at')
     .eq('resend_email_id', email_id)
     .single()
@@ -138,7 +138,7 @@ async function handleEmailOpened(payload: ResendWebhookPayload) {
   if (!campaignSend.opened_at) {
     // Update campaign_sends record
     const { error: updateError } = await supabase
-      .from('campaign_sends')
+      .from('campaign_sends' as any)
       .update({ opened_at: openedAt })
       .eq('id', campaignSend.id)
 
@@ -170,7 +170,7 @@ async function handleEmailClicked(payload: ResendWebhookPayload) {
 
   // Find the campaign_send record
   const { data: campaignSend, error: findError } = await supabase
-    .from('campaign_sends')
+    .from('campaign_sends' as any)
     .select('id, campaign_id, clicked_at')
     .eq('resend_email_id', email_id)
     .single()
@@ -184,7 +184,7 @@ async function handleEmailClicked(payload: ResendWebhookPayload) {
   if (!campaignSend.clicked_at) {
     // Update campaign_sends record
     const { error: updateError } = await supabase
-      .from('campaign_sends')
+      .from('campaign_sends' as any)
       .update({ clicked_at: clickedAt })
       .eq('id', campaignSend.id)
 
@@ -213,7 +213,7 @@ async function handleEmailBounced(payload: ResendWebhookPayload) {
 
   // Update campaign_sends record
   const { error } = await supabase
-    .from('campaign_sends')
+    .from('campaign_sends' as any)
     .update({
       bounced_at: payload.created_at,
       send_error: `Bounced: ${bounce?.type || 'unknown'}`
@@ -232,7 +232,7 @@ async function handleEmailComplained(payload: ResendWebhookPayload) {
 
   // Mark as unsubscribed in campaign_sends
   const { error: updateError } = await supabase
-    .from('campaign_sends')
+    .from('campaign_sends' as any)
     .update({
       unsubscribed_at: payload.created_at
     })

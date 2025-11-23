@@ -323,7 +323,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
 
     // Verify the public.users record was created by trigger
     const { data: publicUser, error: publicUserError } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('id, email, tier, payment_status')
       .eq('id', userId)
       .single()
@@ -333,7 +333,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
       // Create it manually if trigger failed
       checkoutLogger.warn({ userId }, 'Attempting to manually create public.users record')
       const { error: manualInsertError } = await supabase
-        .from('users')
+        .from('users' as any)
         .insert({
           id: userId,
           email: customerEmail.toLowerCase(),

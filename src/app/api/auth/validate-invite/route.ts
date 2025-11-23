@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     // Query the invite_tokens table to validate the token
     const { data: invite, error } = await supabase
-      .from('invite_tokens')
+      .from('invite_tokens' as any)
       .select('*')
       .eq('token', token)
       .single()

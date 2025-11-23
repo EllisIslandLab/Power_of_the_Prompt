@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
 
     let query = supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .select(`
         *,
         campaign_sends(count)
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     const campaignStatus: 'draft' | 'sending' | 'sent' | 'failed' = 'draft'
 
     const { data: campaign, error } = await supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .insert({
         subject,
         content,
@@ -113,7 +113,7 @@ export async function PUT(request: NextRequest) {
 
     // Check if campaign is in draft status
     const { data: existingCampaign, error: fetchError } = await supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .select('status')
       .eq('id', id)
       .single()
@@ -145,7 +145,7 @@ export async function PUT(request: NextRequest) {
     if (scheduledAt !== undefined) updateData.scheduled_at = scheduledAt
 
     const { data: campaign, error } = await supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .update(updateData)
       .eq('id', id)
       .select()
@@ -181,7 +181,7 @@ async function getRecipientCount(targetAudience: any): Promise<number> {
     }
 
     let query = supabase
-      .from('leads')
+      .from('leads' as any)
       .select('id', { count: 'exact', head: true })
       .eq('status', 'waitlist')
 

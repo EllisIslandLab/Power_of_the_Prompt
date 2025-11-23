@@ -31,13 +31,13 @@ export async function POST(req: NextRequest) {
 
     // Delete any existing user record with this email (to avoid conflicts)
     await supabase
-      .from('users')
+      .from('users' as any)
       .delete()
       .eq('email', email);
 
     // Create new user record with the auth user ID
     const { error: insertError } = await supabase
-      .from('users')
+      .from('users' as any)
       .insert({
         id: authData.user.id,
         email: email,

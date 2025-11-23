@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     // Get product from database
     const { data: product, error: productError } = await supabase
-      .from('products')
+      .from('products' as any)
       .select('stripe_price_id, name, price')
       .eq('slug', productSlug)
       .single()
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
 
     // Get user email
     const { data: userData } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('email')
       .eq('id', user.id)
       .single()

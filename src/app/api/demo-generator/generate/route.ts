@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     // Create demo project in database
     const { data: demoProject, error: dbError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .insert({
         template_id: templateId,
         user_email: formData.userEmail,

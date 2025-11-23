@@ -22,7 +22,7 @@ export async function GET() {
       // Check if it's a federal holiday
       const dateStr = checkDate.toISOString().split('T')[0]
       const { data: holidays } = await supabase
-        .from('federal_holidays')
+        .from('federal_holidays' as any)
         .select('*')
         .eq('holiday_date', dateStr)
         .limit(1)
@@ -43,7 +43,7 @@ export async function GET() {
         // Check if slot is blocked in database
         const slotEnd = new Date(slotTime.getTime() + (60 * 60 * 1000))
         const { data: blocks } = await supabase
-          .from('consultation_blocks')
+          .from('consultation_blocks' as any)
           .select('*')
           .or(`and(start_time.lte.${slotTime.toISOString()},end_time.gt.${slotTime.toISOString()}),and(start_time.lt.${slotEnd.toISOString()},end_time.gte.${slotEnd.toISOString()}),and(start_time.gte.${slotTime.toISOString()},end_time.lte.${slotEnd.toISOString()})`)
 

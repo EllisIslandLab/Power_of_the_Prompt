@@ -95,7 +95,7 @@ export async function POST() {
   try {
     // Find the template with category 'questions'
     const { data: templates, error: fetchError } = await supabase
-      .from('email_templates')
+      .from('email_templates' as any)
       .select('*')
       .eq('category', 'questions')
       .order('created_at', { ascending: false })
@@ -120,7 +120,7 @@ export async function POST() {
 
     // Update the template
     const { error: updateError } = await supabase
-      .from('email_templates')
+      .from('email_templates' as any)
       .update({
         content_template: newContent,
         subject_template: 'Welcome to Web Launch Academy - Let\'s Get Started!'

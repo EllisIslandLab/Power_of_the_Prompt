@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     // Check admin role
     const { data: userRecord } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('role')
       .eq('id', user.id)
       .single();
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     // Fetch the template
     const { data: template, error: templateError } = await supabase
-      .from('email_templates')
+      .from('email_templates' as any)
       .select('*')
       .eq('id', templateId)
       .single();
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
     // Fetch all leads (exclude barnabas.financial.coach.1@gmail.com)
     const { data: leads, error: leadsError } = await supabase
-      .from('leads')
+      .from('leads' as any)
       .select('email, name')
       .neq('email', 'barnabas.financial.coach.1@gmail.com')
       .eq('status', 'waitlist');
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 
         // Update lead's last_engagement
         await supabase
-          .from('leads')
+          .from('leads' as any)
           .update({ last_engagement: new Date().toISOString() })
           .eq('email', lead.email);
 

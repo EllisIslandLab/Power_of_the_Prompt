@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     // Track interaction in database
     const { data: interaction, error: interactionError } = await supabase
-      .from('demo_interactions')
+      .from('demo_interactions' as any)
       .insert({
         demo_project_id: demoProjectId,
         interaction_type: interactionType,
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     // Update demo project status based on interaction type
     if (interactionType === 'viewed_preview') {
       await supabase
-        .from('demo_projects')
+        .from('demo_projects' as any)
         .update({
           status: 'viewed',
           viewed_at: new Date().toISOString(),
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
         .eq('status', 'generated') // Only update if still in 'generated' status
     } else if (interactionType === 'purchased_textbook' || interactionType === 'booked_call') {
       await supabase
-        .from('demo_projects')
+        .from('demo_projects' as any)
         .update({
           status: 'converted',
         })

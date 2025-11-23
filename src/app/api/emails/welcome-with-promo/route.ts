@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     // ============================================
 
     const { data: template } = await supabase
-      .from('email_templates')
+      .from('email_templates' as any)
       .select('*')
       .eq('name', 'Welcome Series - Email 1')
       .single()
@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
 
     // Update lead record if exists
     const { data: existingLead } = await supabase
-      .from('leads')
+      .from('leads' as any)
       .select('tags')
       .eq('email', userEmail)
       .single()
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
       : [...currentTags, 'welcome_sent']
 
     await supabase
-      .from('leads')
+      .from('leads' as any)
       .update({
         last_engagement: new Date().toISOString(),
         tags: updatedTags

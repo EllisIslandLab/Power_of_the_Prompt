@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Check if there's already an active invite for this email
     const { data: existingInvite } = await supabase
-      .from('invite_tokens')
+      .from('invite_tokens' as any)
       .select('*')
       .eq('email', email.toLowerCase())
       .is('used_at', null)
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     // Create invite token
     const { data: invite, error } = await supabase
-      .from('invite_tokens')
+      .from('invite_tokens' as any)
       .insert({
         token,
         email: email.toLowerCase(),

@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     // 1. Get demo project and verify AI credits
     const { data: project, error: projectError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .select('*')
       .eq('id', sessionId)
       .single()
@@ -114,7 +114,7 @@ The user has ${creditsRemaining} AI questions remaining.`
     // @ts-expect-error - ai_questions_asked exists but not in generated types yet
     const existingQuestions = project.ai_questions_asked || []
     await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .update({
         ai_credits_used: newCreditsUsed,
         ai_questions_asked: [

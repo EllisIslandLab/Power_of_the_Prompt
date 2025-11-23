@@ -16,7 +16,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
     // Get session
     const { data: session, error: fetchError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .select('*')
       .eq('id', sessionId)
       .single()
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
 
     // Update session with preview
     const { error: updateError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .update({
         preview_html: previewHtml,
         preview_generated_at: new Date().toISOString(),

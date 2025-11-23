@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     // Check rate limit - one free preview per email ever
     const { data: existingSession } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .select('id, preview_generated_at')
       .eq('user_email', email.toLowerCase())
       .not('preview_generated_at', 'is', null)
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       const sessionId = randomUUID()
 
       const { error: insertError } = await supabase
-        .from('demo_projects')
+        .from('demo_projects' as any)
         .insert({
           id: sessionId,
           user_email: email.toLowerCase(),
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     const sessionId = randomUUID()
 
     const { data: session, error } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .insert({
         id: sessionId,
         user_email: email.toLowerCase(),

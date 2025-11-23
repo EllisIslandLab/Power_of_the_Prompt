@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     // Get the demo project details to personalize tips
     const supabase = getSupabase(true)
     const { data: demoProject, error: dbError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .select('*')
       .eq('id', demoProjectId)
       .single()

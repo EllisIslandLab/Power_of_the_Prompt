@@ -65,7 +65,7 @@ export async function POST() {
     while (attempts < maxAttempts) {
       // Check if username exists
       const { data: existing } = await supabase
-        .from('users')
+        .from('users' as any)
         .select('id')
         .eq('username', username)
         .maybeSingle()
@@ -73,7 +73,7 @@ export async function POST() {
       if (!existing) {
         // Username is unique, update user
         const { error: updateError } = await supabase
-          .from('users')
+          .from('users' as any)
           .update({ username })
           .eq('id', user.id)
 

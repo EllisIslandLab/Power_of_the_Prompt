@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Verify the email belongs to the user
     const { data: emailRecord } = await supabase
-      .from('user_emails')
+      .from('user_emails' as any)
       .select('id, user_id')
       .eq('id', emailId)
       .eq('user_id', user.id)
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     // Set this email as primary (trigger will automatically unset other primary emails)
     const { error: updateError } = await supabase
-      .from('user_emails')
+      .from('user_emails' as any)
       .update({ is_primary: true })
       .eq('id', emailId)
 

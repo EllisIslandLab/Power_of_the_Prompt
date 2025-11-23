@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     // Find user with this verification token
     const { data: user, error } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('*')
       .eq('email_verification_token', token)
       .single()
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Update user to mark email as verified
     const { error: updateError } = await supabase
-      .from('users')
+      .from('users' as any)
       .update({
         email_verified: true,
         email_verification_token: null,

@@ -17,7 +17,7 @@ export async function DELETE(request: NextRequest) {
 
     // Delete campaign sends first (foreign key constraint)
     const { error: sendsError } = await supabase
-      .from('campaign_sends')
+      .from('campaign_sends' as any)
       .delete()
       .eq('campaign_id', campaignId)
 
@@ -31,7 +31,7 @@ export async function DELETE(request: NextRequest) {
 
     // Delete the campaign
     const { error: campaignError } = await supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .delete()
       .eq('id', campaignId)
 

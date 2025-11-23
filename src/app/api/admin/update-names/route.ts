@@ -55,7 +55,7 @@ export async function POST() {
 
     for (const lead of leads) {
       const { data, error } = await supabase
-        .from('leads')
+        .from('leads' as any)
         .update({
           display_name: lead.display_name,
           first_name: lead.first_name,

@@ -62,7 +62,7 @@ async function migrateFromAirtable() {
 
         // Check if lead already exists
         const { data: existingLead, error: checkError } = await supabase
-          .from('leads')
+          .from('leads' as any)
           .select('id, custom_fields')
           .eq('email', email.toLowerCase())
           .single()
@@ -102,7 +102,7 @@ async function migrateFromAirtable() {
           }
 
           const { error: updateError } = await supabase
-            .from('leads')
+            .from('leads' as any)
             .update({
               custom_fields: updatedCustomFields,
               tags: leadData.tags, // Update tags to include migration tag
@@ -119,7 +119,7 @@ async function migrateFromAirtable() {
         } else {
           // Insert new lead
           const { error: insertError } = await supabase
-            .from('leads')
+            .from('leads' as any)
             .insert(leadData)
 
           if (insertError) {

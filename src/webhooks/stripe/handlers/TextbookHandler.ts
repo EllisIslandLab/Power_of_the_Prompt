@@ -51,7 +51,7 @@ export class TextbookHandler extends BaseWebhookHandler {
 
       if (!userId) {
         const { data: existingUser } = await supabase
-          .from('users')
+          .from('users' as any)
           .select('id')
           .eq('email', userEmail)
           .single()
@@ -60,7 +60,7 @@ export class TextbookHandler extends BaseWebhookHandler {
           userId = existingUser.id
         } else {
           const { data: newUser, error } = await supabase
-            .from('users')
+            .from('users' as any)
             .insert({
               email: userEmail,
               full_name: session.customer_details?.name || '',
@@ -75,7 +75,7 @@ export class TextbookHandler extends BaseWebhookHandler {
 
       // 2. Update user's total spent and highest tier
       const { data: userData } = await supabase
-        .from('users')
+        .from('users' as any)
         .select('total_spent, highest_tier_purchased')
         .eq('id', userId)
         .single()
@@ -87,7 +87,7 @@ export class TextbookHandler extends BaseWebhookHandler {
       const newHighestTier = newTierIndex > currentTierIndex ? 'textbook' : userData?.highest_tier_purchased
 
       await supabase
-        .from('users')
+        .from('users' as any)
         .update({
           total_spent: newTotalSpent,
           highest_tier_purchased: newHighestTier,
@@ -96,7 +96,7 @@ export class TextbookHandler extends BaseWebhookHandler {
 
       // 3. Create purchase record
       await supabase
-        .from('purchases')
+        .from('purchases' as any)
         .insert({
           user_id: userId,
           product_slug: 'textbook',
@@ -122,7 +122,7 @@ export class TextbookHandler extends BaseWebhookHandler {
 
       // 5. Log email
       await supabase
-        .from('email_logs')
+        .from('email_logs' as any)
         .insert({
           user_id: userId,
           email_type: 'textbook_purchase',
@@ -133,7 +133,7 @@ export class TextbookHandler extends BaseWebhookHandler {
 
       // 6. Update checkout session status
       await supabase
-        .from('stripe_checkout_sessions')
+        .from('stripe_checkout_sessions' as any)
         .update({ status: 'completed' })
         .eq('session_id', session.id)
 

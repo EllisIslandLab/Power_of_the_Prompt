@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch the demo project
     const { data: demoProject, error: fetchError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .select('*')
       .eq('id', demoProjectId)
       .single()
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
 
     // Verify demo exists and belongs to user
     const { data: demoProject, error: demoError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .select('*')
       .eq('id', demoProjectId)
       .eq('user_email', userEmail)

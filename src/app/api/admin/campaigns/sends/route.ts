@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch all sends for this campaign
     const { data: sends, error } = await supabase
-      .from('campaign_sends')
+      .from('campaign_sends' as any)
       .select('*')
       .eq('campaign_id', campaignId)
       .order('sent_at', { ascending: false })

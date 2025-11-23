@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     // Check admin role
     const { data: userRecord } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('role')
       .eq('id', user.id)
       .single();
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch all active email templates
     const { data: templates, error } = await supabase
-      .from('email_templates')
+      .from('email_templates' as any)
       .select('id, name, description, subject_template, content_template, category')
       .eq('is_active', true)
       .order('name');

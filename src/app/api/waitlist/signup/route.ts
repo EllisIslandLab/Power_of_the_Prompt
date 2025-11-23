@@ -42,7 +42,7 @@ export const POST = withMiddleware(
 
     // Check if email already exists in leads table
     const { data: existingEmail, error: checkError } = await supabase
-      .from('leads')
+      .from('leads' as any)
       .select('email')
       .eq('email', email.toLowerCase())
       .single()
@@ -64,7 +64,7 @@ export const POST = withMiddleware(
 
     // Add email to leads table with waitlist status
     const { data: newSignup, error: insertError } = await supabase
-      .from('leads')
+      .from('leads' as any)
       .insert([
         {
           email: email.toLowerCase(),

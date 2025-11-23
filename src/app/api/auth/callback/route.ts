@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       // Manually sync the email verification status to our users table
       try {
         const { error: updateError } = await supabase
-          .from('users')
+          .from('users' as any)
           .update({
             email_verified: !!data.user.email_confirmed_at,
             updated_at: new Date().toISOString()

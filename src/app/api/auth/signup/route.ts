@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Validate invite token
     const { data: invite, error: inviteError } = await supabase
-      .from('invite_tokens')
+      .from('invite_tokens' as any)
       .select('*')
       .eq('token', inviteToken)
       .single()
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
 
           // Update the user profile with new full name
           const { error: updateError } = await supabase
-            .from('users')
+            .from('users' as any)
             .update({
               full_name: fullName,
               updated_at: new Date().toISOString()
@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
     // The handle_new_user trigger creates the base profile, we enhance it here
     try {
       const { error: updateError } = await supabase
-        .from('users')
+        .from('users' as any)
         .update({
           tier: invite.tier,
           payment_status: invite.tier === 'full' ? 'paid' : 'trial',
@@ -242,14 +242,14 @@ export async function POST(request: NextRequest) {
     // Auto-assign to active cohort (if exists)
     try {
       const { data: activeCohort } = await supabase
-        .from('cohorts')
+        .from('cohorts' as any)
         .select('id')
         .eq('is_active', true)
         .single()
 
       if (activeCohort) {
         const { error: cohortError } = await supabase
-          .from('cohort_members')
+          .from('cohort_members' as any)
           .insert({
             cohort_id: activeCohort.id,
             user_id: data.user.id,
@@ -275,7 +275,7 @@ export async function POST(request: NextRequest) {
     // Mark invite token as used
     try {
       await supabase
-        .from('invite_tokens')
+        .from('invite_tokens' as any)
         .update({
           used_at: new Date().toISOString(),
           updated_at: new Date().toISOString()

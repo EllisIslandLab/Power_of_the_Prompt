@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     // Fetch the demo project
     const { data: demoProject, error: fetchError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .select('*')
       .eq('id', demoProjectId)
       .single()
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     // Update the demo project with AI-generated HTML and payment info
     const { error: updateError } = await supabase
-      .from('demo_projects')
+      .from('demo_projects' as any)
       .update({
         generated_html: customHTML,
         status: 'generated',

@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const activeOnly = searchParams.get('active') !== 'false'
 
     let query = supabase
-      .from('email_templates')
+      .from('email_templates' as any)
       .select('*')
       .order('created_at', { ascending: false })
 
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: template, error } = await supabase
-      .from('email_templates')
+      .from('email_templates' as any)
       .insert({
         name,
         description: description || null,
@@ -133,7 +133,7 @@ export async function PUT(request: NextRequest) {
     if (isActive !== undefined) updateData.is_active = isActive
 
     const { data: template, error } = await supabase
-      .from('email_templates')
+      .from('email_templates' as any)
       .update(updateData)
       .eq('id', id)
       .select()
@@ -174,7 +174,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { error } = await supabase
-      .from('email_templates')
+      .from('email_templates' as any)
       .delete()
       .eq('id', id)
 

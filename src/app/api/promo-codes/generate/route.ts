@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     // Save course promo code to database
     const { data: coursePromoData, error: coursePromoError } = await supabase
-      .from('promo_codes')
+      .from('promo_codes' as any)
       .insert({
         code: coursePromoCode.code!,
         stripe_promo_code_id: coursePromoCode.id,
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
 
     // Save guarantee promo code to database
     const { data: guaranteePromoData, error: guaranteePromoError } = await supabase
-      .from('promo_codes')
+      .from('promo_codes' as any)
       .insert({
         code: guaranteePromoCode.code!,
         stripe_promo_code_id: guaranteePromoCode.id,
@@ -221,7 +221,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = getSupabase(true)
 
-    let query = supabase.from('promo_codes').select('*')
+    let query = supabase.from('promo_codes' as any).select('*')
 
     if (code) {
       query = query.eq('code', code)

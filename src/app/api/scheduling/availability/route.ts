@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     let targetCoachId = coachId
     if (!targetCoachId) {
       const { data: adminUsers } = await supabase
-        .from('users')
+        .from('users' as any)
         .select('id')
         .eq('role', 'admin')
         .limit(1)
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch availability slots for this day
     const { data: availabilitySlots, error: availError } = await supabase
-      .from('availability_slots')
+      .from('availability_slots' as any)
       .select('*')
       .eq('coach_id', targetCoachId)
       .eq('is_active', true)
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
     endOfDay.setHours(23, 59, 59, 999)
 
     const { data: existingBookings, error: bookingError } = await supabase
-      .from('session_bookings')
+      .from('session_bookings' as any)
       .select('start_time, duration_minutes')
       .eq('coach_id', targetCoachId)
       .eq('booking_date', date)

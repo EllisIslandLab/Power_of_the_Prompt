@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Check if slot is already booked
     const slotEnd = new Date(slotDate.getTime() + (60 * 60 * 1000))
     const { data: existingBlocks } = await supabase
-      .from('consultation_blocks')
+      .from('consultation_blocks' as any)
       .select('*')
       .or(`and(start_time.lte.${slotDate.toISOString()},end_time.gt.${slotDate.toISOString()}),and(start_time.lt.${slotEnd.toISOString()},end_time.gte.${slotEnd.toISOString()})`)
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     // Create consultation in Supabase
     const { data: consultation, error: consultationError } = await supabase
-      .from('consultations')
+      .from('consultations' as any)
       .insert({
         full_name: fullName,
         email: email,
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
       // Get email template
       const { data: template } = await supabase
-        .from('email_templates')
+        .from('email_templates' as any)
         .select('*')
         .eq('name', 'Consultation Confirmation')
         .single()
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
 
         // Update consultation to mark confirmation sent
         await supabase
-          .from('consultations')
+          .from('consultations' as any)
           .update({
             confirmation_sent: true,
             confirmation_sent_at: new Date().toISOString()
@@ -181,7 +181,7 @@ async function createVideoSession(sessionData: {
 
     // First, try to find or create a user for the guest
     let { data: existingUser } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('*')
       .eq('email', sessionData.userEmail)
       .single()
@@ -197,7 +197,7 @@ async function createVideoSession(sessionData: {
       const guestUserId = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
       const { data: newUser, error: userError } = await supabase
-        .from('users')
+        .from('users' as any)
         .insert({
           id: guestUserId,
           full_name: sessionData.userName,
@@ -227,7 +227,7 @@ async function createVideoSession(sessionData: {
 
     // Create course session for consultation
     const { data: courseSession, error: sessionError } = await supabase
-      .from('course_sessions')
+      .from('course_sessions' as any)
       .insert({
         session_name: sessionData.sessionName,
         session_date: startTime.toISOString(),

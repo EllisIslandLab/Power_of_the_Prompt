@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     // Get campaign details
     const { data: campaign, error: campaignError } = await supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .select('*')
       .eq('id', campaignId)
       .single()
@@ -132,7 +132,7 @@ async function sendCampaignToAll(campaign: any) {
   try {
     // Update campaign status to sending
     await supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .update({ status: 'sending' })
       .eq('id', campaign.id)
 
@@ -141,7 +141,7 @@ async function sendCampaignToAll(campaign: any) {
 
     if (recipients.length === 0) {
       await supabase
-        .from('campaigns')
+        .from('campaigns' as any)
         .update({
           status: 'failed',
           sent_count: 0
@@ -158,7 +158,7 @@ async function sendCampaignToAll(campaign: any) {
 
     if (!resendApiKey) {
       await supabase
-        .from('campaigns')
+        .from('campaigns' as any)
         .update({ status: 'failed' })
         .eq('id', campaign.id)
 
@@ -222,7 +222,7 @@ async function sendCampaignToAll(campaign: any) {
 
             // Record successful send with Resend email ID
             await supabase
-              .from('campaign_sends')
+              .from('campaign_sends' as any)
               .insert({
                 campaign_id: campaign.id,
                 recipient_email: recipient.email,
@@ -252,7 +252,7 @@ async function sendCampaignToAll(campaign: any) {
     // Update campaign with final status
     const finalStatus = sentCount > 0 ? 'sent' : 'failed'
     await supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .update({
         status: finalStatus,
         sent_count: sentCount,
@@ -280,7 +280,7 @@ async function sendCampaignToAll(campaign: any) {
 
     // Update campaign status to failed
     await supabase
-      .from('campaigns')
+      .from('campaigns' as any)
       .update({ status: 'failed' })
       .eq('id', campaign.id)
 
@@ -296,7 +296,7 @@ async function getRecipients(targetAudience: any) {
     // Handle manual recipients
     if (targetAudience?.source === 'manual' && targetAudience?.manualRecipients?.length > 0) {
       const { data: recipients, error } = await supabase
-        .from('leads')
+        .from('leads' as any)
         .select('email, first_name, last_name, display_name')
         .in('email', targetAudience.manualRecipients)
 
@@ -310,7 +310,7 @@ async function getRecipients(targetAudience: any) {
 
     // Handle automatic audience selection
     let query = supabase
-      .from('leads')
+      .from('leads' as any)
       .select('email, first_name, last_name, display_name')
       .eq('status', 'waitlist') // Only active waitlist leads by default
 

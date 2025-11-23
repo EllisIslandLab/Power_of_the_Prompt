@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
     // Check public.users table
     const { data: publicUsers, error: publicError } = await supabase
-      .from('users')
+      .from('users' as any)
       .select('*')
       .eq('email', email);
 
@@ -43,7 +43,7 @@ export async function DELETE(req: NextRequest) {
 
     // Delete from public.users table
     const { error: publicDeleteError } = await supabase
-      .from('users')
+      .from('users' as any)
       .delete()
       .eq('email', email);
 

@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const twentyFiveHoursFromNow = new Date(now.getTime() + (25 * 60 * 60 * 1000))
 
     const { data: consultations24h } = await supabase
-      .from('consultations')
+      .from('consultations' as any)
       .select('*')
       .eq('status', 'scheduled')
       .eq('reminder_24h_sent', false)
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     if (consultations24h && consultations24h.length > 0) {
       // Get 24-hour reminder template
       const { data: template24h } = await supabase
-        .from('email_templates')
+        .from('email_templates' as any)
         .select('*')
         .eq('name', 'Consultation Reminder 24h')
         .single()
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
 
           // Mark reminder as sent
           await supabase
-            .from('consultations')
+            .from('consultations' as any)
             .update({
               reminder_24h_sent: true,
               reminder_24h_sent_at: now.toISOString()
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     const ninetyMinutesFromNow = new Date(now.getTime() + (90 * 60 * 1000))
 
     const { data: consultations1h } = await supabase
-      .from('consultations')
+      .from('consultations' as any)
       .select('*')
       .eq('status', 'scheduled')
       .eq('reminder_1h_sent', false)
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
     if (consultations1h && consultations1h.length > 0) {
       // Get 1-hour reminder template
       const { data: template1h } = await supabase
-        .from('email_templates')
+        .from('email_templates' as any)
         .select('*')
         .eq('name', 'Consultation Reminder 1h')
         .single()
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
 
           // Mark reminder as sent
           await supabase
-            .from('consultations')
+            .from('consultations' as any)
             .update({
               reminder_1h_sent: true,
               reminder_1h_sent_at: now.toISOString()

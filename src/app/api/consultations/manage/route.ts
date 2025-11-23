@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     // Get consultation details
     const { data: consultation, error: fetchError } = await supabase
-      .from('consultations')
+      .from('consultations' as any)
       .select('*')
       .eq('id', consultationId)
       .single()
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     if (action === 'cancel') {
       const { error: cancelError } = await supabase
-        .from('consultations')
+        .from('consultations' as any)
         .update({
           status: 'cancelled',
           cancelled_at: new Date().toISOString(),
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
       // Check if new slot is available
       const slotEnd = new Date(newDate.getTime() + (60 * 60 * 1000))
       const { data: existingBlocks } = await supabase
-        .from('consultation_blocks')
+        .from('consultation_blocks' as any)
         .select('*')
         .or(`and(start_time.lte.${newDate.toISOString()},end_time.gt.${newDate.toISOString()}),and(start_time.lt.${slotEnd.toISOString()},end_time.gte.${slotEnd.toISOString()})`)
 
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
 
       // Update consultation
       const { error: rescheduleError } = await supabase
-        .from('consultations')
+        .from('consultations' as any)
         .update({
           scheduled_date: newDate.toISOString(),
           rescheduled_from: consultationId,
@@ -269,7 +269,7 @@ export async function GET(request: NextRequest) {
     const supabase = getSupabase(true)
 
     const { data: consultation, error } = await supabase
-      .from('consultations')
+      .from('consultations' as any)
       .select('*')
       .eq('id', consultationId)
       .single()
