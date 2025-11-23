@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
         .order('created_at', { ascending: true })
 
       if (purchases) {
-        purchaseHistory = purchases.map(p => ({
+        purchaseHistory = (purchases as Array<{ product_slug: string; amount_paid: number }>).map(p => ({
           tier: p.product_slug,
           amount_paid: p.amount_paid
         }))
