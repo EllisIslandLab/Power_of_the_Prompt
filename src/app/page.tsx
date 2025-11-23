@@ -34,11 +34,11 @@ export default function Home() {
     // Check for expired verification link in URL hash
     const checkForExpiredLink = () => {
       const hash = window.location.hash
-      
+
       if (hash.includes('error=access_denied') && hash.includes('error_code=otp_expired')) {
         // console.log('🔍 Detected expired verification link') // Commented out for auth transition
         setShowExpiredModal(true)
-        
+
         // Clean the URL hash
         window.history.replaceState({}, document.title, window.location.pathname)
       }
@@ -49,7 +49,7 @@ export default function Home() {
 
     // Also check when hash changes (in case user navigates)
     window.addEventListener('hashchange', checkForExpiredLink)
-    
+
     return () => {
       window.removeEventListener('hashchange', checkForExpiredLink)
     }
@@ -58,9 +58,9 @@ export default function Home() {
   return (
     <>
       <ScrollProgress />
-      <ExpiredLinkModal 
-        isOpen={showExpiredModal} 
-        onClose={() => setShowExpiredModal(false)} 
+      <ExpiredLinkModal
+        isOpen={showExpiredModal}
+        onClose={() => setShowExpiredModal(false)}
       />
       <main className="scroll-smooth">
         {/* Coming Soon Page - Simplified Version */}

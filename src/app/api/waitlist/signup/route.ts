@@ -5,6 +5,7 @@ import { resendAdapter } from '@/adapters'
 import { withMiddleware, withValidation, withLogging, withErrorHandling, ConflictError } from '@/api-middleware'
 import { logger } from '@/lib/logger'
 import { alertCriticalError } from '@/lib/error-alerts'
+import { renderBuilderPromoEmail } from '@/lib/email-builder'
 
 const supabase = getAdminClient()
 
@@ -58,7 +59,7 @@ export const POST = withMiddleware(
     }
 
     if (existingEmail) {
-      throw new ConflictError('You\'re already on our waitlist! We\'ll notify you when we launch.')
+      throw new ConflictError('You\'ve already been sent a promo code! Check your inbox (including spam/junk) for your BUILDER25 code. Email hello@weblaunchacademy.com if you need help.')
     }
 
     // Add email to leads table with waitlist status
@@ -92,11 +93,31 @@ export const POST = withMiddleware(
     // Send welcome email via Resend
     const displayName = firstName || 'there'
     try {
-      await resendAdapter.sendEmail({
-        from: 'Web Launch Academy <hello@weblaunchacademy.com>',
-        to: email,
-        subject: `🚀 Welcome${firstName ? `, ${firstName}` : ''}! Let's get started...`,
-        html: `
+      // Send different email based on source
+      const isBuilderPopup = source === 'get-started-popup'
+
+      if (isBuilderPopup) {
+        // Send Builder Promo email with BUILDER25 code
+        const emailHtml = await renderBuilderPromoEmail({
+          customerName: displayName,
+          promoCode: 'BUILDER25',
+          builderUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+        })
+
+        await resendAdapter.sendEmail({
+          from: 'Web Launch Academy <hello@weblaunchacademy.com>',
+          to: email,
+          subject: `🎁 Your BUILDER25 Promo Code - Help Us Build Better Templates!`,
+          html: emailHtml,
+          replyTo: 'hello@weblaunchacademy.com'
+        })
+      } else {
+        // Send standard welcome email
+        await resendAdapter.sendEmail({
+          from: 'Web Launch Academy <hello@weblaunchacademy.com>',
+          to: email,
+          subject: `🚀 Welcome${firstName ? `, ${firstName}` : ''}! Let's get started...`,
+          html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
               <h1 style="color: #2563eb; font-size: 28px; margin-bottom: 10px;">Welcome to Web Launch Academy${firstName ? `, ${firstName}` : ''}!</h1>
@@ -151,7 +172,8 @@ export const POST = withMiddleware(
             </div>
           </div>
         `
-      })
+        })
+      }
     } catch (emailError) {
       logger.error({ error: emailError }, 'Email send error')
       // Don't fail the signup if email fails - they're still on the list

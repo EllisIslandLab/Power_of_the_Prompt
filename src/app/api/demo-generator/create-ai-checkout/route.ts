@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
+      allow_promotion_codes: true, // Enable coupon/promo codes like BUILDER25
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/get-started/build?session_id={CHECKOUT_SESSION_ID}&payment=success`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/get-started?payment=canceled`,
       metadata: {

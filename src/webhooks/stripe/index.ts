@@ -19,12 +19,16 @@ export { WebhookRegistry } from './WebhookRegistry'
 export { CheckoutCompletedHandler } from './handlers/CheckoutCompletedHandler'
 export { PaymentSucceededHandler } from './handlers/PaymentSucceededHandler'
 export { ToolkitPurchaseHandler } from './handlers/ToolkitPurchaseHandler'
+export { AIPremiumHandler } from './handlers/AIPremiumHandler'
+export { TextbookHandler } from './handlers/TextbookHandler'
 
 // Factory function to create a registry with all handlers registered
 import { WebhookRegistry } from './WebhookRegistry'
 import { CheckoutCompletedHandler } from './handlers/CheckoutCompletedHandler'
 import { PaymentSucceededHandler } from './handlers/PaymentSucceededHandler'
 import { ToolkitPurchaseHandler } from './handlers/ToolkitPurchaseHandler'
+import { AIPremiumHandler } from './handlers/AIPremiumHandler'
+import { TextbookHandler } from './handlers/TextbookHandler'
 
 /**
  * Create a Stripe webhook registry with all handlers registered
@@ -33,12 +37,14 @@ export function createStripeWebhookRegistry(): WebhookRegistry {
   const registry = new WebhookRegistry()
 
   // Register all handlers
-  // NOTE: Later registrations overwrite earlier ones for the same event type
-  // ToolkitPurchaseHandler must be registered LAST to take precedence
+  // NOTE: Handlers are checked in order via canHandle() method
+  // More specific handlers should be registered first
   registry.registerAll([
-    new CheckoutCompletedHandler(), // Handles course/tier purchases
     new PaymentSucceededHandler(),
-    new ToolkitPurchaseHandler(), // Must be last - overrides CheckoutCompletedHandler
+    new AIPremiumHandler(),        // Phase 2A: AI Premium Builder ($5)
+    new TextbookHandler(),          // Phase 2A: Launch Guide ($19)
+    new ToolkitPurchaseHandler(),   // Architecture Mastery Toolkit ($190)
+    new CheckoutCompletedHandler(), // Fallback for other purchases
   ])
 
   return registry

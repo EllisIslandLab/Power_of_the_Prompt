@@ -3,6 +3,9 @@ import * as React from 'react'
 import { WelcomeEmail } from '@/emails/WelcomeEmail'
 import { PaymentConfirmationEmail } from '@/emails/PaymentConfirmationEmail'
 import { PasswordResetEmail } from '@/emails/PasswordResetEmail'
+import { AIPremiumConfirmationEmail } from '@/emails/AIPremiumConfirmationEmail'
+import { TextbookConfirmationEmail } from '@/emails/TextbookConfirmationEmail'
+import { BuilderPromoEmail } from '@/emails/BuilderPromoEmail'
 
 /**
  * Email Builder Utility
@@ -125,6 +128,92 @@ export const EmailSubjects = {
   EMAIL_VERIFICATION: 'Verify your Web Launch Academy email',
   SESSION_REMINDER: 'Your Level Up session is coming up',
 } as const
+
+// ============================================================================
+// AI PREMIUM CONFIRMATION EMAIL
+// ============================================================================
+
+export interface AIPremiumConfirmationEmailProps {
+  customerName: string
+  returnUrl?: string
+  sessionId?: string
+}
+
+/**
+ * Render AI Premium Builder confirmation email
+ */
+export async function renderAIPremiumConfirmationEmail(
+  props: AIPremiumConfirmationEmailProps
+): Promise<string> {
+  const { customerName, returnUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000', sessionId = '' } = props
+
+  return render(
+    React.createElement(AIPremiumConfirmationEmail, {
+      customerName,
+      returnUrl,
+      sessionId
+    })
+  )
+}
+
+// ============================================================================
+// TEXTBOOK CONFIRMATION EMAIL
+// ============================================================================
+
+export interface TextbookConfirmationEmailProps {
+  customerName: string
+  portalUrl?: string
+  email?: string
+}
+
+/**
+ * Render Launch Guide (Textbook) confirmation email
+ */
+export async function renderTextbookConfirmationEmail(
+  props: TextbookConfirmationEmailProps
+): Promise<string> {
+  const { customerName, portalUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000', email = '' } = props
+
+  return render(
+    React.createElement(TextbookConfirmationEmail, {
+      customerName,
+      portalUrl,
+      email
+    })
+  )
+}
+
+// ============================================================================
+// BUILDER PROMO EMAIL
+// ============================================================================
+
+export interface BuilderPromoEmailProps {
+  customerName: string
+  promoCode?: string
+  builderUrl?: string
+}
+
+/**
+ * Render Builder Promo email with exclusive promo code
+ * Sent to get-started popup signups to encourage AI Premium usage
+ */
+export async function renderBuilderPromoEmail(
+  props: BuilderPromoEmailProps
+): Promise<string> {
+  const {
+    customerName,
+    promoCode = 'BUILDER25',
+    builderUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  } = props
+
+  return render(
+    React.createElement(BuilderPromoEmail, {
+      customerName,
+      promoCode,
+      builderUrl: `${builderUrl}/get-started`
+    })
+  )
+}
 
 // ============================================================================
 // EMAIL SENDER

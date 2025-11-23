@@ -1,7 +1,7 @@
 interface PurchaseHistory {
   tiers: Array<{
     tier: string
-    amountPaid: number
+    amount_paid: number
   }>
 }
 
@@ -29,7 +29,7 @@ export function calculateRolloverPrice(
 
   // Calculate total spent so far
   const totalSpentSoFar = purchaseHistory.tiers.reduce(
-    (sum, purchase) => sum + purchase.amountPaid,
+    (sum, purchase) => sum + purchase.amount_paid,
     0
   )
 
@@ -43,9 +43,10 @@ export function calculateRolloverPrice(
   // Calculate rollover credit (what they've paid already)
   const rolloverCredit = totalSpentSoFar
 
-  // Final price = (Original - Skip Discount) - Rollover Credit
-  const priceAfterDiscount = originalPrice - skipDiscount
-  const finalPrice = Math.max(0, priceAfterDiscount - rolloverCredit)
+  // Apply ONLY the better discount (rollover OR skip, not both)
+  // This prevents loopholes where users could stack discounts
+  const bestDiscount = Math.max(rolloverCredit, skipDiscount)
+  const finalPrice = Math.max(0, originalPrice - bestDiscount)
 
   return {
     originalPrice,
@@ -73,7 +74,7 @@ export function calculateTierPricing(userPurchases: Array<{ tier: string; amount
   const purchaseHistory: PurchaseHistory = {
     tiers: userPurchases.map(p => ({
       tier: p.tier,
-      amountPaid: p.amount_paid
+      amount_paid: p.amount_paid
     }))
   }
 

@@ -4,24 +4,24 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ProgressBar } from '@/components/shared/ProgressBar'
 import { SaveIndicator } from '@/components/shared/SaveIndicator'
-import { Step1BasicInfo } from './steps/Step1-BasicInfo'
-import { Step2CategorySelection } from './steps/Step2-CategorySelection'
-import { Step3SectionBuilder } from './steps/Step3-SectionBuilder'
-import { Step4Review } from './steps/Step4-Review'
+import { StepCategory } from './steps/StepCategory'
+import { StepBusinessInfo } from './steps/StepBusinessInfo'
+import { StepPreview } from './steps/StepPreview'
 
 interface FormContainerProps {
   sessionId: string
-  builderType: 'free' | 'ai_premium'
+  initialData?: any
 }
 
-export function FormContainer({ sessionId, builderType }: FormContainerProps) {
+export function FormContainer({ sessionId, initialData }: FormContainerProps) {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
-  const [formData, setFormData] = useState<any>({})
+  const [formData, setFormData] = useState<any>(initialData || {})
   const [isSaving, setIsSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
-  const totalSteps = 4
+  const totalSteps = 3
 
   // Auto-save to localStorage
   useEffect(() => {
@@ -72,30 +72,47 @@ export function FormContainer({ sessionId, builderType }: FormContainerProps) {
     }
   }, [sessionId])
 
-  function handleNext() {
+  async function handleNext() {
     // Validate required fields
     if (currentStep === 1) {
-      if (!formData.businessName || !formData.email) {
-        alert('Please fill in Business Name and Email')
+      if (!formData.categoryId && !formData.customCategory) {
+        alert('Please select a category or enter a custom one')
         return
       }
     } else if (currentStep === 2) {
-      if (!formData.businessCategory) {
-        alert('Please select a business category')
-        return
-      }
-    } else if (currentStep === 3) {
-      if (!formData.sections || formData.sections.length === 0) {
-        alert('Please add at least one section')
+      if (!formData.businessName) {
+        alert('Please enter your business name')
         return
       }
     }
 
     if (currentStep < totalSteps) {
+      // If moving to preview step, generate the preview
+      if (currentStep === 2) {
+        setIsGenerating(true)
+        try {
+          const response = await fetch(`/api/sessions/${sessionId}/generate-preview`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          })
+
+          if (!response.ok) {
+            throw new Error('Failed to generate preview')
+          }
+
+          const { previewHtml } = await response.json()
+          setFormData((prev: any) => ({ ...prev, previewHtml }))
+        } catch (error) {
+          console.error('Error generating preview:', error)
+          alert('Failed to generate preview. Please try again.')
+          setIsGenerating(false)
+          return
+        }
+        setIsGenerating(false)
+      }
+
       setCurrentStep(currentStep + 1)
-    } else {
-      // Final step - redirect to preview generation
-      router.push(`/get-started/build/${sessionId}/preview`)
     }
   }
 
@@ -110,12 +127,14 @@ export function FormContainer({ sessionId, builderType }: FormContainerProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-950 py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-foreground">Build Your Website</h1>
+            <h1 className="text-2xl font-bold text-foreground">
+              {currentStep === 3 ? 'Your Preview is Ready!' : 'Build Your Website'}
+            </h1>
             <SaveIndicator
               isSaving={isSaving}
               lastSaved={lastSaved}
@@ -128,56 +147,59 @@ export function FormContainer({ sessionId, builderType }: FormContainerProps) {
         </div>
 
         {/* Step Content */}
-        <div className="bg-card rounded-lg shadow-lg p-8 border border-border">
+        <div className="bg-card rounded-2xl shadow-xl p-8 border border-border">
           {currentStep === 1 && (
-            <Step1BasicInfo
+            <StepCategory
               data={formData}
               onChange={updateFormData}
-              builderType={builderType}
             />
           )}
 
           {currentStep === 2 && (
-            <Step2CategorySelection
+            <StepBusinessInfo
               data={formData}
               onChange={updateFormData}
             />
           )}
 
           {currentStep === 3 && (
-            <Step3SectionBuilder
-              data={formData}
-              onChange={updateFormData}
+            <StepPreview
               sessionId={sessionId}
-              builderType={builderType}
-            />
-          )}
-
-          {currentStep === 4 && (
-            <Step4Review
               data={formData}
               onChange={updateFormData}
             />
           )}
         </div>
 
-        {/* Navigation */}
-        <div className="mt-8 flex items-center justify-between">
-          <button
-            onClick={handleBack}
-            disabled={currentStep === 1}
-            className="px-6 py-3 border border-border rounded-lg font-semibold text-foreground hover:bg-accent/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            ← Back
-          </button>
+        {/* Navigation - Hide on preview step (it has its own CTAs) */}
+        {currentStep < 3 && (
+          <div className="mt-8 flex items-center justify-between">
+            <button
+              onClick={handleBack}
+              disabled={currentStep === 1}
+              className="px-6 py-3 border border-border rounded-lg font-semibold text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Back
+            </button>
 
-          <button
-            onClick={handleNext}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 shadow-md transition-colors"
-          >
-            {currentStep === totalSteps ? 'Generate Preview →' : 'Next →'}
-          </button>
-        </div>
+            <button
+              onClick={handleNext}
+              disabled={isGenerating}
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 shadow-md transition-all disabled:opacity-50"
+            >
+              {isGenerating ? (
+                <span className="flex items-center gap-2">
+                  <div className="h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                  Generating Preview...
+                </span>
+              ) : currentStep === 2 ? (
+                'Generate My Preview'
+              ) : (
+                'Next'
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
