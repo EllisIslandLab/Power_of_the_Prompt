@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { ProgressBar } from '@/components/shared/ProgressBar'
 import { SaveIndicator } from '@/components/shared/SaveIndicator'
 import { StepCategory } from './steps/StepCategory'
@@ -14,7 +13,6 @@ interface FormContainerProps {
 }
 
 export function FormContainer({ sessionId, initialData }: FormContainerProps) {
-  const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState<any>(initialData || {})
   const [isSaving, setIsSaving] = useState(false)
@@ -185,7 +183,7 @@ export function FormContainer({ sessionId, initialData }: FormContainerProps) {
             <button
               onClick={handleNext}
               disabled={isGenerating}
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 shadow-md transition-all disabled:opacity-50"
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold shadow-md transition-all disabled:opacity-50 hover:border-2 hover:border-accent"
             >
               {isGenerating ? (
                 <span className="flex items-center gap-2">

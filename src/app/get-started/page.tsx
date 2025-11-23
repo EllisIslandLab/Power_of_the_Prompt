@@ -123,7 +123,7 @@ export default function GetStartedPage() {
               <Button
                 type="submit"
                 disabled={isLoading || !email}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-lg shadow-lg"
+                className="w-full bg-primary text-primary-foreground font-semibold py-6 text-lg shadow-lg hover:border-2 hover:border-accent transition-all"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -141,7 +141,7 @@ export default function GetStartedPage() {
                   {promoCode ? (
                     'Promo code will be validated on submit'
                   ) : (
-                    <>$5 entry fee • <span className="text-green-600 dark:text-green-400">Rolls over to any purchase</span></>
+                    <>$5 entry fee • <span className="text-accent">Rolls over to any purchase</span></>
                   )}
                 </p>
               </div>
@@ -165,7 +165,7 @@ export default function GetStartedPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-card/50 rounded-xl">
-              <Shield className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
+              <Shield className="h-5 w-5 text-accent mt-0.5" />
               <div>
                 <p className="font-medium text-foreground text-sm">Price Rolls Over</p>
                 <p className="text-xs text-muted-foreground">Never pay twice</p>

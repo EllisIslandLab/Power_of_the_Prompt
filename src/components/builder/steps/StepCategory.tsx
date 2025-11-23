@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
-import { FolderOpen, Plus, ChevronRight } from 'lucide-react'
+import { Plus, ChevronRight, Zap } from 'lucide-react'
 
 interface Category {
   id: string
@@ -216,9 +216,9 @@ export function StepCategory({ data, onChange }: StepCategoryProps) {
 
       {/* Selection Summary */}
       {(selectedSubcategory || customCategory) && (
-        <div className="bg-green-600/10 p-4 rounded-xl border border-green-600/30">
-          <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-            <FolderOpen className="h-5 w-5" />
+        <div className="bg-accent/10 p-4 rounded-xl border border-accent/30">
+          <div className="flex items-center gap-2 text-accent">
+            <Zap className="h-5 w-5" />
             <span className="font-medium">
               {customCategory ? (
                 <>Custom: {customCategory}</>

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Check, ArrowLeft, DollarSign, Clock, BookOpen, Video, Package } from 'lucide-react'
+import { Zap, ArrowLeft, DollarSign, Clock, BookOpen, Video, Package } from 'lucide-react'
 
 interface StepPreviewProps {
   sessionId: string
@@ -110,7 +110,7 @@ export function StepPreview({ sessionId, data, onChange }: StepPreviewProps) {
                 <span className="text-4xl font-bold text-primary">$190</span>
                 <span className="text-muted-foreground">one-time</span>
               </div>
-              <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+              <p className="text-sm text-accent mt-1">
                 Your $5 entry fee is already applied!
               </p>
             </div>
@@ -125,7 +125,7 @@ export function StepPreview({ sessionId, data, onChange }: StepPreviewProps) {
                 'Lifetime updates'
               ].map((feature) => (
                 <li key={feature} className="flex items-center gap-3 text-muted-foreground">
-                  <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                  <Zap className="h-5 w-5 text-accent flex-shrink-0" />
                   {feature}
                 </li>
               ))}
@@ -134,7 +134,7 @@ export function StepPreview({ sessionId, data, onChange }: StepPreviewProps) {
             <Button
               onClick={handleMainPurchase}
               disabled={isProcessing}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 text-lg"
+              className="w-full bg-primary text-primary-foreground font-semibold py-6 text-lg hover:border-2 hover:border-accent transition-all"
             >
               {isProcessing ? 'Processing...' : 'Get Complete Package'}
             </Button>
@@ -206,15 +206,15 @@ export function StepPreview({ sessionId, data, onChange }: StepPreviewProps) {
 
               <ul className="space-y-2 mb-4 text-sm">
                 <li className="flex items-center gap-2 text-muted-foreground">
-                  <Check className="h-4 w-4 text-green-500" />
+                  <Zap className="h-4 w-4 text-accent" />
                   Complete implementation guide
                 </li>
                 <li className="flex items-center gap-2 text-muted-foreground">
-                  <Check className="h-4 w-4 text-green-500" />
+                  <Zap className="h-4 w-4 text-accent" />
                   Your generated code
                 </li>
                 <li className="flex items-center gap-2 text-muted-foreground">
-                  <Check className="h-4 w-4 text-green-500" />
+                  <Zap className="h-4 w-4 text-accent" />
                   Raw recordings included free
                 </li>
                 <li className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
@@ -223,14 +223,14 @@ export function StepPreview({ sessionId, data, onChange }: StepPreviewProps) {
                 </li>
               </ul>
 
-              <p className="text-xs text-green-600 dark:text-green-400 mb-4">
+              <p className="text-xs text-accent mb-4">
                 This $29 rolls over to any future upgrade!
               </p>
 
               <Button
                 onClick={() => handleObjectionPurchase('guidebook')}
                 disabled={isProcessing}
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                className="w-full bg-amber-600 text-white hover:border-2 hover:border-accent transition-all"
               >
                 {isProcessing ? 'Processing...' : 'Get Guidebook - $29'}
               </Button>
@@ -266,7 +266,7 @@ export function StepPreview({ sessionId, data, onChange }: StepPreviewProps) {
               <Button
                 onClick={() => handleObjectionPurchase('guidebook')}
                 disabled={isProcessing}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="w-full bg-primary text-primary-foreground hover:border-2 hover:border-accent transition-all"
               >
                 {isProcessing ? 'Processing...' : 'Save My Progress - $29'}
               </Button>
@@ -303,7 +303,7 @@ export function StepPreview({ sessionId, data, onChange }: StepPreviewProps) {
                   <div className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-primary" />
                     <span className="font-medium text-foreground">Complete Package</span>
-                    <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">Popular</span>
+                    <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded">Popular</span>
                   </div>
                   <span className="font-bold text-primary">$190</span>
                 </div>
@@ -313,7 +313,7 @@ export function StepPreview({ sessionId, data, onChange }: StepPreviewProps) {
                 <Button
                   onClick={handleMainPurchase}
                   disabled={isProcessing}
-                  className="w-full bg-primary hover:bg-primary/90"
+                  className="w-full bg-primary hover:border-2 hover:border-accent transition-all"
                 >
                   Select
                 </Button>
