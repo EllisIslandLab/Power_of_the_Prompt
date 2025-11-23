@@ -13,7 +13,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const supabase = getSupabase(true)
 
     const { data: subcategories, error } = await supabase
-      .from('website_subcategories')
+      .from('website_subcategories' as any)
       .select('id, category_id, name, slug, description')
       .eq('category_id', id)
       .eq('is_active', true)

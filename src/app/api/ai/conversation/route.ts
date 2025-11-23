@@ -128,9 +128,8 @@ The user has ${creditsRemaining} AI questions remaining.`
       .eq('id', sessionId)
 
     // 5. Log interaction
-    // @ts-expect-error - ai_interaction_logs table exists but not in generated types
     await supabase
-      .from('ai_interaction_logs')
+      .from('ai_interaction_logs' as any)
       .insert({
         demo_project_id: sessionId,
         user_id: (project as any).user_id,

@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     if (user) {
       const { data: purchases } = await supabase
-        .from('purchases')
+        .from('purchases' as any)
         .select('product_slug, amount_paid')
         .eq('user_id', user.id)
         .order('created_at', { ascending: true })
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
 
     // Log checkout session to database
     await supabase
-      .from('stripe_checkout_sessions')
+      .from('stripe_checkout_sessions' as any)
       .insert({
         session_id: session.id,
         user_id: user?.id || null,

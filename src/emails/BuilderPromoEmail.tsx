@@ -3,7 +3,6 @@ import {
   Heading,
   Section,
   Button,
-  Code,
 } from '@react-email/components'
 import * as React from 'react'
 import { EmailLayout } from './components/EmailLayout'
@@ -41,7 +40,7 @@ export function BuilderPromoEmail({
           🎁 Your Exclusive Promo Code
         </Heading>
         <div style={promoCodeContainer}>
-          <Code style={promoCodeText}>{promoCode}</Code>
+          <div style={promoCodeText}>{promoCode}</div>
         </div>
         <Text style={promoDescription}>
           Use this code to get the <strong>AI Premium Builder for just $3.75</strong> (25% off)

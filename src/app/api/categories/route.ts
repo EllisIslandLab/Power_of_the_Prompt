@@ -6,7 +6,7 @@ export async function GET() {
     const supabase = getSupabase(true)
 
     const { data: categories, error } = await supabase
-      .from('website_categories')
+      .from('website_categories' as any)
       .select('id, name, slug, description, icon, display_order')
       .eq('is_active', true)
       .order('display_order', { ascending: true })
