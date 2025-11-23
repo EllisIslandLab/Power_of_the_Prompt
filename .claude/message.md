@@ -358,6 +358,30 @@ logger.error({ err, context }, 'Operation failed');
 
 ---
 
+## Architecture Mastery Toolkit
+
+This project includes senior-level coding patterns in `.claudeconfig/`:
+
+| File | Purpose |
+|------|---------|
+| `.claudeconfig/instructions.md` | Project coding standards |
+| `.claudeconfig/patterns.md` | Design pattern reference (34 patterns) |
+| `.claudeconfig/diagnostics.md` | Pattern detection & recommendations |
+| `.claudeconfig/templates/` | Code generation templates |
+
+### Available Pattern Templates
+
+- `repository.md` - Data access layer with caching
+- `factory.md` - Service creation and management
+- `middleware.md` - Request handling (auth, validation, rate limiting)
+- `error-handling.md` - Consistent error responses
+- `caching.md` - Redis caching layer
+- `testing.md` - Unit and integration testing
+
+Run `npm run claude:init` to verify configuration.
+
+---
+
 ## Notes for Claude
 
 ### When working on this codebase:

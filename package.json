@@ -23,7 +23,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "claude:init": "node scripts/init-claude-config.js",
+    "claude:analyze": "echo 'Use Claude Code to analyze patterns: ask Claude to review for pattern opportunities'",
+    "test": "echo 'Tests not yet configured. See .claudeconfig/templates/testing.md for setup guide.'"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
