@@ -53,7 +53,7 @@ ${businessContactEmail ? `- Email: ${businessContactEmail}` : ''}
 ${fullAddress ? `- Address: ${fullAddress}` : ''}
 
 SERVICES WITH ENHANCEMENT DETAILS:
-${services.map((s, i) => `${i + 1}. ${s.title}: ${s.description}${s.additionalDetails ? `\n   ✨ AI Enhancement: ${s.additionalDetails}` : ''}`).join('\n')}
+${services.map((s, i) => `${i + 1}. ${s.title}: ${s.description}${s.additionalDetails ? `\n   ⚡ AI Enhancement: ${s.additionalDetails}` : ''}`).join('\n')}
 
 COLOR SCHEME:
 - Primary: ${colors.primary}

@@ -73,7 +73,7 @@ export function ComingSoonBanner() {
               </Link>
 
               <p className="text-xs text-muted-foreground mt-4">
-                ✨ Takes less than 5 minutes • No technical skills required
+                ⚡ Takes less than 5 minutes • No technical skills required
               </p>
             </CardContent>
           </Card>

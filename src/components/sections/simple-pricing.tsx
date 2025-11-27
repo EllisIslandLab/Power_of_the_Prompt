@@ -231,7 +231,7 @@ export function SimplePricing() {
             </h2>
             <div className="max-w-2xl mx-auto space-y-4">
               <div className="flex items-center justify-center gap-3 text-lg">
-                <span>✨</span>
+                <span>⚡</span>
                 <span className="font-semibold text-primary">Explore First</span>
                 <span className="text-muted-foreground">- Free consultation, then regular pricing</span>
               </div>

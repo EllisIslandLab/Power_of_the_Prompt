@@ -155,7 +155,7 @@ export default function PreviewModal({ isOpen, onClose, onBack, hasAdditionalDet
       <DialogContent className="max-w-7xl h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
-            {customizedHTML ? '✨ AI-Customized Preview' : 'Your Website Preview is Ready!'}
+            {customizedHTML ? '⚡ AI-Customized Preview' : 'Your Website Preview is Ready!'}
           </DialogTitle>
           <DialogDescription>
             {customizedHTML

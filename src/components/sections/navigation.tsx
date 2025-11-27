@@ -73,7 +73,7 @@ export function Navigation() {
               // Public Marketing Navigation
               <>
                 <Link href="/#email-signup" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
-                  <span>✨</span>
+                  <span>⚡</span>
                   Free Demo
                 </Link>
                 <Link href="/#site-samples" className="text-foreground hover:text-primary transition-colors flex items-center gap-1">
