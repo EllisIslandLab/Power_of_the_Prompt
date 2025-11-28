@@ -148,6 +148,7 @@ Make the content compelling, specific to their business, and professionally writ
       user_email: userEmail,
       user_id: user?.id,
       business_name: generatedData.metadata?.businessName || answers.business_type,
+      builder_type: isFreeGeneration ? 'free' : 'ai_premium',
       generated_components: generatedData.components,
       theme_settings: generatedData.theme,
       metadata: generatedData.metadata,

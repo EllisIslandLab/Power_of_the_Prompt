@@ -48,7 +48,7 @@ export function TripleGuarantee() {
             1 Full Year of Basic Support
           </h4>
           <p className="text-sm text-muted-foreground">
-            Web Launch Academy provides 1 full year of basic support including SEO, Best Practices, Performance, and Accessibility testing and consultation via email/chat after your site goes live.
+            Web Launch Academy provides 1 full year of basic support including SEO, Best Practices, Performance, and Accessibility testing and consultation via email after your site goes live.
           </p>
         </div>
       </div>

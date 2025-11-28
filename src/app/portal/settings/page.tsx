@@ -310,7 +310,7 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle>Anonymous Username</CardTitle>
             <CardDescription>
-              Generate or set a username for anonymous interactions (chat, forums, etc.)
+              Generate or set a username for your interactions throughout the platform
             </CardDescription>
           </CardHeader>
           <CardContent>

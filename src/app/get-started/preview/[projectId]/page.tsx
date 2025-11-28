@@ -7,15 +7,18 @@ import { trackConversion } from '@/lib/analytics/trackGeneration';
 export default async function PreviewPage({
   params
 }: {
-  params: { projectId: string }
+  params: Promise<{ projectId: string }>
 }) {
+  // Await params in Next.js 15
+  const { projectId } = await params;
+
   const supabase = getSupabase(true); // Use service role for server-side
 
   // Get project
   const { data: project, error: projectError } = await supabase
     .from('demo_projects')
     .select('*')
-    .eq('id', params.projectId)
+    .eq('id', projectId)
     .single() as any;
 
   if (projectError || !project) {

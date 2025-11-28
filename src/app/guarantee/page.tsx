@@ -45,7 +45,7 @@ export default function GuaranteeDetails() {
               1 Full Year of Basic Support
             </h3>
             <p className="text-foreground/70 leading-relaxed">
-              Web Launch Academy provides 1 full year of basic support including SEO, Best Practices, Performance, and Accessibility testing and consultation via email/chat. This covers routine site health checks and guidance. For more intensive development needs, purchasing additional LVL UP 1-on-1 sessions may be recommended.
+              Web Launch Academy provides 1 full year of basic support including SEO, Best Practices, Performance, and Accessibility testing and consultation via email. This covers routine site health checks and guidance. For more intensive development needs, purchasing additional LVL UP 1-on-1 sessions may be recommended.
             </p>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function GuaranteeDetails() {
               <strong>Lighthouse Score:</strong> We will work with you to achieve a 90+ score across all four metrics (Performance, Accessibility, Best Practices, SEO) using Google's official Lighthouse tool. Scores may vary based on network conditions and device testing. Acceptance is required of all recommended optimizations to achieve these scores. Final testing will be conducted using standard testing conditions.
             </p>
             <p>
-              <strong>Support Scope:</strong> One full year of basic support covers email/chat consultation for SEO, Best Practices, Performance, and Accessibility testing and guidance. Support begins after your site goes live. Does not include content creation, major design changes, or feature additions. For intensive development needs, purchasing additional LVL UP 1-on-1 sessions may be recommended.
+              <strong>Support Scope:</strong> One full year of basic support covers email consultation for SEO, Best Practices, Performance, and Accessibility testing and guidance. Support begins after your site goes live. Does not include content creation, major design changes, or feature additions. For intensive development needs, purchasing additional LVL UP 1-on-1 sessions may be recommended.
             </p>
             <p>
               <strong>Money Back Guarantee:</strong> Full refund available if we fail to deliver any of the three guarantees above. Claims must be made within 30 business days of the 2-week delivery deadline with documented evidence that requirements were not met. Refunds will be processed within 10 business days to your original payment method. This guarantee is subject to the Terms of Service, including dispute resolution procedures.

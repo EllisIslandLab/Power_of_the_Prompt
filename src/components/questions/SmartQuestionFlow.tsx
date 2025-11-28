@@ -9,11 +9,17 @@ import { ChevronLeft, ChevronRight, AlertCircle, Check, Loader } from 'lucide-re
 interface SmartQuestionFlowProps {
   onAnswersChange: (answers: Record<string, string>) => void;
   onEmailChange: (email: string) => void;
+  tokenStatus?: {
+    status: 'available' | 'used' | 'claimed' | 'checking';
+    message: string;
+    projectId?: string;
+  } | null;
 }
 
 export function SmartQuestionFlow({
   onAnswersChange,
-  onEmailChange
+  onEmailChange,
+  tokenStatus
 }: SmartQuestionFlowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -38,8 +44,17 @@ export function SmartQuestionFlow({
     const currentQuestion = coreQuestions[currentStep];
     setError(null);
 
-    // If on email question, send verification code
+    // If on email question, check if user already has tokens claimed
     if (currentQuestion.id === 'email') {
+      // Skip verification for returning users who already have tokens
+      if (tokenStatus?.status === 'available') {
+        console.log('User already has tokens claimed, skipping verification');
+        setEmailVerified(true);
+        setCurrentStep(currentStep + 1);
+        return;
+      }
+
+      // New users need to verify email
       setIsLoading(true);
       try {
         const response = await fetch('/api/ai/send-verification-email', {

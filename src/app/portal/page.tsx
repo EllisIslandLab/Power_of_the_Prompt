@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { Zap, BookOpen, MessageSquare, Settings, Users, Plus, HelpCircle, Handshake } from "lucide-react"
+import { Zap, BookOpen, Settings, Users, Plus, HelpCircle, Handshake } from "lucide-react"
 import { createBrowserClient } from '@supabase/ssr'
 import { OnlineIndicator, usePresence } from "@/components/ui/online-indicator"
 import { SessionCounter } from "@/components/ui/session-counter"
@@ -99,12 +99,6 @@ export default function PortalPage() {
           {/* Navigation Links */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
-              <Link href="/portal/chat">
-                <MessageSquare className="h-5 w-5" />
-                <span className="text-sm">Chat</span>
-              </Link>
-            </Button>
-            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
               <Link href="/portal/cohorts">
                 <Users className="h-5 w-5" />
                 <span className="text-sm">Cohorts</span>
@@ -167,18 +161,6 @@ export default function PortalPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Support</CardTitle>
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">24/7</div>
-              <p className="text-xs text-muted-foreground">
-                AI-powered assistance
-              </p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Student Resources */}

@@ -1,128 +1,111 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
 
-/**
- * ONE-TIME migration endpoint
- * Run this once to add free_tokens columns to users table
- * DELETE THIS FILE after running
- */
-export async function POST() {
-  const supabase = getSupabase(true); // Service role
-
+export async function POST(req: NextRequest) {
   try {
-    console.log('Adding free_tokens columns to users table...');
+    const supabase = getSupabase(true); // Use service role
 
-    // Add columns one by one (idempotent - won't fail if already exists)
-    const migrations = [
-      {
-        name: 'free_tokens_claimed',
-        sql: `
-          DO $$
-          BEGIN
-            IF NOT EXISTS (
-              SELECT 1 FROM information_schema.columns
-              WHERE table_name='users' AND column_name='free_tokens_claimed'
-            ) THEN
-              ALTER TABLE users ADD COLUMN free_tokens_claimed boolean DEFAULT false;
-              RAISE NOTICE 'Added free_tokens_claimed column';
-            END IF;
-          END $$;
-        `
-      },
-      {
-        name: 'free_tokens_used',
-        sql: `
-          DO $$
-          BEGIN
-            IF NOT EXISTS (
-              SELECT 1 FROM information_schema.columns
-              WHERE table_name='users' AND column_name='free_tokens_used'
-            ) THEN
-              ALTER TABLE users ADD COLUMN free_tokens_used boolean DEFAULT false;
-              RAISE NOTICE 'Added free_tokens_used column';
-            END IF;
-          END $$;
-        `
-      },
-      {
-        name: 'free_tokens_claimed_at',
-        sql: `
-          DO $$
-          BEGIN
-            IF NOT EXISTS (
-              SELECT 1 FROM information_schema.columns
-              WHERE table_name='users' AND column_name='free_tokens_claimed_at'
-            ) THEN
-              ALTER TABLE users ADD COLUMN free_tokens_claimed_at timestamp;
-              RAISE NOTICE 'Added free_tokens_claimed_at column';
-            END IF;
-          END $$;
-        `
-      },
-      {
-        name: 'free_tokens_used_at',
-        sql: `
-          DO $$
-          BEGIN
-            IF NOT EXISTS (
-              SELECT 1 FROM information_schema.columns
-              WHERE table_name='users' AND column_name='free_tokens_used_at'
-            ) THEN
-              ALTER TABLE users ADD COLUMN free_tokens_used_at timestamp;
-              RAISE NOTICE 'Added free_tokens_used_at column';
-            END IF;
-          END $$;
-        `
-      },
-      {
-        name: 'index',
-        sql: `CREATE INDEX IF NOT EXISTS idx_users_free_tokens ON users(email, free_tokens_claimed, free_tokens_used);`
-      }
-    ];
+    console.log('🚀 Starting migration...');
 
-    const results = [];
+    // Step 1: Create deep_dive_questions table
+    console.log('📝 Creating deep_dive_questions table...');
+    const { error: createTableError } = await supabase.rpc('exec_sql', {
+      sql: `
+        CREATE TABLE IF NOT EXISTS deep_dive_questions (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          question_text TEXT NOT NULL,
+          question_type TEXT NOT NULL CHECK (question_type IN ('text', 'textarea', 'multiselect')),
+          placeholder_text TEXT,
+          help_text TEXT,
+          is_required BOOLEAN DEFAULT true,
+          character_limit INTEGER,
+          category_id UUID NOT NULL REFERENCES website_categories(id) ON DELETE CASCADE,
+          display_order INTEGER NOT NULL,
+          is_active BOOLEAN DEFAULT true,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        );
 
-    for (const migration of migrations) {
-      try {
-        console.log(`Running migration: ${migration.name}`);
-        const { data, error } = await (supabase as any).rpc('exec_sql', {
-          query: migration.sql
-        });
+        CREATE INDEX IF NOT EXISTS idx_deep_dive_category
+          ON deep_dive_questions(category_id);
 
-        if (error) {
-          console.error(`Error in ${migration.name}:`, error);
-          results.push({ name: migration.name, success: false, error: error.message });
-        } else {
-          console.log(`✅ ${migration.name} completed`);
-          results.push({ name: migration.name, success: true });
-        }
-      } catch (err: any) {
-        console.error(`Exception in ${migration.name}:`, err);
-        results.push({ name: migration.name, success: false, error: err.message });
-      }
+        CREATE INDEX IF NOT EXISTS idx_deep_dive_active
+          ON deep_dive_questions(category_id, is_active, display_order);
+      `
+    });
+
+    if (createTableError) {
+      console.error('❌ Error creating table:', createTableError);
+      return NextResponse.json({
+        success: false,
+        error: 'Failed to create deep_dive_questions table',
+        details: createTableError
+      }, { status: 500 });
     }
 
-    // Verify columns exist
-    const { data: testUser } = await (supabase as any)
-      .from('users')
-      .select('email, free_tokens_claimed, free_tokens_used, free_tokens_claimed_at, free_tokens_used_at')
-      .limit(1)
-      .single();
+    // Step 2: Update users table
+    console.log('📝 Updating users table...');
+    const { error: updateUsersError } = await supabase.rpc('exec_sql', {
+      sql: `
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS total_ai_credits INTEGER DEFAULT 0;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS used_ai_credits INTEGER DEFAULT 0;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS available_ai_credits INTEGER DEFAULT 0;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS has_purchased BOOLEAN DEFAULT false;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS purchased_at TIMESTAMP;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS ai_model_tier TEXT DEFAULT 'haiku'
+          CHECK (ai_model_tier IN ('haiku', 'sonnet', 'opus'));
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS data_retention_expires_at TIMESTAMP;
+      `
+    });
 
-    console.log('Test query result:', testUser);
+    if (updateUsersError) {
+      console.error('❌ Error updating users:', updateUsersError);
+      return NextResponse.json({
+        success: false,
+        error: 'Failed to update users table',
+        details: updateUsersError
+      }, { status: 500 });
+    }
+
+    // Step 3: Update demo_projects table
+    console.log('📝 Updating demo_projects table...');
+    const { error: updateProjectsError } = await supabase.rpc('exec_sql', {
+      sql: `
+        ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS ai_model_used TEXT DEFAULT 'haiku'
+          CHECK (ai_model_used IN ('haiku', 'sonnet', 'opus'));
+        ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS preview_round_number INTEGER DEFAULT 1;
+        ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS data_expires_at TIMESTAMP;
+        ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS is_data_retained BOOLEAN DEFAULT false;
+        ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS related_stripe_session_id TEXT;
+        ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS deep_dive_round_answers JSONB;
+        ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS all_accumulated_answers JSONB DEFAULT '[]'::jsonb;
+        ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS preview_generation_started_at TIMESTAMP;
+        ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS preview_generation_completed_at TIMESTAMP;
+      `
+    });
+
+    if (updateProjectsError) {
+      console.error('❌ Error updating demo_projects:', updateProjectsError);
+      return NextResponse.json({
+        success: false,
+        error: 'Failed to update demo_projects table',
+        details: updateProjectsError
+      }, { status: 500 });
+    }
+
+    console.log('✅ Migration completed successfully!');
 
     return NextResponse.json({
       success: true,
-      message: 'Migration completed',
-      results,
-      testQuery: testUser
+      message: 'Migration completed! Note: Question data insertion should be done separately.'
     });
 
   } catch (error: any) {
-    console.error('Migration failed:', error);
+    console.error('❌ Migration failed:', error);
     return NextResponse.json({
       success: false,
-      error: error.message
+      error: 'Migration failed',
+      details: error.message
     }, { status: 500 });
   }
 }

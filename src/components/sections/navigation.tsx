@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
-import { MessageCircle, BookOpen, Video, FileText, HelpCircle, Settings, Crown, Monitor } from "lucide-react"
+import { BookOpen, Video, FileText, HelpCircle, Settings, Crown, Monitor } from "lucide-react"
 
 export function Navigation() {
   const pathname = usePathname()
@@ -45,10 +45,6 @@ export function Navigation() {
                 <Link href="/portal/textbook" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
                   <BookOpen className="h-4 w-4" />
                   Textbook
-                </Link>
-                <Link href="/portal/chat" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-                  <MessageCircle className="h-4 w-4" />
-                  Chat
                 </Link>
                 <Link href="/portal/collaboration" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
                   <Video className="h-4 w-4" />

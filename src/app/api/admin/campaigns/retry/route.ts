@@ -60,8 +60,9 @@ export async function POST(request: NextRequest) {
     const courseData = targetAudience?.selectedCourse || {}
 
     // Send emails to each recipient with delay to avoid rate limits
-    for (const lead of leads || []) {
+    for (const leadData of leads || []) {
       try {
+        const lead = leadData as any
         const recipientName = lead.display_name || lead.first_name || 'there'
 
         // Process email content with variables

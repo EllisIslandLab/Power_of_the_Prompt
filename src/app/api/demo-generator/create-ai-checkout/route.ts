@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
             currency: 'usd',
             product_data: {
               name: 'AI Premium Website Builder',
-              description: '30 AI-powered refinements for your perfect website',
+              description: '3 AI-powered refinements with Sonnet model + 30-day data retention',
               images: ['https://weblaunchacademy.com/ai-premium-icon.png'], // Optional
             },
             unit_amount: 500, // $5.00 in cents

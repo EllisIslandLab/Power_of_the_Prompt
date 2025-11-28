@@ -109,7 +109,7 @@ export function CourseCommitmentModal({ isOpen, onClose }: CourseCommitmentModal
                     <h4 className="font-semibold text-gray-800">1 Year Basic Support</h4>
                   </div>
                   <p className="text-sm text-gray-700">
-                    One full year of basic support including SEO, Best Practices, Performance, and Accessibility testing and consultation via email/chat.
+                    One full year of basic support including SEO, Best Practices, Performance, and Accessibility testing and consultation via email.
                   </p>
                 </div>
               </div>

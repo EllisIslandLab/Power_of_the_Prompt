@@ -13,7 +13,6 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import {
   HelpCircle,
-  MessageCircle,
   Calendar,
   Search,
   ChevronDown,
@@ -21,7 +20,8 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  ArrowLeft
+  ArrowLeft,
+  FileText
 } from "lucide-react"
 
 interface FAQ {
@@ -83,14 +83,14 @@ export default function SupportPage() {
     {
       id: '4',
       question: 'Can I get one-on-one help with my project?',
-      answer: 'Yes! You can schedule one-on-one sessions during office hours. Check the Collaboration Hub in your portal to see available times and book a session. You can also ask questions in the student chat for immediate help from peers and instructors.',
+      answer: 'Yes! You can schedule one-on-one sessions during office hours. Check the Collaboration Hub in your portal to see available times and book a session. You can also reach out through the support system for immediate assistance.',
       category: 'GENERAL',
       helpful: 29
     },
     {
       id: '5',
       question: 'What if I get stuck on a specific chapter in the textbook?',
-      answer: 'If you\'re stuck: 1) Use the student chat to ask specific questions, 2) Schedule office hours for detailed help, 3) Check the Resources section for additional guides and templates, 4) Submit a support ticket for complex issues that need detailed assistance.',
+      answer: 'If you\'re stuck: 1) Schedule office hours for detailed help, 2) Check the Resources section for additional guides and templates, 3) Submit a support ticket for complex issues that need detailed assistance, 4) Review the FAQ for common problems and solutions.',
       category: 'GENERAL',
       helpful: 41
     },
@@ -481,19 +481,6 @@ export default function SupportPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-medium mb-2 flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4 text-primary" />
-                  Student Chat
-                </h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Get real-time help from fellow students and instructors in our chat rooms.
-                </p>
-                <Button variant="outline" size="sm" asChild>
-                  <a href="/portal/chat">Join Chat</a>
-                </Button>
-              </div>
-              
-              <div>
-                <h4 className="font-medium mb-2 flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-primary" />
                   Office Hours
                 </h4>
@@ -502,6 +489,19 @@ export default function SupportPage() {
                 </p>
                 <Button variant="outline" size="sm" asChild>
                   <a href="/portal/collaboration">Book Session</a>
+                </Button>
+              </div>
+
+              <div>
+                <h4 className="font-medium mb-2 flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Resources
+                </h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Access comprehensive guides, templates, and learning materials.
+                </p>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/portal/resources">View Resources</a>
                 </Button>
               </div>
             </div>
