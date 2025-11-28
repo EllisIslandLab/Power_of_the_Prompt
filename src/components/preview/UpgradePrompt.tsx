@@ -122,7 +122,7 @@ export function UpgradePrompt({
         <ul className="space-y-2 text-sm text-muted-foreground dark:text-slate-400">
           <li className="flex items-start gap-2">
             <span className="text-primary dark:text-blue-400">✓</span>
-            <span><strong>30 AI-powered refinements</strong></span>
+            <span><strong>3 AI-powered refinements</strong></span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-primary dark:text-blue-400">✓</span>

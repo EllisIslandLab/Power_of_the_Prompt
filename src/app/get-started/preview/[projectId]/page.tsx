@@ -85,7 +85,7 @@ export default async function PreviewPage({
                   Customize with AI - $5
                 </h3>
                 <p className="text-sm text-muted-foreground dark:text-slate-400 mb-4">
-                  30 AI-powered refinements to perfect every detail
+                  3 AI-powered refinements to perfect every detail
                 </p>
                 <ul className="text-sm space-y-2 text-muted-foreground dark:text-slate-400">
                   <li>• Change any section instantly</li>

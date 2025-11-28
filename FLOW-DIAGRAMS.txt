@@ -1,0 +1,256 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                    /GET-STARTED FLOW - VISUAL OVERVIEW                         ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+CURRENT STATE (BROKEN):
+─────────────────────
+
+User visits /get-started
+          ↓
+    [SPINNER]  ← ThreeRoundFlow component missing
+          ↓
+   (Waits forever)
+
+
+AFTER IMPLEMENTATION (WORKING):
+──────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ /get-started                                                                │
+│ ┌───────────────────────────────────────────────────────────────────────────┤
+│ │  Build Your Custom Website In 3 Simple Rounds                             │
+│ │                                                                           │
+│ │  [ThreeRoundFlow Component]                                              │
+│ │                                                                           │
+│ │  📝 ROUND 1/3: BUSINESS INFO                                            │
+│ │  ┌────────────────────────────────────────────────┐                     │
+│ │  │ Email: [________________]                      │                     │
+│ │  │ Business Name: [________________]              │                     │
+│ │  │ Description: [________________________]         │                     │
+│ │  │ Target Audience: [________________]            │                     │
+│ │  │ Primary Color: [Color Picker]                  │                     │
+│ │  │ Secondary Color: [Color Picker]                │                     │
+│ │  └────────────────────────────────────────────────┘                     │
+│ │                                [Previous] [Next ▶]                       │
+│ │                                                                           │
+│ │  Progress: ████░░░ (1/3)                                                 │
+│ └───────────────────────────────────────────────────────────────────────────┘
+│                                 [Submit]
+└─────────────────────────────────────────────────────────────────────────────┘
+          ↓ POST /api/save-rounds
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ /get-started/verify/[projectId]                                             │
+│ ┌───────────────────────────────────────────────────────────────────────────┤
+│ │  ✉️ Check your email for a 6-digit code                                 │
+│ │                                                                           │
+│ │  Code sent to: user@example.com                                          │
+│ │                                                                           │
+│ │  Enter code: [_][_][_][_][_][_]                                         │
+│ │                                                                           │
+│ │  ⏱️ Code expires in: 9:45                                               │
+│ │                                                                           │
+│ │  [Resend Code] (remaining: 2)                                            │
+│ │                                                                           │
+│ │  Already verified? [Continue]                                            │
+│ └───────────────────────────────────────────────────────────────────────────┘
+          ↓ POST /api/ai/verify-code
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ /get-started/deep-dive/[projectId]                                          │
+│ ┌───────────────────────────────────────────────────────────────────────────┤
+│ │  Optional: Tell us more for better results                               │
+│ │                                                                           │
+│ │  🎯 Target Audience:                                                     │
+│ │  [________________________________]                                      │
+│ │                                                                           │
+│ │  😞 Business Pain Points:                                               │
+│ │  [________________________________]                                      │
+│ │                                                                           │
+│ │  ⭐ Unique Value Proposition:                                            │
+│ │  [________________________________]                                      │
+│ │                                                                           │
+│ │  🏆 Competitive Advantage:                                              │
+│ │  [________________________________]                                      │
+│ │                                                                           │
+│ │                              [Skip] [Generate Preview ▶]                 │
+│ └───────────────────────────────────────────────────────────────────────────┘
+          ↓ POST /api/ai/generate-preview
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ /get-started/preview/[projectId]                                            │
+│ ┌──────────────────────────┬──────────────────────────────────────────────┐ │
+│ │   Website Preview        │  Customize with AI - $5                    │ │
+│ │  ┌──────────────────────┐ │  └─────────────────────────────────────────┘ │
+│ │  │                      │ │  • 3 AI refinements                           │
+│ │  │  [Website Preview]   │ │  • Change any section                        │
+│ │  │                      │ │  • Rewrite content                           │
+│ │  │                      │ │  • Adjust colors & fonts                     │
+│ │  │                      │ │  • Add/remove sections                       │
+│ │  │                      │ │  [Customize Now]                             │
+│ │  └──────────────────────┘ │                                              │
+│ │                           │  Foundation Course - $799                    │
+│ │                           │  └─────────────────────────────────────────────┘
+│ │                           │  • Production-ready code                       │
+│ │                           │  • Supabase backend                           │
+│ │                           │  • Stripe payments                            │
+│ │                           │  • Complete docs                              │
+│ │                           │  [Buy Course]                                 │
+│ └──────────────────────────┴──────────────────────────────────────────────┘
+          ↓ Stripe Checkout
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ /get-started/success?session_id=...                                         │
+│ ┌───────────────────────────────────────────────────────────────────────────┤
+│ │  ✅ Payment Successful!                                                  │
+│ │                                                                           │
+│ │  Your website is ready to customize.                                     │
+│ │                                                                           │
+│ │  [View My Website] [Download Code]                                       │
+│ └───────────────────────────────────────────────────────────────────────────┘
+
+
+MISSING COMPONENTS STATUS:
+─────────────────────────
+
+❌ ThreeRoundFlow.tsx
+   └─ Blocks: EVERYTHING
+   └─ Time: 5 hours
+   └─ Priority: 🔴 CRITICAL
+
+❌ /api/save-rounds
+   └─ Blocks: Data persistence
+   └─ Time: 2.5 hours
+   └─ Priority: 🔴 CRITICAL
+
+❌ /get-started/verify page
+   └─ Blocks: UX clarity
+   └─ Time: 3.5 hours
+   └─ Priority: 🟠 IMPORTANT
+
+❌ /get-started/deep-dive page
+   └─ Blocks: Quality improvement
+   └─ Time: 2.5 hours
+   └─ Priority: 🟡 NICE-TO-HAVE
+
+
+API CALL SEQUENCE:
+──────────────────
+
+1️⃣  GET /get-started
+    └─> Renders page with ThreeRoundFlow
+
+2️⃣  POST /api/save-rounds (after form submit)
+    ├─> Input: all 3 rounds
+    ├─> Save to: demo_projects + users
+    └─> Output: projectId, needsVerification
+
+3️⃣  POST /api/ai/send-verification-email (automatic)
+    ├─> Input: email from round1
+    ├─> Save to: Redis (Upstash)
+    └─> Send: 6-digit code via Resend
+
+4️⃣  POST /api/ai/verify-code (user enters code)
+    ├─> Input: email, 6-digit code
+    ├─> Check: Redis for match
+    └─> Update: users.free_tokens_claimed = true
+
+5️⃣  POST /api/ai/generate-preview (from deep-dive or direct)
+    ├─> Input: email, all answers
+    ├─> Call: Claude API (Haiku or Sonnet)
+    ├─> Save: demo_projects.generated_components
+    └─> Update: users.free_tokens_used = true
+
+6️⃣  GET /get-started/preview/[projectId]
+    ├─> Query: demo_projects by ID
+    ├─> Check: AI premium status
+    └─> Render: PreviewFrame + UpgradePrompt
+
+7️⃣  POST /api/demo-generator/create-ai-checkout
+    ├─> Input: projectId, tier ($5 or $799)
+    ├─> Create: Stripe session
+    └─> Output: checkout URL
+
+8️⃣  Stripe Webhook → Success
+    ├─> Verify: payment confirmed
+    ├─> Update: users, demo_projects
+    └─> Redirect: to /get-started/success
+
+
+DATABASE TABLES INVOLVED:
+────────────────────────
+
+users
+├─ id (UUID)
+├─ email (text, unique)
+├─ free_tokens_claimed (boolean)
+├─ free_tokens_used (boolean)
+└─ created_at, updated_at
+
+demo_projects
+├─ id (UUID)
+├─ user_email (text FK)
+├─ business_name (text)
+├─ metadata (JSONB) ← stores all 3 rounds
+├─ generated_components (JSONB)
+├─ theme_settings (JSONB)
+├─ status (text)
+└─ created_at, updated_at
+
+website_categories
+├─ id (UUID)
+├─ name (text)
+├─ slug (text, unique)
+└─ is_active (boolean)
+
+website_subcategories
+├─ id (UUID)
+├─ category_id (UUID FK)
+├─ name (text)
+└─ slug (text)
+
+
+FORM VALIDATION:
+────────────────
+
+Round 1:
+├─ Email: Must be valid email format
+├─ Business Name: 3-100 characters
+├─ Business Description: Optional
+├─ Target Audience: Optional
+└─ Colors: Valid hex colors
+
+Round 2:
+├─ Category: Required, must exist in DB
+└─ Subcategory: Required if parent selected
+
+Round 3:
+├─ Content Source: One of [upload, ai_placeholder, skip]
+└─ Files: Optional (only if upload selected)
+
+
+TESTING CHECKLIST:
+──────────────────
+
+Basic Flow:
+□ Load /get-started → see form (not spinner)
+□ Fill Round 1 → next button works
+□ Fill Round 2 → category loads from DB
+□ Fill Round 3 → submit button appears
+□ Click submit → loading state shows
+□ Check DB → demo_projects created
+□ Check email → code received
+□ Enter code → auto-verify
+□ See preview → generated website displays
+□ Click upgrade → Stripe checkout loads
+□ Complete payment → success page shows
+
+Error Cases:
+□ Invalid email → shows error
+□ Missing category → prevents next
+□ Code expires → resend works
+□ Wrong code 5x → rate limited
+□ Network error → retry shows
+
+Edge Cases:
+□ Refresh page → draft recovers from localStorage
+□ Multiple windows → data stays in sync
+□ Mobile view → form is usable
+□ Slow connection → loading states show
+
