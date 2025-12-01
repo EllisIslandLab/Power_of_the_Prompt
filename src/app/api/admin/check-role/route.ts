@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       .from('users' as any)
       .select('role, email, full_name')
       .eq('id', user.id)
-      .single()
+      .single() as any
 
     if (dbError || !userRecord) {
       // User exists in auth but not in public.users - trigger may have failed

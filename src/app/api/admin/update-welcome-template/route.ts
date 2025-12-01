@@ -99,7 +99,7 @@ export async function POST() {
       .select('*')
       .eq('category', 'questions')
       .order('created_at', { ascending: false })
-      .limit(1)
+      .limit(1) as any
 
     if (fetchError) {
       console.error('Error fetching template:', fetchError)

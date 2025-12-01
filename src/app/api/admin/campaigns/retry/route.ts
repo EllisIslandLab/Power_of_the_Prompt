@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       .from('campaigns' as any)
       .select('*')
       .eq('id', campaignId)
-      .single()
+      .single() as any
 
     if (campaignError || !campaign) {
       return NextResponse.json(
@@ -61,9 +61,9 @@ export async function POST(request: NextRequest) {
 
     // Send emails to each recipient with delay to avoid rate limits
     for (const leadData of leads || []) {
+      const lead = leadData as any
+      const recipientName = lead.display_name || lead.first_name || 'there'
       try {
-        const lead = leadData as any
-        const recipientName = lead.display_name || lead.first_name || 'there'
 
         // Process email content with variables
         const campaignData = campaign as any

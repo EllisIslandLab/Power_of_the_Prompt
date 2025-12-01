@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         notes: `Booked via calendar at ${new Date().toISOString()}`
       })
       .select()
-      .single()
+      .single() as any
 
     if (consultationError) {
       console.error('Error creating consultation:', consultationError)
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
         .from('email_templates' as any)
         .select('*')
         .eq('name', 'Consultation Confirmation')
-        .single()
+        .single() as any
 
       if (template) {
         let emailContent = template.content_template
@@ -184,7 +184,7 @@ async function createVideoSession(sessionData: {
       .from('users' as any)
       .select('*')
       .eq('email', sessionData.userEmail)
-      .single()
+      .single() as any
 
     let userId = existingUser?.id
 
@@ -208,7 +208,7 @@ async function createVideoSession(sessionData: {
           progress: 0
         })
         .select('*')
-        .single()
+        .single() as any
 
       if (userError) {
         throw new Error(`Failed to create user record: ${userError.message}`)
@@ -236,7 +236,7 @@ async function createVideoSession(sessionData: {
         recording_points: 0
       })
       .select('*')
-      .single()
+      .single() as any
 
     if (sessionError) {
       throw new Error(`Failed to create consultation session: ${sessionError.message}`)

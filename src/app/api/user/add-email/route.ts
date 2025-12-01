@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       .from('user_emails' as any)
       .select('id, user_id')
       .eq('email', email)
-      .maybeSingle()
+      .maybeSingle() as any
 
     if (existingEmail) {
       return NextResponse.json(

@@ -65,7 +65,7 @@ async function migrateFromAirtable() {
           .from('leads' as any)
           .select('id, custom_fields')
           .eq('email', email.toLowerCase())
-          .single()
+          .single() as any
 
         if (checkError && checkError.code !== 'PGRST116') {
           // PGRST116 is "not found" error, which is expected for new leads

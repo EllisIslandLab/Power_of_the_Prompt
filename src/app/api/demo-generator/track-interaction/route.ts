@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         metadata,
       })
       .select('id')
-      .single()
+      .single() as any
 
     if (interactionError) {
       console.error('Error tracking interaction:', interactionError)

@@ -38,7 +38,7 @@ export async function GET() {
       .from('users' as any)
       .select('id, email, full_name, role, tier, username, email_verified, payment_status')
       .eq('id', user.id)
-      .single()
+      .single() as any
 
     if (profileError) {
       return NextResponse.json(

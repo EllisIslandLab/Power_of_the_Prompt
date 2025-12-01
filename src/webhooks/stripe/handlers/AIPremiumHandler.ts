@@ -56,7 +56,7 @@ export class AIPremiumHandler extends BaseWebhookHandler {
           .from('users' as any)
           .select('id')
           .eq('email', userEmail)
-          .single()
+          .single() as any
 
         if (existingUser) {
           userId = existingUser.id
@@ -68,7 +68,7 @@ export class AIPremiumHandler extends BaseWebhookHandler {
               full_name: session.customer_details?.name || '',
             })
             .select('id')
-            .single()
+            .single() as any
 
           if (error) throw error
           userId = newUser.id
@@ -76,7 +76,7 @@ export class AIPremiumHandler extends BaseWebhookHandler {
       }
 
       // 2. Grant 3 AI credits and upgrade to Sonnet model
-      await supabase.rpc('update_user_ai_credits', {
+      await (supabase as any).rpc('update_user_ai_credits', {
         p_user_id: userId,
         p_credits_to_add: 3,
         p_amount_paid: amountPaid,

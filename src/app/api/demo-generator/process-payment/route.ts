@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       .from('demo_projects' as any)
       .select('*')
       .eq('id', demoProjectId)
-      .single()
+      .single() as any
 
     if (fetchError || !demoProject) {
       return NextResponse.json(

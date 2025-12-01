@@ -56,7 +56,7 @@ export class ToolkitPurchaseHandler extends BaseWebhookHandler {
         .from('products' as any)
         .select('id, name, price')
         .eq('slug', productSlug)
-        .single()
+        .single() as any
 
       if (productError || !product) {
         purchaseLogger.error({ error: productError }, 'Product not found')
@@ -94,7 +94,7 @@ export class ToolkitPurchaseHandler extends BaseWebhookHandler {
           access_granted: true,
         })
         .select('id')
-        .single()
+        .single() as any
 
       if (purchaseError) {
         purchaseLogger.error({ error: purchaseError }, 'Failed to create purchase record')
@@ -104,7 +104,7 @@ export class ToolkitPurchaseHandler extends BaseWebhookHandler {
       purchaseLogger.info({ purchaseId: purchase.id }, 'Purchase record created')
 
       // Increment total purchases counter
-      const { error: updateError } = await supabase.rpc('increment_product_purchases', {
+      const { error: updateError } = await (supabase as any).rpc('increment_product_purchases', {
         product_id: product.id
       })
 

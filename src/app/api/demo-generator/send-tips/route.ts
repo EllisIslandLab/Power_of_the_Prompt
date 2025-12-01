@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       .from('demo_projects' as any)
       .select('*')
       .eq('id', demoProjectId)
-      .single()
+      .single() as any
 
     if (dbError || !demoProject) {
       return NextResponse.json(

@@ -103,7 +103,7 @@ async function migrateFromAirtable() {
           .from('leads' as any)
           .select('id')
           .eq('email', email.toLowerCase())
-          .single()
+          .single() as any
 
         if (existingLead) {
           continue // Skip if already exists
@@ -173,7 +173,7 @@ async function addLead(body: any) {
       .from('leads' as any)
       .select('id')
       .eq('email', email.toLowerCase())
-      .single()
+      .single() as any
 
     if (existingLead) {
       return NextResponse.json(
@@ -193,7 +193,7 @@ async function addLead(body: any) {
         custom_fields: customFields || {}
       })
       .select()
-      .single()
+      .single() as any
 
     if (error) {
       console.error('Error adding lead:', error)

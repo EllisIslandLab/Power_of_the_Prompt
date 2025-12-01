@@ -114,7 +114,7 @@ export function BuilderPromoEmail({
           <li style={listItem}>Click "Start Building" above</li>
           <li style={listItem}>Choose "AI Premium Builder ($5)"</li>
           <li style={listItem}>On the Stripe checkout page, click "Add promotion code"</li>
-          <li style={listItem}>Enter: <Code style={inlineCode}>{promoCode}</Code></li>
+          <li style={listItem}>Enter: <code style={inlineCode}>{promoCode}</code></li>
           <li style={listItem}>Watch the price drop to $3.75!</li>
         </ol>
       </Section>

@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
         confirmation_email_sent: false
       })
       .select()
-      .single()
+      .single() as any
 
     if (bookingError) {
       throw bookingError
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       .from('users' as any)
       .select('email, full_name')
       .eq('id', user.id)
-      .single()
+      .single() as any
 
     // Send confirmation email
     try {

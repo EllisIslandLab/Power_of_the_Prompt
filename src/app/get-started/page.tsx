@@ -45,47 +45,56 @@ export default function GetStartedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-slate-950">
-      <div className="container mx-auto px-4 py-16">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-primary dark:bg-primary rounded-2xl mb-6 shadow-lg">
-              <Sparkles className="h-10 w-10 text-primary-foreground dark:text-white" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-2xl shadow-blue-500/50">
+              <Sparkles className="h-10 w-10 text-white" />
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground dark:text-slate-100">
-              Build Your Custom Website
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
+              First Round
               <br />
-              <span className="text-primary dark:text-blue-400">In 3 Simple Rounds</span>
+              <span className="text-blue-400">Basic Business Information</span>
             </h1>
 
-            <p className="text-xl text-muted-foreground dark:text-slate-400 mb-4">
-              Provide your real business information and let AI enhance it.
-              <br />
-              <strong className="text-foreground dark:text-slate-100">
-                Your data + AI intelligence = Perfect website
-              </strong>
+            <p className="text-xl text-slate-300 mb-6">
+              Tell us about your business, then we'll generate a beautiful website using AI.
             </p>
 
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 dark:bg-accent/20 border border-accent dark:border-accent/50 rounded-full text-sm">
-              <span className="text-accent dark:text-yellow-400">✓</span>
-              <span className="text-foreground dark:text-slate-100">No credit card required</span>
-              <span className="text-muted-foreground dark:text-slate-400">•</span>
-              <span className="text-accent dark:text-yellow-400">✓</span>
-              <span className="text-foreground dark:text-slate-100">2 free AI refinements</span>
+            <div className="space-y-3 mb-8">
+              <div className="text-left inline-block">
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-400 text-lg">✓</span>
+                    <span className="text-slate-100">No credit card required</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-yellow-400 text-lg">✓</span>
+                    <span className="text-slate-100">1 free AI-enhanced preview generation</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
           {/* Main Content */}
-          <Card className="p-8 md:p-12 dark:bg-slate-900 dark:border-slate-700">
+          <Card className="p-8 md:p-12 bg-slate-900/80 backdrop-blur-xl border-slate-700/50 shadow-2xl shadow-blue-500/10">
             {isSaving ? (
               <div className="py-12 text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-                <p className="text-lg font-medium text-foreground dark:text-slate-100">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-4"></div>
+                <p className="text-lg font-medium text-slate-100">
                   Saving your information...
                 </p>
-                <p className="text-sm text-muted-foreground dark:text-slate-400 mt-2">
+                <p className="text-sm text-slate-400 mt-2">
                   This will only take a moment
                 </p>
               </div>
@@ -98,30 +107,30 @@ export default function GetStartedPage() {
           <div className="mt-12 grid md:grid-cols-3 gap-6 text-center">
             <div className="p-6">
               <div className="text-4xl mb-3">📝</div>
-              <h3 className="font-semibold text-foreground dark:text-slate-100 mb-2">
+              <h3 className="font-semibold text-slate-100 mb-2">
                 Round 1: Business Info
               </h3>
-              <p className="text-sm text-muted-foreground dark:text-slate-400">
+              <p className="text-sm text-slate-400">
                 Name, contact, colors - the fundamentals
               </p>
             </div>
 
             <div className="p-6">
               <div className="text-4xl mb-3">🎯</div>
-              <h3 className="font-semibold text-foreground dark:text-slate-100 mb-2">
+              <h3 className="font-semibold text-slate-100 mb-2">
                 Round 2: Category
               </h3>
-              <p className="text-sm text-muted-foreground dark:text-slate-400">
+              <p className="text-sm text-slate-400">
                 What type of business you run
               </p>
             </div>
 
             <div className="p-6">
               <div className="text-4xl mb-3">📄</div>
-              <h3 className="font-semibold text-foreground dark:text-slate-100 mb-2">
+              <h3 className="font-semibold text-slate-100 mb-2">
                 Round 3: Content
               </h3>
-              <p className="text-sm text-muted-foreground dark:text-slate-400">
+              <p className="text-sm text-slate-400">
                 Upload files or let AI create placeholders
               </p>
             </div>

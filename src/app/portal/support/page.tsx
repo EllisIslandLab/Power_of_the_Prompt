@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
+  MessageCircle,
   CheckCircle,
   AlertCircle,
   ArrowLeft,

@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         .from('leads' as any)
         .select('email, status')
         .eq('email', emailToCheck)
-        .single()
+        .single() as any
 
       if (checkError && checkError.code !== 'PGRST116') {
         // PGRST116 is "not found" error, which is what we want

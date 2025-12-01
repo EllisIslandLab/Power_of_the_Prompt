@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       .select('id, preview_generated_at')
       .eq('user_email', email.toLowerCase())
       .not('preview_generated_at', 'is', null)
-      .single()
+      .single() as any
 
     if (existingSession) {
       return NextResponse.json(
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
         current_step: 1
       })
       .select()
-      .single()
+      .single() as any
 
     if (error) {
       console.error('Error creating session:', error)

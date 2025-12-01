@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       .select('id, user_id, is_primary')
       .eq('id', emailId)
       .eq('user_id', user.id)
-      .maybeSingle()
+      .maybeSingle() as any
 
     if (!emailRecord) {
       return NextResponse.json(

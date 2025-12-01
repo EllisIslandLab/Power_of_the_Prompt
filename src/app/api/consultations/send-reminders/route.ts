@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       .eq('status', 'scheduled')
       .eq('reminder_24h_sent', false)
       .gte('scheduled_date', twentyThreeHoursFromNow.toISOString())
-      .lte('scheduled_date', twentyFiveHoursFromNow.toISOString())
+      .lte('scheduled_date', twentyFiveHoursFromNow.toISOString()) as any
 
     if (consultations24h && consultations24h.length > 0) {
       // Get 24-hour reminder template
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         .from('email_templates' as any)
         .select('*')
         .eq('name', 'Consultation Reminder 24h')
-        .single()
+        .single() as any
 
       for (const consultation of consultations24h) {
         try {
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       .eq('status', 'scheduled')
       .eq('reminder_1h_sent', false)
       .gte('scheduled_date', thirtyMinutesFromNow.toISOString())
-      .lte('scheduled_date', ninetyMinutesFromNow.toISOString())
+      .lte('scheduled_date', ninetyMinutesFromNow.toISOString()) as any
 
     if (consultations1h && consultations1h.length > 0) {
       // Get 1-hour reminder template
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
         .from('email_templates' as any)
         .select('*')
         .eq('name', 'Consultation Reminder 1h')
-        .single()
+        .single() as any
 
       for (const consultation of consultations1h) {
         try {

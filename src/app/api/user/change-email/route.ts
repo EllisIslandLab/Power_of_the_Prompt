@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       .from('users' as any)
       .select('id')
       .eq('email', newEmail.toLowerCase())
-      .single()
+      .single() as any
 
     if (existingUser) {
       return NextResponse.json(

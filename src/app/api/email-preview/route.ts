@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         .from('email_templates' as any)
         .select('*')
         .eq('id', template)
-        .single()
+        .single() as any
 
       if (error || !dbTemplate) {
         return NextResponse.json(

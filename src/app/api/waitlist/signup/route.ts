@@ -45,7 +45,7 @@ export const POST = withMiddleware(
       .from('leads' as any)
       .select('email')
       .eq('email', email.toLowerCase())
-      .single()
+      .single() as any
 
     if (checkError && checkError.code !== 'PGRST116') {
       // PGRST116 is "not found" error, which is what we want
@@ -78,7 +78,7 @@ export const POST = withMiddleware(
         }
       ])
       .select()
-      .single()
+      .single() as any
 
     if (insertError) {
       logger.error({ error: insertError }, 'Failed to add email to leads')

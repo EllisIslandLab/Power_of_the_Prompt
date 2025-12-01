@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
         status: 'generated',
       })
       .select('id')
-      .single()
+      .single() as any
 
     if (dbError) {
       console.error('Database error:', dbError)

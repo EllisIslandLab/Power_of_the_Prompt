@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       .from('products' as any)
       .select('stripe_price_id, name, price')
       .eq('slug', productSlug)
-      .single()
+      .single() as any
 
     if (productError || !product) {
       console.error('Product not found in database:', productSlug, productError)
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       .from('users' as any)
       .select('email')
       .eq('id', user.id)
-      .single()
+      .single() as any
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({

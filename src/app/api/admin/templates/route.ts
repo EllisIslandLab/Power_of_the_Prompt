@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
         created_by: createdBy || 'admin'
       })
       .select()
-      .single()
+      .single() as any
 
     if (error) {
       console.error('Error creating template:', error)
@@ -137,7 +137,7 @@ export async function PUT(request: NextRequest) {
       .update(updateData)
       .eq('id', id)
       .select()
-      .single()
+      .single() as any
 
     if (error) {
       console.error('Error updating template:', error)

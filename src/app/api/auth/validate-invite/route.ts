@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       .from('invite_tokens' as any)
       .select('*')
       .eq('token', token)
-      .single()
+      .single() as any
 
     if (error || !invite) {
       return NextResponse.json(

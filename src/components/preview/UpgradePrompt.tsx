@@ -18,7 +18,7 @@ export function UpgradePrompt({
 }: UpgradePromptProps) {
   const [isUpgrading, setIsUpgrading] = useState(false);
 
-  async function handleUpgrade() {
+  async function handleUpgrade(tier: 'refinements' | 'full_package') {
     setIsUpgrading(true);
 
     try {
@@ -26,13 +26,13 @@ export function UpgradePrompt({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tier: 'ai_premium',
+          tier,
           userEmail,
           userName: userEmail.split('@')[0],
           projectId: project.id,
           returnState: {
             projectId: project.id,
-            action: 'customize'
+            action: tier === 'refinements' ? 'customize' : 'download'
           }
         })
       });
@@ -41,7 +41,7 @@ export function UpgradePrompt({
       window.location.href = url;
     } catch (error) {
       console.error('Upgrade error:', error);
-      alert('Failed to start upgrade. Please try again.');
+      alert('Failed to start checkout. Please try again.');
       setIsUpgrading(false);
     }
   }
@@ -152,18 +152,44 @@ export function UpgradePrompt({
         </p>
       </div>
 
-      {/* Upgrade Button */}
-      <Button
-        onClick={handleUpgrade}
-        disabled={isUpgrading}
-        className="w-full bg-primary text-primary-foreground text-lg font-bold py-6 hover:bg-primary-hover disabled:opacity-50 dark:hover:bg-primary-hover"
-      >
-        {isUpgrading ? 'Processing...' : 'Upgrade to AI Premium - $5'}
-      </Button>
+      {/* Pricing Options */}
+      <div className="space-y-3">
+        {/* Option 1: Refinements */}
+        <Button
+          onClick={() => handleUpgrade('refinements')}
+          disabled={isUpgrading}
+          className="w-full bg-primary text-primary-foreground text-lg font-bold py-6 hover:bg-primary-hover disabled:opacity-50"
+        >
+          {isUpgrading ? 'Processing...' : '⚡ Refine Preview - $10'}
+        </Button>
+        <p className="text-xs text-center text-muted-foreground dark:text-slate-500 -mt-1">
+          2 AI refinement credits • $5 per credit
+        </p>
 
-      <p className="text-xs text-center text-muted-foreground dark:text-slate-500 mt-3">
-        💎 This $5 rolls into any higher package!
-      </p>
+        {/* Divider */}
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border dark:border-slate-700"></div>
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <span className="px-2 bg-card dark:bg-slate-900 text-muted-foreground">or get everything</span>
+          </div>
+        </div>
+
+        {/* Option 2: Full Package */}
+        <Button
+          onClick={() => handleUpgrade('full_package')}
+          disabled={isUpgrading}
+          variant="outline"
+          className="w-full border-2 border-secondary dark:border-blue-500/50 text-lg font-bold py-6 hover:bg-secondary/10"
+        >
+          📦 Foundation Course - $799
+        </Button>
+        <div className="text-xs text-center text-muted-foreground dark:text-slate-500 -mt-1 space-y-1">
+          <p>Full code + Textbook + Videos + Architecture Toolkit</p>
+          <p className="text-accent dark:text-yellow-400 font-medium">💎 Any credits purchased roll over!</p>
+        </div>
+      </div>
     </Card>
   );
 }

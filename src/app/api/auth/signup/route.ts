@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       .from('invite_tokens' as any)
       .select('*')
       .eq('token', inviteToken)
-      .single()
+      .single() as any
 
     if (inviteError || !invite) {
       logger.warn({ type: 'auth', email, inviteToken }, 'Invalid invite token')
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
         .from('cohorts' as any)
         .select('id')
         .eq('is_active', true)
-        .single()
+        .single() as any
 
       if (activeCohort) {
         const { error: cohortError } = await supabase

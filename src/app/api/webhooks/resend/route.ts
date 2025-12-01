@@ -122,7 +122,7 @@ async function handleEmailOpened(payload: ResendWebhookPayload) {
     .from('campaign_sends' as any)
     .select('id, campaign_id, opened_at')
     .eq('resend_email_id', email_id)
-    .single()
+    .single() as any
 
   if (findError) {
     console.error(`Failed to find campaign_send for email ${email_id}:`, findError)
@@ -173,7 +173,7 @@ async function handleEmailClicked(payload: ResendWebhookPayload) {
     .from('campaign_sends' as any)
     .select('id, campaign_id, clicked_at')
     .eq('resend_email_id', email_id)
-    .single()
+    .single() as any
 
   if (findError || !campaignSend) {
     console.error(`Failed to find campaign_send for email ${email_id}`)

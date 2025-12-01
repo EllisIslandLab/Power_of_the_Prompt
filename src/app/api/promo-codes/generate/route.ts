@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         used: false
       })
       .select()
-      .single()
+      .single() as any
 
     if (coursePromoError) {
       console.error('Error saving course promo code:', coursePromoError)
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
         used: false
       })
       .select()
-      .single()
+      .single() as any
 
     if (guaranteePromoError) {
       console.error('Error saving guarantee promo code:', guaranteePromoError)

@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       .from('users' as any)
       .select('*')
       .eq('email', email.toLowerCase())
-      .single()
+      .single() as any
 
     if (error || !user) {
       // Don't reveal whether email exists or not for security

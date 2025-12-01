@@ -151,7 +151,7 @@ export async function PATCH(request: NextRequest) {
       .select('*')
       .eq('id', booking_id)
       .eq('user_id', user.id)
-      .single()
+      .single() as any
 
     if (verifyError || !booking) {
       return NextResponse.json(
@@ -166,7 +166,7 @@ export async function PATCH(request: NextRequest) {
       .update({ status })
       .eq('id', booking_id)
       .select()
-      .single()
+      .single() as any
 
     if (updateError) {
       throw updateError

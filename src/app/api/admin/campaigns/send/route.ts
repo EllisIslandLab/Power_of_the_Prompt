@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       .from('campaigns' as any)
       .select('*')
       .eq('id', campaignId)
-      .single()
+      .single() as any
 
     if (campaignError || !campaign) {
       return NextResponse.json(
@@ -298,7 +298,7 @@ async function getRecipients(targetAudience: any) {
       const { data: recipients, error } = await supabase
         .from('leads' as any)
         .select('email, first_name, last_name, display_name')
-        .in('email', targetAudience.manualRecipients)
+        .in('email', targetAudience.manualRecipients) as any
 
       if (error) {
         console.error('Error fetching manual recipients:', error)
@@ -333,7 +333,7 @@ async function getRecipients(targetAudience: any) {
       if (end) query = query.lte('signup_date', end)
     }
 
-    const { data: recipients, error } = await query
+    const { data: recipients, error } = await query as any
 
     if (error) {
       console.error('Error fetching recipients:', error)

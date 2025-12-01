@@ -326,7 +326,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
       .from('users' as any)
       .select('id, email, tier, payment_status')
       .eq('id', userId)
-      .single()
+      .single() as any
 
     if (publicUserError) {
       checkoutLogger.error({ error: publicUserError, userId }, 'public.users record not found - trigger may not have fired!')
@@ -389,7 +389,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
 
     // Temporary: Award bonus points instead
     try {
-      await supabase.rpc('add_bonus_points', {
+      await (supabase as any).rpc('add_bonus_points', {
         p_user_id: userId,
         p_points: sessionsToCredit * 100 // 100 points per session credit
       })

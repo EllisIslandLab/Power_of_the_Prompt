@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       .eq('email', email.toLowerCase())
       .is('used_at', null)
       .gt('expires_at', new Date().toISOString())
-      .single()
+      .single() as any
 
     if (existingInvite) {
       return NextResponse.json(
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
         created_by: createdBy || 'system'
       })
       .select()
-      .single()
+      .single() as any
 
     if (error) {
       console.error('Failed to create invite token:', error)

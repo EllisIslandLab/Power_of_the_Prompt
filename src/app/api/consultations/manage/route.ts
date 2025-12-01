@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       .from('consultations' as any)
       .select('*')
       .eq('id', consultationId)
-      .single()
+      .single() as any
 
     if (fetchError || !consultation) {
       return NextResponse.json(
@@ -272,7 +272,7 @@ export async function GET(request: NextRequest) {
       .from('consultations' as any)
       .select('*')
       .eq('id', consultationId)
-      .single()
+      .single() as any
 
     if (error || !consultation) {
       return NextResponse.json(

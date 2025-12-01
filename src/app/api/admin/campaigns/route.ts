@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         status: campaignStatus
       })
       .select()
-      .single()
+      .single() as any
 
     if (error) {
       console.error('Error creating campaign:', error)
@@ -116,7 +116,7 @@ export async function PUT(request: NextRequest) {
       .from('campaigns' as any)
       .select('status')
       .eq('id', id)
-      .single()
+      .single() as any
 
     if (fetchError || !existingCampaign) {
       return NextResponse.json(
@@ -149,7 +149,7 @@ export async function PUT(request: NextRequest) {
       .update(updateData)
       .eq('id', id)
       .select()
-      .single()
+      .single() as any
 
     if (error) {
       console.error('Error updating campaign:', error)

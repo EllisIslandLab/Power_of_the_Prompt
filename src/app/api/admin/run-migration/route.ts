@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     // Step 1: Create deep_dive_questions table
     console.log('📝 Creating deep_dive_questions table...');
-    const { error: createTableError } = await supabase.rpc('exec_sql', {
+    const { error: createTableError } = await (supabase.rpc as any)('exec_sql', {
       sql: `
         CREATE TABLE IF NOT EXISTS deep_dive_questions (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     // Step 2: Update users table
     console.log('📝 Updating users table...');
-    const { error: updateUsersError } = await supabase.rpc('exec_sql', {
+    const { error: updateUsersError } = await (supabase.rpc as any)('exec_sql', {
       sql: `
         ALTER TABLE users ADD COLUMN IF NOT EXISTS total_ai_credits INTEGER DEFAULT 0;
         ALTER TABLE users ADD COLUMN IF NOT EXISTS used_ai_credits INTEGER DEFAULT 0;
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     // Step 3: Update demo_projects table
     console.log('📝 Updating demo_projects table...');
-    const { error: updateProjectsError } = await supabase.rpc('exec_sql', {
+    const { error: updateProjectsError } = await (supabase.rpc as any)('exec_sql', {
       sql: `
         ALTER TABLE demo_projects ADD COLUMN IF NOT EXISTS ai_model_used TEXT DEFAULT 'haiku'
           CHECK (ai_model_used IN ('haiku', 'sonnet', 'opus'));

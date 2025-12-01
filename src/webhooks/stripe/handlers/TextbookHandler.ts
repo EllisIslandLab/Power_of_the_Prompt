@@ -54,7 +54,7 @@ export class TextbookHandler extends BaseWebhookHandler {
           .from('users' as any)
           .select('id')
           .eq('email', userEmail)
-          .single()
+          .single() as any
 
         if (existingUser) {
           userId = existingUser.id
@@ -66,7 +66,7 @@ export class TextbookHandler extends BaseWebhookHandler {
               full_name: session.customer_details?.name || '',
             })
             .select('id')
-            .single()
+            .single() as any
 
           if (error) throw error
           userId = newUser.id
@@ -78,7 +78,7 @@ export class TextbookHandler extends BaseWebhookHandler {
         .from('users' as any)
         .select('total_spent, highest_tier_purchased')
         .eq('id', userId)
-        .single()
+        .single() as any
 
       const newTotalSpent = (userData?.total_spent || 0) + amountPaid
       const tierOrder = ['ai_premium', 'textbook', 'basic', 'mid', 'pro']

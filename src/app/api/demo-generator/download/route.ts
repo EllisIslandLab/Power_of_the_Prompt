@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
       .from('demo_projects' as any)
       .select('*')
       .eq('id', demoProjectId)
-      .single()
+      .single() as any
 
     if (fetchError || !demoProject) {
       return NextResponse.json(
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
       .select('*')
       .eq('id', demoProjectId)
       .eq('user_email', userEmail)
-      .single()
+      .single() as any
 
     if (demoError || !demoProject) {
       return NextResponse.json(

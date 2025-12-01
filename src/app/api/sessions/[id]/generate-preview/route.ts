@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       .from('demo_projects' as any)
       .select('*')
       .eq('id', sessionId)
-      .single()
+      .single() as any
 
     if (fetchError || !session) {
       return NextResponse.json(

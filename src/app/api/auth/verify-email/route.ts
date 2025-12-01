@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       .from('users' as any)
       .select('*')
       .eq('email_verification_token', token)
-      .single()
+      .single() as any
 
     if (error || !user) {
       console.error('User not found for token:', error)

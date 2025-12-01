@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       .from('email_templates' as any)
       .select('*')
       .eq('name', 'Welcome Series - Email 1')
-      .single()
+      .single() as any
 
     if (!template) {
       throw new Error('Welcome email template not found')
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
       .from('leads' as any)
       .select('tags')
       .eq('email', userEmail)
-      .single()
+      .single() as any
 
     const currentTags = Array.isArray(existingLead?.tags) ? existingLead.tags as string[] : []
     const updatedTags = currentTags.includes('welcome_sent')

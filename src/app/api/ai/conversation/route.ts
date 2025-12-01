@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       .from('demo_projects' as any)
       .select('*')
       .eq('id', sessionId)
-      .single()
+      .single() as any
 
     if (projectError || !project) {
       return NextResponse.json(
@@ -49,8 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if user has paid for AI Premium
-    // @ts-expect-error - ai_premium_paid exists but not in generated types yet
-    if (!project.ai_premium_paid) {
+    if (!(project as any).ai_premium_paid) {
       return NextResponse.json(
         { error: 'AI Premium required. Please upgrade to use AI features.' },
         { status: 403 }
@@ -58,10 +57,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if credits are available
-    // @ts-expect-error - ai_credits_used exists but not in generated types yet
-    const creditsUsed = project.ai_credits_used || 0
-    // @ts-expect-error - ai_credits_total exists but not in generated types yet
-    const creditsTotal = project.ai_credits_total || 30
+    const creditsUsed = (project as any).ai_credits_used || 0
+    const creditsTotal = (project as any).ai_credits_total || 30
     const creditsRemaining = creditsTotal - creditsUsed
 
     if (creditsRemaining <= 0) {
@@ -111,7 +108,7 @@ The user has ${creditsRemaining} AI questions remaining.`
 
     // 4. Consume 1 AI credit
     const newCreditsUsed = creditsUsed + 1
-    // @ts-expect-error - ai_questions_asked exists but not in generated types yet
+    
     const existingQuestions = project.ai_questions_asked || []
     await supabase
       .from('demo_projects' as any)
