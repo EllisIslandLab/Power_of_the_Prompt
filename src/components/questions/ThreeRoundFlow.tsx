@@ -41,6 +41,7 @@ interface CompleteFormData {
 
 interface ThreeRoundFlowProps {
   onComplete: (data: CompleteFormData) => Promise<void>;
+  initialRound?: 1 | 2 | 3;
 }
 
 interface Category {
@@ -66,8 +67,8 @@ interface ValidationErrors {
 // MAIN COMPONENT
 // ============================================
 
-export function ThreeRoundFlow({ onComplete }: ThreeRoundFlowProps) {
-  const [currentRound, setCurrentRound] = useState<1 | 2 | 3>(1);
+export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowProps) {
+  const [currentRound, setCurrentRound] = useState<1 | 2 | 3>(initialRound);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
 

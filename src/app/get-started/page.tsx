@@ -1,14 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ThreeRoundFlow } from '@/components/questions/ThreeRoundFlow';
 import { Card } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 
-export default function GetStartedPage() {
+function GetStartedContent() {
   const router = useRouter();
+  const [initialRound, setInitialRound] = useState<1 | 2 | 3 | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Get initial round from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const roundParam = params.get('round');
+    const round = (roundParam && ['1', '2', '3'].includes(roundParam)
+      ? parseInt(roundParam) as 1 | 2 | 3
+      : 1);
+    setInitialRound(round);
+  }, []);
 
   async function handleThreeRoundsComplete(data: any) {
     setIsSaving(true);
@@ -98,8 +109,15 @@ export default function GetStartedPage() {
                   This will only take a moment
                 </p>
               </div>
+            ) : initialRound !== null ? (
+              <ThreeRoundFlow onComplete={handleThreeRoundsComplete} initialRound={initialRound} />
             ) : (
-              <ThreeRoundFlow onComplete={handleThreeRoundsComplete} />
+              <div className="py-12 text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-4"></div>
+                <p className="text-lg font-medium text-slate-100">
+                  Loading...
+                </p>
+              </div>
             )}
           </Card>
 
@@ -140,3 +158,5 @@ export default function GetStartedPage() {
     </div>
   );
 }
+
+export default GetStartedContent;
