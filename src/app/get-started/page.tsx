@@ -8,16 +8,14 @@ import { Sparkles } from 'lucide-react';
 
 function GetStartedContent() {
   const router = useRouter();
-  const [initialRound, setInitialRound] = useState<1 | 2 | 3 | null>(null);
+  const [initialRound, setInitialRound] = useState<1 | 3 | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // Get initial round from URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const roundParam = params.get('round');
-    const round = (roundParam && ['1', '2', '3'].includes(roundParam)
-      ? parseInt(roundParam) as 1 | 2 | 3
-      : 1);
+    const round = (roundParam === '3' ? 3 : 1) as 1 | 3;
     setInitialRound(round);
   }, []);
 

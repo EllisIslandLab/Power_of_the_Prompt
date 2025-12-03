@@ -243,6 +243,8 @@ export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowP
     } else if (currentRound === 2) {
       isValid = validateRound2();
       if (isValid) setCurrentRound(3);
+    } else if (currentRound === 3) {
+      // Round 3 handled by Submit button, not Next
     }
   }
 
@@ -719,7 +721,6 @@ export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowP
 
         {/* Round Content */}
         {currentRound === 1 && renderRound1()}
-        {currentRound === 2 && renderRound2()}
         {currentRound === 3 && renderRound3()}
 
         {/* Error Messages */}
