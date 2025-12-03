@@ -9,7 +9,6 @@ import { Sparkles } from 'lucide-react';
 function GetStartedContent() {
   const router = useRouter();
   const [initialRound, setInitialRound] = useState<1 | 2 | 3 | null>(null);
-  const [currentRound, setCurrentRound] = useState<1 | 2 | 3>(1);
   const [isSaving, setIsSaving] = useState(false);
 
   // Get initial round from URL on mount
@@ -20,7 +19,6 @@ function GetStartedContent() {
       ? parseInt(roundParam) as 1 | 2 | 3
       : 1);
     setInitialRound(round);
-    setCurrentRound(round);
   }, []);
 
   async function handleThreeRoundsComplete(data: any) {
@@ -73,44 +71,15 @@ function GetStartedContent() {
               <Sparkles className="h-10 w-10 text-white" />
             </div>
 
-            {currentRound === 1 && (
-              <>
-                <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
-                  First Round
-                  <br />
-                  <span className="text-blue-400">Basic Business Information</span>
-                </h1>
-                <p className="text-xl text-slate-300 mb-6">
-                  Tell us about your business, then we'll generate a beautiful website using AI.
-                </p>
-              </>
-            )}
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
+              First Round
+              <br />
+              <span className="text-blue-400">Basic Business Information</span>
+            </h1>
 
-            {currentRound === 2 && (
-              <>
-                <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
-                  Second Round
-                  <br />
-                  <span className="text-blue-400">Website Category</span>
-                </h1>
-                <p className="text-xl text-slate-300 mb-6">
-                  What type of website are you building?
-                </p>
-              </>
-            )}
-
-            {currentRound === 3 && (
-              <>
-                <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
-                  Final Round
-                  <br />
-                  <span className="text-blue-400">Content Source</span>
-                </h1>
-                <p className="text-xl text-slate-300 mb-6">
-                  Let's get your content ready and generate your beautiful website!
-                </p>
-              </>
-            )}
+            <p className="text-xl text-slate-300 mb-6">
+              Tell us about your business, then we'll generate a beautiful website using AI.
+            </p>
 
             <div className="space-y-3 mb-8">
               <div className="text-left inline-block">
@@ -141,11 +110,7 @@ function GetStartedContent() {
                 </p>
               </div>
             ) : initialRound !== null ? (
-              <ThreeRoundFlow
-                onComplete={handleThreeRoundsComplete}
-                initialRound={initialRound}
-                onRoundChange={setCurrentRound}
-              />
+              <ThreeRoundFlow onComplete={handleThreeRoundsComplete} initialRound={initialRound} />
             ) : (
               <div className="py-12 text-center">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-400 mx-auto mb-4"></div>

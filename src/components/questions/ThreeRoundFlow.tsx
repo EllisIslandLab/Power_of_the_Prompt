@@ -42,7 +42,6 @@ interface CompleteFormData {
 interface ThreeRoundFlowProps {
   onComplete: (data: CompleteFormData) => Promise<void>;
   initialRound?: 1 | 2 | 3;
-  onRoundChange?: (round: 1 | 2 | 3) => void;
 }
 
 interface Category {
@@ -68,15 +67,10 @@ interface ValidationErrors {
 // MAIN COMPONENT
 // ============================================
 
-export function ThreeRoundFlow({ onComplete, initialRound = 1, onRoundChange }: ThreeRoundFlowProps) {
+export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowProps) {
   const [currentRound, setCurrentRound] = useState<1 | 2 | 3>(initialRound);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
-
-  // Notify parent when round changes
-  useEffect(() => {
-    onRoundChange?.(currentRound);
-  }, [currentRound, onRoundChange]);
 
   // Round 1 state
   const [round1, setRound1] = useState<Round1Data>({
@@ -239,7 +233,12 @@ export function ThreeRoundFlow({ onComplete, initialRound = 1, onRoundChange }: 
     if (currentRound === 1) {
       isValid = validateRound1();
       if (isValid) {
-        setCurrentRound(2);
+        // Save Round 1 data to localStorage
+        const formData = { round1, round2, round3 };
+        localStorage.setItem('threeRoundForm', JSON.stringify(formData));
+
+        // Redirect to interactive category selector
+        window.location.href = '/get-started-phase2';
       }
     } else if (currentRound === 2) {
       isValid = validateRound2();
