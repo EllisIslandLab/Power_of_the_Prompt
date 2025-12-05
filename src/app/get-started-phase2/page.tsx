@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { ArrowRight, Sparkles, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CategoryNode } from '@/components/category-selector/CategoryNode';
+import { getCachedData, prefetchCategories } from '@/lib/prefetch-categories';
 
 interface Category {
   id: string;
@@ -42,11 +43,24 @@ function GetStartedPhase2Content() {
   const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
   const [synonymSuggestion, setSynonymSuggestion] = useState<{ name: string; id: string } | null>(null);
 
-  // Pre-fetch categories and ALL subcategories on page load
+  // Load categories and subcategories - use cache if available
   useEffect(() => {
     async function loadCategoriesAndSubcategories() {
       try {
-        // Load categories
+        // Check cache first
+        const cached = getCachedData();
+
+        if (cached) {
+          console.log('[Phase2] Using prefetched data from cache');
+          setCategories(cached.categories);
+          setAllSubcategories(cached.subcategories);
+          setIsLoading(false);
+          return;
+        }
+
+        console.log('[Phase2] Cache miss, fetching fresh data...');
+
+        // No cache, fetch normally
         const categoriesResponse = await fetch('/api/categories/list');
         const categoriesData = await categoriesResponse.json();
 

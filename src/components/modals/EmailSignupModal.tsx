@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { X, Mail, Sparkles, Gift } from 'lucide-react'
+import { prefetchCategories } from '@/lib/prefetch-categories'
 
 interface EmailSignupModalProps {
   isOpen: boolean
@@ -51,6 +52,9 @@ export function EmailSignupModal({ isOpen, onClose, onSuccess, source = 'popup' 
     setError(null)
 
     try {
+      // Start prefetching categories immediately (don't await - let it run in background)
+      prefetchCategories().catch(err => console.error('[Prefetch] Background prefetch failed:', err))
+
       const response = await fetch('/api/waitlist/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
