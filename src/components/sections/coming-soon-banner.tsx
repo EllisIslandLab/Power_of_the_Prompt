@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Sparkles } from "lucide-react"
 
 export function ComingSoonBanner() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [wantsOwnership, setWantsOwnership] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -25,6 +27,7 @@ export function ComingSoonBanner() {
         body: JSON.stringify({
           email,
           name: name || undefined,
+          wantsOwnership,
           source: 'coming-soon-banner',
         }),
       })
@@ -38,6 +41,7 @@ export function ComingSoonBanner() {
       setSuccess(true)
       setEmail('')
       setName('')
+      setWantsOwnership(false)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
@@ -111,6 +115,26 @@ export function ComingSoonBanner() {
                       disabled={isSubmitting}
                       className="w-full"
                     />
+                  </div>
+
+                  {/* Ownership Checkbox */}
+                  <div className="flex items-start space-x-3 text-left">
+                    <Checkbox
+                      id="ownership"
+                      checked={wantsOwnership}
+                      onCheckedChange={(checked) => setWantsOwnership(checked as boolean)}
+                      disabled={isSubmitting}
+                      className="mt-1"
+                    />
+                    <label
+                      htmlFor="ownership"
+                      className="text-sm font-medium cursor-pointer leading-tight"
+                    >
+                      Yes, I want a website I actually OWN.
+                      <span className="block text-xs text-muted-foreground font-normal mt-1">
+                        No monthly fees, complete control over your code
+                      </span>
+                    </label>
                   </div>
 
                   {/* Error Message */}
