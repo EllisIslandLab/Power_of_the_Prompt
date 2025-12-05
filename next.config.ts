@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   },
   // Add empty turbopack config to silence webpack warning
   turbopack: {},
+  // Exclude packages from server-side bundling to avoid Turbopack errors
+  serverExternalPackages: ['pino', 'pino-pretty', 'thread-stream'],
   // Performance optimizations
   experimental: {
     optimizePackageImports: [
