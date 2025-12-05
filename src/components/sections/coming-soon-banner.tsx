@@ -1,11 +1,49 @@
 'use client'
 
-import Link from 'next/link'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Sparkles, ArrowRight, CheckCircle2 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Sparkles } from "lucide-react"
 
 export function ComingSoonBanner() {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/waitlist/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          name: name || undefined,
+          source: 'coming-soon-banner',
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to sign up')
+      }
+
+      setSuccess(true)
+      setEmail('')
+      setName('')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <section id="email-signup" className="py-24 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
@@ -20,61 +58,90 @@ export function ComingSoonBanner() {
             Build a startup website where you own the code - no hosting fees, no hidden costs, just pure creativity.
           </p>
 
-          {/* Demo CTA Section */}
-          <Card className="max-w-2xl mx-auto mb-8 border-2 border-primary/20 shadow-lg">
+          {/* Simple Email Signup Form */}
+          <Card className="max-w-xl mx-auto mb-8 border-2 border-primary/20 shadow-lg">
             <CardContent className="p-8">
-              <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="flex items-center justify-center gap-2 mb-6">
                 <Sparkles className="h-6 w-6 text-primary animate-pulse" />
-                <h2 className="font-bold text-2xl">Create Your Free Website Preview</h2>
+                <h2 className="font-bold text-2xl">Get Early Access</h2>
                 <Sparkles className="h-6 w-6 text-primary animate-pulse" />
               </div>
 
-              <p className="text-lg text-muted-foreground mb-6 max-w-xl mx-auto">
-                See your website come to life in minutes. No credit card required, no commitment - just a beautiful preview of what your business website could look like.
-              </p>
-
-              {/* Feature highlights */}
-              <div className="grid md:grid-cols-3 gap-4 mb-8 text-left">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-semibold text-sm">100% Free Demo</p>
-                    <p className="text-xs text-muted-foreground">No payment needed</p>
-                  </div>
+              {success ? (
+                <div className="text-center py-6">
+                  <div className="text-4xl mb-4">🎉</div>
+                  <h3 className="text-xl font-semibold mb-2">You're on the list!</h3>
+                  <p className="text-muted-foreground">
+                    We'll notify you when we launch.
+                  </p>
                 </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-semibold text-sm">Ready in Minutes</p>
-                    <p className="text-xs text-muted-foreground">Fast & easy setup</p>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Name Input (Optional) */}
+                  <div className="text-left">
+                    <label htmlFor="name" className="block text-sm font-medium mb-2">
+                      Your name (optional)
+                    </label>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Enter your name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={isSubmitting}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Optional - helps us greet you properly in emails
+                    </p>
                   </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-semibold text-sm">Professional Design</p>
-                    <p className="text-xs text-muted-foreground">Customized for you</p>
+
+                  {/* Email Input */}
+                  <div className="text-left">
+                    <label htmlFor="email" className="block text-sm font-medium mb-2">
+                      Enter your email <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      disabled={isSubmitting}
+                      className="w-full"
+                    />
                   </div>
-                </div>
-              </div>
 
-              {/* CTA Button */}
-              <Link href="/get-started">
-                <Button
-                  size="lg"
-                  className="w-full md:w-auto text-lg px-8 py-6 font-semibold group relative overflow-hidden"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    Get Your Free Website Preview
-                    <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Button>
-              </Link>
+                  {/* Error Message */}
+                  {error && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-sm text-red-800">{error}</p>
+                    </div>
+                  )}
 
-              <p className="text-xs text-muted-foreground mt-4">
-                ⚡ Takes less than 5 minutes • No technical skills required
-              </p>
+                  {/* Submit Button */}
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || !email}
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Signing up...
+                      </span>
+                    ) : (
+                      'Notify Me'
+                    )}
+                  </Button>
+
+                  {/* Privacy Note */}
+                  <p className="text-xs text-center text-muted-foreground mt-4">
+                    No spam, just updates on the next launch.
+                  </p>
+                </form>
+              )}
             </CardContent>
           </Card>
 
