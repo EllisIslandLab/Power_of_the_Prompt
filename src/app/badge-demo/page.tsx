@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
-export default function BadgeDemoPage() {
+function BadgeDemoContent() {
   const searchParams = useSearchParams()
   const [shouldHighlight, setShouldHighlight] = useState(false)
   const [showBanner, setShowBanner] = useState(false)
@@ -550,5 +550,17 @@ export default function BadgeDemoPage() {
         }
       `}</style>
     </div>
+  )
+}
+
+export default function BadgeDemoPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    }>
+      <BadgeDemoContent />
+    </Suspense>
   )
 }
