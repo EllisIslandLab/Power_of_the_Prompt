@@ -73,7 +73,7 @@ export const POST = withMiddleware(
           last_name: lastName || null,
           wants_ownership: validated.wantsOwnership ?? true, // Default to true if not provided
           status: 'waitlist',
-          source: 'coming-soon-page',
+          source: source || 'coming-soon-page', // Use provided source or default
           signup_date: new Date().toISOString()
         }
       ])
