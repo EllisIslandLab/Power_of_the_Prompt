@@ -38,6 +38,16 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 31536000, // 1 year
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'yourwebsitescore.com',
+        pathname: '/api/badge/**',
+      },
+    ],
   },
   webpack: (config, { isServer }) => {
     // Suppress warnings

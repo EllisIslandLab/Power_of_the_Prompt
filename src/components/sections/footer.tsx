@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Mail, Phone, MapPin } from "lucide-react"
 
@@ -49,30 +50,21 @@ export function Footer() {
                   Painesville, Ohio | Available nationwide via video call
                 </span>
               </div>
-              {/* Join Mailing List Button & Website Certification Badge - Same Line */}
-              <div className="mt-4 flex flex-col sm:flex-row items-center gap-3 justify-center">
+              <div className="flex items-start gap-3 mt-3">
+                <span className="text-lg">🕒</span>
+                <div className="text-muted-foreground">
+                  <strong>Business Hours:</strong><br />
+                  Monday - Friday: 9am - 6pm EST
+                </div>
+              </div>
+              {/* Join Mailing List Button */}
+              <div className="mt-4">
                 <Button asChild variant="outline" size="sm">
                   <a href="/#email-signup">
                     <ArrowRight className="h-4 w-4 mr-2" />
                     Join Mailing List
                   </a>
                 </Button>
-                <a
-                  href="https://yourwebsitescore.com/certified-websites/weblaunchacademy.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-opacity hover:opacity-80 inline-block"
-                  title="View our website certification"
-                >
-                  <img
-                    src="https://yourwebsitescore.com/api/badge/weblaunchacademy.com"
-                    alt="YourWebsiteScore Certification Badge"
-                    height="40"
-                    width="auto"
-                    loading="lazy"
-                    className="h-[40px] w-auto"
-                  />
-                </a>
               </div>
             </div>
           </div>
@@ -98,8 +90,8 @@ export function Footer() {
                 Site Maintenance
               </Link>
               */}
-              <Link href="#top" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
-                Back to the Top
+              <Link href="/#email-signup" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
+                Consultation Booking
               </Link>
               <Link href="/#website-samples-gallery" className="block text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                 Website Samples Gallery
@@ -117,18 +109,61 @@ export function Footer() {
               Learn to build professional websites with Fortune 500 technology. Complete ownership, no monthly fees, modern tech stack.
             </p>
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                <strong>Business Hours:</strong><br />
-                Monday - Friday: 9am - 6pm EST
-              </p>
-              <p className="text-sm text-muted-foreground">
-                <a href="/#email-signup" className="text-primary hover:text-primary/80 underline">Join our list</a> for consultation booking
-              </p>
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-green-500">✓</span>
                 <Link href="/guarantee" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                   Triple Guarantee Protection
                 </Link>
+              </div>
+
+              {/* WLA Referral Badge */}
+              <div className="pt-2">
+                <Link
+                  href="/badge-demo"
+                  className="inline-block transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,219,87,0.6)]"
+                  title="Get up to $250 per referral - Click to learn more"
+                >
+                  <div className="inline-flex items-center gap-2 rounded-md h-[40px] pl-[44px] pr-3 py-1 relative border-l-[3px]" style={{ backgroundColor: '#0a1840', borderLeftColor: '#ffdb57' }}>
+                    {/* Logo */}
+                    <div className="absolute left-[6px] top-1/2 -translate-y-1/2 w-8 h-8">
+                      <Image
+                        src="/favicon-logo.png"
+                        alt="WLA Logo"
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    </div>
+                    {/* Text */}
+                    <div className="flex flex-col leading-tight">
+                      <span className="text-white text-xs font-semibold font-sans">
+                        Built with
+                      </span>
+                      <span className="text-xs font-bold font-sans" style={{ color: '#ffdb57' }}>
+                        Web Launch Academy
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+
+              {/* YourWebsiteScore Badge */}
+              <div className="pt-2">
+                <a
+                  href="https://yourwebsitescore.com/certified-websites/weblaunchacademy.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-opacity hover:opacity-80 inline-block"
+                  title="View our website certification"
+                >
+                  <Image
+                    src="https://yourwebsitescore.com/api/badge/weblaunchacademy.com"
+                    alt="YourWebsiteScore Certification Badge"
+                    height={40}
+                    width={150}
+                    className="h-[40px] w-auto"
+                  />
+                </a>
               </div>
             </div>
           </div>

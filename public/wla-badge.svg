@@ -1,0 +1,22 @@
+<svg width="220" height="40" viewBox="0 0 220 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="220" height="40" rx="6" fill="#0a1840"/>
+
+  <!-- Left accent bar -->
+  <rect width="4" height="40" rx="6" fill="#ffdb57"/>
+
+  <!-- Logo will be placed as an image in the component -->
+  <!-- Reserve space: x=8, y=4, 32x32px -->
+  <rect x="8" y="4" width="32" height="32" fill="#11296b" rx="16"/>
+
+  <!-- Embedded logo image -->
+  <image x="8" y="4" width="32" height="32" href="/favicon-logo.png" />
+
+  <!-- Text -->
+  <text x="48" y="17" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="white">
+    Built with
+  </text>
+  <text x="48" y="27" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffdb57">
+    Web Launch Academy
+  </text>
+</svg>

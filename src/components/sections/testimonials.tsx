@@ -121,7 +121,7 @@ export function Testimonials() {
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             What People Are Saying
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
             Real feedback from real people (and friends who can't escape honest reviews)
           </p>
         </div>
@@ -155,7 +155,7 @@ export function Testimonials() {
 
               {/* View More Button */}
               <div className="text-center">
-                <Button 
+                <Button
                   onClick={() => setShowModal(true)}
                   variant="outline"
                   className="w-full"
@@ -163,6 +163,19 @@ export function Testimonials() {
                 >
                   {loadingTestimonials ? 'Loading...' : `View More Testimonials ${testimonials.length > 0 ? `(${testimonials.length})` : ''}`}
                 </Button>
+
+                {/* Referral CTA */}
+                <div className="mt-4">
+                  <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                    <a href="/badge-demo?highlight=true">
+                      <span className="mr-2">💰</span>
+                      Earn Up To $250 Per Referral!
+                    </a>
+                  </Button>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Learn about our affiliate program
+                  </p>
+                </div>
               </div>
             </div>
           </div>
