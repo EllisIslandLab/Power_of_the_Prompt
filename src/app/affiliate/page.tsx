@@ -259,6 +259,14 @@ function BadgeDemoContent() {
                 </p>
               </CardContent>
             </Card>
+
+            <Card className="mt-4 bg-blue-50 dark:bg-blue-950/20 border-blue-500/50">
+              <CardContent className="p-4">
+                <p className="text-gray-900 dark:text-gray-100 text-sm">
+                  <strong>💡 Built with WLA Methodology?</strong> Since your site is built with Next.js 15, React, and TypeScript, import the <code className="bg-gray-300 dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">Image</code> component from <code className="bg-gray-300 dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">next/image</code> instead of using an HTML <code className="bg-gray-300 dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">&lt;img&gt;</code> tag. This optimizes performance and avoids linting warnings—keeping your site consistent with WLA best practices.
+                </p>
+              </CardContent>
+            </Card>
           </CardContent>
         </Card>
 
@@ -319,6 +327,14 @@ function BadgeDemoContent() {
                 </p>
               </CardContent>
             </Card>
+
+            <Card className="mt-4 bg-blue-50 dark:bg-blue-950/20 border-blue-500/50">
+              <CardContent className="p-4">
+                <p className="text-gray-900 dark:text-gray-100 text-sm">
+                  <strong>💡 Built with WLA Methodology?</strong> Since your site is built with Next.js 15, React, and TypeScript, import the <code className="bg-gray-300 dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">Image</code> component from <code className="bg-gray-300 dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">next/image</code> instead of using an HTML <code className="bg-gray-300 dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">&lt;img&gt;</code> tag. This optimizes performance and avoids linting warnings—keeping your site consistent with WLA best practices.
+                </p>
+              </CardContent>
+            </Card>
           </CardContent>
         </Card>
 
@@ -331,10 +347,10 @@ function BadgeDemoContent() {
               <div>
                 <h3 className="text-lg font-semibold text-white mb-2">Which Method Should You Choose?</h3>
                 <p className="text-white/90 mb-2">
-                  <strong>Method 1 (Hosted):</strong> Fastest setup - just copy and paste! Perfect if you want the badge to stay perfectly up-to-date automatically.
+                  <strong>Method 1 (Hosted):</strong> Fastest setup - just copy and paste! Perfect if you want the badge to stay perfectly up-to-date automatically. Great for static websites or non-React projects.
                 </p>
                 <p className="text-white/90">
-                  <strong>Method 2 (Self-hosted):</strong> Choose this if you prefer complete control and don't want to rely on external servers. Takes a few extra minutes to set up.
+                  <strong>Method 2 (Self-hosted):</strong> Choose this if you prefer complete control and don't want to rely on external servers. Recommended for WLA sites built with Next.js 15 (use the Next.js Image component instead of HTML img tags).
                 </p>
               </div>
 
@@ -343,8 +359,16 @@ function BadgeDemoContent() {
                 <ul className="space-y-1 ml-5 list-disc text-white/90">
                   <li><strong>For Method 1:</strong> Just the HTML code below - that's it!</li>
                   <li><strong>For Method 2:</strong> The HTML code below + download the logo using the script above</li>
+                  <li><strong>For WLA Sites (Next.js 15):</strong> Use the Next.js <code className="bg-gray-700 px-1 rounded text-yellow-300">Image</code> component for better performance and type safety</li>
                   <li><strong>Where to add it:</strong> Paste the code in your website footer (or wherever you want the badge to appear)</li>
                 </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-2">WLA Tech Stack Support</h3>
+                <p className="text-white/90">
+                  Both methods work with the full WLA tech stack: <strong>Next.js 15, React 19, TypeScript, Tailwind CSS, Supabase, and Vercel</strong>. For the best experience with WLA sites, use Method 2 with the Next.js Image component as shown in the tip above each code block.
+                </p>
               </div>
             </div>
           </CardContent>
