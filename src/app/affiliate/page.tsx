@@ -198,9 +198,9 @@ function BadgeDemoContent() {
         {/* Method 1: Hosted Badge */}
         <Card className="mb-8 bg-gray-900/80 backdrop-blur-sm">
           <CardContent className="p-8">
-            <h2 className="text-2xl font-bold mb-4 text-white">✅ Method 1: Hosted Badge (LIVE DEMO)</h2>
+            <h2 className="text-2xl font-bold mb-4 text-white">✅ Method 1: Hosted Badge (Easiest)</h2>
             <p className="text-white/90 mb-6">
-              This badge loads the logo from weblaunchacademy.com - clients just paste the code!
+              Simply paste this code on your website - the badge and logo load automatically from Web Launch Academy's servers. No files to download or manage!
             </p>
 
             {/* Live Demo */}
@@ -225,7 +225,7 @@ function BadgeDemoContent() {
             </div>
 
             {/* Code Block */}
-            <h3 className="text-lg font-semibold mb-3 text-white">Code to Give Clients:</h3>
+            <h3 className="text-lg font-semibold mb-3 text-white">Copy This Code to Your Website:</h3>
             <div className="bg-gray-800 rounded-lg p-4 overflow-x-auto">
               <pre className="text-sm text-gray-200">
 {`<!-- Web Launch Academy Badge -->
@@ -265,18 +265,22 @@ function BadgeDemoContent() {
         {/* Method 2: Self-Hosted */}
         <Card className="mb-8 bg-gray-900/80 backdrop-blur-sm">
           <CardContent className="p-8">
-            <h2 className="text-2xl font-bold mb-4 text-white">✅ Method 2: Self-Hosted Badge</h2>
+            <h2 className="text-2xl font-bold mb-4 text-white">✅ Method 2: Self-Hosted Badge (No Dependencies)</h2>
             <p className="text-white/90 mb-6">
-              Client downloads the logo file and hosts it themselves - fully independent!
+              Want full control? Download the logo file and host it on your own website. This badge works completely independently - no reliance on external servers.
             </p>
 
             <Card className="bg-gray-800/80 backdrop-blur-sm border-accent/50 mb-6">
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-3">Instructions for Clients:</h3>
+                <h3 className="text-lg font-semibold text-white mb-3">Instructions for Your Clients:</h3>
                 <ol className="space-y-2 ml-5 list-decimal text-white">
-                  <li>Download <code className="bg-gray-700 px-2 py-1 rounded text-yellow-300">favicon-logo.png</code> from Web Launch Academy</li>
-                  <li>Upload it to their website (e.g., <code className="bg-gray-700 px-2 py-1 rounded text-yellow-300">/images/wla-logo.png</code>)</li>
-                  <li>Paste the code below, updating the image path</li>
+                  <li>Download the badge logo using this script:
+                    <div className="bg-gray-700 rounded px-3 py-2 mt-2 text-sm text-gray-200 overflow-x-auto">
+                      <code>./scripts/download-badge-logo.sh https://raw.githubusercontent.com/EllisIslandLab/Power_of_the_Prompt/main/public/favicon-logo.png wla-logo.png</code>
+                    </div>
+                  </li>
+                  <li>Upload the downloaded logo to your website (e.g., <code className="bg-gray-700 px-2 py-1 rounded text-yellow-300">/images/wla-logo.png</code>)</li>
+                  <li>Paste the code below, updating the image path to match where you uploaded the logo</li>
                 </ol>
               </CardContent>
             </Card>
@@ -311,7 +315,7 @@ function BadgeDemoContent() {
             <Card className="mt-6 bg-green-50 dark:bg-green-950/20 border-green-500/50">
               <CardContent className="p-4">
                 <p className="text-gray-900 dark:text-gray-100">
-                  <strong>✅ Pros:</strong> No external dependencies, works offline, client has full control
+                  <strong>✅ Pros:</strong> No external dependencies, works offline, complete control over your badge assets
                 </p>
               </CardContent>
             </Card>
@@ -325,21 +329,21 @@ function BadgeDemoContent() {
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Which Method to Use?</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">Which Method Should You Choose?</h3>
                 <p className="text-white/90 mb-2">
-                  <strong>Method 1 (Hosted):</strong> Best for most clients - they just paste code and it works!
+                  <strong>Method 1 (Hosted):</strong> Fastest setup - just copy and paste! Perfect if you want the badge to stay perfectly up-to-date automatically.
                 </p>
                 <p className="text-white/90">
-                  <strong>Method 2 (Self-hosted):</strong> Use if client has concerns about external dependencies or wants full control
+                  <strong>Method 2 (Self-hosted):</strong> Choose this if you prefer complete control and don't want to rely on external servers. Takes a few extra minutes to set up.
                 </p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Files to Share with Clients:</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">What You'll Need:</h3>
                 <ul className="space-y-1 ml-5 list-disc text-white/90">
-                  <li><code className="bg-gray-700 px-2 py-1 rounded text-yellow-300">favicon-logo.png</code> - The logo file (if they choose Method 2)</li>
-                  <li>The HTML code from Method 1 or Method 2 above</li>
-                  <li>Instructions: "Add this to your website footer"</li>
+                  <li><strong>For Method 1:</strong> Just the HTML code below - that's it!</li>
+                  <li><strong>For Method 2:</strong> The HTML code below + download the logo using the script above</li>
+                  <li><strong>Where to add it:</strong> Paste the code in your website footer (or wherever you want the badge to appear)</li>
                 </ul>
               </div>
             </div>

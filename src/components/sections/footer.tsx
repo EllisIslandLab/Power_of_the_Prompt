@@ -119,7 +119,7 @@ export function Footer() {
               {/* WLA Referral Badge */}
               <div className="pt-2">
                 <Link
-                  href="/badge-demo"
+                  href="/affiliate"
                   className="inline-block transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,219,87,0.6)]"
                   title="Get up to $250 per referral - Click to learn more"
                 >

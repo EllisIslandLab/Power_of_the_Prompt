@@ -167,7 +167,7 @@ export function Testimonials() {
                 {/* Referral CTA */}
                 <div className="mt-4">
                   <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                    <a href="/badge-demo?highlight=true">
+                    <a href="/affiliate?highlight=true">
                       <span className="mr-2">💰</span>
                       Earn Up To $250 Per Referral!
                     </a>
@@ -266,9 +266,9 @@ export function Testimonials() {
                     </div>
                   )}
 
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? 'Submitting...' : 'Submit Testimonial'}
