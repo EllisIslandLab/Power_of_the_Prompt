@@ -30,10 +30,13 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files - keep .env.local private, but track .env.example as template
+# env files - keep all .env files private except .env.example which is a template
+.env
 .env.local
 .env.local.*
 .env.*.local
+.env.*.js
+.env.vercel
 
 # vercel
 .vercel

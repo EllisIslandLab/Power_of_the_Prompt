@@ -1,5 +1,8 @@
+'use client'
+
 import React from 'react'
 import Image from 'next/image'
+import { trackBadgeClick } from '@/lib/affiliate'
 
 interface WLABadgeProps {
   /** The URL to link to when the badge is clicked */
@@ -8,6 +11,10 @@ interface WLABadgeProps {
   className?: string
   /** Size variant */
   size?: 'sm' | 'md' | 'lg'
+  /** Optional referrer ID for affiliate tracking */
+  referrerId?: string
+  /** Optional referrer email for affiliate tracking */
+  referrerEmail?: string
 }
 
 const sizeConfig = {
@@ -35,6 +42,7 @@ const sizeConfig = {
  * Web Launch Academy Certification Badge
  *
  * Use this badge on websites built with or by Web Launch Academy.
+ * Can optionally track affiliate referrals if referrerId and referrerEmail are provided.
  *
  * @example
  * // Basic usage
@@ -45,6 +53,10 @@ const sizeConfig = {
  * <WLABadge href="https://weblaunchacademy.com" />
  *
  * @example
+ * // With affiliate tracking
+ * <WLABadge referrerId="user-uuid" referrerEmail="user@example.com" />
+ *
+ * @example
  * // Different sizes
  * <WLABadge size="sm" />
  * <WLABadge size="lg" />
@@ -52,9 +64,27 @@ const sizeConfig = {
 export function WLABadge({
   href = "https://weblaunchacademy.com",
   className = "",
-  size = "md"
+  size = "md",
+  referrerId,
+  referrerEmail,
 }: WLABadgeProps) {
   const config = sizeConfig[size]
+
+  const handleBadgeClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Track the click if affiliate info is provided
+    if (referrerId && referrerEmail) {
+      try {
+        await trackBadgeClick(
+          referrerId,
+          referrerEmail,
+          typeof window !== 'undefined' ? window.location.hostname : undefined
+        )
+      } catch (error) {
+        // Log but don't block navigation
+        console.error('Failed to track badge click:', error)
+      }
+    }
+  }
 
   const badge = (
     <div
@@ -125,6 +155,7 @@ export function WLABadge({
         className="inline-block"
         title="Built with Web Launch Academy"
         style={{ textDecoration: 'none' }}
+        onClick={handleBadgeClick}
       >
         {badge}
       </a>

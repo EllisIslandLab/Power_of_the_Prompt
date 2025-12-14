@@ -20,6 +20,7 @@ import { alertCriticalError } from '@/lib/error-alerts'
  * 5. Mark lead as converted
  * 6. Send welcome/confirmation email
  * 7. Log payment completion
+ * 8. Create affiliate compensation record if applicable
  */
 export class CheckoutCompletedHandler extends BaseWebhookHandler {
   readonly eventType = 'checkout.session.completed'
@@ -126,6 +127,17 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         sessionsToCredit,
         customerEmail,
         passwordResetUrl
+      )
+
+      // 6. Handle affiliate compensation if applicable
+      const amount = session.amount_total || 0
+      await this.handleAffiliateCompensation(
+        userId,
+        customerEmail,
+        amount,
+        session.id,
+        supabase,
+        checkoutLogger
       )
 
       const duration = Date.now() - startTime
@@ -447,6 +459,122 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         'Failed to send payment confirmation email'
       )
       // Don't re-throw - email failure shouldn't fail the webhook
+    }
+  }
+
+  /**
+   * Handle affiliate compensation tracking
+   * Checks if the customer came through an affiliate badge click
+   * and creates a compensation record
+   */
+  private async handleAffiliateCompensation(
+    userId: string,
+    customerEmail: string,
+    amount: number,
+    sessionId: string,
+    supabase: any,
+    checkoutLogger: any
+  ): Promise<void> {
+    try {
+      // Try to find a recent badge click for this email that hasn't been converted
+      const { data: badgeClicks, error: clickError } = await supabase
+        .from('affiliate_badge_clicks')
+        .select('*')
+        .eq('referee_email', customerEmail)
+        .eq('converted', false)
+        .order('clicked_at', { ascending: false })
+        .limit(1)
+
+      if (clickError) {
+        checkoutLogger.warn({ error: clickError }, 'Failed to look up badge clicks')
+        return
+      }
+
+      if (!badgeClicks || badgeClicks.length === 0) {
+        checkoutLogger.debug({ customerEmail }, 'No badge click found for customer')
+        return
+      }
+
+      const badgeClick = badgeClicks[0]
+      const referrerId = badgeClick.referrer_id
+      const badgeClickId = badgeClick.id
+
+      checkoutLogger.info(
+        { referrerId, badgeClickId, amount },
+        'Found affiliate badge click, calculating compensation'
+      )
+
+      // Calculate commission based on purchase amount and referrer tier
+      const { data: commissionData, error: commissionError } = await supabase
+        .rpc('calculate_affiliate_commission', {
+          p_purchase_amount: amount / 100, // Convert cents to dollars
+          p_referrer_id: referrerId
+        })
+
+      if (commissionError || !commissionData || commissionData.length === 0) {
+        checkoutLogger.warn(
+          { error: commissionError, referrerId },
+          'Failed to calculate commission'
+        )
+        return
+      }
+
+      const { commission_percentage, commission_amount } = commissionData[0]
+
+      // Create compensation record
+      const { data: compensation, error: compError } = await supabase
+        .from('affiliate_compensations')
+        .insert({
+          referrer_id: referrerId,
+          referrer_email: badgeClick.referrer_email,
+          badge_click_id: badgeClickId,
+          purchase_id: sessionId,
+          purchase_amount: amount / 100, // Convert to dollars
+          commission_percentage,
+          commission_amount,
+          status: 'earned',
+          held_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+        })
+        .select()
+        .single()
+
+      if (compError) {
+        checkoutLogger.error(
+          { error: compError, referrerId },
+          'Failed to create compensation record'
+        )
+        return
+      }
+
+      // Mark the badge click as converted
+      const { error: markError } = await supabase.rpc('mark_badge_click_converted', {
+        p_badge_click_id: badgeClickId,
+        p_referee_email: customerEmail,
+        p_referee_id: userId,
+      })
+
+      if (markError) {
+        checkoutLogger.warn(
+          { error: markError, badgeClickId },
+          'Failed to mark badge click as converted'
+        )
+      }
+
+      checkoutLogger.info(
+        {
+          compensationId: compensation.id,
+          referrerId,
+          commissionAmount: compensation_amount,
+          status: 'earned',
+        },
+        'Affiliate compensation created'
+      )
+    } catch (error) {
+      checkoutLogger.error(
+        { error, customerEmail },
+        'Exception in affiliate compensation handling'
+      )
+      // Don't re-throw - compensation failure shouldn't fail the webhook
     }
   }
 }
