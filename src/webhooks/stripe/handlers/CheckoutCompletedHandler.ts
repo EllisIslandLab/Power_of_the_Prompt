@@ -130,7 +130,6 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
       )
 
       // 6. Handle affiliate compensation if applicable
-      const amount = session.amount_total || 0
       await this.handleAffiliateCompensation(
         userId,
         customerEmail,
@@ -564,7 +563,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         {
           compensationId: compensation.id,
           referrerId,
-          commissionAmount: compensation_amount,
+          commissionAmount: commission_amount,
           status: 'earned',
         },
         'Affiliate compensation created'
