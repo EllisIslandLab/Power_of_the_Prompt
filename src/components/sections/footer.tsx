@@ -105,8 +105,7 @@ export function Footer() {
               Learn to build professional websites with Fortune 500 technology. Complete ownership, no monthly fees, modern tech stack.
             </p>
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-green-500">✓</span>
+              <div className="text-sm">
                 <Link href="/guarantee" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                   Triple Guarantee Protection
                 </Link>

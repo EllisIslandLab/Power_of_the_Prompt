@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { CheckIcon, DollarIcon, LightningIcon } from "@/components/icons/SimpleIcons"
 
 export function Build4You() {
   return (
@@ -29,28 +30,28 @@ export function Build4You() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
-                <span className="text-green-500 text-xl">✓</span>
+                <LightningIcon size={24} />
                 <div>
                   <h4 className="font-medium text-foreground">Fast Delivery</h4>
                   <p className="text-sm text-muted-foreground">2-4 week turnaround</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-green-500 text-xl">✓</span>
+                <CheckIcon size={24} />
                 <div>
                   <h4 className="font-medium text-foreground">Full Ownership</h4>
                   <p className="text-sm text-muted-foreground">Complete source code</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-green-500 text-xl">✓</span>
+                <LightningIcon size={24} />
                 <div>
                   <h4 className="font-medium text-foreground">Modern Tech</h4>
                   <p className="text-sm text-muted-foreground">React, Next.js, TypeScript</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <span className="text-green-500 text-xl">✓</span>
+                <DollarIcon size={24} />
                 <div>
                   <h4 className="font-medium text-foreground">No Monthly Fees</h4>
                   <p className="text-sm text-muted-foreground">One-time payment</p>
@@ -76,27 +77,27 @@ export function Build4You() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-foreground">Custom Design</span>
-                    <span className="text-green-500">✓</span>
+                    <CheckIcon size={20} />
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-foreground">Responsive Mobile</span>
-                    <span className="text-green-500">✓</span>
+                    <CheckIcon size={20} />
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-foreground">SEO Optimized</span>
-                    <span className="text-green-500">✓</span>
+                    <CheckIcon size={20} />
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-foreground">Performance Optimized</span>
-                    <span className="text-green-500">✓</span>
+                    <CheckIcon size={20} />
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-foreground">Full Source Code</span>
-                    <span className="text-green-500">✓</span>
+                    <CheckIcon size={20} />
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-foreground">90 Days Support</span>
-                    <span className="text-green-500">✓</span>
+                    <CheckIcon size={20} />
                   </div>
                 </div>
               </div>

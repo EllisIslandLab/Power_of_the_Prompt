@@ -232,7 +232,7 @@ export function SimplePricing() {
             </h2>
             <div className="max-w-2xl mx-auto space-y-4">
               <div className="flex items-center justify-center gap-3 text-lg">
-                <span>⚡</span>
+                <LightningIcon size={20} />
                 <span className="font-semibold text-primary">Explore First</span>
                 <span className="text-muted-foreground">- Free consultation, then regular pricing</span>
               </div>
@@ -333,7 +333,7 @@ export function SimplePricing() {
                     <ul className="space-y-3 mb-6">
                       {course.features.map((feature, index) => (
                         <li key={index} className="flex items-start gap-3">
-                          <Zap className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
+                          <CheckIcon size={16} />
                           <span className="text-sm">
                             {feature.includes('I want to see you win') ? (
                               <span className="italic text-primary font-bold">{feature}</span>
@@ -369,17 +369,23 @@ export function SimplePricing() {
             <div className="max-w-3xl mx-auto mb-6">
               <div className="grid md:grid-cols-3 gap-6 mb-6">
                 <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                  <div className="text-3xl mb-2">✓</div>
+                  <div className="flex justify-center mb-2">
+                    <CheckIcon size={32} />
+                  </div>
                   <h4 className="font-semibold text-sm mb-2">Fully-Functional Site</h4>
                   <p className="text-xs text-muted-foreground">Within 2 weeks after completing 8-week program</p>
                 </div>
                 <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                  <div className="text-3xl mb-2">✓</div>
+                  <div className="flex justify-center mb-2">
+                    <CheckIcon size={32} />
+                  </div>
                   <h4 className="font-semibold text-sm mb-2">90+ Lighthouse Scores</h4>
                   <p className="text-xs text-muted-foreground">Performance, Accessibility, Best Practices, SEO</p>
                 </div>
                 <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                  <div className="text-3xl mb-2">✓</div>
+                  <div className="flex justify-center mb-2">
+                    <CheckIcon size={32} />
+                  </div>
                   <h4 className="font-semibold text-sm mb-2">1 Year Basic Support</h4>
                   <p className="text-xs text-muted-foreground">Email/chat consultation and testing</p>
                 </div>

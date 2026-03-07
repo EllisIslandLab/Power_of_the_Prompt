@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Check, X } from "lucide-react"
+import { CheckIcon, DollarIcon } from "@/components/icons/SimpleIcons"
 
 export function ResponsiveComparison() {
   const [isMobile, setIsMobile] = useState(false)
@@ -17,15 +18,39 @@ export function ResponsiveComparison() {
     return () => window.removeEventListener('resize', checkScreenSize)
   }, [])
 
+  // Icon renderer for consistent semantic meaning
+  const renderIcon = (type: 'check' | 'x' | 'dollar' | 'dollar-high' | 'warning') => {
+    switch(type) {
+      case 'check':
+        return <CheckIcon size={20} />
+      case 'x':
+        return <X className="h-5 w-5 text-red-500" />
+      case 'dollar':
+        return <DollarIcon size={20} />
+      case 'dollar-high':
+        return (
+          <div className="flex gap-0.5">
+            <DollarIcon size={16} />
+            <DollarIcon size={16} />
+            <DollarIcon size={16} />
+          </div>
+        )
+      case 'warning':
+        return <span className="text-yellow-500 text-lg">!</span>
+      default:
+        return null
+    }
+  }
+
   const comparisonData = [
     {
       feature: "Annual Fees",
       platforms: "$192-1,908/year*",
-      agencies: "$18,000-120,000+/year*", 
+      agencies: "$18,000-120,000+/year*",
       webLaunch: "$0 after training (upfront cost)*",
-      platformsIcon: "💰",
-      agenciesIcon: "💰💰💰",
-      webLaunchIcon: "✅",
+      platformsIcon: "dollar" as const,
+      agenciesIcon: "dollar-high" as const,
+      webLaunchIcon: "check" as const,
       highlight: true
     },
     {
@@ -33,9 +58,9 @@ export function ResponsiveComparison() {
       platforms: "Platform-hosted solution",
       agencies: "Agency-managed solution",
       webLaunch: "Complete source code access",
-      platformsIcon: "❌",
-      agenciesIcon: "❌", 
-      webLaunchIcon: "✅",
+      platformsIcon: "x" as const,
+      agenciesIcon: "x" as const,
+      webLaunchIcon: "check" as const,
       highlight: true
     },
     {
@@ -43,9 +68,9 @@ export function ResponsiveComparison() {
       platforms: "Proprietary platforms (limited flexibility)",
       agencies: "Often WordPress or legacy systems",
       webLaunch: "Uncompromising tech stack (used by Fortune 500 companies)",
-      platformsIcon: "⚠️",
-      agenciesIcon: "⚠️",
-      webLaunchIcon: "✅",
+      platformsIcon: "warning" as const,
+      agenciesIcon: "warning" as const,
+      webLaunchIcon: "check" as const,
       highlight: true
     },
     {
@@ -53,9 +78,9 @@ export function ResponsiveComparison() {
       platforms: "3-7 sec load times**",
       agencies: "3-6 sec load times**",
       webLaunch: "< 3 sec Guaranteed**",
-      platformsIcon: "⚠️",
-      agenciesIcon: "⚠️",
-      webLaunchIcon: "✅",
+      platformsIcon: "warning" as const,
+      agenciesIcon: "warning" as const,
+      webLaunchIcon: "check" as const,
       highlight: false
     },
     {
@@ -63,9 +88,9 @@ export function ResponsiveComparison() {
       platforms: "Limited templates",
       agencies: "Custom but locked-in",
       webLaunch: "Unlimited flexibility",
-      platformsIcon: "⚠️",
-      agenciesIcon: "⚠️",
-      webLaunchIcon: "✅",
+      platformsIcon: "warning" as const,
+      agenciesIcon: "warning" as const,
+      webLaunchIcon: "check" as const,
       highlight: false
     },
     {
@@ -73,9 +98,9 @@ export function ResponsiveComparison() {
       platforms: "No education provided",
       agencies: "No knowledge transfer",
       webLaunch: "Full training included",
-      platformsIcon: "❌",
-      agenciesIcon: "❌",
-      webLaunchIcon: "✅",
+      platformsIcon: "x" as const,
+      agenciesIcon: "x" as const,
+      webLaunchIcon: "check" as const,
       highlight: false
     },
     {
@@ -83,9 +108,9 @@ export function ResponsiveComparison() {
       platforms: "Basic ticket system",
       agencies: "Ongoing dependency",
       webLaunch: "Learn to be independent",
-      platformsIcon: "🎫",
-      agenciesIcon: "🔄",
-      webLaunchIcon: "🎓",
+      platformsIcon: "warning" as const,
+      agenciesIcon: "warning" as const,
+      webLaunchIcon: "check" as const,
       highlight: false
     },
     {
@@ -93,9 +118,9 @@ export function ResponsiveComparison() {
       platforms: "Platform-dependent",
       agencies: "May require recreation",
       webLaunch: "Fully portable codebase",
-      platformsIcon: "❌",
-      agenciesIcon: "⚠️",
-      webLaunchIcon: "✅",
+      platformsIcon: "x" as const,
+      agenciesIcon: "warning" as const,
+      webLaunchIcon: "check" as const,
       highlight: false
     }
   ]
@@ -206,19 +231,20 @@ export function ResponsiveComparison() {
         <h4 className="text-sm font-semibold text-foreground mb-3">Legend:</h4>
         <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
-            <span>✅</span>
+            <CheckIcon size={16} />
             <span>Included/Excellent</span>
           </div>
           <div className="flex items-center gap-1">
-            <span>❌</span>
+            <X className="h-4 w-4 text-red-500" />
             <span>Not Available</span>
           </div>
           <div className="flex items-center gap-1">
-            <span>⚠️</span>
+            <span className="text-yellow-500 text-lg">!</span>
             <span>Limited/Variable</span>
           </div>
-          <div className="flex items-center gap-1">
-            <span>Cost Level</span>
+          <div className="flex items-center gap-2">
+            <DollarIcon size={16} />
+            <span>High Costs</span>
           </div>
         </div>
       </div>
