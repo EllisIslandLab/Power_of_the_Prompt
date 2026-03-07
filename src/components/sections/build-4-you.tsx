@@ -59,7 +59,7 @@ export function Build4You() {
             </div>
             
             <div className="pt-6">
-              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+              <Button asChild size="lg">
                 <Link href="/website-building">Get Your Website Built</Link>
               </Button>
             </div>

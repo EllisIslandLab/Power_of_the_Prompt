@@ -110,9 +110,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <DarkModeProvider>
-          {/* ANIMATED BACKGROUND - Only shows in dark mode now */}
+          {/* Connection lines background - subtle animation in dark mode */}
           <AnimatedBackground />
-          
+
           <Providers>
             <Navigation />
             {children}

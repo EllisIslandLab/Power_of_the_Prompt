@@ -101,7 +101,7 @@ export function AnimatedBackground() {
 
   return (
     <div className="dark-mode-cubes-container">
-      {/* Connection lines */}
+      {/* Connection lines - subtle animated lines in dark mode */}
       {connections.map((line) => (
         <div
           key={line.id}
@@ -112,20 +112,6 @@ export function AnimatedBackground() {
             width: `${line.length}%`,
             transform: `rotate(${line.angle}deg)`,
             animationDelay: `${Math.random() * 4}s`
-          }}
-        />
-      ))}
-
-      {/* Floating cubes */}
-      {cubes.map((cube) => (
-        <div
-          key={cube.id}
-          className={`floating-cube ${cube.size} ${cube.glinting ? 'glinting' : ''}`}
-          style={{
-            left: `${cube.x}%`,
-            top: `${cube.y}%`,
-            animationDelay: `${cube.delay}s, ${cube.delay + 10}s, ${cube.delay + 20}s`,
-            animationDuration: `${cube.duration}s, 40s, 8s`
           }}
         />
       ))}

@@ -176,7 +176,6 @@ export function ResponsiveComparison() {
             <div className="border-l-4 border-orange-200 pl-4">
               <div className="font-medium text-sm text-muted-foreground mb-1">DIY Platform Builders</div>
               <div className="flex items-center gap-2">
-                <span className="text-lg">{comparison.platformsIcon}</span>
                 <div className="text-sm text-orange-600">{comparison.platforms}</div>
               </div>
             </div>
@@ -184,7 +183,6 @@ export function ResponsiveComparison() {
             <div className="border-l-4 border-orange-200 pl-4">
               <div className="font-medium text-sm text-muted-foreground mb-1">Traditional Agencies</div>
               <div className="flex items-center gap-2">
-                <span className="text-lg">{comparison.agenciesIcon}</span>
                 <div className="text-sm text-orange-600">{comparison.agencies}</div>
               </div>
             </div>
@@ -195,7 +193,6 @@ export function ResponsiveComparison() {
                 Our Method
               </div>
               <div className="flex items-center gap-2 text-green-600">
-                <span className="text-lg">{comparison.webLaunchIcon}</span>
                 <Check className="h-4 w-4" />
                 <span className="font-medium text-sm">{comparison.webLaunch}</span>
               </div>
@@ -221,7 +218,6 @@ export function ResponsiveComparison() {
             <span>Limited/Variable</span>
           </div>
           <div className="flex items-center gap-1">
-            <span>💰</span>
             <span>Cost Level</span>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Quote, X, ChevronLeft, ChevronRight } from "lucide-react"
+import { DollarIcon } from "@/components/icons/SimpleIcons"
 
 interface Testimonial {
   id: string
@@ -166,9 +167,9 @@ export function Testimonials() {
 
                 {/* Referral CTA */}
                 <div className="mt-4">
-                  <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                    <a href="/affiliate?highlight=true">
-                      <span className="mr-2">💰</span>
+                  <Button asChild size="lg">
+                    <a href="/affiliate?highlight=true" className="flex items-center gap-2">
+                      <DollarIcon size={18} />
                       Earn Up To $250 Per Referral!
                     </a>
                   </Button>

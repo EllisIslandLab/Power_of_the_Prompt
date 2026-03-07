@@ -19,7 +19,7 @@ export function Footer() {
             Stop paying monthly fees for limited control. Build a professional website with modern web technologies that you actually own.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8 py-6 h-auto">
+            <Button asChild size="lg">
               <Link href="/#build-with-you">Start Learning & Building</Link>
             </Button>
           </div>
@@ -32,26 +32,22 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-lg mb-4">Get In Touch</h3>
             <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <span className="text-lg">📧</span>
+              <div>
                 <a href="mailto:hello@weblaunchacademy.com" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                   hello@weblaunchacademy.com
                 </a>
               </div>
-              <div className="flex items-start gap-3">
-                <span className="text-lg">📞</span>
+              <div>
                 <a href="tel:+14403549904" className="text-muted-foreground hover:text-primary transition-colors underline decoration-1 underline-offset-2">
                   (440) 354-9904
                 </a>
               </div>
-              <div className="flex items-start gap-3">
-                <span className="text-lg">📍</span>
+              <div>
                 <span className="text-muted-foreground">
                   Painesville, Ohio | Available nationwide via video call
                 </span>
               </div>
-              <div className="flex items-start gap-3 mt-3">
-                <span className="text-lg">🕒</span>
+              <div className="mt-3">
                 <div className="text-muted-foreground">
                   <strong>Business Hours:</strong><br />
                   Monday - Friday: 9am - 6pm EST

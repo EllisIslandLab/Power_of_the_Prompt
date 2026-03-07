@@ -197,7 +197,7 @@ export function SiteTLC() {
                   </p>
                 </div>
                 
-                <Button asChild size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Button asChild size="lg" className="w-full">
                   <Link href="/contact">Protect Your Investment</Link>
                 </Button>
               </div>

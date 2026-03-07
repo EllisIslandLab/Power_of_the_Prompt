@@ -5,18 +5,22 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
-  BookOpen, 
-  ArrowLeft, 
-  ArrowRight, 
-  Menu, 
-  X, 
+import { ScrollArea } from "@/components/ui/scroll-area"
+import * as Accordion from "@radix-ui/react-accordion"
+import {
+  BookOpen,
+  ArrowLeft,
+  ArrowRight,
+  Menu,
+  X,
   Clock,
-  Eye,
-  EyeOff
+  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen
 } from "lucide-react"
 import { textbookChapters, getChapterByPath, getNextChapter, getPreviousChapter } from "@/content/textbook"
 import { useParams } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 // This would normally come from a markdown parser like remark/rehype
 async function getMarkdownContent(filePath: string): Promise<string> {
@@ -41,9 +45,9 @@ export default function TextbookChapterPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [readingProgress, setReadingProgress] = useState(0)
   const [estimatedReadTime, setEstimatedReadTime] = useState(0)
-  const [darkMode, setDarkMode] = useState(false)
-  const [hoveredChapter, setHoveredChapter] = useState<string | null>(null)
-  const [sidebarOffset, setSidebarOffset] = useState(0)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [expandedChapter, setExpandedChapter] = useState<string | null>(null)
+  const [activeSection, setActiveSection] = useState<string | null>(null)
 
   const currentChapter = getChapterByPath(chapterPath)
   const nextChapter = currentChapter ? getNextChapter(currentChapter.id) : undefined
@@ -51,14 +55,14 @@ export default function TextbookChapterPage() {
 
   const loadChapterContent = useCallback(async () => {
     if (!currentChapter) return
-    
+
     setLoading(true)
     try {
       // In a real implementation, you'd fetch the markdown file and parse it
       // For now, we'll simulate loading the content
       const mockContent = await getMarkdownContent(currentChapter.filePath)
       setContent(mockContent)
-      
+
       // Estimate reading time (average 200 words per minute)
       const wordCount = mockContent.split(/\s+/).length
       setEstimatedReadTime(Math.ceil(wordCount / 200))
@@ -70,41 +74,102 @@ export default function TextbookChapterPage() {
     }
   }, [currentChapter])
 
+  const handleSectionClick = useCallback((sectionId: string) => {
+    const element = document.getElementById(`section-${sectionId}`)
+    if (element) {
+      const headerOffset = 80
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
+    }
+
+    // Close mobile sidebar after click
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false)
+    }
+  }, [])
+
   useEffect(() => {
     if (currentChapter) {
       loadChapterContent()
     }
   }, [currentChapter, loadChapterContent])
 
+  // Load sidebar collapsed state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('wlc-textbook-sidebar-collapsed')
+    if (saved !== null) {
+      setSidebarCollapsed(JSON.parse(saved))
+    }
+  }, [])
 
+  // Save sidebar collapsed state to localStorage
+  useEffect(() => {
+    localStorage.setItem('wlc-textbook-sidebar-collapsed', JSON.stringify(sidebarCollapsed))
+  }, [sidebarCollapsed])
+
+  // Auto-expand current chapter
+  useEffect(() => {
+    if (currentChapter && !sidebarCollapsed) {
+      setExpandedChapter(currentChapter.id)
+    }
+  }, [currentChapter, sidebarCollapsed])
+
+  // Simplified reading progress tracking
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const viewportHeight = window.innerHeight
-      
-      // Calculate reading progress for progress bar
-      const progress = scrollTop / docHeight
-      setReadingProgress(Math.min(progress * 100, 100))
-      
-      // Calculate scroll progress (0 to 1)
-      const scrollProgress = scrollTop / docHeight
-      
-      // Define sidebar dimensions
-      const sidebarHeight = viewportHeight * 1.6 // Sidebar is 60% taller than viewport
-      const maxMovement = sidebarHeight - viewportHeight // How much the sidebar can move
-      
-      // Calculate offset: start at 0 (normal position), move up as we scroll down
-      // This will push the top navigation out of view and bring bottom navigation into view
-      // Multiply by 2.0 to make it move faster than the scroll
-      const offset = -scrollProgress * maxMovement * 2.0
-      
-      setSidebarOffset(offset)
+      const progress = (scrollTop / docHeight) * 100
+      setReadingProgress(Math.min(progress, 100))
     }
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Active section tracking
+  useEffect(() => {
+    if (!currentChapter) return
+
+    let ticking = false
+
+    const handleScroll = () => {
+      const sections = currentChapter.sections
+      let active = null
+
+      for (const section of sections) {
+        const element = document.getElementById(`section-${section.id}`)
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          if (rect.top <= 150 && rect.bottom >= 150) {
+            active = section.id
+            break
+          }
+        }
+      }
+
+      setActiveSection(active)
+    }
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', onScroll)
+    handleScroll() // Initial check
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [currentChapter])
 
   if (!currentChapter) {
     return (
@@ -128,7 +193,7 @@ export default function TextbookChapterPage() {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark bg-gray-950' : 'bg-gray-50'}`}>
+    <div className="min-h-screen bg-background">
       {/* Reading Progress Bar */}
       <div className="fixed top-0 left-0 right-0 z-50">
         <div
@@ -149,90 +214,145 @@ export default function TextbookChapterPage() {
 
       <div className="flex">
         {/* Sidebar */}
-        <aside 
-          className={`
-            fixed inset-y-0 left-0 z-30 w-80 bg-card border-r 
-            transform transition-transform duration-300 flex flex-col
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          `}
-          style={{
-            top: `${sidebarOffset}px`,
-            height: '160vh', // Taller than viewport to hold all content
-            transition: 'top 0.1s ease-out'
-          }}
+        <aside
+          className={cn(
+            "fixed inset-y-0 left-0 z-30 bg-card border-r flex flex-col",
+            "transform transition-all duration-300",
+            sidebarCollapsed ? "w-20" : "w-80",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          )}
         >
-          <div className="p-6 border-b">
-            <Link href="/portal/textbook" className="flex items-center gap-2 text-lg font-semibold">
+          <div className="p-6 border-b flex items-center justify-between">
+            <Link
+              href="/portal/textbook"
+              className={cn(
+                "flex items-center gap-2 text-lg font-semibold transition-all",
+                sidebarCollapsed && "opacity-0 w-0 overflow-hidden"
+              )}
+            >
               <BookOpen className="h-5 w-5" />
-              Student Textbook
+              <span>Student Textbook</span>
             </Link>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="hidden lg:flex"
+              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {sidebarCollapsed ? (
+                <PanelLeftOpen className="h-4 w-4" />
+              ) : (
+                <PanelLeftClose className="h-4 w-4" />
+              )}
+            </Button>
           </div>
-          
-          <nav className="p-4 flex-1 overflow-hidden">
-            <div className="space-y-2">
-              {textbookChapters.map((chapter) => (
-                <div 
-                  key={chapter.id}
-                  onMouseEnter={() => setHoveredChapter(chapter.id)}
-                  onMouseLeave={() => setHoveredChapter(null)}
-                >
-                  <Link
-                    href={`/portal/textbook${chapter.filePath}`}
-                    className={`
-                      flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors
-                      ${currentChapter.id === chapter.id 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'hover:bg-muted text-muted-foreground hover:text-foreground'
-                      }
-                    `}
-                  >
-                    <div className={`
-                      w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold
-                      ${currentChapter.id === chapter.id 
-                        ? 'bg-primary-foreground text-primary' 
-                        : 'bg-muted text-muted-foreground'
-                      }
-                    `}>
-                      {chapter.id}
-                    </div>
-                    <span className="flex-1">{chapter.title}</span>
-                  </Link>
-                  
-                  <div 
-                    className="ml-9 mt-2 space-y-1 overflow-hidden transition-all duration-500 ease-in-out"
-                    style={{
-                      maxHeight: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? '500px' : '0px',
-                      opacity: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? 1 : 0,
-                      paddingTop: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? '8px' : '0px',
-                      marginTop: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? '8px' : '0px'
-                    }}
-                  >
-                    {chapter.sections.map((section, index) => (
-                      <a
-                        key={section.id}
-                        href={`#section-${section.id}`}
-                        className="block px-3 py-1 text-xs text-muted-foreground hover:text-foreground rounded transition-all"
-                        style={{
-                          transitionDelay: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? `${index * 100}ms` : '0ms',
-                          transitionDuration: '300ms',
-                          transform: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? 'translateY(0)' : 'translateY(-10px)',
-                          opacity: (currentChapter.id === chapter.id || hoveredChapter === chapter.id) ? 1 : 0
-                        }}
-                      >
-                        {section.title}
-                      </a>
-                    ))}
-                  </div>
+
+          <ScrollArea className="flex-1">
+            <nav className="p-4">
+              {sidebarCollapsed ? (
+                // Collapsed view: Just chapter numbers with tooltips
+                <div className="space-y-2">
+                  {textbookChapters.map((chapter) => (
+                    <Link
+                      key={chapter.id}
+                      href={`/portal/textbook${chapter.filePath}`}
+                      className={cn(
+                        "flex items-center justify-center w-full h-12 rounded-lg transition-colors",
+                        currentChapter.id === chapter.id
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-muted text-muted-foreground"
+                      )}
+                      title={chapter.title}
+                    >
+                      <span className="text-sm font-bold">{chapter.id}</span>
+                    </Link>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </nav>
+              ) : (
+                // Expanded view: Accordion with sections
+                <Accordion.Root
+                  type="single"
+                  collapsible
+                  value={expandedChapter || undefined}
+                  onValueChange={(value) => setExpandedChapter(value || null)}
+                  className="space-y-1"
+                >
+                  {textbookChapters.map((chapter) => (
+                    <Accordion.Item
+                      key={chapter.id}
+                      value={chapter.id}
+                      className="border-none"
+                    >
+                      <div
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm",
+                          currentChapter.id === chapter.id && "bg-primary/10"
+                        )}
+                      >
+                        <Link
+                          href={`/portal/textbook${chapter.filePath}`}
+                          className={cn(
+                            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
+                            currentChapter.id === chapter.id
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground hover:bg-muted/80"
+                          )}
+                          title={chapter.title}
+                        >
+                          {chapter.id}
+                        </Link>
+
+                        <Accordion.Trigger
+                          className={cn(
+                            "group flex items-center justify-between gap-2 flex-1 text-left font-medium transition-colors",
+                            "hover:text-primary",
+                            currentChapter.id === chapter.id
+                              ? "text-primary"
+                              : "text-foreground"
+                          )}
+                        >
+                          <span className="flex-1">{chapter.title}</span>
+                          <ChevronRight className="h-4 w-4 shrink-0 transition-transform duration-150 group-data-[state=open]:rotate-90" />
+                        </Accordion.Trigger>
+                      </div>
+
+                      <Accordion.Content className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
+                        <div className="ml-8 mt-1 space-y-1 pb-2">
+                          {chapter.sections.map((section) => (
+                            <button
+                              key={section.id}
+                              onClick={() => handleSectionClick(section.id)}
+                              className={cn(
+                                "block w-full text-left px-3 py-1 text-xs rounded transition-colors",
+                                activeSection === section.id
+                                  ? "bg-primary/10 text-primary font-medium"
+                                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                              )}
+                            >
+                              {section.title}
+                            </button>
+                          ))}
+                        </div>
+                      </Accordion.Content>
+                    </Accordion.Item>
+                  ))}
+                </Accordion.Root>
+              )}
+            </nav>
+          </ScrollArea>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-0">
+        <main
+          className={cn(
+            "flex-1 transition-all duration-300",
+            sidebarCollapsed ? "lg:ml-20" : "lg:ml-80"
+          )}
+        >
           {/* Header */}
-          <header className={`sticky top-1 z-20 backdrop-blur border-b p-4 lg:px-8 ${darkMode ? 'bg-gray-900/95' : 'bg-white/95'}`}>
+          <header className="sticky top-1 z-20 backdrop-blur border-b p-4 lg:px-8 bg-background/95">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 min-w-0">
                 <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
@@ -249,20 +369,12 @@ export default function TextbookChapterPage() {
                   <Clock className="h-4 w-4" />
                   <span>{estimatedReadTime} min read</span>
                 </div>
-                
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDarkMode(!darkMode)}
-                >
-                  {darkMode ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                </Button>
               </div>
             </div>
           </header>
 
           {/* Content */}
-          <div className={`max-w-4xl mx-auto px-4 lg:px-8 py-8 ${darkMode ? 'bg-gray-950' : 'bg-white'} rounded-lg shadow-sm`}>
+          <div className="max-w-4xl mx-auto px-4 lg:px-8 py-8 bg-card rounded-lg shadow-sm">
             {/* Chapter Header */}
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4">
@@ -301,10 +413,10 @@ export default function TextbookChapterPage() {
 
             {/* Markdown Content */}
             {!loading && (
-              <article className={`prose prose-xl max-w-none ${!darkMode ? 'prose-slate' : 'prose-invert'}`}>
+              <article className="prose prose-xl max-w-none prose-slate dark:prose-invert">
                 <div
                   dangerouslySetInnerHTML={{ __html: content }}
-                  className={`markdown-content ${!darkMode ? 'text-black' : ''}`}
+                  className="markdown-content"
                 />
               </article>
             )}

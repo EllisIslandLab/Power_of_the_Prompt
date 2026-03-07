@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Zap, Code, Globe, ShoppingCart, Building, MessageCircle, Rocket, Star } from "lucide-react"
 import { useStripeCheckout } from "@/hooks/useStripeCheckout"
 import { Footer } from "@/components/sections/footer"
+import { CheckIcon, DollarIcon, LightningIcon } from "@/components/icons/SimpleIcons"
 
 // Dynamic date calculation for next cohort
 function getNextCohortDate() {
@@ -218,9 +219,9 @@ export function SimplePricing() {
           <div className="text-center mb-12">
             {/* Exclusive Badge */}
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-accent/20 to-primary/20 px-6 py-2 rounded-full border border-accent/30 mb-6">
-              <span className="text-lg">🌟</span>
+              <CheckIcon size={18} />
               <span className="font-bold text-sm uppercase tracking-wider text-primary">Exclusive to Web Launch Academy</span>
-              <span className="text-lg">🌟</span>
+              <CheckIcon size={18} />
             </div>
             <p className="text-sm text-muted-foreground mb-8 font-medium">
               The only course that teaches AI-powered web development for business owners
@@ -236,7 +237,7 @@ export function SimplePricing() {
                 <span className="text-muted-foreground">- Free consultation, then regular pricing</span>
               </div>
               <div className="flex items-center justify-center gap-3 text-lg">
-                <span>💰</span>
+                <DollarIcon size={20} />
                 <span className="font-semibold text-primary">Commit & Save</span>
                 <span className="text-muted-foreground">- Start building immediately and save $200</span>
               </div>
@@ -245,9 +246,8 @@ export function SimplePricing() {
           
           {/* Path 1: Explore First */}
           <div className="mb-12">
-            <h3 className="text-2xl font-bold text-center mb-8 flex items-center justify-center gap-2">
-              <span>🤔</span>
-              <span>Not Sure? Let's Talk First</span>
+            <h3 className="text-2xl font-bold text-center mb-8">
+              Not Sure? Let's Talk First
             </h3>
             
             <div className="max-w-md mx-auto">
@@ -290,7 +290,7 @@ export function SimplePricing() {
           {/* Path 2: Commit & Save */}
           <div className="mb-12">
             <h3 className="text-2xl font-bold text-center mb-8 flex items-center justify-center gap-2">
-              <span>🚀</span>
+              <LightningIcon size={24} />
               <span>Ready to Build? Start Saving Now</span>
             </h3>
             
@@ -305,8 +305,9 @@ export function SimplePricing() {
                   </div>
                   
                   {/* Savings Badge */}
-                  <div className="absolute top-16 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold z-10">
-                    💰 Save {course.savings}
+                  <div className="absolute top-16 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold z-10 flex items-center gap-1">
+                    <DollarIcon size={14} className="text-white" />
+                    Save {course.savings}
                   </div>
                   
                   <CardHeader className="pt-12">

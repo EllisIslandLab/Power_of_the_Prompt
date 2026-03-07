@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Sparkles } from "lucide-react"
+import { LightningIcon, CheckIcon } from "@/components/icons/SimpleIcons"
 
 export function ComingSoonBanner() {
   const [name, setName] = useState('')
@@ -66,9 +66,7 @@ export function ComingSoonBanner() {
           <Card className="max-w-xl mx-auto mb-8 border-2 border-primary/20 shadow-lg">
             <CardContent className="p-8">
               <div className="flex items-center justify-center gap-2 mb-6">
-                <Sparkles className="h-6 w-6 text-primary animate-pulse" />
                 <h2 className="font-bold text-2xl">Get Early Access</h2>
-                <Sparkles className="h-6 w-6 text-primary animate-pulse" />
               </div>
 
               {success ? (
@@ -173,17 +171,23 @@ export function ComingSoonBanner() {
 
           <div className="grid md:grid-cols-3 gap-6 text-center">
             <div>
-              <div className="text-3xl mb-2">🚀</div>
+              <div className="flex justify-center mb-3">
+                <CheckIcon size={24} />
+              </div>
               <h3 className="font-semibold text-lg mb-1">Built for Speed</h3>
               <p className="text-sm text-muted-foreground">Lightning fast websites that convert</p>
             </div>
             <div>
-              <div className="text-3xl mb-2">⚡</div>
+              <div className="flex justify-center mb-3">
+                <CheckIcon size={24} />
+              </div>
               <h3 className="font-semibold text-lg mb-1">AI-Powered</h3>
               <p className="text-sm text-muted-foreground">Smart development with Claude Code</p>
             </div>
             <div>
-              <div className="text-3xl mb-2">💎</div>
+              <div className="flex justify-center mb-3">
+                <CheckIcon size={24} />
+              </div>
               <h3 className="font-semibold text-lg mb-1">Own Forever</h3>
               <p className="text-sm text-muted-foreground">No startup subscription fees, complete ownership</p>
             </div>

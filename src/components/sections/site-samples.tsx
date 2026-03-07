@@ -297,7 +297,6 @@ export function SiteSamples() {
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-200 flex items-center justify-center">
                             <div className="text-center p-4">
-                              <div className="text-4xl mb-2">🌐</div>
                               <div className="text-sm font-medium text-gray-700">{sample.title}</div>
                               <div className="text-xs text-gray-500 mt-1">{sample.category}</div>
                             </div>

@@ -11,9 +11,9 @@ export default function PortalLayout({
 }) {
   return (
     <DarkModeProvider>
-      {/* ANIMATED BACKGROUND - Only shows in dark mode now */}
+      {/* Connection lines background - subtle animation in dark mode */}
       <AnimatedBackground />
-      
+
       <Providers>
         {/* No Navigation component here - portal has its own navigation */}
         {children}

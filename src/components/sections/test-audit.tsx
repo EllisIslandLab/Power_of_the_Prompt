@@ -490,7 +490,7 @@ export function TestAudit() {
             </div>
             
             <div className="mt-6 text-center">
-              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+              <Button asChild size="lg">
                 <Link href="/audit">Get Your Real Report</Link>
               </Button>
             </div>
