@@ -3,14 +3,14 @@ import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 /**
- * Middleware for authentication and route protection
+ * Proxy for authentication and route protection
  *
- * IMPORTANT: This middleware is intentionally SIMPLE to avoid auth conflicts
+ * IMPORTANT: This proxy is intentionally SIMPLE to avoid auth conflicts
  * - Only checks if user is authenticated (not their role)
  * - Admin role checking is done in AdminAuthGuard component
  * - This prevents "Multiple GoTrueClient instances" errors
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
