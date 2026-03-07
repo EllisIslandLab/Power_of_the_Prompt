@@ -5,8 +5,10 @@ const nextConfig: NextConfig = {
     // Keep TypeScript checking enabled
     ignoreBuildErrors: false,
   },
-  // Add empty turbopack config to silence webpack warning
-  turbopack: {},
+  // Configure turbopack workspace root
+  turbopack: {
+    root: '/home/ellis/weblaunchcoach',
+  },
   // Exclude packages from server-side bundling to avoid Turbopack errors
   serverExternalPackages: ['pino', 'pino-pretty', 'thread-stream'],
   // Performance optimizations
