@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Shield, Clock, Award } from "lucide-react"
 import { CourseCommitmentModal } from "@/components/course-commitment-modal"
+import { CheckIcon } from "@/components/icons/SimpleIcons"
 
 export function BuildWithYou() {
   const [showCommitmentModal, setShowCommitmentModal] = useState(false)
@@ -84,7 +85,7 @@ export function BuildWithYou() {
                     <ul className="space-y-2">
                       {feature.tasks.map((task, taskIndex) => (
                         <li key={taskIndex} className="flex items-start gap-2 text-muted-foreground">
-                          <span className="text-green-500 text-sm mt-1">✓</span>
+                          <CheckIcon size={16} />
                           <span>{task}</span>
                         </li>
                       ))}
@@ -111,16 +112,28 @@ export function BuildWithYou() {
               <div className="space-y-3 mb-8">
                 <div className="text-center text-sm text-muted-foreground mb-4">Graduate with:</div>
                 <div className="flex justify-between items-center">
-                  <span className="text-foreground">✓ Fully Functional Website</span>
+                  <div className="flex items-center gap-2">
+                    <CheckIcon size={16} />
+                    <span className="text-foreground">Fully Functional Website</span>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-foreground">✓ Source Code Ownership</span>
+                  <div className="flex items-center gap-2">
+                    <CheckIcon size={16} />
+                    <span className="text-foreground">Source Code Ownership</span>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-foreground">✓ Lifetime Access to Materials</span>
+                  <div className="flex items-center gap-2">
+                    <CheckIcon size={16} />
+                    <span className="text-foreground">Lifetime Access to Materials</span>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-foreground">✓ Lifetime Access to Community</span>
+                  <div className="flex items-center gap-2">
+                    <CheckIcon size={16} />
+                    <span className="text-foreground">Lifetime Access to Community</span>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-foreground">✗ No Additional Costs</span>
@@ -128,7 +141,7 @@ export function BuildWithYou() {
                 <div className="flex justify-between items-center">
                   <span className="text-foreground">✗ No Monthly Fees</span>
                 </div>
-                <div className="text-center text-sm font-semibold text-primary mt-4">All 100% Guaranteed ✓✓✓</div>
+                <div className="text-center text-sm font-semibold text-primary mt-4">All 100% Guaranteed</div>
                 <div className="text-center text-xs text-muted-foreground">(See inside for our 3X-Guarantee & other details)</div>
               </div>
               

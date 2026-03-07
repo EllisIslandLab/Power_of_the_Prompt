@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { CheckIcon } from "@/components/icons/SimpleIcons"
 
 export function NewHero() {
   const scrollToSection = (sectionId: string) => {
@@ -47,15 +48,15 @@ export function NewHero() {
           <p className="text-sm text-muted-foreground mb-4">Trusted by professionals who demand ownership</p>
           <div className="flex justify-center items-center gap-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
+              <CheckIcon size={20} />
               No Monthly Fees
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
+              <CheckIcon size={20} />
               Complete Ownership
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-green-500">✓</span>
+              <CheckIcon size={20} />
               Modern Tech Stack
             </div>
           </div>

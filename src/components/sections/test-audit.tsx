@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { Play, AlertCircle, CheckCircle, Clock, TrendingDown, TrendingUp, ExternalLink, Loader2 } from "lucide-react"
+import { CheckIcon, LightningIcon } from "@/components/icons/SimpleIcons"
 
 export function TestAudit() {
   const [currentStep, setCurrentStep] = useState(0)
@@ -23,12 +24,12 @@ export function TestAudit() {
     {
       title: "Enter Your Website URL",
       description: "We'll analyze your current website",
-      icon: "🌐"
+      icon: <CheckIcon size={20} />
     },
     {
       title: "Performance Analysis",
       description: "Testing speed, Core Web Vitals, and optimization",
-      icon: "⚡"
+      icon: <LightningIcon size={20} />
     },
     {
       title: "SEO & Security Scan",
@@ -509,7 +510,7 @@ export function TestAudit() {
                   <ul className="space-y-2">
                     {audit.items.map((item, itemIndex) => (
                       <li key={itemIndex} className="flex items-start gap-2 text-muted-foreground text-sm">
-                        <span className="text-green-500 text-xs mt-1">✓</span>
+                        <CheckIcon size={16} />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -535,27 +536,27 @@ export function TestAudit() {
               <div className="space-y-3 mb-6 text-left">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-foreground">Performance Score</span>
-                  <span className="text-green-500">✓</span>
+                  <CheckIcon size={20} />
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-foreground">SEO Analysis</span>
-                  <span className="text-green-500">✓</span>
+                  <CheckIcon size={20} />
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-foreground">Security Scan</span>
-                  <span className="text-green-500">✓</span>
+                  <CheckIcon size={20} />
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-foreground">Mobile Test</span>
-                  <span className="text-green-500">✓</span>
+                  <CheckIcon size={20} />
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-foreground">Improvement Plan</span>
-                  <span className="text-green-500">✓</span>
+                  <CheckIcon size={20} />
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-foreground">Video Walkthrough</span>
-                  <span className="text-green-500">✓</span>
+                  <CheckIcon size={20} />
                 </div>
               </div>
               
@@ -586,7 +587,9 @@ export function TestAudit() {
               </p>
             </div>
             <div className="space-y-3">
-              <div className="text-3xl">🎯</div>
+              <div className="text-3xl">
+                <CheckIcon size={32} />
+              </div>
               <h4 className="font-semibold text-foreground">Actionable Insights</h4>
               <p className="text-sm text-muted-foreground">
                 Specific recommendations prioritized by business impact and ease of implementation
@@ -627,19 +630,19 @@ export function TestAudit() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-green-600">
-                    <span>✓</span>
+                    <CheckIcon size={20} />
                     <span>Lightning fast performance (&lt;1s)</span>
                   </div>
                   <div className="flex items-center gap-2 text-green-600">
-                    <span>✓</span>
+                    <CheckIcon size={20} />
                     <span>Perfect mobile optimization</span>
                   </div>
                   <div className="flex items-center gap-2 text-green-600">
-                    <span>✓</span>
+                    <CheckIcon size={20} />
                     <span>Search engine optimized</span>
                   </div>
                   <div className="flex items-center gap-2 text-green-600">
-                    <span>✓</span>
+                    <CheckIcon size={20} />
                     <span>Enterprise-grade security</span>
                   </div>
                 </div>

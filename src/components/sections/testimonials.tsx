@@ -199,13 +199,13 @@ export function Testimonials() {
                   {submittedWithEmail ? (
                     <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-md">
                       <p className="text-sm text-primary font-medium">
-                        🚀 You've also been signed up for early access updates!
+                        You've also been signed up for early access updates!
                       </p>
                     </div>
                   ) : (
                     <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
                       <p className="text-sm text-blue-700 font-medium">
-                        💡 If you haven't already, don't forget to sign up for the launch!
+                        If you haven't already, don't forget to sign up for the launch!
                       </p>
                     </div>
                   )}
@@ -238,7 +238,7 @@ export function Testimonials() {
                       onChange={(e) => setEmail(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      💡 Providing your email signs you up for early access updates and allows you to edit your testimonial later
+                      Providing your email signs you up for early access updates and allows you to edit your testimonial later
                     </p>
                   </div>
                   

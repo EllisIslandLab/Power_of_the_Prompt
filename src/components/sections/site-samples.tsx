@@ -6,6 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, X, ExternalLink, Star } from "lucide-react"
 import { siteSamples } from "@/data/site-samples"
+import { CheckIcon } from "@/components/icons/SimpleIcons"
 
 export function SiteSamples() {
   const [selectedSample, setSelectedSample] = useState<any>(null)
@@ -428,7 +429,7 @@ export function SiteSamples() {
                   <ul className="space-y-3">
                     {selectedSample.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-center gap-3 text-muted-foreground">
-                        <span className="text-green-500 font-bold">✓</span>
+                        <CheckIcon size={20} />
                         <span>{feature}</span>
                       </li>
                     ))}
