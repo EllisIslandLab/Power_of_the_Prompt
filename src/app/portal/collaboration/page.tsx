@@ -297,7 +297,7 @@ export default function CollaborationPage() {
                         <div className="flex items-start justify-between">
                           <span className="text-3xl">{session.icon}</span>
                           {session.isPremium && (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="default" className="text-xs">
                               PREMIUM
                             </Badge>
                           )}

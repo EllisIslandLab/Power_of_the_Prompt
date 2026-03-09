@@ -12,7 +12,7 @@ export function DarkModeToggle() {
       <Button
         onClick={toggleDarkMode}
         size="lg"
-        variant={isDarkMode ? "secondary" : "outline"}
+        variant={isDarkMode ? "default" : "outline"}
         className={`
           rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110
           ${isDarkMode 

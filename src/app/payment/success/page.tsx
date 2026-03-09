@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { CheckCircle, Crown, ArrowRight, Mail } from 'lucide-react'
+import { CheckIcon } from '@/components/icons/SimpleIcons'
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()
@@ -81,11 +82,11 @@ function PaymentSuccessContent() {
       `Your payment has been processed successfully and you now have Full Access privileges.\n\n` +
       `Complete your student account setup here:\n${inviteData.signupUrl}\n\n` +
       `What you get with Full Access:\n` +
-      `✅ All course materials and premium content\n` +
-      `✅ One-on-one coaching sessions\n` +
-      `✅ Live group sessions\n` +
-      `✅ Priority support\n` +
-      `✅ Downloadable resources and certificates\n\n` +
+      `√ All course materials and premium content\n` +
+      `√ One-on-one coaching sessions\n` +
+      `√ Live group sessions\n` +
+      `√ Priority support\n` +
+      `√ Downloadable resources and certificates\n\n` +
       `This invitation will expire in 7 days, so please complete your setup soon.\n\n` +
       `Welcome to the academy!\n\n` +
       `Best regards,\nWeb Launch Academy Team`
@@ -152,25 +153,37 @@ function PaymentSuccessContent() {
             {/* What's Included */}
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">✅ Course Access</h3>
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <CheckIcon size={20} />
+                  Course Access
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   All course materials, premium content, and future updates
                 </p>
               </div>
               <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">✅ One-on-One Sessions</h3>
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <CheckIcon size={20} />
+                  One-on-One Sessions
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Personal coaching and guidance tailored to your goals
                 </p>
               </div>
               <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">✅ Live Group Sessions</h3>
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <CheckIcon size={20} />
+                  Live Group Sessions
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Interactive workshops and Q&A sessions with other students
                 </p>
               </div>
               <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">✅ Priority Support</h3>
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
+                  <CheckIcon size={20} />
+                  Priority Support
+                </h3>
                 <p className="text-sm text-muted-foreground">
                   Fast-track support and direct access to instructors
                 </p>

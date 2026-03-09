@@ -323,7 +323,7 @@ export default function WebsiteBuildingPage() {
                       return item ? (
                         <>
                           <h3 className="text-2xl font-bold">{item.title}</h3>
-                          <Badge variant="secondary" className="mt-2">{item.category}</Badge>
+                          <Badge variant="default" className="mt-2">{item.category}</Badge>
                           <div className="text-3xl font-bold text-primary mt-2">{item.price}</div>
                           {selectedAddOns.length > 0 && (
                             <div className="text-lg text-muted-foreground">

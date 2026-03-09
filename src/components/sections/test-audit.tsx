@@ -34,12 +34,12 @@ export function TestAudit() {
     {
       title: "SEO & Security Scan",
       description: "Checking search visibility and security issues",
-      icon: "🔍"
+      icon: <CheckIcon size={20} />
     },
     {
       title: "Report Generation",
       description: "Creating your personalized improvement plan",
-      icon: "📊"
+      icon: <CheckIcon size={20} />
     }
   ]
 
@@ -523,7 +523,9 @@ export function TestAudit() {
           <div className="lg:sticky lg:top-8">
             <div className="bg-background border border-border rounded-2xl p-6 text-center">
               <div className="mb-6">
-                <div className="text-4xl mb-4">🔍</div>
+                <div className="flex justify-center mb-4">
+                  <CheckIcon size={48} />
+                </div>
                 <h3 className="text-xl font-bold text-foreground mb-2">
                   Comprehensive Website Audit
                 </h3>
@@ -580,14 +582,16 @@ export function TestAudit() {
           
           <div className="grid md:grid-cols-3 gap-6 text-center mb-8">
             <div className="space-y-3">
-              <div className="text-3xl">📊</div>
+              <div className="flex justify-center">
+                <CheckIcon size={32} />
+              </div>
               <h4 className="font-semibold text-foreground">Performance Metrics</h4>
               <p className="text-sm text-muted-foreground">
                 Detailed speed scores, Core Web Vitals, and optimization opportunities that directly impact conversions
               </p>
             </div>
             <div className="space-y-3">
-              <div className="text-3xl">
+              <div className="flex justify-center">
                 <CheckIcon size={32} />
               </div>
               <h4 className="font-semibold text-foreground">Actionable Insights</h4>
@@ -596,7 +600,9 @@ export function TestAudit() {
               </p>
             </div>
             <div className="space-y-3">
-              <div className="text-3xl">📈</div>
+              <div className="flex justify-center">
+                <LightningIcon size={32} />
+              </div>
               <h4 className="font-semibold text-foreground">Growth Opportunities</h4>
               <p className="text-sm text-muted-foreground">
                 Identify ways to improve conversions, reduce bounce rate, and increase search rankings

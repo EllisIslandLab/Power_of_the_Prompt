@@ -373,7 +373,7 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold text-green-600">{stats.campaigns.avgOpenRate.toFixed(1)}%</div>
                 <div className="text-sm text-muted-foreground">Average Open Rate</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  {stats.campaigns.avgOpenRate > 20 ? '🟢 Above industry average' : '🟡 Below industry average (20%)'}
+                  {stats.campaigns.avgOpenRate > 20 ? 'Above industry average' : 'Below industry average (20%)'}
                 </div>
               </div>
               <div className="text-center p-4 bg-muted/50 rounded-lg">

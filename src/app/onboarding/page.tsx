@@ -128,7 +128,7 @@ export default function OnboardingPage() {
           </div>
 
           <h1 className="text-3xl font-bold text-foreground">
-            All Set! 🎉
+            All Set!
           </h1>
 
           <p className="text-muted-foreground">
@@ -148,7 +148,7 @@ export default function OnboardingPage() {
       <div className="w-full max-w-lg space-y-8 py-12">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-foreground">
-            Welcome to Web Launch Academy! 🚀
+            Welcome to Web Launch Academy!
           </h1>
           <p className="text-xl text-muted-foreground">
             Just one more step to get started

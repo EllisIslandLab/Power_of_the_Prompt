@@ -71,7 +71,9 @@ export function ComingSoonBanner() {
 
               {success ? (
                 <div className="text-center py-6">
-                  <div className="text-4xl mb-4">🎉</div>
+                  <div className="flex justify-center mb-4">
+                    <CheckIcon size={48} />
+                  </div>
                   <h3 className="text-xl font-semibold mb-2">You're on the list!</h3>
                   <p className="text-muted-foreground">
                     We'll notify you when we launch.

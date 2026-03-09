@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Quote, X, ChevronLeft, ChevronRight } from "lucide-react"
-import { DollarIcon } from "@/components/icons/SimpleIcons"
+import { DollarIcon, CheckIcon } from "@/components/icons/SimpleIcons"
 
 interface Testimonial {
   id: string
@@ -143,7 +143,7 @@ export function Testimonials() {
                   </blockquote>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-sm">😅</span>
+                      <span className="text-sm font-semibold">MF</span>
                     </div>
                     <div>
                       <div className="font-semibold text-sm">One of Matt's Friends</div>
@@ -191,7 +191,9 @@ export function Testimonials() {
               
               {isSubmitted ? (
                 <div className="text-center py-8">
-                  <div className="text-4xl mb-4">🙏</div>
+                  <div className="flex justify-center mb-4">
+                    <CheckIcon size={48} />
+                  </div>
                   <h4 className="font-semibold mb-2">Thanks for your testimonial!</h4>
                   <p className="text-muted-foreground mb-2">
                     We appreciate your feedback and will review it soon.

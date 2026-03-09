@@ -361,7 +361,7 @@ export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowP
       <div className="space-y-6">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-foreground dark:text-slate-100 mb-2">
-            📝 Business Information
+            Business Information
           </h2>
           <p className="text-muted-foreground dark:text-slate-400">
             Tell us about your business and visual preferences
@@ -491,7 +491,7 @@ export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowP
       <div className="space-y-6">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-foreground dark:text-slate-100 mb-2">
-            🎯 Website Category
+            Website Category
           </h2>
           <p className="text-muted-foreground dark:text-slate-400">
             What type of website are you building?
@@ -594,7 +594,7 @@ export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowP
       <div className="space-y-6">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-foreground dark:text-slate-100 mb-2">
-            📄 Content Source
+            Content Source
           </h2>
           <p className="text-muted-foreground dark:text-slate-400">
             How would you like to provide content?
@@ -613,7 +613,7 @@ export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowP
             }`}
           >
             <div className="font-semibold text-foreground dark:text-slate-100">
-              ✨ AI will create placeholders
+              AI will create placeholders
             </div>
             <div className="text-sm text-muted-foreground dark:text-slate-400 mt-1">
               Perfect for quick start - AI creates sample content. You can refine later.
@@ -630,7 +630,7 @@ export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowP
             }`}
           >
             <div className="font-semibold text-foreground dark:text-slate-100">
-              📤 I'll upload my own content
+              I'll upload my own content
             </div>
             <div className="text-sm text-muted-foreground dark:text-slate-400 mt-1">
               Provide your own text, documents, or images
@@ -647,7 +647,7 @@ export function ThreeRoundFlow({ onComplete, initialRound = 1 }: ThreeRoundFlowP
             }`}
           >
             <div className="font-semibold text-foreground dark:text-slate-100">
-              ⏭️ Skip for now
+              Skip for now
             </div>
             <div className="text-sm text-muted-foreground dark:text-slate-400 mt-1">
               Start with AI placeholders, add content later

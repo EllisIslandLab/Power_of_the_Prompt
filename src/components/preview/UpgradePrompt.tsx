@@ -50,7 +50,6 @@ export function UpgradePrompt({
     return (
       <Card className="p-6 sticky top-8 dark:bg-slate-900 dark:border-slate-700">
         <div className="text-center mb-6">
-          <div className="text-4xl mb-3">⚡</div>
           <h2 className="text-2xl font-bold text-foreground dark:text-slate-100 mb-2">Customize with AI</h2>
           <p className="text-muted-foreground dark:text-slate-400">
             You have AI Premium! Use your credits to refine any element.
@@ -90,14 +89,14 @@ export function UpgradePrompt({
                 className="w-full justify-start"
                 onClick={() => window.location.href = '/pricing'}
               >
-                📦 Get Full Code Package - $799
+                Get Full Code Package - $799
               </Button>
               <Button
                 variant="outline"
                 className="w-full justify-start"
                 onClick={() => window.location.href = '/pricing'}
               >
-                📚 Architecture Mastery - $190
+                Architecture Mastery - $190
               </Button>
             </div>
           </div>
@@ -109,7 +108,6 @@ export function UpgradePrompt({
   return (
     <Card className={cn('p-6 sticky top-8 border-2 border-accent dark:bg-slate-900 dark:border-slate-700')}>
       <div className="text-center mb-6">
-        <div className="text-4xl mb-3">🚀</div>
         <h2 className="text-2xl font-bold text-foreground dark:text-slate-100 mb-2">Love What You See?</h2>
         <p className="text-foreground dark:text-slate-300">
           Unlock deep customization with AI for just <strong>$5</strong>
@@ -146,7 +144,7 @@ export function UpgradePrompt({
       {/* FOMO Trigger */}
       <div className="bg-accent/10 dark:bg-accent/20 border border-accent rounded-lg p-3 mb-6">
         <p className="text-sm text-accent-foreground dark:text-accent">
-          ⏱️ <strong>You've invested 2 minutes.</strong>
+          <strong>You've invested 2 minutes.</strong>
           <br />
           Don't let this preview go to waste!
         </p>
@@ -160,7 +158,7 @@ export function UpgradePrompt({
           disabled={isUpgrading}
           className="w-full bg-primary text-primary-foreground text-lg font-bold py-6 hover:bg-primary-hover disabled:opacity-50"
         >
-          {isUpgrading ? 'Processing...' : '⚡ Refine Preview - $10'}
+          {isUpgrading ? 'Processing...' : 'Refine Preview - $10'}
         </Button>
         <p className="text-xs text-center text-muted-foreground dark:text-slate-500 -mt-1">
           2 AI refinement credits • $5 per credit
@@ -183,11 +181,11 @@ export function UpgradePrompt({
           variant="outline"
           className="w-full border-2 border-secondary dark:border-blue-500/50 text-lg font-bold py-6 hover:bg-secondary/10"
         >
-          📦 Foundation Course - $799
+          Foundation Course - $799
         </Button>
         <div className="text-xs text-center text-muted-foreground dark:text-slate-500 -mt-1 space-y-1">
           <p>Full code + Textbook + Videos + Architecture Toolkit</p>
-          <p className="text-accent dark:text-yellow-400 font-medium">💎 Any credits purchased roll over!</p>
+          <p className="text-accent dark:text-yellow-400 font-medium">Any credits purchased roll over!</p>
         </div>
       </div>
     </Card>

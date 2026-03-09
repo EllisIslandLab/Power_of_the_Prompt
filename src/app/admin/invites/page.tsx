@@ -222,7 +222,7 @@ export default function AdminInvitesPage() {
                 <div className="space-y-4">
                   <div className="p-4 bg-green-50 border border-green-200 rounded-md">
                     <p className="text-sm text-green-800">
-                      ✅ Invite created for <strong>{success.email}</strong> with{' '}
+                      Invite created for <strong>{success.email}</strong> with{' '}
                       <strong>{success.tier === 'full' ? 'Full Access' : 'Free Tier'}</strong> privileges
                     </p>
                   </div>
@@ -284,19 +284,19 @@ export default function AdminInvitesPage() {
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">🔒 Secure Access</h3>
+                <h3 className="font-semibold text-foreground">Secure Access</h3>
                 <p className="text-sm text-muted-foreground">
                   Only students with valid invite tokens can signup. No public registration allowed.
                 </p>
               </div>
               <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">⭐ Tier Management</h3>
+                <h3 className="font-semibold text-foreground">Tier Management</h3>
                 <p className="text-sm text-muted-foreground">
                   Choose Free (basic access) or Full (premium features) based on student's commitment level.
                 </p>
               </div>
               <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">📧 Email Integration</h3>
+                <h3 className="font-semibold text-foreground">Email Integration</h3>
                 <p className="text-sm text-muted-foreground">
                   Send invites via email after consultations or when students commit to payment.
                 </p>

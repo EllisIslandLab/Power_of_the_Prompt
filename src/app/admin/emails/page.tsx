@@ -207,7 +207,7 @@ export default function AdminEmailsPage() {
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     <span>{template.name}</span>
-                    <Badge variant="secondary" className="ml-2">
+                    <Badge variant="default" className="ml-2">
                       {template.category}
                     </Badge>
                   </div>

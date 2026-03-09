@@ -194,7 +194,6 @@ export function SmartQuestionFlow({
       {emailSent && !emailVerified && (
         <div className="p-4 bg-primary/5 dark:bg-primary/10 border-2 border-primary/30 dark:border-primary/20 rounded-lg sticky top-4 z-10">
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 text-xl">🎁</div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-foreground dark:text-slate-100 mb-2">
                 Verification code sent to {answers.email}
@@ -257,7 +256,6 @@ export function SmartQuestionFlow({
 
       {emailVerified && (
         <div className="p-4 bg-accent/10 dark:bg-accent/20 border-2 border-accent rounded-lg flex items-center gap-3">
-          <div className="flex-shrink-0 text-2xl">⚡</div>
           <div>
             <p className="text-sm font-semibold text-foreground dark:text-slate-100">
               Verified! Your free AI tokens are activated

@@ -242,7 +242,7 @@ export function TimeSlotPicker({ onSlotSelect, selectedSlot }: TimeSlotPickerPro
             {hasHighlightedSlots && (
               <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
                 <p className="text-sm text-green-800 font-medium">
-                  🎯 Slots highlighted in green are within the next 72 hours - perfect for taking advantage of your promo code expiration!
+                  Slots highlighted in green are within the next 72 hours - perfect for taking advantage of your promo code expiration!
                 </p>
               </div>
             )}

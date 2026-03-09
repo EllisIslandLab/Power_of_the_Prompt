@@ -144,23 +144,23 @@ export default function AdminMigrationPage() {
 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span>📧 Email addresses</span>
+                <span>Email addresses</span>
                 <span className="text-green-600">✓</span>
               </div>
               <div className="flex justify-between">
-                <span>👤 Names</span>
+                <span>Names</span>
                 <span className="text-green-600">✓</span>
               </div>
               <div className="flex justify-between">
-                <span>🔗 URLs tested</span>
+                <span>URLs tested</span>
                 <span className="text-green-600">✓</span>
               </div>
               <div className="flex justify-between">
-                <span>📊 Quick scores</span>
+                <span>Quick scores</span>
                 <span className="text-green-600">✓</span>
               </div>
               <div className="flex justify-between">
-                <span>📅 Test dates</span>
+                <span>Test dates</span>
                 <span className="text-green-600">✓</span>
               </div>
             </div>
@@ -191,23 +191,23 @@ export default function AdminMigrationPage() {
 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span>🏷️ Segmentation tags</span>
+                <span>Segmentation tags</span>
                 <span className="text-blue-600">New</span>
               </div>
               <div className="flex justify-between">
-                <span>📈 Campaign tracking</span>
+                <span>Campaign tracking</span>
                 <span className="text-blue-600">New</span>
               </div>
               <div className="flex justify-between">
-                <span>🎯 Audience targeting</span>
+                <span>Audience targeting</span>
                 <span className="text-blue-600">New</span>
               </div>
               <div className="flex justify-between">
-                <span>📧 Email preferences</span>
+                <span>Email preferences</span>
                 <span className="text-blue-600">New</span>
               </div>
               <div className="flex justify-between">
-                <span>🔄 Sync capabilities</span>
+                <span>Sync capabilities</span>
                 <span className="text-blue-600">New</span>
               </div>
             </div>

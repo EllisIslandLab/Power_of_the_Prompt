@@ -222,7 +222,7 @@ export function CategoryNode({
                   }}
                   transition={{ duration: 0.5, repeat: Infinity }}
                 >
-                  ✨ Custom
+                  Custom
                 </motion.span>
               </div>
             )}

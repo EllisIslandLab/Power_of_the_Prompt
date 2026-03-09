@@ -161,7 +161,7 @@ export default function AdminCohortsPage() {
       case 'upcoming':
         return <Badge className="bg-blue-500">Upcoming</Badge>
       case 'completed':
-        return <Badge variant="secondary">Completed</Badge>
+        return <Badge variant="default">Completed</Badge>
       default:
         return null
     }

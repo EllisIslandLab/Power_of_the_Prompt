@@ -167,7 +167,7 @@ export default function CohortDetailPage() {
       case 'completed':
         return <Badge className="bg-blue-500">Completed</Badge>
       case 'dropped':
-        return <Badge variant="secondary">Dropped</Badge>
+        return <Badge variant="default">Dropped</Badge>
       default:
         return null
     }

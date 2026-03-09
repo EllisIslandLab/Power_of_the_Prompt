@@ -378,7 +378,7 @@ export default function TextbookChapterPage() {
             {/* Chapter Header */}
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-4">
-                <Badge variant="secondary">Chapter {currentChapter.id}</Badge>
+                <Badge variant="default">Chapter {currentChapter.id}</Badge>
                 <Badge variant="outline">{currentChapter.sections.length} sections</Badge>
               </div>
               

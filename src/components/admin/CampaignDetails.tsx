@@ -370,7 +370,7 @@ export function CampaignDetails({ campaignId, onClose, onRefresh }: CampaignDeta
                           </Badge>
                         )}
                         {status.status === 'pending' && (
-                          <Badge variant="secondary">
+                          <Badge variant="default">
                             <Clock className="h-3 w-3 mr-1" />
                             Pending
                           </Badge>

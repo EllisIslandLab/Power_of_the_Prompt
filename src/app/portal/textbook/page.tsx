@@ -94,7 +94,7 @@ export default function TextbookPortalPage() {
                         Chapter {chapter.id}: {chapter.title}
                       </CardTitle>
                       <div className="flex items-center gap-2 mb-3">
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="default" className="text-xs">
                           {chapter.sections.length} sections
                         </Badge>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">

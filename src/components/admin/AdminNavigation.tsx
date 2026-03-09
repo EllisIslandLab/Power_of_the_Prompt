@@ -107,7 +107,7 @@ export function AdminNavigation() {
                 return (
                   <Link key={item.href} href={item.href}>
                     <Button
-                      variant={active ? "secondary" : "ghost"}
+                      variant={active ? "default" : "ghost"}
                       className={`flex items-center gap-2 ${
                         active ? "bg-primary/10 text-primary" : ""
                       }`}
@@ -115,7 +115,7 @@ export function AdminNavigation() {
                       <Icon className="h-4 w-4" />
                       {item.label}
                       {item.badge && (
-                        <Badge variant="secondary" className="ml-1 text-xs">
+                        <Badge variant="default" className="ml-1 text-xs">
                           {item.badge}
                         </Badge>
                       )}
@@ -199,7 +199,7 @@ export function AdminNavigation() {
                         <Icon className="h-4 w-4" />
                         {item.label}
                         {item.badge && (
-                          <Badge variant="secondary" className="ml-auto text-xs">
+                          <Badge variant="default" className="ml-auto text-xs">
                             {item.badge}
                           </Badge>
                         )}

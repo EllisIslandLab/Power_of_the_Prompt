@@ -156,7 +156,7 @@ export function ServicePayment({ serviceId, onSuccess, onError }: ServicePayment
                 <div>
                   <CardTitle className="text-2xl">{service.service_name}</CardTitle>
                   <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
-                    <Badge variant="secondary">{service.service_type}</Badge>
+                    <Badge variant="default">{service.service_type}</Badge>
                     <Clock className="h-4 w-4" />
                     {service.duration_estimate}
                   </div>

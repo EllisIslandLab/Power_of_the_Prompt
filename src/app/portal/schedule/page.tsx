@@ -491,7 +491,7 @@ export default function SchedulePage() {
                               })} ({booking.duration_minutes} min)
                             </p>
                           </div>
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="default" className="text-xs">
                             {booking.status}
                           </Badge>
                         </div>

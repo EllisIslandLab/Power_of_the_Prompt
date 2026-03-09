@@ -179,10 +179,10 @@ export default function PortalPage() {
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">
-                    📖 8 comprehensive chapters covering everything from setup to long-term success
+                    8 comprehensive chapters covering everything from setup to long-term success
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    🔐 Student-exclusive content with progress tracking
+                    Student-exclusive content with progress tracking
                   </p>
                 </div>
                 <Button asChild className="shrink-0">

@@ -72,7 +72,6 @@ export function CourseCommitmentModal({ isOpen, onClose }: CourseCommitmentModal
           {/* Triple Guarantee */}
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-8 mb-8">
             <div className="text-center mb-8">
-              <div className="text-4xl mb-4">🏆</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-2">
                 OUR TRIPLE GUARANTEE
               </h3>

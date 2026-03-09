@@ -69,7 +69,7 @@ export default function AdminCampaignsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'draft':
-        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />Draft</Badge>
+        return <Badge variant="default"><Clock className="h-3 w-3 mr-1" />Draft</Badge>
       case 'sending':
         return <Badge className="bg-blue-100 text-blue-800"><Send className="h-3 w-3 mr-1" />Sending</Badge>
       case 'sent':
@@ -77,7 +77,7 @@ export default function AdminCampaignsPage() {
       case 'failed':
         return <Badge variant="destructive"><AlertTriangle className="h-3 w-3 mr-1" />Failed</Badge>
       default:
-        return <Badge variant="secondary">{status}</Badge>
+        return <Badge variant="default">{status}</Badge>
     }
   }
 

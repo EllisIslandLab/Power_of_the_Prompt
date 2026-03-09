@@ -394,7 +394,7 @@ export default function AdminTemplatesPage() {
                     <div className="text-sm font-medium mb-2">Variables:</div>
                     <div className="flex flex-wrap gap-1">
                       {template.variables.map((variable) => (
-                        <Badge key={variable} variant="secondary" className="text-xs">
+                        <Badge key={variable} variant="default" className="text-xs">
                           {`{{${variable}}}`}
                         </Badge>
                       ))}
@@ -656,7 +656,7 @@ export default function AdminTemplatesPage() {
                       <Label className="font-semibold">Variables:</Label>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {selectedTemplate.variables.map((variable) => (
-                          <Badge key={variable} variant="secondary" className="text-xs">
+                          <Badge key={variable} variant="default" className="text-xs">
                             {`{{${variable}}}`}
                           </Badge>
                         ))}

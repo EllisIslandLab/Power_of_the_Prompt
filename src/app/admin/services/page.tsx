@@ -136,7 +136,7 @@ export default function AdminServicesPage() {
     const hasStripeIds = service.stripe_price_id && service.stripe_product_id
     
     if (!service.is_active) {
-      return <Badge variant="secondary"><EyeOff className="h-3 w-3 mr-1" />Inactive</Badge>
+      return <Badge variant="default"><EyeOff className="h-3 w-3 mr-1" />Inactive</Badge>
     } else if (hasStripeIds) {
       return <Badge className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" />Synced</Badge>
     } else {

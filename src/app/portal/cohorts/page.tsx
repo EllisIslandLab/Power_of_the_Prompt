@@ -131,7 +131,7 @@ export default function StudentCohortsPage() {
       case 'upcoming':
         return <Badge className="bg-blue-500">Upcoming</Badge>
       case 'completed':
-        return <Badge variant="secondary">Completed</Badge>
+        return <Badge variant="default">Completed</Badge>
       default:
         return null
     }
@@ -144,7 +144,7 @@ export default function StudentCohortsPage() {
       case 'completed':
         return <Badge className="bg-blue-500">Completed</Badge>
       case 'dropped':
-        return <Badge variant="secondary">Dropped</Badge>
+        return <Badge variant="default">Dropped</Badge>
       default:
         return null
     }

@@ -162,7 +162,7 @@ export default function SupportPage() {
       case 'MEDIUM':
         return <Badge variant="outline">Medium</Badge>
       case 'LOW':
-        return <Badge variant="secondary">Low</Badge>
+        return <Badge variant="default">Low</Badge>
       default:
         return null
     }

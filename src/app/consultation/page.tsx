@@ -172,7 +172,7 @@ export default function ConsultationPage() {
                   <div className="flex items-center gap-3">
                     <Calendar className="h-8 w-8" />
                     <div>
-                      <CardTitle className="text-2xl">🎯 Schedule Your Call Now</CardTitle>
+                      <CardTitle className="text-2xl">Schedule Your Call Now</CardTitle>
                       <CardDescription className="text-primary-foreground/90 text-base">
                         Pick a time that works for you - completely custom booking system
                       </CardDescription>
@@ -222,7 +222,7 @@ export default function ConsultationPage() {
                   <div className="flex items-center gap-3">
                     <Phone className="h-6 w-6 text-secondary" />
                     <div>
-                      <CardTitle className="text-xl">📞 Or I'll Call You</CardTitle>
+                      <CardTitle className="text-xl">Or I'll Call You</CardTitle>
                       <CardDescription>
                         Can't find a good time? I'll reach out based on your preference
                       </CardDescription>
