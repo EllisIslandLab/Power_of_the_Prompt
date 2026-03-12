@@ -17,7 +17,8 @@ import {
   Calendar,
   Plus,
   ArrowRight,
-  Activity
+  Activity,
+  FileText
 } from "lucide-react"
 
 interface DashboardStats {
@@ -156,6 +157,25 @@ export default function AdminDashboard() {
             </Link>
           </Button>
         </div>
+      </div>
+
+      {/* Quick Access - Form Submissions */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <Link href="/admin/form-submissions" className="block">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <FileText className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-lg">Form Submissions</div>
+                  <div className="text-sm text-muted-foreground">View client revision requests</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Quick Stats */}
