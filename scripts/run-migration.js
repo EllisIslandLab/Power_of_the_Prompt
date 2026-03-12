@@ -15,7 +15,7 @@ console.log('╚═════════════════════�
 
 console.log('📋 To apply the migration, please follow these steps:\n')
 console.log('1. Open your Supabase Dashboard:')
-console.log('   🔗 https://supabase.com/dashboard/project/qaaautcjhztvjhizklxr/sql/new\n')
+console.log('   🔗 [Your Supabase SQL Editor]\n')
 console.log('2. Copy the contents of this file:')
 console.log('   📄 supabase/migrations/20260312000001_create_form_submissions.sql\n')
 console.log('3. Paste it into the SQL Editor and click "Run"\n')
