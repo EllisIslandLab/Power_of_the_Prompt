@@ -53,7 +53,7 @@ interface HCaptchaProps {
   onChalExpired?: () => void
   size?: 'normal' | 'compact' | 'invisible'
   theme?: 'light' | 'dark'
-  tabindex?: number
+  tabIndex?: number
   languageOverride?: string
 }
 
@@ -68,7 +68,7 @@ export const HCaptcha = forwardRef<HCaptchaRef, HCaptchaProps>(
       onChalExpired,
       size = 'normal',
       theme = 'light',
-      tabindex,
+      tabIndex,
       languageOverride,
     },
     ref
@@ -141,7 +141,7 @@ export const HCaptcha = forwardRef<HCaptchaRef, HCaptchaProps>(
           onChalExpired={onChalExpired}
           size={size}
           theme={theme}
-          tabindex={tabindex}
+          tabIndex={tabIndex}
           languageOverride={languageOverride}
         />
       </div>
