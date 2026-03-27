@@ -6,6 +6,8 @@ interface EnvConfig {
   supabaseAnonKey: string
   jitsiAppId: string
   resendApiKey?: string // Optional since it's server-side only
+  hcaptchaSecretKey?: string // Server-side only
+  hcaptchaSiteKey: string // Public site key
 }
 
 function validateEnvVar(name: string, value: string | undefined, expectedLength?: number): string {
@@ -30,18 +32,24 @@ function getEnvConfig(): EnvConfig {
   const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const envKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   const envJitsi = process.env.NEXT_PUBLIC_JITSI_APP_ID
-  
-  // Only check RESEND_API_KEY on server side
+  const envHcaptchaSite = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY
+
+  // Only check server-side keys on server side
   const envResend = typeof window === 'undefined' ? process.env.RESEND_API_KEY : undefined
+  const envHcaptchaSecret = typeof window === 'undefined' ? process.env.HCAPTCHA_SECRET_KEY : undefined
   
   // Validate each variable
   const validUrl = validateEnvVar('NEXT_PUBLIC_SUPABASE_URL', envUrl, 40)
   const validKey = validateEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY', envKey, 200)
   const validJitsi = validateEnvVar('NEXT_PUBLIC_JITSI_APP_ID', envJitsi, 50)
-  
-  // Only validate Resend on server side
-  const validResend = typeof window === 'undefined' 
-    ? validateEnvVar('RESEND_API_KEY', envResend, 30) 
+  const validHcaptchaSite = validateEnvVar('NEXT_PUBLIC_HCAPTCHA_SITE_KEY', envHcaptchaSite, 30)
+
+  // Only validate server-side keys on server side
+  const validResend = typeof window === 'undefined'
+    ? validateEnvVar('RESEND_API_KEY', envResend, 30)
+    : ''
+  const validHcaptchaSecret = typeof window === 'undefined'
+    ? validateEnvVar('HCAPTCHA_SECRET_KEY', envHcaptchaSecret, 30)
     : ''
   
   // Fallback values - these will be used if environment variables are missing
@@ -50,19 +58,23 @@ function getEnvConfig(): EnvConfig {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
     jitsiAppId: 'vpaas-magic-cookie-1764593a618848cfa0023ac1a152f3c8',
-    resendApiKey: typeof window === 'undefined' ? (process.env.RESEND_API_KEY || '') : undefined
+    hcaptchaSiteKey: process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || '',
+    resendApiKey: typeof window === 'undefined' ? (process.env.RESEND_API_KEY || '') : undefined,
+    hcaptchaSecretKey: typeof window === 'undefined' ? (process.env.HCAPTCHA_SECRET_KEY || '') : undefined
   }
   
   const config: EnvConfig = {
     supabaseUrl: validUrl || fallbacks.supabaseUrl,
     supabaseAnonKey: validKey || fallbacks.supabaseAnonKey,
     jitsiAppId: validJitsi || fallbacks.jitsiAppId,
-    resendApiKey: validResend || fallbacks.resendApiKey
+    hcaptchaSiteKey: validHcaptchaSite || fallbacks.hcaptchaSiteKey,
+    resendApiKey: validResend || fallbacks.resendApiKey,
+    hcaptchaSecretKey: validHcaptchaSecret || fallbacks.hcaptchaSecretKey
   }
   
   // Log final configuration (client-side only checks required vars)
-  const clientRequiredMissing = !validUrl || !validKey || !validJitsi
-  const serverRequiredMissing = typeof window === 'undefined' && !validResend
+  const clientRequiredMissing = !validUrl || !validKey || !validJitsi || !validHcaptchaSite
+  const serverRequiredMissing = typeof window === 'undefined' && (!validResend || !validHcaptchaSecret)
   
   if (clientRequiredMissing || serverRequiredMissing) {
     console.warn('⚠️  Some required environment variables are missing')
@@ -99,5 +111,14 @@ export function getResendConfig() {
   }
   return {
     apiKey: ENV.resendApiKey || process.env.RESEND_API_KEY || ''
+  }
+}
+
+export function getHCaptchaConfig() {
+  return {
+    siteKey: ENV.hcaptchaSiteKey || process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || '',
+    secretKey: typeof window === 'undefined'
+      ? (ENV.hcaptchaSecretKey || process.env.HCAPTCHA_SECRET_KEY || '')
+      : undefined
   }
 }

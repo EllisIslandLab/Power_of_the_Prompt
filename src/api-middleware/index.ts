@@ -35,6 +35,8 @@ export { withLogging } from './withLogging'
 export { withErrorHandling } from './withErrorHandling'
 export { withRateLimit } from './withRateLimit'
 export type { RateLimitOptions } from './withRateLimit'
+export { withCaptcha } from './withCaptcha'
+export type { CaptchaOptions } from './withCaptcha'
 
 // Error classes
 export {

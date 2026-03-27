@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { LightningIcon, CheckIcon } from "@/components/icons/SimpleIcons"
+import { HCaptcha, HCaptchaRef } from "@/components/common/HCaptcha"
 
 export function ComingSoonBanner() {
   const [name, setName] = useState('')
@@ -14,11 +15,20 @@ export function ComingSoonBanner() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const captchaRef = useRef<HCaptchaRef>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
+
+    // Validate captcha token
+    if (!captchaToken) {
+      setError('Please complete the captcha verification')
+      setIsSubmitting(false)
+      return
+    }
 
     try {
       const response = await fetch('/api/waitlist/signup', {
@@ -29,6 +39,7 @@ export function ComingSoonBanner() {
           name: name || undefined,
           wantsOwnership,
           source: 'coming-soon-banner',
+          captchaToken,
         }),
       })
 
@@ -42,11 +53,26 @@ export function ComingSoonBanner() {
       setEmail('')
       setName('')
       setWantsOwnership(false)
+      setCaptchaToken(null)
+      captchaRef.current?.resetCaptcha()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
+      // Reset captcha on error so user can try again
+      setCaptchaToken(null)
+      captchaRef.current?.resetCaptcha()
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  function handleCaptchaVerify(token: string) {
+    setCaptchaToken(token)
+    setError(null)
+  }
+
+  function handleCaptchaExpire() {
+    setCaptchaToken(null)
+    setError('Captcha expired. Please verify again.')
   }
 
   return (
@@ -137,6 +163,15 @@ export function ComingSoonBanner() {
                     </label>
                   </div>
 
+                  {/* hCaptcha Widget */}
+                  <div className="flex justify-center py-2">
+                    <HCaptcha
+                      ref={captchaRef}
+                      onVerify={handleCaptchaVerify}
+                      onExpire={handleCaptchaExpire}
+                    />
+                  </div>
+
                   {/* Error Message */}
                   {error && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -147,7 +182,7 @@ export function ComingSoonBanner() {
                   {/* Submit Button */}
                   <Button
                     type="submit"
-                    disabled={isSubmitting || !email}
+                    disabled={isSubmitting || !email || !captchaToken}
                     className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3"
                   >
                     {isSubmitting ? (

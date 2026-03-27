@@ -16,6 +16,13 @@ export interface MiddlewareContext {
   validated?: any // Data from validation middleware
   user?: any // User from auth middleware
   startTime?: number // Start time from logging middleware
+  captcha?: {
+    // Captcha verification result from withCaptcha middleware
+    verified: boolean
+    timestamp?: string
+    hostname?: string
+    score?: number
+  }
   [key: string]: any // Allow additional custom properties
 }
 

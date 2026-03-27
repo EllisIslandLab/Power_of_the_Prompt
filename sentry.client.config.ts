@@ -13,52 +13,60 @@
 
 import * as Sentry from '@sentry/nextjs'
 
-// Uncomment this when you have your Sentry DSN
+// Only initialize Sentry if DSN is configured
+const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN
 
-Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+if (SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
 
-  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-  // We recommend adjusting this value in production (0.1 = 10%)
-  tracesSampleRate: 0.1,
+    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+    // We recommend adjusting this value in production (0.1 = 10%)
+    tracesSampleRate: 0.1,
 
-  // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: false,
+    // Setting this option to true will print useful information to the console while you're setting up Sentry.
+    debug: false,
 
-  replaysOnErrorSampleRate: 1.0,
+    replaysOnErrorSampleRate: 1.0,
 
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
+    // This sets the sample rate to be 10%. You may want this to be 100% while
+    // in development and sample at a lower rate in production
+    replaysSessionSampleRate: 0.1,
 
-  // You can remove this option if you're not planning to use the Sentry Session Replay feature:
-  integrations: [
-    Sentry.replayIntegration({
-      // Additional Replay configuration goes in here, for example:
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-  ],
+    // You can remove this option if you're not planning to use the Sentry Session Replay feature:
+    integrations: [
+      Sentry.replayIntegration({
+        // Additional Replay configuration goes in here, for example:
+        maskAllText: true,
+        blockAllMedia: true,
+      }),
+    ],
 
-  // Configure email alerts in your Sentry dashboard:
-  // 1. Go to Alerts → Create Alert Rule
-  // 2. Choose "Issues"
-  // 3. Set conditions (e.g., "When an issue is first seen")
-  // 4. Add action: "Send a notification via email to hello@weblaunchacademy.com"
+    // Configure email alerts in your Sentry dashboard:
+    // 1. Go to Alerts → Create Alert Rule
+    // 2. Choose "Issues"
+    // 3. Set conditions (e.g., "When an issue is first seen")
+    // 4. Add action: "Send a notification via email to hello@weblaunchacademy.com"
 
-  environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV,
 
-  // Ignore common errors that don't need alerts
-  ignoreErrors: [
-    // Browser extensions
-    'top.GLOBALS',
-    'chrome-extension://',
-    'moz-extension://',
-    // Network errors that are expected
-    'Network request failed',
-    'NetworkError',
-    // ResizeObserver errors (harmless)
-    'ResizeObserver loop limit exceeded',
-  ],
-})
+    // Ignore common errors that don't need alerts
+    ignoreErrors: [
+      // Browser extensions
+      'top.GLOBALS',
+      'chrome-extension://',
+      'moz-extension://',
+      // Network errors that are expected
+      'Network request failed',
+      'NetworkError',
+      // ResizeObserver errors (harmless)
+      'ResizeObserver loop limit exceeded',
+      // Generic script errors (cross-origin scripts without CORS)
+      'Script error',
+      'script error',
+    ],
+  })
+} else {
+  console.log('Sentry DSN not configured - error tracking disabled')
+}
 

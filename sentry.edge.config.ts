@@ -6,12 +6,17 @@
 
 import * as Sentry from '@sentry/nextjs'
 
-// Uncomment this when you have your Sentry DSN
+// Only initialize Sentry if DSN is configured
+const SENTRY_DSN = process.env.SENTRY_DSN
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  tracesSampleRate: 0.1,
-  debug: false,
-  environment: process.env.NODE_ENV,
-})
+if (SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    tracesSampleRate: 0.1,
+    debug: false,
+    environment: process.env.NODE_ENV,
+  })
+} else {
+  console.log('Sentry DSN not configured - edge error tracking disabled')
+}
 

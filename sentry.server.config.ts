@@ -12,23 +12,28 @@
 
 import * as Sentry from '@sentry/nextjs'
 
-// Uncomment this when you have your Sentry DSN
+// Only initialize Sentry if DSN is configured
+const SENTRY_DSN = process.env.SENTRY_DSN
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
+if (SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
 
-  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-  // We recommend adjusting this value in production (0.1 = 10%)
-  tracesSampleRate: 0.1,
+    // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+    // We recommend adjusting this value in production (0.1 = 10%)
+    tracesSampleRate: 0.1,
 
-  // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: false,
+    // Setting this option to true will print useful information to the console while you're setting up Sentry.
+    debug: false,
 
-  environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV,
 
-  // Ignore common errors
-  ignoreErrors: [
-    'PGRST116', // Supabase "not found" errors (expected)
-  ],
-})
+    // Ignore common errors
+    ignoreErrors: [
+      'PGRST116', // Supabase "not found" errors (expected)
+    ],
+  })
+} else {
+  console.log('Sentry DSN not configured - server error tracking disabled')
+}
 

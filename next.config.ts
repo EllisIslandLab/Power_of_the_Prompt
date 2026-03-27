@@ -144,18 +144,18 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // Scripts: Allow self, Stripe, Jitsi, Vercel Analytics, Vercel Live, and inline scripts (required for Next.js)
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.jitsi.net https://8x8.vc https://*.sentry.io https://yourwebsitescore.com https://va.vercel-scripts.com https://vercel.live",
-              // Styles: Allow self and inline styles (required for styled-components/emotion)
-              "style-src 'self' 'unsafe-inline'",
-              // Images: Allow self, data URIs, Supabase, Stripe, YourWebsiteScore badge
-              "img-src 'self' data: https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co https://lh3.googleusercontent.com https://yourwebsitescore.com",
+              // Scripts: Allow self, Stripe, Jitsi, hCaptcha, Vercel Analytics, Vercel Live, and inline scripts (required for Next.js)
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.jitsi.net https://8x8.vc https://*.sentry.io https://yourwebsitescore.com https://va.vercel-scripts.com https://vercel.live https://js.hcaptcha.com https://*.hcaptcha.com",
+              // Styles: Allow self, inline styles, and hCaptcha
+              "style-src 'self' 'unsafe-inline' https://*.hcaptcha.com",
+              // Images: Allow self, data URIs, Supabase, Stripe, YourWebsiteScore badge, hCaptcha
+              "img-src 'self' data: https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co https://lh3.googleusercontent.com https://yourwebsitescore.com https://*.hcaptcha.com",
               // Fonts: Allow self and data URIs
               "font-src 'self' data:",
-              // Connect: Allow API calls to Supabase, Stripe, Jitsi, Sentry, Vercel Analytics
-              "connect-src 'self' https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co wss://qaaautcjhztvjhizklxr.supabase.co https://api.stripe.com https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc https://*.sentry.io https://va.vercel-scripts.com https://vitals.vercel-insights.com",
-              // Frames: Allow Stripe checkout and Jitsi video
-              "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.jitsi.net https://8x8.vc",
+              // Connect: Allow API calls to Supabase, Stripe, Jitsi, Sentry, Vercel Analytics, hCaptcha
+              "connect-src 'self' https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co wss://qaaautcjhztvjhizklxr.supabase.co https://api.stripe.com https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc https://*.sentry.io https://va.vercel-scripts.com https://vitals.vercel-insights.com https://*.hcaptcha.com",
+              // Frames: Allow Stripe checkout, Jitsi video, and hCaptcha
+              "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.jitsi.net https://8x8.vc https://*.hcaptcha.com",
               // Media: Allow Jitsi for video/audio
               "media-src 'self' https://*.jitsi.net https://8x8.vc",
               // Objects: Disallow plugins

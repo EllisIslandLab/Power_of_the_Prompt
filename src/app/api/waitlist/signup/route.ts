@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import { waitlistSignupSchema } from '@/lib/schemas'
 import { getAdminClient } from '@/adapters'
 import { resendAdapter } from '@/adapters'
-import { withMiddleware, withValidation, withLogging, withErrorHandling, ConflictError } from '@/api-middleware'
+import { withMiddleware, withValidation, withLogging, withErrorHandling, withCaptcha, ConflictError } from '@/api-middleware'
 import { logger } from '@/lib/logger'
 import { alertCriticalError } from '@/lib/error-alerts'
 import { renderBuilderPromoEmail } from '@/lib/email-builder'
@@ -16,7 +16,7 @@ const supabase = getAdminClient()
  * Uses middleware for validation, logging, and error handling.
  */
 export const POST = withMiddleware(
-  [withErrorHandling, withLogging, withValidation(waitlistSignupSchema)],
+  [withErrorHandling, withLogging, withCaptcha(), withValidation(waitlistSignupSchema)],
   async (req: NextRequest, { validated }) => {
     const { email, name, source, referrer } = validated
 
