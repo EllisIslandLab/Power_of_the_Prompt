@@ -54,7 +54,11 @@
       "WebFetch(domain:platform.claude.com)",
       "Bash(SUPABASE_ACCESS_TOKEN=sbp_7d744da21b8fe89e8df59e59546b75acfd04091f npx supabase db push:*)"
     ],
-    "deny": [],
+    "deny": [
+      "Read(.env.local)",
+      "Edit(.env.local)",
+      "Write(.env.local)"
+    ],
     "defaultMode": "acceptEdits",
     "additionalDirectories": [
       "/home/ellisisland"
