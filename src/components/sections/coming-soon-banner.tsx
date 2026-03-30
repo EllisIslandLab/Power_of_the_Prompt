@@ -1,12 +1,19 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { LightningIcon, CheckIcon } from "@/components/icons/SimpleIcons"
-import { HCaptcha, HCaptchaRef } from "@/components/common/HCaptcha"
+import type { HCaptchaRef } from "@/components/common/HCaptcha"
+
+// Lazy load HCaptcha only when needed
+const HCaptcha = dynamic(() => import("@/components/common/HCaptcha").then(mod => ({ default: mod.HCaptcha })), {
+  ssr: false,
+  loading: () => <div className="text-sm text-muted-foreground">Loading verification...</div>
+})
 
 export function ComingSoonBanner() {
   const [name, setName] = useState('')
@@ -16,6 +23,7 @@ export function ComingSoonBanner() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [shouldLoadCaptcha, setShouldLoadCaptcha] = useState(false)
   const captchaRef = useRef<HCaptchaRef>(null)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -137,6 +145,7 @@ export function ComingSoonBanner() {
                       placeholder="your@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      onFocus={() => setShouldLoadCaptcha(true)}
                       required
                       disabled={isSubmitting}
                       className="w-full"
@@ -163,14 +172,16 @@ export function ComingSoonBanner() {
                     </label>
                   </div>
 
-                  {/* hCaptcha Widget */}
-                  <div className="flex justify-center py-2">
-                    <HCaptcha
-                      ref={captchaRef}
-                      onVerify={handleCaptchaVerify}
-                      onExpire={handleCaptchaExpire}
-                    />
-                  </div>
+                  {/* hCaptcha Widget - Only loads when user focuses email input */}
+                  {shouldLoadCaptcha && (
+                    <div className="flex justify-center py-2">
+                      <HCaptcha
+                        ref={captchaRef}
+                        onVerify={handleCaptchaVerify}
+                        onExpire={handleCaptchaExpire}
+                      />
+                    </div>
+                  )}
 
                   {/* Error Message */}
                   {error && (
