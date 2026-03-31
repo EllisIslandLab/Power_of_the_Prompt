@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
 import Anthropic from '@anthropic-ai/sdk';
 import { generateRefinementPrompt } from '@/lib/ai/prompts/componentRefinement';
+import { rateLimiter } from '@/lib/rate-limiter';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!
@@ -9,7 +12,54 @@ const anthropic = new Anthropic({
 
 export async function POST(req: NextRequest) {
   try {
-    const { userEmail, projectId, componentName, userRequest } = await req.json();
+    // Rate limiting - prevent AI budget drain
+    const ip = req.headers.get('x-real-ip') ||
+               req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+               'anonymous';
+
+    const rateLimit = await rateLimiter.checkLimit(
+      '/api/ai/refine-component',
+      ip,
+      { tier: 'custom', requests: 20, window: '1 h' }
+    );
+
+    if (!rateLimit.success) {
+      const retryAfter = Math.ceil((rateLimit.reset - Date.now()) / 1000);
+      return NextResponse.json({
+        success: false,
+        error: 'Too many refinement requests',
+        retryAfter
+      }, { status: 429 });
+    }
+
+    // Authenticate user - don't trust email from request body
+    const cookieStore = await cookies();
+    const supabaseAuth = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
+
+    const { data: { user: authUser }, error: authError } = await supabaseAuth.auth.getUser();
+
+    if (!authUser || authError) {
+      return NextResponse.json({
+        success: false,
+        error: 'Authentication required'
+      }, { status: 401 });
+    }
+
+    const userEmail = authUser.email!;
+    const { projectId, componentName, userRequest } = await req.json();
 
     if (!userEmail || !projectId || !componentName || !userRequest) {
       return NextResponse.json({
@@ -38,7 +88,7 @@ export async function POST(req: NextRequest) {
     // Check user has available credits
     const { data: user, error: userError } = await (supabase as any)
       .from('users')
-      .select('available_ai_credits')
+      .select('id, available_ai_credits, total_ai_credits, used_ai_credits')
       .eq('email', userEmail)
       .single();
 
@@ -49,13 +99,32 @@ export async function POST(req: NextRequest) {
       }, { status: 404 });
     }
 
-    if (user.available_ai_credits < 1) {
+    const availableCredits = user.available_ai_credits ?? 0;
+
+    if (availableCredits < 1) {
       return NextResponse.json({
         success: false,
         error: 'You need at least 1 AI credit to refine components',
-        creditsAvailable: user.available_ai_credits,
-        creditsNeeded: 1
+        creditsAvailable: availableCredits,
+        creditsNeeded: 1,
+        needsUpgrade: true
       }, { status: 403 });
+    }
+
+    // Per-user rate limiting (20 refinements per hour)
+    const userRateLimit = await rateLimiter.checkLimit(
+      '/api/ai/refine-component',
+      userEmail,
+      { tier: 'custom', requests: 20, window: '1 h' }
+    );
+
+    if (!userRateLimit.success) {
+      const retryAfter = Math.ceil((userRateLimit.reset - Date.now()) / 1000);
+      return NextResponse.json({
+        success: false,
+        error: 'Refinement rate limit exceeded',
+        retryAfter
+      }, { status: 429 });
     }
 
     // Get current component
@@ -135,11 +204,12 @@ Make the refinement professional, cohesive, and conversion-focused.`,
       throw new Error('Failed to save refined component');
     }
 
-    // Deduct 1 credit
+    // Deduct 1 credit (increment used_ai_credits, not decrement available_ai_credits)
+    // available_ai_credits is a generated column: (total_ai_credits - used_ai_credits)
     const { error: creditError } = await (supabase as any)
       .from('users')
       .update({
-        available_ai_credits: user.available_ai_credits - 1
+        used_ai_credits: (user.used_ai_credits ?? 0) + 1
       })
       .eq('email', userEmail);
 
@@ -169,7 +239,7 @@ Make the refinement professional, cohesive, and conversion-focused.`,
       success: true,
       componentName,
       refinedComponent,
-      creditsRemaining: user.available_ai_credits - 1
+      creditsRemaining: availableCredits - 1
     });
 
   } catch (error) {

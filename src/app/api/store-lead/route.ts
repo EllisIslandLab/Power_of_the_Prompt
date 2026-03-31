@@ -1,8 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAirtableBase } from '@/lib/airtable'
+import { rateLimiter, RateLimitConfigs } from '@/lib/rate-limiter'
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting to prevent spam
+    const ip = request.headers.get('x-real-ip') ||
+               request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+               'anonymous';
+
+    const rateLimit = await rateLimiter.checkLimit(
+      '/api/store-lead',
+      ip,
+      RateLimitConfigs.API
+    );
+
+    if (!rateLimit.success) {
+      const retryAfter = Math.ceil((rateLimit.reset - Date.now()) / 1000);
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': retryAfter.toString() }
+        }
+      );
+    }
+
     const { url, email, name, quickScore, sessionId } = await request.json()
     
     if (!url || !email || !quickScore || !sessionId) {

@@ -60,8 +60,33 @@ const getRandomItem = (array: string[]) => {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting to prevent spam
+    const ip = request.headers.get('x-real-ip') ||
+               request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+               'anonymous';
+
+    // Import rate limiter at the top of the file
+    const { rateLimiter, RateLimitConfigs } = await import('@/lib/rate-limiter');
+
+    const rateLimit = await rateLimiter.checkLimit(
+      '/api/testimonials/submit',
+      ip,
+      RateLimitConfigs.API
+    );
+
+    if (!rateLimit.success) {
+      const retryAfter = Math.ceil((rateLimit.reset - Date.now()) / 1000);
+      return NextResponse.json(
+        { error: 'Too many testimonial submissions. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': retryAfter.toString() }
+        }
+      );
+    }
+
     const body = await request.json()
-    
+
     // Validate required fields
     const { name, testimonial } = body
     

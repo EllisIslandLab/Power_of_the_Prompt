@@ -3,6 +3,9 @@ import { getSupabase } from '@/lib/supabase';
 import Anthropic from '@anthropic-ai/sdk';
 import { generatePreviewPrompt } from '@/lib/ai/prompts/previewGeneration';
 import { trackGeneration } from '@/lib/analytics/trackGeneration';
+import { rateLimiter } from '@/lib/rate-limiter';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!
@@ -12,7 +15,62 @@ export async function POST(req: NextRequest) {
   const startTime = Date.now();
 
   try {
-    const { userEmail, answers, isFreeGeneration } = await req.json();
+    // Rate limiting - prevent AI budget drain
+    const ip = req.headers.get('x-real-ip') ||
+               req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+               'anonymous';
+
+    const rateLimit = await rateLimiter.checkLimit(
+      '/api/ai/generate-preview',
+      ip,
+      { tier: 'custom', requests: 10, window: '1 h' }
+    );
+
+    if (!rateLimit.success) {
+      const retryAfter = Math.ceil((rateLimit.reset - Date.now()) / 1000);
+      return NextResponse.json({
+        success: false,
+        error: 'Too many generation requests',
+        message: `Please try again in ${Math.ceil(retryAfter / 60)} minutes`,
+        retryAfter
+      }, {
+        status: 429,
+        headers: {
+          'Retry-After': retryAfter.toString()
+        }
+      });
+    }
+
+    const { answers, isFreeGeneration } = await req.json();
+
+    // Get authenticated user from session (don't trust email from request body)
+    const cookieStore = await cookies();
+    const supabaseAuth = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
+
+    const { data: { user: authUser }, error: authError } = await supabaseAuth.auth.getUser();
+
+    if (!authUser || authError) {
+      return NextResponse.json({
+        success: false,
+        error: 'Authentication required',
+        needsAuth: true
+      }, { status: 401 });
+    }
+
+    const userEmail = authUser.email!;
 
     if (!userEmail || !answers) {
       return NextResponse.json({
@@ -58,7 +116,10 @@ export async function POST(req: NextRequest) {
     console.log('User state:', {
       email: userEmail,
       claimed: user?.free_tokens_claimed,
-      used: user?.free_tokens_used
+      used: user?.free_tokens_used,
+      available_credits: user?.available_ai_credits,
+      total_credits: user?.total_ai_credits,
+      used_credits: user?.used_ai_credits
     });
 
     // Check if user has free tokens available (claimed but not used)
@@ -80,6 +141,37 @@ export async function POST(req: NextRequest) {
           error: 'You\'ve already used your free preview. Upgrade to AI Premium for $5 to create more!',
           needsUpgrade: true
         }, { status: 403 });
+      }
+    } else {
+      // For paid generations, check AI credit balance
+      const availableCredits = user?.available_ai_credits ?? 0;
+
+      if (availableCredits <= 0) {
+        console.log('User has no available AI credits:', userEmail);
+        return NextResponse.json({
+          success: false,
+          error: 'You\'ve used all your AI credits. Please upgrade to continue!',
+          needsUpgrade: true,
+          creditsUsed: user?.used_ai_credits ?? 0,
+          totalCredits: user?.total_ai_credits ?? 0
+        }, { status: 403 });
+      }
+
+      // Add per-user rate limiting for paid users (10 per hour)
+      const userRateLimit = await rateLimiter.checkLimit(
+        '/api/ai/generate-preview',
+        userEmail,
+        { tier: 'custom', requests: 10, window: '1 h' }
+      );
+
+      if (!userRateLimit.success) {
+        const retryAfter = Math.ceil((userRateLimit.reset - Date.now()) / 1000);
+        return NextResponse.json({
+          success: false,
+          error: 'Generation rate limit exceeded',
+          message: `You can create up to 10 previews per hour. Please try again in ${Math.ceil(retryAfter / 60)} minutes`,
+          retryAfter
+        }, { status: 429 });
       }
     }
 
@@ -189,6 +281,18 @@ Make the content compelling, specific to their business, and professionally writ
         .eq('email', userEmail);
 
       console.log(`Free tokens used for ${userEmail}`);
+    } else {
+      // Decrement AI credits for paid generation
+      // Note: We use used_ai_credits increment instead of decrement available_ai_credits
+      // because available_ai_credits is a generated column
+      await (supabase as any)
+        .from('users')
+        .update({
+          used_ai_credits: (user?.used_ai_credits ?? 0) + 1
+        })
+        .eq('email', userEmail);
+
+      console.log(`AI credit used for ${userEmail} (${(user?.used_ai_credits ?? 0) + 1}/${user?.total_ai_credits ?? 0})`);
     }
 
     // Log AI interaction

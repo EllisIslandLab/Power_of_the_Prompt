@@ -1,9 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabase } from '@/lib/supabase'
 import { generateRamseyCoachHTML } from '@/lib/demo-generator/ramsey-coach-template'
+import { rateLimiter, RateLimitConfigs } from '@/lib/rate-limiter'
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limiting to prevent spam
+    const ip = req.headers.get('x-real-ip') ||
+               req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+               'anonymous';
+
+    const rateLimit = await rateLimiter.checkLimit(
+      '/api/demo-generator/generate',
+      ip,
+      RateLimitConfigs.API
+    );
+
+    if (!rateLimit.success) {
+      const retryAfter = Math.ceil((rateLimit.reset - Date.now()) / 1000);
+      return NextResponse.json(
+        { error: 'Too many demo generation requests. Please try again later.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': retryAfter.toString() }
+        }
+      );
+    }
+
     const body = await req.json()
     const { templateId, ...formData } = body
 
