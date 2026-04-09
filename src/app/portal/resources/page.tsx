@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createBrowserClient } from '@supabase/ssr'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -22,8 +23,14 @@ import {
   Zap,
   Shield,
   Smartphone,
-  ArrowLeft
+  ArrowLeft,
+  Unlock
 } from "lucide-react"
+
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 interface Resource {
   id: string
@@ -36,11 +43,49 @@ interface Resource {
   tags: string[]
   difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'
   featured: boolean
+  productSlug?: string
 }
 
 export default function ResourcesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('ALL')
+  const [purchasedProducts, setPurchasedProducts] = useState<Set<string>>(new Set())
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    checkPurchases()
+  }, [])
+
+  async function checkPurchases() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setLoading(false)
+        return
+      }
+
+      // Get all products user has purchased
+      const { data: purchases } = await supabase
+        .from('purchases')
+        .select('product_id, products(slug)')
+        .eq('user_id', user.id)
+        .eq('status', 'completed')
+        .eq('access_granted', true)
+
+      if (purchases) {
+        const purchasedSlugs = new Set(
+          purchases
+            .map((p: any) => p.products?.slug)
+            .filter(Boolean)
+        )
+        setPurchasedProducts(purchasedSlugs)
+      }
+    } catch (error) {
+      console.error('Error checking purchases:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const resources: Resource[] = [
     {
@@ -53,7 +98,8 @@ export default function ResourcesPage() {
       isExternal: false,
       tags: ['Architecture', 'Patterns', 'Professional'],
       difficulty: 'INTERMEDIATE',
-      featured: true
+      featured: true,
+      productSlug: 'architecture-mastery-toolkit'
     },
     {
       id: '9',
@@ -127,6 +173,17 @@ export default function ResourcesPage() {
       default:
         return <FileText className="h-5 w-5" />
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading resources...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -228,9 +285,16 @@ export default function ResourcesPage() {
                               Open
                             </>
                           ) : resource.category === 'PREMIUM' ? (
-                            <>
-                              View Details - $190
-                            </>
+                            resource.productSlug && purchasedProducts.has(resource.productSlug) ? (
+                              <>
+                                <Unlock className="mr-2 h-4 w-4" />
+                                Unlocked
+                              </>
+                            ) : (
+                              <>
+                                View Details - $190
+                              </>
+                            )
                           ) : (
                             <>
                               <Download className="mr-2 h-4 w-4" />
@@ -300,9 +364,16 @@ export default function ResourcesPage() {
                             Open
                           </>
                         ) : resource.category === 'PREMIUM' ? (
-                          <>
-                            View Details - $190
-                          </>
+                          resource.productSlug && purchasedProducts.has(resource.productSlug) ? (
+                            <>
+                              <Unlock className="mr-2 h-4 w-4" />
+                              Unlocked
+                            </>
+                          ) : (
+                            <>
+                              View Details - $190
+                            </>
+                          )
                         ) : (
                           <>
                             <Download className="mr-2 h-4 w-4" />
