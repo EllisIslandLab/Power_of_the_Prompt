@@ -112,6 +112,29 @@ export async function POST(request: NextRequest) {
 
     logger.info({ type: 'auth', email, tier: invite.tier }, 'Invite token validated')
 
+    // Check if user already exists in auth.users
+    const { data: { users: existingAuthUsers } } = await supabase.auth.admin.listUsers()
+    const existingAuthUser = existingAuthUsers?.find(u => u.email?.toLowerCase() === email.toLowerCase())
+
+    if (existingAuthUser) {
+      logger.warn(
+        { type: 'auth', email, userId: existingAuthUser.id, emailConfirmed: !!existingAuthUser.email_confirmed_at },
+        'User already exists in auth.users'
+      )
+
+      if (existingAuthUser.email_confirmed_at) {
+        return NextResponse.json(
+          { error: 'This email is already registered and verified. Please sign in instead.' },
+          { status: 409 }
+        )
+      } else {
+        return NextResponse.json(
+          { error: 'This email is already registered but not verified. Please check your email for the verification link, or contact support.' },
+          { status: 409 }
+        )
+      }
+    }
+
     // Use Supabase's built-in auth system
     logger.info(
       { type: 'auth', email: email.toLowerCase(), fullName },
