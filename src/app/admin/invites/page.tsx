@@ -85,16 +85,9 @@ export default function AdminInvitesPage() {
     // You could add a toast notification here
   }
 
-  const sendEmailInvite = (email: string, signupUrl: string, tier: string) => {
-    const subject = encodeURIComponent('Your Web Launch Academy Invitation')
-    const body = encodeURIComponent(
-      `You've been invited to join Web Launch Academy with ${tier === 'full' ? 'Full Access' : 'Free Tier'} privileges!\n\n` +
-      `Click here to create your account:\n${signupUrl}\n\n` +
-      `This invitation will expire in 7 days.\n\n` +
-      `Best regards,\nWeb Launch Academy Team`
-    )
-    
-    window.open(`mailto:${email}?subject=${subject}&body=${body}`)
+  const copySignupLink = (signupUrl: string) => {
+    navigator.clipboard.writeText(signupUrl)
+    // You could add a toast notification here
   }
 
   return (
@@ -222,7 +215,8 @@ export default function AdminInvitesPage() {
                 <div className="space-y-4">
                   <div className="p-4 bg-green-50 border border-green-200 rounded-md">
                     <p className="text-sm text-green-800">
-                      Invite created for <strong>{success.email}</strong> with{' '}
+                      <Mail className="h-4 w-4 inline mr-1" />
+                      <strong>Invite created and email sent!</strong> Invitation sent to <strong>{success.email}</strong> with{' '}
                       <strong>{success.tier === 'full' ? 'Full Access' : 'Free Tier'}</strong> privileges
                     </p>
                   </div>
@@ -248,17 +242,12 @@ export default function AdminInvitesPage() {
 
                   <div className="flex gap-2">
                     <Button
-                      onClick={() => sendEmailInvite(success.email, success.signupUrl, success.tier)}
+                      variant="outline"
+                      onClick={() => copySignupLink(success.signupUrl)}
                       className="flex-1"
                     >
-                      <Mail className="h-4 w-4 mr-2" />
-                      Send Email Invite
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => copyToClipboard(success.signupUrl)}
-                    >
-                      Copy Link
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy Invite Link
                     </Button>
                   </div>
                 </div>
