@@ -13,7 +13,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, fullName, tier, expiresInDays = 7 } = await request.json()
+    const { email, fullName, tier, expiresInDays = 7, createdBy, stripeSessionId } = await request.json()
 
     // Create a Supabase client with cookie access for server-side auth
     const cookieStore = await cookies()
@@ -40,7 +40,47 @@ export async function POST(request: NextRequest) {
     // Get the authenticated user's ID
     const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
 
-    if (authError || !authUser) {
+    // Allow unauthenticated requests from payment flow if Stripe session is provided
+    let authenticatedUserId: string | null = null
+
+    if (authUser) {
+      // User is authenticated - use their ID
+      authenticatedUserId = authUser.id
+    } else if (stripeSessionId && createdBy === 'payment-system') {
+      // Payment flow - verify the Stripe session exists and matches the email
+      try {
+        const stripe = await import('stripe')
+        const stripeClient = new stripe.default(process.env.STRIPE_SECRET_KEY!, {
+          apiVersion: '2025-06-30.basil'
+        })
+
+        const session = await stripeClient.checkout.sessions.retrieve(stripeSessionId)
+
+        if (!session || session.customer_details?.email?.toLowerCase() !== email.toLowerCase()) {
+          return NextResponse.json(
+            { error: 'Invalid Stripe session or email mismatch' },
+            { status: 401 }
+          )
+        }
+
+        // Valid payment session - use 'payment-system' as the creator
+        authenticatedUserId = null // Will be stored as NULL in created_by
+        logger.info(
+          { sessionId: stripeSessionId, email },
+          'Processing invite for verified payment session'
+        )
+      } catch (stripeError) {
+        logger.error(
+          { error: stripeError, sessionId: stripeSessionId },
+          'Failed to verify Stripe session'
+        )
+        return NextResponse.json(
+          { error: 'Failed to verify payment session' },
+          { status: 401 }
+        )
+      }
+    } else {
+      // No authentication and no valid payment session
       return NextResponse.json(
         { error: 'Unauthorized - must be signed in to create invites' },
         { status: 401 }
@@ -102,7 +142,7 @@ export async function POST(request: NextRequest) {
         full_name: fullName || null,
         tier,
         expires_at: expiresAt.toISOString(),
-        created_by: authUser.id // Use the authenticated user's UUID
+        created_by: authenticatedUserId // Use authenticated user's UUID or NULL for payment system
       })
       .select()
       .single() as any
@@ -122,14 +162,18 @@ export async function POST(request: NextRequest) {
 
     // Send invite email
     try {
-      // Get the inviter's name from the users table
-      const { data: inviter } = await supabaseAdmin
-        .from('users' as any)
-        .select('full_name')
-        .eq('id', authUser.id)
-        .single() as any
+      // Get the inviter's name from the users table (if authenticated)
+      let inviterName = 'Web Launch Academy'
 
-      const inviterName = inviter?.full_name || 'Web Launch Academy'
+      if (authenticatedUserId) {
+        const { data: inviter } = await supabaseAdmin
+          .from('users' as any)
+          .select('full_name')
+          .eq('id', authenticatedUserId)
+          .single() as any
+
+        inviterName = inviter?.full_name || 'Web Launch Academy'
+      }
 
       // Render the email
       const emailHtml = await renderInviteEmail({

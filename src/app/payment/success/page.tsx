@@ -43,7 +43,8 @@ function PaymentSuccessContent() {
             email: email,
             tier: 'full', // Paying customers get full access
             createdBy: 'payment-system',
-            expiresInDays: 7
+            expiresInDays: 7,
+            stripeSessionId: sessionId // Pass session ID for verification
           })
         })
 
