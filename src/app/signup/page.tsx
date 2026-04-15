@@ -38,7 +38,8 @@ function SignupContent() {
     hasUppercase: false,
     hasLowercase: false,
     hasNumber: false,
-    hasSpecialChar: false
+    hasSpecialChar: false,
+    passwordsMatch: false
   })
 
   // Validate invite token on component mount
@@ -172,10 +173,12 @@ function SignupContent() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
 
-    setFormData(prev => ({
-      ...prev,
+    const newFormData = {
+      ...formData,
       [name]: value
-    }))
+    }
+
+    setFormData(newFormData)
 
     // Real-time password validation
     if (name === 'password') {
@@ -184,8 +187,17 @@ function SignupContent() {
         hasUppercase: /[A-Z]/.test(value),
         hasLowercase: /[a-z]/.test(value),
         hasNumber: /[0-9]/.test(value),
-        hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)
+        hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value),
+        passwordsMatch: value.length > 0 && value === newFormData.confirmPassword
       })
+    }
+
+    // Check if confirm password matches
+    if (name === 'confirmPassword') {
+      setPasswordValidation(prev => ({
+        ...prev,
+        passwordsMatch: value.length > 0 && value === newFormData.password
+      }))
     }
   }
 
@@ -414,6 +426,20 @@ function SignupContent() {
                 className="h-11"
                 placeholder="Confirm your password"
               />
+
+              {/* Password Match Indicator */}
+              {formData.confirmPassword && (
+                <div className={`flex items-center gap-2 text-sm mt-2 ${passwordValidation.passwordsMatch ? 'text-green-600' : 'text-red-600'}`}>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {passwordValidation.passwordsMatch ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    )}
+                  </svg>
+                  <span>{passwordValidation.passwordsMatch ? 'Passwords match' : 'Passwords do not match'}</span>
+                </div>
+              )}
             </div>
           </div>
 
