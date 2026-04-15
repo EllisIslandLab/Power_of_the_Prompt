@@ -210,16 +210,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update the user profile with invite-specific data (tier, invited_by)
+    // Update the user profile with invite-specific data (tier, payment_status)
     // The handle_new_user trigger creates the base profile, we enhance it here
+    // Note: invited_by is for affiliate tracking, not invite tokens, so we don't set it here
     try {
       const { error: updateError } = await supabase
         .from('users' as any)
         .update({
           tier: invite.tier,
           payment_status: invite.tier === 'full' ? 'paid' : 'trial',
-          invited_by: invite.created_by,
-          invited_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq('id', data.user.id)
