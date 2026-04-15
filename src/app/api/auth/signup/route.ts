@@ -210,10 +210,50 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update the user profile with invite-specific data (tier, payment_status)
-    // The handle_new_user trigger creates the base profile, we enhance it here
-    // Note: invited_by is for affiliate tracking, not invite tokens, so we don't set it here
-    try {
+    const userId = data.user.id
+
+    // Wait briefly for auth trigger to fire (if it exists)
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    // Check if public.users record exists, create if not
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users' as any)
+      .select('id')
+      .eq('id', userId)
+      .single() as any
+
+    if (checkError || !existingUser) {
+      // Trigger didn't create the record, create it manually
+      logger.info({ type: 'auth', userId }, 'Creating public.users record manually')
+
+      const { error: insertError } = await supabase
+        .from('users' as any)
+        .insert({
+          id: userId,
+          email: email.toLowerCase(),
+          full_name: fullName,
+          email_verified: false,
+          role: 'student',
+          tier: invite.tier,
+          payment_status: invite.tier === 'full' ? 'paid' : 'trial'
+        })
+
+      if (insertError) {
+        logger.error(
+          { type: 'auth', userId, error: insertError },
+          'Failed to create public.users record'
+        )
+        return NextResponse.json(
+          { error: 'Failed to create user profile' },
+          { status: 500 }
+        )
+      }
+
+      logger.info({ type: 'auth', userId, tier: invite.tier }, 'Created public.users record')
+    } else {
+      // Record exists, update it with invite data
+      logger.info({ type: 'auth', userId }, 'Updating existing public.users record')
+
       const { error: updateError } = await supabase
         .from('users' as any)
         .update({
@@ -221,21 +261,19 @@ export async function POST(request: NextRequest) {
           payment_status: invite.tier === 'full' ? 'paid' : 'trial',
           updated_at: new Date().toISOString(),
         })
-        .eq('id', data.user.id)
+        .eq('id', userId)
 
       if (updateError) {
         logger.error(
-          { type: 'auth', userId: data.user.id, error: updateError },
+          { type: 'auth', userId, error: updateError },
           'Failed to update user profile with invite data'
         )
       } else {
         logger.info(
-          { type: 'auth', userId: data.user.id, tier: invite.tier },
+          { type: 'auth', userId, tier: invite.tier },
           'Updated user profile with invite data'
         )
       }
-    } catch (profileErr) {
-      logger.error({ type: 'auth', userId: data.user.id, error: profileErr }, 'Profile update error')
     }
 
     // Auto-assign to active cohort (if exists)
@@ -251,24 +289,24 @@ export async function POST(request: NextRequest) {
           .from('cohort_members' as any)
           .insert({
             cohort_id: activeCohort.id,
-            user_id: data.user.id,
+            user_id: userId,
             status: 'active'
           })
 
         if (cohortError) {
           logger.error(
-            { type: 'auth', userId: data.user.id, cohortId: activeCohort.id, error: cohortError },
+            { type: 'auth', userId: userId, cohortId: activeCohort.id, error: cohortError },
             'Failed to add user to active cohort'
           )
         } else {
           logger.info(
-            { type: 'auth', userId: data.user.id, cohortId: activeCohort.id },
+            { type: 'auth', userId: userId, cohortId: activeCohort.id },
             'Added user to active cohort'
           )
         }
       }
     } catch (cohortErr) {
-      logger.error({ type: 'auth', userId: data.user.id, error: cohortErr }, 'Cohort assignment error')
+      logger.error({ type: 'auth', userId: userId, error: cohortErr }, 'Cohort assignment error')
     }
 
     // Mark invite token as used
@@ -286,11 +324,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Log successful signup
-    logSecurity('signup', 'low', { userId: data.user.id, email, tier: invite.tier })
+    logSecurity('signup', 'low', { userId: userId, email, tier: invite.tier })
 
     const duration = Date.now() - startTime
     logger.info(
-      { type: 'auth', userId: data.user.id, email, duration },
+      { type: 'auth', userId: userId, email, duration },
       `Sign-up successful (${duration}ms)`
     )
 
@@ -299,14 +337,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Account created successfully. Please check your email for verification.',
-        userId: data.user.id,
+        userId: userId,
         needsEmailVerification: true,
       })
     } else {
       return NextResponse.json({
         success: true,
         message: 'Account created and verified successfully.',
-        userId: data.user.id,
+        userId: userId,
         needsEmailVerification: false,
       })
     }
