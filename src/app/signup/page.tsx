@@ -150,7 +150,7 @@ function SignupContent() {
           fullName: formData.fullName,
           email: formData.email,
           password: formData.password,
-          inviteToken: token
+          token: token // Field name must match schema: 'token' not 'inviteToken'
         })
       })
 
