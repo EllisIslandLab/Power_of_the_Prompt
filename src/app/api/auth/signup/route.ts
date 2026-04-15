@@ -113,6 +113,11 @@ export async function POST(request: NextRequest) {
     logger.info({ type: 'auth', email, tier: invite.tier }, 'Invite token validated')
 
     // Use Supabase's built-in auth system
+    logger.info(
+      { type: 'auth', email: email.toLowerCase(), fullName },
+      'Attempting to create auth user'
+    )
+
     const { data, error } = await supabase.auth.signUp({
       email: email.toLowerCase(),
       password: password,
@@ -123,7 +128,24 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    logger.info(
+      { type: 'auth', email, hasData: !!data, hasError: !!error, hasUser: !!data?.user },
+      'Auth signUp response'
+    )
+
     if (error) {
+      // Log the full error for debugging
+      logger.error(
+        { type: 'auth', email, error: error.message, errorCode: error.code, fullError: error },
+        'Supabase Auth signUp failed'
+      )
+      console.error('Signup error details:', {
+        message: error.message,
+        code: error.code,
+        status: error.status,
+        email
+      })
+
       // Handle specific error cases
       if (error.message.includes('already registered')) {
         // For existing users, update their profile and resend verification email
@@ -196,9 +218,14 @@ export async function POST(request: NextRequest) {
           { status: 409 }
         )
       }
-      
+
+      // Return detailed error message for debugging
+      const errorMessage = error.message || 'Failed to create account. Please try again.'
       return NextResponse.json(
-        { error: error.message || 'Failed to create account. Please try again.' },
+        {
+          error: errorMessage,
+          details: error.code ? `Error code: ${error.code}` : undefined
+        },
         { status: 400 }
       )
     }
