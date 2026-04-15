@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-import { CheckCircle, Crown, ArrowRight, Mail } from 'lucide-react'
+import { CheckCircle, Crown, ArrowRight, Mail, Copy } from 'lucide-react'
 import { CheckIcon } from '@/components/icons/SimpleIcons'
 
 function PaymentSuccessContent() {
@@ -22,7 +22,6 @@ function PaymentSuccessContent() {
   } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [emailSent, setEmailSent] = useState(false)
 
   useEffect(() => {
     const generateInviteForPayment = async () => {
@@ -70,30 +69,9 @@ function PaymentSuccessContent() {
     generateInviteForPayment()
   }, [sessionId, email])
 
-  const sendEmailInvite = async () => {
+  const copySignupLink = () => {
     if (!inviteData) return
-
-    setEmailSent(true)
-    // In a real implementation, you'd call an API to send the email
-    // For now, we'll use mailto to open the user's email client
-    
-    const subject = encodeURIComponent('Complete Your Web Launch Academy Setup')
-    const body = encodeURIComponent(
-      `Thank you for your commitment to Web Launch Academy!\n\n` +
-      `Your payment has been processed successfully and you now have Full Access privileges.\n\n` +
-      `Complete your student account setup here:\n${inviteData.signupUrl}\n\n` +
-      `What you get with Full Access:\n` +
-      `√ All course materials and premium content\n` +
-      `√ One-on-one coaching sessions\n` +
-      `√ Live group sessions\n` +
-      `√ Priority support\n` +
-      `√ Downloadable resources and certificates\n\n` +
-      `This invitation will expire in 7 days, so please complete your setup soon.\n\n` +
-      `Welcome to the academy!\n\n` +
-      `Best regards,\nWeb Launch Academy Team`
-    )
-    
-    window.open(`mailto:${inviteData.email}?subject=${subject}&body=${body}`)
+    navigator.clipboard.writeText(inviteData.signupUrl)
   }
 
   if (loading) {
@@ -191,10 +169,17 @@ function PaymentSuccessContent() {
               </div>
             </div>
 
+            <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-sm text-green-800">
+                <strong><Mail className="h-4 w-4 inline mr-1" />Email Sent!</strong> We&apos;ve sent your secure signup link to <strong>{email}</strong>.
+                Check your inbox and click the link to complete your account setup.
+              </p>
+            </div>
+
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
               <p className="text-sm text-blue-800">
-                <strong>Next Step:</strong> Create your student account using the secure link below. 
-                This will give you immediate access to all premium features.
+                <strong>Next Step:</strong> Click the button below or use the link we emailed you to create your account
+                and get immediate access to all premium features.
               </p>
             </div>
 
@@ -217,13 +202,12 @@ function PaymentSuccessContent() {
                       Complete Account Setup
                     </Link>
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
-                    onClick={sendEmailInvite}
-                    disabled={emailSent}
+                    onClick={copySignupLink}
                   >
-                    <Mail className="h-4 w-4 mr-2" />
-                    {emailSent ? 'Email Sent' : 'Email Me Link'}
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Link
                   </Button>
                 </div>
               </div>
@@ -261,7 +245,7 @@ function PaymentSuccessContent() {
             <div className="flex gap-3">
               <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
               <p className="text-sm">
-                Save this page or email yourself the link in case you need it later.
+                Check your email inbox for the signup link. If you don&apos;t see it, check your spam folder.
               </p>
             </div>
           </CardContent>
