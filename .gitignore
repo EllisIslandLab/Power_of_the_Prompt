@@ -63,6 +63,10 @@ IMPLEMENTATION_ROADMAP.md
 # Keep these files private and secure
 # Store them in Supabase Storage or private S3 bucket instead
 
+# Claude Code settings - contains tokens and permissions
+.claude/settings.local.json
+.claude/*.local.json
+
 # Source images (optimized versions are used in src/app)
 public/Favicon 10.png
 public/Favicon 11v2.png

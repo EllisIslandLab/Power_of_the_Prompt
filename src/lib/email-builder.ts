@@ -6,6 +6,7 @@ import { PasswordResetEmail } from '@/emails/PasswordResetEmail'
 import { AIPremiumConfirmationEmail } from '@/emails/AIPremiumConfirmationEmail'
 import { TextbookConfirmationEmail } from '@/emails/TextbookConfirmationEmail'
 import { BuilderPromoEmail } from '@/emails/BuilderPromoEmail'
+import { InviteEmail } from '@/emails/InviteEmail'
 
 /**
  * Email Builder Utility
@@ -127,6 +128,7 @@ export const EmailSubjects = {
   PASSWORD_RESET: 'Reset your Web Launch Academy password',
   EMAIL_VERIFICATION: 'Verify your Web Launch Academy email',
   SESSION_REMINDER: 'Your Level Up session is coming up',
+  INVITE: "You're invited to Web Launch Academy!",
 } as const
 
 // ============================================================================
@@ -228,3 +230,32 @@ export const EMAIL_FROM = 'Web Launch Academy <noreply@weblaunchacademy.com>' as
  * Support email for replies
  */
 export const EMAIL_SUPPORT = 'support@weblaunchacademy.com' as const
+
+// ============================================================================
+// INVITE EMAIL
+// ============================================================================
+
+export interface InviteEmailProps {
+  recipientName?: string
+  signupUrl: string
+  inviterName?: string
+  tier: 'basic' | 'full'
+  expiresInDays?: number
+}
+
+/**
+ * Render invite email for new user invitations
+ */
+export async function renderInviteEmail(props: InviteEmailProps): Promise<string> {
+  const { recipientName, signupUrl, inviterName, tier, expiresInDays = 7 } = props
+
+  return render(
+    React.createElement(InviteEmail, {
+      recipientName,
+      signupUrl,
+      inviterName,
+      tier,
+      expiresInDays
+    })
+  )
+}

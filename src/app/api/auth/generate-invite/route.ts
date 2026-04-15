@@ -1,20 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { randomBytes } from 'crypto'
+import { cookies } from 'next/headers'
+import { resendAdapter } from '@/adapters/ResendAdapter'
+import { renderInviteEmail, EMAIL_FROM, EmailSubjects } from '@/lib/email-builder'
+import { logger } from '@/lib/logger'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-})
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, fullName, tier, createdBy, expiresInDays = 7 } = await request.json()
+    const { email, fullName, tier, expiresInDays = 7 } = await request.json()
+
+    // Create a Supabase client with cookie access for server-side auth
+    const cookieStore = await cookies()
+
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch {}
+          },
+        },
+      }
+    )
+
+    // Get the authenticated user's ID
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !authUser) {
+      return NextResponse.json(
+        { error: 'Unauthorized - must be signed in to create invites' },
+        { status: 401 }
+      )
+    }
+
+    // Use service role client for admin operations
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
 
     // Validate input
     if (!email || !tier) {
@@ -38,8 +77,8 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + expiresInDays)
 
-    // Check if there's already an active invite for this email
-    const { data: existingInvite } = await supabase
+    // Check if there's already an active invite for this email (use admin client)
+    const { data: existingInvite } = await supabaseAdmin
       .from('invite_tokens' as any)
       .select('*')
       .eq('email', email.toLowerCase())
@@ -54,8 +93,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create invite token
-    const { data: invite, error } = await supabase
+    // Create invite token (use admin client for insert)
+    const { data: invite, error } = await supabaseAdmin
       .from('invite_tokens' as any)
       .insert({
         token,
@@ -63,7 +102,7 @@ export async function POST(request: NextRequest) {
         full_name: fullName || null,
         tier,
         expires_at: expiresAt.toISOString(),
-        created_by: createdBy || 'system'
+        created_by: authUser.id // Use the authenticated user's UUID
       })
       .select()
       .single() as any
@@ -81,6 +120,51 @@ export async function POST(request: NextRequest) {
     const host = request.headers.get('host') || 'weblaunchacademy.com'
     const signupUrl = `${protocol}://${host}/signup?token=${token}`
 
+    // Send invite email
+    try {
+      // Get the inviter's name from the users table
+      const { data: inviter } = await supabaseAdmin
+        .from('users' as any)
+        .select('full_name')
+        .eq('id', authUser.id)
+        .single() as any
+
+      const inviterName = inviter?.full_name || 'Web Launch Academy'
+
+      // Render the email
+      const emailHtml = await renderInviteEmail({
+        recipientName: fullName,
+        signupUrl,
+        inviterName,
+        tier: tier as 'basic' | 'full',
+        expiresInDays
+      })
+
+      // Send via Resend
+      await resendAdapter.sendEmail({
+        from: EMAIL_FROM,
+        to: email,
+        subject: EmailSubjects.INVITE,
+        html: emailHtml,
+        tags: [
+          { name: 'type', value: 'invite' },
+          { name: 'tier', value: tier }
+        ]
+      })
+
+      logger.info(
+        { type: 'email', email, tier, inviteId: invite.id },
+        'Invite email sent successfully'
+      )
+    } catch (emailError) {
+      // Log the error but don't fail the invite creation
+      logger.error(
+        { type: 'email', email, error: emailError },
+        'Failed to send invite email'
+      )
+      // Still return success since the invite was created
+    }
+
     return NextResponse.json({
       success: true,
       invite: {
@@ -91,7 +175,7 @@ export async function POST(request: NextRequest) {
         expires_at: invite.expires_at,
         signup_url: signupUrl
       },
-      message: `Invite created for ${email} with ${tier} access`
+      message: `Invite created and email sent to ${email}`
     })
 
   } catch (error) {

@@ -32,6 +32,15 @@ function SignupContent() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
+  // Password validation state
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    hasUppercase: false,
+    hasLowercase: false,
+    hasNumber: false,
+    hasSpecialChar: false
+  })
+
   // Validate invite token on component mount
   useEffect(() => {
     const validateToken = async () => {
@@ -101,20 +110,32 @@ function SignupContent() {
     }
 
     // Standardized password validation
-    if (formData.password.length < 8) {
+    if (!passwordValidation.minLength) {
       setError('Password must be at least 8 characters long')
       setSubmitLoading(false)
       return
     }
 
-    if (!/[A-Z]/.test(formData.password)) {
+    if (!passwordValidation.hasUppercase) {
       setError('Password must contain at least one uppercase letter')
       setSubmitLoading(false)
       return
     }
 
-    if (!/[0-9]/.test(formData.password)) {
+    if (!passwordValidation.hasLowercase) {
+      setError('Password must contain at least one lowercase letter')
+      setSubmitLoading(false)
+      return
+    }
+
+    if (!passwordValidation.hasNumber) {
       setError('Password must contain at least one number')
+      setSubmitLoading(false)
+      return
+    }
+
+    if (!passwordValidation.hasSpecialChar) {
+      setError('Password must contain at least one special character')
       setSubmitLoading(false)
       return
     }
@@ -149,10 +170,23 @@ function SignupContent() {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: value
     }))
+
+    // Real-time password validation
+    if (name === 'password') {
+      setPasswordValidation({
+        minLength: value.length >= 8,
+        hasUppercase: /[A-Z]/.test(value),
+        hasLowercase: /[a-z]/.test(value),
+        hasNumber: /[0-9]/.test(value),
+        hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)
+      })
+    }
   }
 
   // Loading state
@@ -306,9 +340,64 @@ function SignupContent() {
                 className="h-11"
                 placeholder="Create a secure password"
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                Min 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
-              </p>
+
+              {/* Password Requirements with Checkmarks */}
+              <div className="mt-3 space-y-2 text-sm">
+                <div className={`flex items-center gap-2 ${passwordValidation.minLength ? 'text-green-600' : 'text-muted-foreground'}`}>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {passwordValidation.minLength ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    ) : (
+                      <circle cx="12" cy="12" r="10" strokeWidth="2" opacity="0.3"></circle>
+                    )}
+                  </svg>
+                  <span>Minimum 8 characters</span>
+                </div>
+
+                <div className={`flex items-center gap-2 ${passwordValidation.hasUppercase ? 'text-green-600' : 'text-muted-foreground'}`}>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {passwordValidation.hasUppercase ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    ) : (
+                      <circle cx="12" cy="12" r="10" strokeWidth="2" opacity="0.3"></circle>
+                    )}
+                  </svg>
+                  <span>At least one uppercase letter</span>
+                </div>
+
+                <div className={`flex items-center gap-2 ${passwordValidation.hasLowercase ? 'text-green-600' : 'text-muted-foreground'}`}>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {passwordValidation.hasLowercase ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    ) : (
+                      <circle cx="12" cy="12" r="10" strokeWidth="2" opacity="0.3"></circle>
+                    )}
+                  </svg>
+                  <span>At least one lowercase letter</span>
+                </div>
+
+                <div className={`flex items-center gap-2 ${passwordValidation.hasNumber ? 'text-green-600' : 'text-muted-foreground'}`}>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {passwordValidation.hasNumber ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    ) : (
+                      <circle cx="12" cy="12" r="10" strokeWidth="2" opacity="0.3"></circle>
+                    )}
+                  </svg>
+                  <span>At least one number</span>
+                </div>
+
+                <div className={`flex items-center gap-2 ${passwordValidation.hasSpecialChar ? 'text-green-600' : 'text-muted-foreground'}`}>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {passwordValidation.hasSpecialChar ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    ) : (
+                      <circle cx="12" cy="12" r="10" strokeWidth="2" opacity="0.3"></circle>
+                    )}
+                  </svg>
+                  <span>At least one special character (!@#$%...)</span>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2">
