@@ -140,19 +140,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Use Supabase's built-in auth system
+    // Use Supabase's admin API to create user (service role key)
     logger.info(
       { type: 'auth', email: email.toLowerCase(), fullName },
-      'Attempting to create auth user'
+      'Attempting to create auth user via admin API'
     )
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.admin.createUser({
       email: email.toLowerCase(),
       password: password,
-      options: {
-        data: {
-          full_name: fullName,
-        }
+      email_confirm: false, // Will send confirmation email
+      user_metadata: {
+        full_name: fullName,
       }
     })
 
