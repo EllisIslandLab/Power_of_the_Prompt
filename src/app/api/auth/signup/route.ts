@@ -149,10 +149,21 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase.auth.admin.createUser({
       email: email.toLowerCase(),
       password: password,
-      email_confirm: false, // Will send confirmation email
+      email_confirm: true, // Auto-confirm email
       user_metadata: {
         full_name: fullName,
       }
+    })
+
+    // Log the raw response for debugging
+    console.log('Admin createUser response:', {
+      hasData: !!data,
+      hasUser: !!data?.user,
+      hasError: !!error,
+      errorMessage: error?.message,
+      errorCode: error?.code,
+      errorStatus: error?.status,
+      fullError: error
     })
 
     logger.info(
