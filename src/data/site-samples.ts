@@ -81,7 +81,7 @@ export const siteSamples: SiteSample[] = [
       "Secure client intake forms"
     ],
     image: "/images/site-samples/screencapture-athymetoheal.webp",
-    liveUrl: "https://athymetoheal.vercel.app/",
+    liveUrl: "https://athymetoheal.org",
     category: "Service Business",
     testimonial: "A beautiful website that perfectly captures the essence of holistic healing and natural wellness.",
     studentName: "Wellness Practitioner",
