@@ -20,6 +20,7 @@ import {
   Activity,
   FileText
 } from "lucide-react"
+import { LighthouseTester } from "@/components/admin/LighthouseTester"
 
 interface DashboardStats {
   campaigns: {
@@ -414,6 +415,9 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       )}
+
+      {/* Lighthouse Website Tester */}
+      <LighthouseTester />
     </div>
   )
 }

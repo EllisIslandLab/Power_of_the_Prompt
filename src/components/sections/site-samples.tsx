@@ -284,7 +284,7 @@ export function SiteSamples() {
                   >
                     {/* Simplified card structure */}
                     <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-900 to-black p-2 rounded-lg">
-                      <div className="w-full h-full bg-white rounded-sm overflow-hidden relative">
+                      <div className="w-full h-full bg-white rounded-sm overflow-hidden relative" style={{ aspectRatio: '4/3' }}>
                         {sample.image && !sample.image.includes('placeholder') ? (
                           <Image
                             src={sample.image}
@@ -294,6 +294,8 @@ export function SiteSamples() {
                             sizes="320px"
                             loading={isCenter ? "eager" : "lazy"}
                             priority={isCenter && sample.isFeatured}
+                            quality={85}
+                            style={{ objectFit: 'cover' }}
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-200 flex items-center justify-center">
@@ -384,7 +386,7 @@ export function SiteSamples() {
               </div>
               
               {/* Live Website Preview */}
-              <div className="aspect-video bg-gradient-to-br from-muted/30 to-muted/60 rounded-xl mb-8 relative overflow-hidden">
+              <div className="aspect-video bg-gradient-to-br from-muted/30 to-muted/60 rounded-xl mb-8 relative overflow-hidden" style={{ minHeight: '400px' }}>
                 {selectedSample.image && !selectedSample.image.includes('placeholder') ? (
                   <Image
                     src={selectedSample.image}
@@ -393,6 +395,8 @@ export function SiteSamples() {
                     fill
                     sizes="(max-width: 768px) 100vw, 80vw"
                     priority
+                    quality={90}
+                    style={{ objectFit: 'cover' }}
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">

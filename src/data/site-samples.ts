@@ -35,7 +35,7 @@ export const siteSamples: SiteSample[] = [
       "Airtable integration for secure client data collection",
       "Mobile-responsive professional design"
     ],
-    image: "/images/site-samples/screencapture-winchestertherapyservices.jpg",
+    image: "/images/site-samples/screencapture-winchestertherapyservices.webp",
     liveUrl: "https://winchester-therapy-services-blue.vercel.app/",
     category: "Service Business",
     testimonial: "I remember when I was finishing my basement, my parents came over and brought my little brother to help out. Well, he barely lifted a finger. Now, he got me a working website that saves me about $200 per year and I own my own code! Better late than never little bro.",
@@ -69,6 +69,34 @@ export const siteSamples: SiteSample[] = [
     }
   },
   {
+    title: "A Thyme to Heal",
+    description: "Holistic wellness and herbal healing practice website with consultation booking and educational resources",
+    tech: "Next.js, TypeScript, Vercel, Airtable Integration",
+    features: [
+      "Clean, calming wellness-focused design",
+      "Service offerings and treatment information",
+      "Consultation booking system",
+      "Educational herbal healing resources",
+      "Mobile-responsive holistic design",
+      "Secure client intake forms"
+    ],
+    image: "/images/site-samples/screencapture-athymetoheal.webp",
+    liveUrl: "https://athymetoheal.vercel.app/",
+    category: "Service Business",
+    testimonial: "A beautiful website that perfectly captures the essence of holistic healing and natural wellness.",
+    studentName: "Wellness Practitioner",
+    isFeatured: true,
+    realSiteData: {
+      tagline: "Natural Healing Through Herbal Wisdom",
+      services: [
+        "Herbal Consultations",
+        "Natural Remedies",
+        "Wellness Coaching",
+        "Holistic Health Planning"
+      ]
+    }
+  },
+  {
     title: "Meche's Creations",
     description: "Creative handmade jewelry and accessories boutique with unique artisan designs and custom pieces",
     tech: "Next.js hosted on Vercel",
@@ -80,7 +108,7 @@ export const siteSamples: SiteSample[] = [
       "Airtable integration for client data collection",
       "Responsive mobile-first design"
     ],
-    image: "/images/site-samples/screencapture-mechescreations-v2.jpg",
+    image: "/images/site-samples/screencapture-mechescreations-v2.webp",
     liveUrl: "https://www.mechescreations.com",
     category: "E-commerce",
     testimonial: "I've given Matt three kids; he built me this website with no hosting fees. It's a start I suppose.",

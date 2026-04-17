@@ -45,9 +45,31 @@ export default function SettingsPage() {
   const [usernameLoading, setUsernameLoading] = useState(false)
   const [usernameMessage, setUsernameMessage] = useState<{type: 'success' | 'error', text: string} | null>(null)
 
+  // Profile editing state
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
+  const [fullName, setFullName] = useState('')
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [profileMessage, setProfileMessage] = useState<{type: 'success' | 'error', text: string} | null>(null)
+
+  // Website URL state
+  const [websiteUrl, setWebsiteUrl] = useState('')
+  const [websiteLoading, setWebsiteLoading] = useState(false)
+  const [websiteMessage, setWebsiteMessage] = useState<{type: 'success' | 'error', text: string} | null>(null)
+
+  // Payment state
+  const [invoices, setInvoices] = useState<any[]>([])
+  const [invoicesLoading, setInvoicesLoading] = useState(false)
+  const [portalLoading, setPortalLoading] = useState(false)
+
+  // Tech stack preferences
+  const [techStackPreferences, setTechStackPreferences] = useState<string[]>([])
+  const [techStackLoading, setTechStackLoading] = useState(false)
+  const [techStackMessage, setTechStackMessage] = useState<{type: 'success' | 'error', text: string} | null>(null)
+
   useEffect(() => {
     fetchUserProfile()
     fetchEmails()
+    fetchInvoices()
   }, [])
 
   const fetchUserProfile = async () => {
@@ -57,6 +79,9 @@ export default function SettingsPage() {
         const data = await response.json()
         setUser(data.user)
         setUsername(data.user.username || '')
+        setFullName(data.user.full_name || '')
+        setWebsiteUrl(data.user.website_url || '')
+        setTechStackPreferences(data.user.tech_stack_preferences || [])
       }
     } catch (error) {
       console.error('Error fetching profile:', error)
@@ -74,6 +99,47 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Error fetching emails:', error)
+    }
+  }
+
+  const fetchInvoices = async () => {
+    setInvoicesLoading(true)
+    try {
+      const response = await fetch('/api/stripe/invoices')
+      if (response.ok) {
+        const data = await response.json()
+        setInvoices(data.invoices || [])
+      }
+    } catch (error) {
+      console.error('Error fetching invoices:', error)
+    } finally {
+      setInvoicesLoading(false)
+    }
+  }
+
+  const openCustomerPortal = async () => {
+    setPortalLoading(true)
+    try {
+      const response = await fetch('/api/stripe/customer-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          return_url: window.location.href
+        })
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.url) {
+        window.location.href = data.url
+      } else {
+        alert(data.error || 'Failed to open customer portal')
+        setPortalLoading(false)
+      }
+    } catch (error) {
+      console.error('Error opening customer portal:', error)
+      alert('Failed to open customer portal')
+      setPortalLoading(false)
     }
   }
 
@@ -256,6 +322,95 @@ export default function SettingsPage() {
     }
   }
 
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setProfileMessage(null)
+    setProfileLoading(true)
+
+    try {
+      const response = await fetch('/api/user/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ full_name: fullName })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser({ ...user, full_name: fullName })
+        setProfileMessage({type: 'success', text: 'Profile updated successfully!'})
+        setIsEditingProfile(false)
+      } else {
+        setProfileMessage({type: 'error', text: data.error || 'Failed to update profile'})
+      }
+    } catch (error) {
+      setProfileMessage({type: 'error', text: 'An error occurred'})
+    } finally {
+      setProfileLoading(false)
+    }
+  }
+
+  const handleWebsiteUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setWebsiteMessage(null)
+    setWebsiteLoading(true)
+
+    try {
+      const response = await fetch('/api/user/update-website', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ website_url: websiteUrl })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser({ ...user, website_url: websiteUrl })
+        setWebsiteMessage({type: 'success', text: 'Website URL updated successfully!'})
+      } else {
+        setWebsiteMessage({type: 'error', text: data.error || 'Failed to update website URL'})
+      }
+    } catch (error) {
+      setWebsiteMessage({type: 'error', text: 'An error occurred'})
+    } finally {
+      setWebsiteLoading(false)
+    }
+  }
+
+  const toggleTechStack = (tech: string) => {
+    setTechStackPreferences(prev =>
+      prev.includes(tech)
+        ? prev.filter(t => t !== tech)
+        : [...prev, tech]
+    )
+  }
+
+  const handleTechStackUpdate = async () => {
+    setTechStackMessage(null)
+    setTechStackLoading(true)
+
+    try {
+      const response = await fetch('/api/user/update-tech-stack', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tech_stack_preferences: techStackPreferences })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setUser({ ...user, tech_stack_preferences: techStackPreferences })
+        setTechStackMessage({type: 'success', text: 'Tech stack preferences updated!'})
+      } else {
+        setTechStackMessage({type: 'error', text: data.error || 'Failed to update preferences'})
+      }
+    } catch (error) {
+      setTechStackMessage({type: 'error', text: 'An error occurred'})
+    } finally {
+      setTechStackLoading(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -277,29 +432,134 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-6">
-        {/* Current Account Info */}
+        {/* Account Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>Your current account details</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Account Information</CardTitle>
+                <CardDescription>Your current account details</CardDescription>
+              </div>
+              {!isEditingProfile && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditingProfile(true)}
+                >
+                  Edit Profile
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
+            {profileMessage && (
+              <div className={`flex items-center gap-2 p-3 rounded-md ${
+                profileMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'
+              }`}>
+                {profileMessage.type === 'success' ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : (
+                  <AlertCircle className="h-4 w-4" />
+                )}
+                <p className="text-sm">{profileMessage.text}</p>
+              </div>
+            )}
+
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Email</Label>
               <p className="text-base">{user?.email}</p>
             </div>
-            <div>
-              <Label className="text-sm font-medium text-muted-foreground">Full Name</Label>
-              <p className="text-base">{user?.full_name || 'Not set'}</p>
-            </div>
+
+            {isEditingProfile ? (
+              <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <div>
+                  <Label htmlFor="full_name">Full Name</Label>
+                  <Input
+                    id="full_name"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button type="submit" disabled={profileLoading}>
+                    {profileLoading ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setIsEditingProfile(false)
+                      setFullName(user?.full_name || '')
+                      setProfileMessage(null)
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Full Name</Label>
+                <p className="text-base">{user?.full_name || 'Not set'}</p>
+              </div>
+            )}
+
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Role</Label>
-              <p className="text-base capitalize">{user?.role || 'Student'}</p>
+              <p className="text-base capitalize">{user?.role || 'Client'}</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Account Tier</Label>
               <p className="text-base capitalize">{user?.tier || 'Basic'}</p>
             </div>
+          </CardContent>
+        </Card>
+
+        <Separator />
+
+        {/* Website Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Website Information</CardTitle>
+            <CardDescription>
+              Add your website URL to track your project and access custom tutorials
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleWebsiteUpdate} className="space-y-4">
+              <div>
+                <Label htmlFor="website_url">Website URL</Label>
+                <Input
+                  id="website_url"
+                  type="url"
+                  value={websiteUrl}
+                  onChange={(e) => setWebsiteUrl(e.target.value)}
+                  placeholder="https://your-website.com"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Enter the URL of the website you&apos;re building
+                </p>
+              </div>
+
+              {websiteMessage && (
+                <div className={`flex items-center gap-2 p-3 rounded-md ${
+                  websiteMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'
+                }`}>
+                  {websiteMessage.type === 'success' ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4" />
+                  )}
+                  <p className="text-sm">{websiteMessage.text}</p>
+                </div>
+              )}
+
+              <Button type="submit" disabled={websiteLoading}>
+                {websiteLoading ? 'Saving...' : 'Save Website URL'}
+              </Button>
+            </form>
           </CardContent>
         </Card>
 
@@ -358,6 +618,175 @@ export default function SettingsPage() {
                 {usernameLoading ? 'Updating...' : 'Update Username'}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        <Separator />
+
+        {/* Tech Stack Preferences */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tech Stack Preferences</CardTitle>
+            <CardDescription>
+              Select the technologies you&apos;re using to personalize your resources
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {[
+                { id: 'nextjs', label: 'Next.js' },
+                { id: 'react', label: 'React' },
+                { id: 'supabase', label: 'Supabase' },
+                { id: 'tailwind', label: 'Tailwind CSS' },
+                { id: 'typescript', label: 'TypeScript' },
+                { id: 'vercel', label: 'Vercel' },
+                { id: 'postgres', label: 'PostgreSQL' },
+                { id: 'git', label: 'Git/GitHub' },
+                { id: 'nodejs', label: 'Node.js' },
+              ].map((tech) => (
+                <button
+                  key={tech.id}
+                  type="button"
+                  onClick={() => toggleTechStack(tech.id)}
+                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                    techStackPreferences.includes(tech.id)
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border hover:border-primary/50 text-muted-foreground'
+                  }`}
+                >
+                  {tech.label}
+                </button>
+              ))}
+            </div>
+
+            {techStackMessage && (
+              <div className={`flex items-center gap-2 p-3 rounded-md ${
+                techStackMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'
+              }`}>
+                {techStackMessage.type === 'success' ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : (
+                  <AlertCircle className="h-4 w-4" />
+                )}
+                <p className="text-sm">{techStackMessage.text}</p>
+              </div>
+            )}
+
+            <Button onClick={handleTechStackUpdate} disabled={techStackLoading}>
+              {techStackLoading ? 'Saving...' : 'Save Preferences'}
+            </Button>
+
+            <p className="text-xs text-muted-foreground">
+              Resources will be filtered based on your selected tech stack when you visit the Resources page.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Separator />
+
+        {/* Payment Method */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Billing & Payments</CardTitle>
+            <CardDescription>
+              Manage your payment methods and view invoice history
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
+              <div>
+                <p className="text-sm font-medium mb-1">Stripe Customer Portal</p>
+                <p className="text-sm text-muted-foreground">
+                  Update payment methods, view billing history, and manage subscriptions
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={openCustomerPortal}
+                disabled={portalLoading || !user?.stripe_customer_id}
+              >
+                {portalLoading ? 'Opening...' : 'Manage Billing'}
+              </Button>
+            </div>
+
+            {!user?.stripe_customer_id && (
+              <div className="p-3 bg-blue-50 text-blue-800 rounded-lg text-sm">
+                No billing account found. Make your first purchase to access billing management.
+              </div>
+            )}
+
+            {/* Invoice History */}
+            {invoices.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">Recent Invoices</h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={fetchInvoices}
+                    disabled={invoicesLoading}
+                  >
+                    {invoicesLoading ? 'Loading...' : 'Refresh'}
+                  </Button>
+                </div>
+
+                <div className="space-y-2">
+                  {invoices.slice(0, 5).map((invoice) => (
+                    <div
+                      key={invoice.id}
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-medium text-sm">
+                            {invoice.description}
+                          </p>
+                          <Badge
+                            variant="outline"
+                            className={
+                              invoice.status === 'paid'
+                                ? 'bg-green-50 text-green-700 border-green-200'
+                                : 'bg-gray-50 text-gray-700 border-gray-200'
+                            }
+                          >
+                            {invoice.status}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(invoice.created * 1000).toLocaleDateString()} • {invoice.number || 'Invoice'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <p className="font-medium">
+                          ${invoice.amount.toFixed(2)} {invoice.currency}
+                        </p>
+                        {invoice.invoice_pdf && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            asChild
+                          >
+                            <a
+                              href={invoice.invoice_pdf}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              PDF
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {invoices.length > 5 && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Showing 5 of {invoices.length} invoices. View all in the Customer Portal.
+                  </p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 

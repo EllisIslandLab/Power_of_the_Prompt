@@ -1,10 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
+    const { website_url } = await request.json()
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,23 +34,38 @@ export async function GET() {
       )
     }
 
-    // Get user profile from public.users
-    const { data: profile, error: profileError } = await supabase
-      .from('users' as any)
-      .select('id, email, full_name, role, tier, username, email_verified, payment_status, website_url, youtube_playlist_id, payment_method_id, stripe_customer_id, tech_stack_preferences')
-      .eq('id', user.id)
-      .single() as any
+    // Validate URL if provided
+    if (website_url && website_url.trim() !== '') {
+      try {
+        new URL(website_url)
+      } catch (e) {
+        return NextResponse.json(
+          { error: 'Invalid URL format' },
+          { status: 400 }
+        )
+      }
+    }
 
-    if (profileError) {
+    // Update website URL
+    const { error: updateError } = await supabase
+      .from('users' as any)
+      .update({ website_url: website_url || null })
+      .eq('id', user.id)
+
+    if (updateError) {
+      console.error('Website update error:', updateError)
       return NextResponse.json(
-        { error: 'Profile not found' },
-        { status: 404 }
+        { error: 'Failed to update website URL' },
+        { status: 500 }
       )
     }
 
-    return NextResponse.json({ user: profile })
+    return NextResponse.json({
+      success: true,
+      message: 'Website URL updated successfully'
+    })
   } catch (error) {
-    console.error('Profile fetch error:', error)
+    console.error('Website update error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

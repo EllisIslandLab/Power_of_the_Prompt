@@ -8,11 +8,34 @@ import { ExpiredLinkModal } from "@/components/modals/ExpiredLinkModal"
 
 // Lazy load components below the fold for better performance
 const SiteSamples = dynamic(() => import("@/components/sections/site-samples").then(mod => ({ default: mod.SiteSamples })), {
-  loading: () => <div className="min-h-screen flex items-center justify-center text-muted-foreground" aria-label="Loading content">Loading...</div>,
+  loading: () => (
+    <div className="py-24 bg-muted/30" style={{ minHeight: '700px' }} aria-label="Loading content">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16 animate-pulse">
+          <div className="h-12 bg-muted rounded w-2/3 mx-auto mb-6"></div>
+          <div className="h-6 bg-muted rounded w-1/2 mx-auto"></div>
+        </div>
+        <div className="h-96 bg-muted/50 rounded-lg flex items-center justify-center">
+          <p className="text-muted-foreground">Loading gallery...</p>
+        </div>
+      </div>
+    </div>
+  ),
   ssr: false
 })
 const Testimonials = dynamic(() => import("@/components/sections/testimonials").then(mod => ({ default: mod.Testimonials })), {
-  loading: () => <div className="min-h-64 flex items-center justify-center text-muted-foreground" aria-label="Loading testimonials">Loading testimonials...</div>,
+  loading: () => (
+    <div className="py-16" style={{ minHeight: '400px' }}>
+      <div className="max-w-6xl mx-auto px-4 animate-pulse">
+        <div className="h-8 bg-muted rounded w-1/3 mx-auto mb-8"></div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[1,2,3].map(i => (
+            <div key={i} className="h-48 bg-muted rounded-lg"></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  ),
   ssr: false
 })
 const ScrollProgress = dynamic(() => import("@/components/scroll-progress").then(mod => ({ default: mod.ScrollProgress })), {

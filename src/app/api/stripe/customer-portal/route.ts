@@ -1,10 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getStripe } from '@/lib/stripe'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
+    const { return_url } = await request.json()
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,25 +35,32 @@ export async function GET() {
       )
     }
 
-    // Get user profile from public.users
-    const { data: profile, error: profileError } = await supabase
+    // Get user's Stripe customer ID from database
+    const { data: userData } = await supabase
       .from('users' as any)
-      .select('id, email, full_name, role, tier, username, email_verified, payment_status, website_url, youtube_playlist_id, payment_method_id, stripe_customer_id, tech_stack_preferences')
+      .select('stripe_customer_id, email')
       .eq('id', user.id)
-      .single() as any
+      .single()
 
-    if (profileError) {
+    if (!userData?.stripe_customer_id) {
       return NextResponse.json(
-        { error: 'Profile not found' },
+        { error: 'No Stripe customer found. Please make a purchase first.' },
         { status: 404 }
       )
     }
 
-    return NextResponse.json({ user: profile })
+    // Create Stripe Customer Portal session
+    const stripe = getStripe()
+    const session = await stripe.billingPortal.sessions.create({
+      customer: userData.stripe_customer_id,
+      return_url: return_url || `${process.env.NEXT_PUBLIC_BASE_URL}/portal/settings`,
+    })
+
+    return NextResponse.json({ url: session.url })
   } catch (error) {
-    console.error('Profile fetch error:', error)
+    console.error('Customer Portal error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to create customer portal session' },
       { status: 500 }
     )
   }

@@ -6,12 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { Zap, BookOpen, Settings, Users, Plus, HelpCircle, Handshake } from "lucide-react"
+import { BookOpen, Settings, Zap, FileEdit, Menu, X } from "lucide-react"
 import { createBrowserClient } from '@supabase/ssr'
 import { OnlineIndicator, usePresence } from "@/components/ui/online-indicator"
-import { SessionCounter } from "@/components/ui/session-counter"
+import { WebsitePreview } from "@/components/portal/WebsitePreview"
+import { LighthouseScores } from "@/components/portal/LighthouseScores"
+import RevisionStartForm from "@/components/portal/forms/RevisionStartForm"
+import RevisionModifierForm from "@/components/portal/forms/RevisionModifierForm"
 
-// Use browser client for proper cookie handling
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -23,14 +25,15 @@ interface UserData {
   full_name?: string
   role: string
   tier: string
+  website_url?: string
 }
 
 export default function PortalPage() {
   const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const router = useRouter()
 
-  // Track presence for current user
   usePresence()
 
   useEffect(() => {
@@ -73,246 +76,169 @@ export default function PortalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="container mx-auto max-w-6xl">
-        {/* Header */}
-        <div className="mb-8 bg-card/50 backdrop-blur border rounded-lg p-8">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-foreground">
-                  Welcome back, {user.full_name || user.email}!
-                </h1>
-                <OnlineIndicator userId={user.id} showLabel />
-              </div>
-              <p className="text-muted-foreground">
-                Your Web Launch Academy dashboard
-              </p>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+      <div className="flex">
+        {/* Mobile Sidebar Toggle */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="fixed top-4 left-4 z-50 md:hidden"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          {sidebarOpen ? <X /> : <Menu />}
+        </Button>
+
+        {/* Left Sidebar */}
+        <aside
+          className={`fixed md:sticky top-0 left-0 h-screen bg-card border-r transition-all duration-300 z-40 ${
+            sidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0 md:w-16'
+          }`}
+        >
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="p-4 border-b">
+              {sidebarOpen ? (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h2 className="font-bold text-lg">Web Launch</h2>
+                    <OnlineIndicator userId={user.id} />
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user.full_name || user.email}
+                  </p>
+                  <Badge variant={user.role === 'admin' ? 'default' : 'secondary'} className="mt-2 text-xs">
+                    {user.role === 'admin' ? 'Admin' : 'Client'}
+                  </Badge>
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  <OnlineIndicator userId={user.id} />
+                </div>
+              )}
             </div>
-            <Link href="/">
-              <Button variant="outline">
-                Sign Out
-              </Button>
-            </Link>
-          </div>
 
-          {/* Navigation Links */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
-              <Link href="/portal/cohorts">
-                <Users className="h-5 w-5" />
-                <span className="text-sm">Cohorts</span>
-              </Link>
-            </Button>
-            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
-              <Link href="/portal/collaboration">
-                <Handshake className="h-5 w-5" />
-                <span className="text-sm">Collaboration</span>
-              </Link>
-            </Button>
-            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
-              <Link href="/portal/resources">
-                <Zap className="h-5 w-5" />
-                <span className="text-sm">Resources</span>
-              </Link>
-            </Button>
-            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
-              <Link href="/portal/support">
-                <HelpCircle className="h-5 w-5" />
-                <span className="text-sm">Support</span>
-              </Link>
-            </Button>
-            <Button variant="ghost" className="h-auto py-3 flex flex-col gap-2" asChild>
-              <Link href="/portal/textbook">
-                <BookOpen className="h-5 w-5" />
-                <span className="text-sm">Textbook</span>
-              </Link>
-            </Button>
-          </div>
-        </div>
+            {/* Navigation */}
+            <nav className="flex-1 overflow-y-auto p-2">
+              <div className="space-y-1">
+                <Button
+                  variant="ghost"
+                  className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
+                  asChild
+                >
+                  <a href="#revision-rounds">
+                    <FileEdit className="h-4 w-4" />
+                    {sidebarOpen && <span className="ml-2">Revision Rounds</span>}
+                  </a>
+                </Button>
 
-        {/* Status Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Account Status</CardTitle>
-              <Zap className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                {user.role === 'admin' ? 'Admin' : 'Student'}
-              </Badge>
-              <p className="text-xs text-muted-foreground mt-2">
-                {user.role === 'admin' ? 'Admin Access' : 'Student Access'}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Tier: {user.tier}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">LVL UP Sessions</CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <SessionCounter userId={user.id} variant="full" />
-            </CardContent>
-          </Card>
-
-        </div>
-
-        {/* Student Resources */}
-        <div className="mb-8">
-          <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
-                WebLaunchCoach Student Textbook
-              </CardTitle>
-              <CardDescription>
-                Complete guide to professional web development - &quot;Build Once, Own Forever&quot;
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">
-                    8 comprehensive chapters covering everything from setup to long-term success
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Student-exclusive content with progress tracking
-                  </p>
-                </div>
-                <Button asChild className="shrink-0">
+                <Button
+                  variant="ghost"
+                  className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
+                  asChild
+                >
                   <Link href="/portal/textbook">
-                    Access Textbook
+                    <BookOpen className="h-4 w-4" />
+                    {sidebarOpen && <span className="ml-2">Dev Guide</span>}
+                  </Link>
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
+                  asChild
+                >
+                  <Link href="/portal/resources">
+                    <Zap className="h-4 w-4" />
+                    {sidebarOpen && <span className="ml-2">Resources</span>}
+                  </Link>
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
+                  asChild
+                >
+                  <Link href="/portal/settings">
+                    <Settings className="h-4 w-4" />
+                    {sidebarOpen && <span className="ml-2">Settings</span>}
                   </Link>
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </nav>
 
-        {/* Cohort Management */}
-        {user.role === 'admin' && (
-          <div className="mb-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  Cohort Management
-                </CardTitle>
-                <CardDescription>
-                  Manage your student cohorts and track progress
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-4">
-                  <Button asChild>
-                    <Link href="/portal/cohorts">
-                      View All Cohorts
-                    </Link>
-                  </Button>
-                  <Button variant="outline" asChild>
-                    <Link href="/portal/cohorts/new">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create New Cohort
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Student Cohort View */}
-        {user.role === 'student' && (
-          <div className="mb-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
-                  My Cohort
-                </CardTitle>
-                <CardDescription>
-                  Connect with your learning group
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm text-muted-foreground mb-4">
-                  Join a cohort to learn alongside other students
-                </div>
-                <Button variant="outline" asChild>
-                  <Link href="/portal/cohorts">
-                    View Available Cohorts
-                  </Link>
+            {/* Footer */}
+            <div className="p-4 border-t">
+              {sidebarOpen ? (
+                <Button variant="outline" size="sm" className="w-full" asChild>
+                  <Link href="/">Sign Out</Link>
                 </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                Get Started
-              </CardTitle>
-              <CardDescription>
-                Begin your website building journey
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button className="w-full" asChild>
-                <Link href="/portal/textbook">
-                  📚 Student Textbook
-                </Link>
-              </Button>
-              {user.role === 'admin' && (
-                <Button variant="outline" className="w-full" asChild>
-                  <Link href="/portal/cohorts">
-                    <Users className="h-4 w-4 mr-2" />
-                    Manage Cohorts
-                  </Link>
+              ) : (
+                <Button variant="ghost" size="sm" className="w-full" asChild>
+                  <Link href="/">→</Link>
                 </Button>
               )}
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/portal/schedule">
-                  Schedule Session
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        </aside>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-primary" />
-                Account Settings
-              </CardTitle>
-              <CardDescription>
-                Manage your profile and preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="text-sm">
-                <strong>Email:</strong> {user.email}
-              </div>
-              <div className="text-sm">
-                <strong>Role:</strong> {user.role === 'admin' ? 'Admin' : 'Student'}
-              </div>
-              <Button variant="outline" size="sm" className="mt-4" asChild>
-                <Link href="/portal/settings">
-                  Update Profile
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Main Content */}
+        <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold">
+                Welcome back, {user.full_name || user.email}!
+              </h1>
+            </div>
+            <p className="text-muted-foreground">Your Web Launch Academy dashboard</p>
+          </div>
+
+          {/* Revision Rounds Section */}
+          <div id="revision-rounds" className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Revision Rounds</h2>
+            <div className="grid md:grid-cols-2 gap-4 mb-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Start New Revision</CardTitle>
+                  <CardDescription>
+                    Request changes or improvements to your website
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RevisionStartForm
+                    userEmail={user.email}
+                    userName={user.full_name || user.email}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Modify Revision</CardTitle>
+                  <CardDescription>
+                    Adjust an existing revision request
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RevisionModifierForm
+                    userEmail={user.email}
+                    userName={user.full_name || user.email}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Website Preview Section */}
+          <div className="mb-8">
+            <WebsitePreview userId={user.id} websiteUrl={user.website_url || null} />
+          </div>
+
+          {/* Lighthouse Scores Section */}
+          <div className="mb-8">
+            <LighthouseScores userId={user.id} />
+          </div>
+        </main>
       </div>
     </div>
   )

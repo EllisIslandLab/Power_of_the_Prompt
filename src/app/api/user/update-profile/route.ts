@@ -1,10 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies()
+    const { full_name } = await request.json()
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,23 +34,26 @@ export async function GET() {
       )
     }
 
-    // Get user profile from public.users
-    const { data: profile, error: profileError } = await supabase
+    // Update profile
+    const { error: updateError } = await supabase
       .from('users' as any)
-      .select('id, email, full_name, role, tier, username, email_verified, payment_status, website_url, youtube_playlist_id, payment_method_id, stripe_customer_id, tech_stack_preferences')
+      .update({ full_name })
       .eq('id', user.id)
-      .single() as any
 
-    if (profileError) {
+    if (updateError) {
+      console.error('Profile update error:', updateError)
       return NextResponse.json(
-        { error: 'Profile not found' },
-        { status: 404 }
+        { error: 'Failed to update profile' },
+        { status: 500 }
       )
     }
 
-    return NextResponse.json({ user: profile })
+    return NextResponse.json({
+      success: true,
+      message: 'Profile updated successfully'
+    })
   } catch (error) {
-    console.error('Profile fetch error:', error)
+    console.error('Profile update error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
