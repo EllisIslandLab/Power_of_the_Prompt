@@ -1,9 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import PortalLayout from './components/PortalLayout'
+import DeploymentHistory from './DeploymentHistory'
 
-export default async function PortalPage() {
+export default async function DeploymentsPage() {
   const cookieStore = cookies()
 
   const supabase = createServerClient(
@@ -21,28 +21,26 @@ export default async function PortalPage() {
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) {
-    redirect('/signin?redirect=/portal')
+    redirect('/signin?redirect=/portal/deployments')
   }
 
-  // Fetch user profile
   const { data: user } = await supabase
     .from('users')
     .select('*')
     .eq('id', session.user.id)
     .single()
 
-  // Fetch or create client account
   const { data: clientAccount } = await supabase
     .from('client_accounts')
     .select('*')
     .eq('user_id', session.user.id)
     .single()
 
-  return (
-    <PortalLayout
-      user={user}
-      clientAccount={clientAccount}
-      session={session}
-    />
-  )
+  const { data: deployments } = await supabase
+    .from('deployment_history')
+    .select('*')
+    .eq('client_account_id', clientAccount?.id)
+    .order('created_at', { ascending: false })
+
+  return <DeploymentHistory deployments={deployments || []} />
 }

@@ -1,9 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import PortalLayout from './components/PortalLayout'
+import PreferencesInterface from './PreferencesInterface'
 
-export default async function PortalPage() {
+export default async function PreferencesPage() {
   const cookieStore = cookies()
 
   const supabase = createServerClient(
@@ -21,28 +21,32 @@ export default async function PortalPage() {
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) {
-    redirect('/signin?redirect=/portal')
+    redirect('/signin?redirect=/portal/preferences')
   }
 
-  // Fetch user profile
   const { data: user } = await supabase
     .from('users')
     .select('*')
     .eq('id', session.user.id)
     .single()
 
-  // Fetch or create client account
   const { data: clientAccount } = await supabase
     .from('client_accounts')
     .select('*')
     .eq('user_id', session.user.id)
     .single()
 
+  const { data: preferences } = await supabase
+    .from('client_preferences')
+    .select('*')
+    .eq('client_account_id', clientAccount?.id)
+    .single()
+
   return (
-    <PortalLayout
+    <PreferencesInterface
       user={user}
       clientAccount={clientAccount}
-      session={session}
+      preferences={preferences}
     />
   )
 }

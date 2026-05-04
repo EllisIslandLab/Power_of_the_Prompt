@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     const tested_url = pageData?.full_url ||
-      (pageData?.users?.website_url ? `${pageData.users.website_url}${pageData.page_path}` : null)
+      (pageData?.users?.[0]?.website_url ? `${pageData.users[0].website_url}${pageData.page_path}` : null)
 
     // Insert lighthouse scores
     const { error: insertError } = await supabase
