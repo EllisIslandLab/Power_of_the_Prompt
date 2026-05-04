@@ -35,7 +35,10 @@ export default function ChatInterface({
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -214,8 +217,97 @@ What would you like to update?`,
     }
   }
 
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+
+    const file = files[0]
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('conversationId', currentConversationId || '')
+
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/portal/upload-image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Upload failed')
+      }
+
+      // Add success message
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `upload-${Date.now()}`,
+          role: 'system',
+          content: `Image uploaded successfully: ${result.filename}\nPath: ${result.url}\n\nYou can now reference this image in your requests.`,
+          timestamp: new Date(),
+        },
+      ])
+
+      setUploadedImages(prev => [...prev, result.url])
+    } catch (error) {
+      console.error('Upload error:', error)
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `error-${Date.now()}`,
+          role: 'system',
+          content: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          timestamp: new Date(),
+        },
+      ])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    handleFileUpload(e.dataTransfer.files)
+  }
+
   return (
-    <div className="h-full flex flex-col bg-card">
+    <div
+      className="h-full flex flex-col bg-card relative"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {/* Drag & Drop Overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 bg-primary/10 border-4 border-dashed border-primary z-50 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-primary mb-2">Drop Image Here</p>
+            <p className="text-sm text-muted-foreground">Supported: JPG, PNG, WebP, GIF (max 10MB)</p>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+        onChange={(e) => handleFileUpload(e.target.files)}
+        className="hidden"
+      />
+
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map(message => (
@@ -258,6 +350,16 @@ What would you like to update?`,
       {/* Input Area */}
       <div className="border-t border-border p-4 bg-muted/30">
         <div className="flex gap-2">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isLoading}
+            className="px-3 py-2 border border-border rounded-lg hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title="Upload Image"
+          >
+            <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </button>
           <textarea
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
@@ -276,7 +378,7 @@ What would you like to update?`,
           </button>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          Tip: Request one change at a time for best results
+          Tip: Drag & drop images or click the image icon to upload • Request one change at a time
         </p>
       </div>
     </div>

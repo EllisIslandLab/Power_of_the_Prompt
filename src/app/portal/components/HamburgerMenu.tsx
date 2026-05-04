@@ -86,6 +86,15 @@ export default function HamburgerMenu({ user, clientAccount }: HamburgerMenuProp
             <div className="py-2">
               <button
                 onClick={() => {
+                  window.location.href = '/portal/website-settings'
+                  setIsOpen(false)
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted/50 transition-colors"
+              >
+                Website Settings
+              </button>
+              <button
+                onClick={() => {
                   window.location.href = '/portal/history'
                   setIsOpen(false)
                 }}
