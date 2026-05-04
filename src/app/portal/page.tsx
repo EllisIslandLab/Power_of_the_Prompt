@@ -6,13 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { BookOpen, Settings, Zap, FileEdit, Menu, X } from "lucide-react"
+import { Settings, Wrench, Menu, X, Package } from "lucide-react"
 import { createBrowserClient } from '@supabase/ssr'
 import { OnlineIndicator, usePresence } from "@/components/ui/online-indicator"
-import { WebsitePreview } from "@/components/portal/WebsitePreview"
-import { LighthouseScores } from "@/components/portal/LighthouseScores"
-import RevisionStartForm from "@/components/portal/forms/RevisionStartForm"
-import RevisionModifierForm from "@/components/portal/forms/RevisionModifierForm"
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -125,20 +121,9 @@ export default function PortalPage() {
                   className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
                   asChild
                 >
-                  <a href="#revision-rounds">
-                    <FileEdit className="h-4 w-4" />
-                    {sidebarOpen && <span className="ml-2">Revision Rounds</span>}
-                  </a>
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
-                  asChild
-                >
-                  <Link href="/portal/textbook">
-                    <BookOpen className="h-4 w-4" />
-                    {sidebarOpen && <span className="ml-2">Dev Guide</span>}
+                  <Link href="/portal/products/architecture-mastery-toolkit">
+                    <Package className="h-4 w-4" />
+                    {sidebarOpen && <span className="ml-2">Architecture Mastery</span>}
                   </Link>
                 </Button>
 
@@ -148,7 +133,7 @@ export default function PortalPage() {
                   asChild
                 >
                   <Link href="/portal/resources">
-                    <Zap className="h-4 w-4" />
+                    <Wrench className="h-4 w-4" />
                     {sidebarOpen && <span className="ml-2">Resources</span>}
                   </Link>
                 </Button>
@@ -190,53 +175,37 @@ export default function PortalPage() {
                 Welcome back, {user.full_name || user.email}!
               </h1>
             </div>
-            <p className="text-muted-foreground">Your Web Launch Academy dashboard</p>
+            <p className="text-muted-foreground">Your Web Launch portal</p>
           </div>
 
-          {/* Revision Rounds Section */}
-          <div id="revision-rounds" className="mb-8">
-            <h2 className="text-2xl font-bold mb-4">Revision Rounds</h2>
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Start New Revision</CardTitle>
-                  <CardDescription>
-                    Request changes or improvements to your website
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <RevisionStartForm
-                    userEmail={user.email}
-                    userName={user.full_name || user.email}
-                  />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Modify Revision</CardTitle>
-                  <CardDescription>
-                    Adjust an existing revision request
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <RevisionModifierForm
-                    userEmail={user.email}
-                    userName={user.full_name || user.email}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Website Preview Section */}
+          {/* Website Modification Section */}
           <div className="mb-8">
-            <WebsitePreview userId={user.id} websiteUrl={user.website_url || null} />
-          </div>
-
-          {/* Lighthouse Scores Section */}
-          <div className="mb-8">
-            <LighthouseScores userId={user.id} />
+            <h2 className="text-2xl font-bold mb-4">Website Modification</h2>
+            <Card>
+              <CardHeader>
+                <CardTitle>Manage Your Website</CardTitle>
+                <CardDescription>
+                  Tools and features for modifying your website will be available here
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Website modification functionality coming soon...
+                </p>
+                <div className="flex gap-4">
+                  <Button variant="outline" asChild>
+                    <Link href="/portal/resources">
+                      View Resources
+                    </Link>
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link href="/portal/products/architecture-mastery-toolkit">
+                      Architecture Toolkit
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>

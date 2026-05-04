@@ -1,27 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAirtableBase } from '@/lib/airtable'
+import { createClient } from '@supabase/supabase-js'
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 export async function GET() {
   try {
-    const base = getAirtableBase()
-    
     // Fetch approved testimonials with arrangement order (Arrangement > 0 means it should be displayed)
-    const records = await base('Testimonial Submissions').select({
-      filterByFormula: `AND({Arrangement} > 0, {Status} = 'Approved')`,
-      sort: [{ field: 'Arrangement', direction: 'asc' }], // Sort by arrangement order (1, 2, 3, etc.)
-      maxRecords: 100 // Allow more testimonials for pagination
-    }).firstPage()
+    const { data: records, error } = await supabase
+      .from('testimonials')
+      .select('*')
+      .eq('status', 'Approved')
+      .gt('arrangement', 0)
+      .order('arrangement', { ascending: true })
+      .limit(100)
 
-    const testimonials = records.map(record => ({
+    if (error) {
+      console.error('Supabase query error:', error)
+      throw error
+    }
+
+    const testimonials = (records || []).map(record => ({
       id: record.id,
-      name: record.fields['Name'] as string,
-      testimonial: record.fields['Testimonial'] as string,
-      title: record.fields['Title/Role'] as string || 'Customer',
-      avatar: record.fields['Avatar'] as string || '😊',
-      email: record.fields['Email'] as string,
-      submittedDate: record.fields['Submitted Date'] as string,
-      updatedDate: record.fields['Updated Date'] as string,
-      arrangement: record.fields['Arrangement'] as number || 0,
+      name: record.name,
+      testimonial: record.testimonial,
+      title: record.title_role || 'Customer',
+      avatar: record.avatar || '😊',
+      email: record.email,
+      submittedDate: record.submitted_date,
+      updatedDate: record.updated_date,
+      arrangement: record.arrangement || 0,
     }))
 
     return NextResponse.json({
@@ -31,22 +42,9 @@ export async function GET() {
 
   } catch (error) {
     console.error('Error fetching testimonials:', error)
-    
-    // Check if it's an Airtable table not found error
-    if ((error as Error).message?.includes('Could not find table') || 
-        (error as Error).message?.includes('NOT_FOUND')) {
-      return NextResponse.json(
-        { 
-          success: false,
-          error: 'Testimonials not yet configured.',
-          testimonials: []
-        },
-        { status: 503 }
-      )
-    }
-    
+
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: 'Failed to fetch testimonials',
         testimonials: [],
