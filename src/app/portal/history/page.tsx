@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import ConversationHistory from './ConversationHistory'
 
 export default async function HistoryPage() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
