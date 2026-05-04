@@ -24,8 +24,8 @@ export default function PortalLayout({ user, clientAccount, session }: PortalLay
   })
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      {/* Token Budget Bar - Thin life bar at top */}
+    <div className="h-screen flex flex-col bg-background">
+      {/* Token Budget Bar - Matches homepage scroll progress */}
       <TokenBudgetBar
         used={tokenBudget.used}
         limit={tokenBudget.limit}
@@ -36,7 +36,7 @@ export default function PortalLayout({ user, clientAccount, session }: PortalLay
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
 
         {/* Mobile: Preview on top, Desktop: Preview on right (60%) */}
-        <div className="lg:order-2 h-1/2 lg:h-full lg:w-3/5 border-b lg:border-b-0 lg:border-l border-gray-200">
+        <div className="lg:order-2 h-1/2 lg:h-full lg:w-3/5 border-b lg:border-b-0 lg:border-l border-border">
           <PreviewPanel
             previewUrl={previewUrl}
             conversationId={currentConversation}
@@ -57,7 +57,7 @@ export default function PortalLayout({ user, clientAccount, session }: PortalLay
       </div>
 
       {/* Footer Bar - Hamburger Menu & Balance */}
-      <div className="bg-white border-t border-gray-200 px-4 py-2 flex items-center justify-between">
+      <div className="bg-card border-t border-border px-4 py-2 flex items-center justify-between">
         <HamburgerMenu user={user} clientAccount={clientAccount} />
         <BalanceDisplay balance={clientAccount?.account_balance || 0} />
       </div>

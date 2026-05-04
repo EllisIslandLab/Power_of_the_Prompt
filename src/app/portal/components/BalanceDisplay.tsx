@@ -10,14 +10,14 @@ export default function BalanceDisplay({ balance }: BalanceDisplayProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-gray-500">Balance:</span>
+      <span className="text-xs text-muted-foreground">Balance:</span>
       <span
         className={`text-sm font-semibold ${
           isCritical
-            ? 'text-red-600'
+            ? 'text-destructive'
             : isLow
-            ? 'text-yellow-600'
-            : 'text-green-600'
+            ? 'text-accent-foreground'
+            : 'text-foreground'
         }`}
       >
         ${balance.toFixed(2)}
@@ -25,7 +25,7 @@ export default function BalanceDisplay({ balance }: BalanceDisplayProps) {
       {isLow && (
         <button
           onClick={() => (window.location.href = '/portal/billing')}
-          className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded hover:bg-primary-hover transition-colors"
         >
           Add Funds
         </button>

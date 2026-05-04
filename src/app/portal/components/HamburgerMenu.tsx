@@ -32,11 +32,11 @@ export default function HamburgerMenu({ user, clientAccount }: HamburgerMenuProp
       {/* Hamburger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        className="p-2 hover:bg-muted/50 rounded-lg transition-colors"
         aria-label="Menu"
       >
         <svg
-          className="w-6 h-6 text-gray-700"
+          className="w-6 h-6 text-foreground"
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -58,26 +58,26 @@ export default function HamburgerMenu({ user, clientAccount }: HamburgerMenuProp
           />
 
           {/* Menu Panel */}
-          <div className="absolute bottom-full left-0 mb-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
+          <div className="absolute bottom-full left-0 mb-2 w-72 bg-card rounded-lg shadow-lg border border-border z-20">
             {/* User Info */}
-            <div className="px-4 py-3 border-b border-gray-200">
-              <p className="text-sm font-semibold text-gray-900">
+            <div className="px-4 py-3 border-b border-border">
+              <p className="text-sm font-semibold text-foreground">
                 {user?.full_name || 'User'}
               </p>
-              <p className="text-xs text-gray-500">{user?.email}</p>
+              <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
 
             {/* Trial Status */}
             {clientAccount?.trial_status === 'active' && (
-              <div className="px-4 py-3 bg-blue-50 border-b border-blue-100">
-                <p className="text-xs font-semibold text-blue-900">
+              <div className="px-4 py-3 bg-accent/10 border-b border-border">
+                <p className="text-xs font-semibold text-accent-foreground">
                   Trial Period Active
                 </p>
-                <p className="text-xs text-blue-700">
+                <p className="text-xs text-muted-foreground">
                   {trialDaysRemaining} days remaining
                 </p>
-                <p className="text-xs text-blue-600 mt-1">
-                  Free bug fixes during trial!
+                <p className="text-xs text-muted-foreground mt-1">
+                  Free bug fixes during trial
                 </p>
               </div>
             )}
@@ -89,46 +89,46 @@ export default function HamburgerMenu({ user, clientAccount }: HamburgerMenuProp
                   window.location.href = '/portal/history'
                   setIsOpen(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted/50 transition-colors"
               >
-                📜 Conversation History
+                Conversation History
               </button>
               <button
                 onClick={() => {
                   window.location.href = '/portal/deployments'
                   setIsOpen(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted/50 transition-colors"
               >
-                🚀 Deployment History
+                Deployment History
               </button>
               <button
                 onClick={() => {
                   window.location.href = '/portal/billing'
                   setIsOpen(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted/50 transition-colors"
               >
-                💳 Billing & Balance
+                Billing & Balance
               </button>
               <button
                 onClick={() => {
                   window.location.href = '/portal/preferences'
                   setIsOpen(false)
                 }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted/50 transition-colors"
               >
-                ⚙️ Preferences
+                Preferences
               </button>
             </div>
 
             {/* Sign Out */}
-            <div className="border-t border-gray-200 py-2">
+            <div className="border-t border-border py-2">
               <button
                 onClick={handleSignOut}
-                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
+                className="w-full px-4 py-2 text-left text-sm text-destructive hover:bg-destructive/10 transition-colors"
               >
-                🚪 Sign Out
+                Sign Out
               </button>
             </div>
           </div>

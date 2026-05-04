@@ -13,13 +13,11 @@ export default function PreviewPanel({ previewUrl, conversationId }: PreviewPane
 
   if (!previewUrl) {
     return (
-      <div className="h-full flex items-center justify-center bg-gray-100">
+      <div className="h-full flex items-center justify-center bg-muted/30">
         <div className="text-center">
-          <div className="text-6xl mb-4">👀</div>
-          <h3 className="text-lg font-semibold text-gray-700">Preview Panel</h3>
-          <p className="text-sm text-gray-500 mt-2">
-            Your website preview will appear here<br />
-            once Claude makes changes
+          <h3 className="text-lg font-semibold text-foreground">Website Preview</h3>
+          <p className="text-sm text-muted-foreground mt-2 max-w-md">
+            Your live preview will appear here once changes are implemented.
           </p>
         </div>
       </div>
@@ -27,24 +25,24 @@ export default function PreviewPanel({ previewUrl, conversationId }: PreviewPane
   }
 
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col bg-card">
       {/* Navigation Controls (if multiple changes) */}
       {changedElements.length > 1 && (
-        <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 flex items-center justify-between">
+        <div className="bg-muted/30 border-b border-border px-4 py-2 flex items-center justify-between">
           <button
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
             disabled={currentIndex === 0}
-            className="px-3 py-1 text-sm bg-white border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-3 py-1 text-sm bg-card border border-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted/50"
           >
             ← Previous
           </button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-muted-foreground">
             Change {currentIndex + 1} of {changedElements.length}
           </span>
           <button
             onClick={() => setCurrentIndex(Math.min(changedElements.length - 1, currentIndex + 1))}
             disabled={currentIndex === changedElements.length - 1}
-            className="px-3 py-1 text-sm bg-white border border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            className="px-3 py-1 text-sm bg-card border border-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted/50"
           >
             Next →
           </button>
@@ -62,9 +60,9 @@ export default function PreviewPanel({ previewUrl, conversationId }: PreviewPane
       </div>
 
       {/* Preview Info */}
-      <div className="bg-gray-50 border-t border-gray-200 px-4 py-2">
-        <p className="text-xs text-gray-500">
-          Preview: <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+      <div className="bg-muted/30 border-t border-border px-4 py-2">
+        <p className="text-xs text-muted-foreground">
+          Preview: <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
             {previewUrl}
           </a>
         </p>

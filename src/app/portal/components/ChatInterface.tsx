@@ -52,19 +52,18 @@ export default function ChatInterface({
     const greeting: ChatMessage = {
       id: 'greeting',
       role: 'assistant',
-      content: `Hi ${firstName}! 👋 Welcome to your website revision workspace.
+      content: `Welcome, ${firstName}. I'm here to help you manage website revisions.
 
-I'm here to help you make changes to your website. Just describe what you'd like to update, and I'll handle the implementation.
+**How it works:**
+• Describe one change at a time for clarity
+• I'll implement the change and generate a preview
+• Review and approve before deploying to production
 
-**How this works:**
-• Describe one change at a time for best results
-• I'll make the change and show you a preview
-• You can review and approve before it goes live
+**Your account:**
+Balance: $${clientAccount?.account_balance?.toFixed(2) || '0.00'}
+${clientAccount?.trial_status === 'active' ? `Trial: ${Math.ceil((new Date(clientAccount.trial_expiration_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days remaining` : ''}
 
-**Current balance:** $${clientAccount?.account_balance?.toFixed(2) || '0.00'}
-${clientAccount?.trial_status === 'active' ? `**Trial period:** ${Math.ceil((new Date(clientAccount.trial_expiration_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days remaining` : ''}
-
-What would you like to work on today?`,
+What would you like to update?`,
       timestamp: new Date(),
     }
     setMessages([greeting])
@@ -199,7 +198,7 @@ What would you like to work on today?`,
         {
           id: `error-${Date.now()}`,
           role: 'system',
-          content: '❌ Sorry, something went wrong. Please try again.',
+          content: 'Error: Unable to process request. Please try again.',
           timestamp: new Date(),
         },
       ])
@@ -216,7 +215,7 @@ What would you like to work on today?`,
   }
 
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col bg-card">
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map(message => (
@@ -227,10 +226,10 @@ What would you like to work on today?`,
             <div
               className={`max-w-[80%] rounded-lg px-4 py-2 ${
                 message.role === 'user'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-primary text-primary-foreground'
                   : message.role === 'system'
-                  ? 'bg-red-100 text-red-800 border border-red-200'
-                  : 'bg-gray-100 text-gray-900'
+                  ? 'bg-destructive/10 text-destructive border border-destructive/20'
+                  : 'bg-muted text-foreground'
               }`}
             >
               <div className="whitespace-pre-wrap">{message.content}</div>
@@ -244,11 +243,11 @@ What would you like to work on today?`,
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 rounded-lg px-4 py-2">
+            <div className="bg-muted rounded-lg px-4 py-2">
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -257,27 +256,27 @@ What would you like to work on today?`,
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
+      <div className="border-t border-border p-4 bg-muted/30">
         <div className="flex gap-2">
           <textarea
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Describe the change you'd like to make..."
-            className="flex-1 resize-none border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 resize-none border border-border rounded-lg px-4 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             rows={2}
             disabled={isLoading}
           />
           <button
             onClick={handleSendMessage}
             disabled={isLoading || !inputValue.trim()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Send
           </button>
         </div>
-        <p className="text-xs text-gray-500 mt-2">
-          💡 Tip: Request one change at a time for fastest results
+        <p className="text-xs text-muted-foreground mt-2">
+          Tip: Request one change at a time for best results
         </p>
       </div>
     </div>
