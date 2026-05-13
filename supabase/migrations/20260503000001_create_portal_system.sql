@@ -122,9 +122,9 @@ CREATE TABLE IF NOT EXISTS deployment_notifications (
   conversation_id UUID REFERENCES revision_conversations(id) ON DELETE CASCADE,
   notification_type VARCHAR(50) NOT NULL CHECK (notification_type IN ('code_deployed', 'database_completed', 'database_work_ready', 'preview_ready', 'balance_low')),
   title TEXT NOT NULL,
-  description TEXT NOT NULL,
+  message TEXT NOT NULL,
   action_url TEXT,
-  is_acknowledged BOOLEAN DEFAULT false,
+  read BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now(),
   acknowledged_at TIMESTAMPTZ
 );
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS deployment_notifications (
 COMMENT ON TABLE deployment_notifications IS 'User notifications for deployments and work completion';
 COMMENT ON COLUMN deployment_notifications.notification_type IS 'Type of notification for display styling';
 
-CREATE INDEX idx_notifications_user ON deployment_notifications(user_id, is_acknowledged);
+CREATE INDEX idx_notifications_user ON deployment_notifications(user_id, read);
 CREATE INDEX idx_notifications_created ON deployment_notifications(created_at DESC);
 
 -- ============================================
