@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { Quote, X, ChevronLeft, ChevronRight } from "lucide-react"
+import { Quote, X, ChevronLeft, ChevronRight, Star } from "lucide-react"
 import { DollarIcon, CheckIcon } from "@/components/icons/SimpleIcons"
 
 interface Testimonial {
@@ -164,6 +164,24 @@ export function Testimonials() {
                 >
                   {loadingTestimonials ? 'Loading...' : `View More Testimonials ${testimonials.length > 0 ? `(${testimonials.length})` : ''}`}
                 </Button>
+
+                {/* Google Review Button */}
+                <div className="mt-4">
+                  <Button asChild variant="default" className="w-full">
+                    <a
+                      href="https://g.page/r/CWbHy700H0C1EAI/review"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2"
+                    >
+                      <Star className="h-4 w-4 fill-current" />
+                      Leave a Google Review
+                    </a>
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Share your experience on Google
+                  </p>
+                </div>
 
                 {/* Referral CTA */}
                 <div className="mt-4">
