@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['pino', 'pino-pretty', 'thread-stream'],
   // Performance optimizations
   experimental: {
+    // Enable instrumentation for Sentry
+    instrumentationHook: true,
     optimizePackageImports: [
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
