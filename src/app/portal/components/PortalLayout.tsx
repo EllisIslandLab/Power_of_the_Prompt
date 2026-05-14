@@ -131,6 +131,10 @@ export default function PortalLayout({
           clientAccount={clientAccount}
           onLayoutChange={handleLayoutChange}
           onImageUpload={handleImageUpload}
+          modifiedFiles={pendingDiffs.map(diff => ({
+            path: diff.filePath,
+            type: diff.type === 'file_preview' ? 'created' as const : 'modified' as const
+          }))}
         />
       )}
 

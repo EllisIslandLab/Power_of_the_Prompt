@@ -127,12 +127,11 @@ export default function ChatInterface({
       }
     }
 
-    // Load immediately
+    // Load immediately when conversation changes
     loadPendingChanges()
 
-    // Poll every 3 seconds while conversation is active
-    const interval = setInterval(loadPendingChanges, 3000)
-    return () => clearInterval(interval)
+    // Don't poll - let user manually refresh or approve changes
+    // This prevents the annoying loop and works like VS Code workflow
   }, [currentConversationId])
 
   const loadActiveConversation = async () => {

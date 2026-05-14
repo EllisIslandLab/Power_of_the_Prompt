@@ -9,11 +9,12 @@ interface SidebarProps {
   clientAccount?: any
   onLayoutChange?: (layout: 'left' | 'right' | 'top' | 'bottom' | 'floating') => void
   onImageUpload?: () => void
+  modifiedFiles?: Array<{ path: string; type: 'modified' | 'created' | 'deleted' }>
 }
 
 type SidebarTool = 'explorer' | 'search' | 'git' | 'targets' | 'mode' | 'balance' | 'settings' | 'layout' | 'upload' | 'help'
 
-export default function Sidebar({ onModeChange, initialTheme = 'dark', user, clientAccount, onLayoutChange, onImageUpload }: SidebarProps) {
+export default function Sidebar({ onModeChange, initialTheme = 'dark', user, clientAccount, onLayoutChange, onImageUpload, modifiedFiles = [] }: SidebarProps) {
   const [activeTool, setActiveTool] = useState<SidebarTool | null>(null)
   const [currentMode, setCurrentMode] = useState<'builder' | 'chat'>('builder')
   const [chatLayout, setChatLayout] = useState<'left' | 'right' | 'top' | 'bottom' | 'floating'>('left')
@@ -158,7 +159,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
                   setActiveTool(activeTool === tool.id ? null : tool.id)
                 }
               }}
-              className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors mb-2 ${
+              className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors mb-2 relative ${
                 activeTool === tool.id
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
@@ -166,6 +167,13 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
               title={tool.label}
             >
               {tool.icon}
+              {/* VS Code style indicator for modified files */}
+              {tool.id === 'explorer' && modifiedFiles.length > 0 && (
+                <span className="absolute top-1 right-1 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -227,20 +235,48 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
               {/* Explorer Content */}
               {activeTool === 'explorer' && (
                 <div className="text-sm text-muted-foreground">
-                  <p className="mb-2">Project Files</p>
-                  <div className="space-y-1 font-mono text-xs">
-                    <div className="pl-2">📁 src</div>
-                    <div className="pl-4">📁 app</div>
-                    <div className="pl-6">📁 portal</div>
-                    <div className="pl-8">📄 page.tsx</div>
-                    <div className="pl-6">📁 api</div>
-                    <div className="pl-4">📁 components</div>
-                    <div className="pl-2">📁 public</div>
-                    <div className="pl-4">📁 images</div>
-                  </div>
-                  <p className="text-xs mt-4 text-muted-foreground">
-                    Full file browser coming soon
-                  </p>
+                  {modifiedFiles.length > 0 ? (
+                    <>
+                      <p className="mb-2 font-semibold text-foreground">
+                        Modified Files ({modifiedFiles.length})
+                      </p>
+                      <div className="space-y-1">
+                        {modifiedFiles.map((file, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 px-2 py-1 rounded hover:bg-muted/50 font-mono text-xs"
+                          >
+                            <span className={`w-2 h-2 rounded-full ${
+                              file.type === 'modified' ? 'bg-yellow-500' :
+                              file.type === 'created' ? 'bg-green-500' :
+                              'bg-red-500'
+                            }`} />
+                            <span className="truncate text-foreground">{file.path}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-xs mt-4 text-muted-foreground">
+                        Review and approve changes below
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="mb-2">Project Files</p>
+                      <div className="space-y-1 font-mono text-xs">
+                        <div className="pl-2">📁 src</div>
+                        <div className="pl-4">📁 app</div>
+                        <div className="pl-6">📁 portal</div>
+                        <div className="pl-8">📄 page.tsx</div>
+                        <div className="pl-6">📁 api</div>
+                        <div className="pl-4">📁 components</div>
+                        <div className="pl-2">📁 public</div>
+                        <div className="pl-4">📁 images</div>
+                      </div>
+                      <p className="text-xs mt-4 text-muted-foreground">
+                        No pending changes
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
 
