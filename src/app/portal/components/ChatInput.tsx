@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import Image from 'next/image'
 
 interface ChatInputProps {
   user: any
@@ -36,6 +37,7 @@ export default function ChatInput({
   const [isDragging, setIsDragging] = useState(false)
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [rejectReason, setRejectReason] = useState('')
+  const [isButtonPressed, setIsButtonPressed] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const supabase = createBrowserClient(
@@ -51,6 +53,8 @@ export default function ChatInput({
 
   const handleSend = () => {
     if (!inputValue.trim() || disabled) return
+
+    // Send message
     onMessageSent(inputValue.trim())
     setInputValue('')
   }
@@ -171,13 +175,41 @@ export default function ChatInput({
         />
         <button
           onClick={handleSend}
+          onMouseDown={() => setIsButtonPressed(true)}
+          onMouseUp={() => {
+            // Keep glow for a moment, then fade back
+            setTimeout(() => setIsButtonPressed(false), 150)
+          }}
+          onMouseLeave={() => setIsButtonPressed(false)}
           disabled={disabled || !inputValue.trim()}
-          className="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 flex items-center justify-center shadow-sm"
+          className="flex-shrink-0 w-12 h-12 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-transform hover:scale-[1.02] active:scale-95 relative overflow-hidden"
           title="Send message (Enter)"
+          style={{ background: 'transparent' }}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
+          {/* Base button image */}
+          <Image
+            src="/images/elements/button.webp"
+            alt="Send"
+            fill
+            className={`object-cover transition-all ${
+              isButtonPressed
+                ? 'opacity-0 duration-150 ease-in'
+                : 'opacity-100 duration-200 ease-out'
+            }`}
+            priority
+          />
+          {/* Glow button image - crossfades in when pressed */}
+          <Image
+            src="/images/elements/glow-button.webp"
+            alt="Send"
+            fill
+            className={`object-cover transition-all ${
+              isButtonPressed
+                ? 'opacity-100 duration-150 ease-out'
+                : 'opacity-0 duration-200 ease-in'
+            }`}
+            priority
+          />
         </button>
       </div>
 
