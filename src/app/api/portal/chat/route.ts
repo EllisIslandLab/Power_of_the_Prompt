@@ -694,6 +694,14 @@ export async function POST(request: Request) {
           }
 
           const filePath = toolInput.path
+          const content = toolInput.content
+          const description = toolInput.description
+
+          if (!filePath || !content) {
+            console.error('[Tool] create_file missing required fields:', { filePath, hasContent: !!content })
+            return { error: 'Missing required fields: path and content are required' }
+          }
+
           console.log('[Tool] create_file:', filePath, 'on branch:', workingBranch)
 
           // Clean up any old pending changes for this file to avoid duplicates
@@ -712,9 +720,9 @@ export async function POST(request: Request) {
               user_id: clientAccount.user_id,
               file_path: filePath,
               change_type: 'create',
-              new_content: toolInput.content,
-              full_file_content: toolInput.content,
-              description: toolInput.description,
+              new_content: content,
+              full_file_content: content,
+              description: description,
               status: 'pending_approval',
               branch_name: workingBranch,
             })
@@ -728,7 +736,7 @@ export async function POST(request: Request) {
             awaiting_approval: true,
             change_id: pendingChange?.id,
             message: `New file proposed: "${filePath}". Showing content for user approval...`,
-            preview: toolInput.content.slice(0, 500),
+            preview: content.slice(0, 500),
           }
         } else if (toolName === 'commit_all_changes') {
           if (!workingBranch) {
