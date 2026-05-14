@@ -768,6 +768,41 @@ export async function POST(request: Request) {
 
           console.log('[Tool] create_pull_request:', toolInput.title)
 
+          // Check for pending changes and commit them automatically
+          const { data: pendingChanges } = await supabase
+            .from('pending_code_changes')
+            .select('id')
+            .eq('conversation_id', conversationId)
+            .eq('status', 'pending_approval')
+            .limit(1)
+
+          let commitResult = null
+          if (pendingChanges && pendingChanges.length > 0) {
+            console.log('[Tool] Auto-committing pending changes before PR creation')
+
+            const commitResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/portal/commit-all-changes`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ conversationId }),
+              }
+            )
+
+            if (!commitResponse.ok) {
+              return { error: 'Failed to commit pending changes before creating PR' }
+            }
+
+            commitResult = await commitResponse.json()
+            console.log('[Tool] Auto-commit result:', commitResult)
+
+            if (!commitResult.success) {
+              return {
+                error: `Failed to commit changes: ${commitResult.message || 'Unknown error'}`,
+              }
+            }
+          }
+
           // Create the PR
           const pr = await createPullRequest(
             project.github_installation_id,
@@ -797,7 +832,10 @@ export async function POST(request: Request) {
             success: true,
             pr_number: pr.number,
             pr_url: pr.html_url,
-            message: `Pull request created: ${pr.html_url}`,
+            committed: commitResult?.committed || 0,
+            message: commitResult
+              ? `Committed ${commitResult.committed} changes to ${workingBranch}. Pull request created: ${pr.html_url}`
+              : `Pull request created: ${pr.html_url}`,
           }
         }
       } catch (error: any) {
