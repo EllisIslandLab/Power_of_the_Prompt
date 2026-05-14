@@ -240,7 +240,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
                       <p className="mb-2 font-semibold text-foreground">
                         Modified Files ({modifiedFiles.length})
                       </p>
-                      <div className="space-y-1">
+                      <div className="space-y-1 max-h-[400px] overflow-y-auto scrollbar-thin pr-2">
                         {modifiedFiles.map((file, index) => (
                           <div
                             key={index}

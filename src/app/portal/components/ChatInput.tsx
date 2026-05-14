@@ -14,9 +14,6 @@ interface ChatInputProps {
   disabled?: boolean
   layout?: 'left' | 'right' | 'top' | 'bottom' | 'floating'
   hasPendingDiffs?: boolean
-  onApproveCurrentDiff?: () => void
-  onRejectCurrentDiff?: () => void
-  onSkipToNextDiff?: () => void
 }
 
 export default function ChatInput({
@@ -29,14 +26,9 @@ export default function ChatInput({
   disabled = false,
   layout = 'bottom',
   hasPendingDiffs = false,
-  onApproveCurrentDiff,
-  onRejectCurrentDiff,
-  onSkipToNextDiff,
 }: ChatInputProps) {
   const [inputValue, setInputValue] = useState('')
   const [isDragging, setIsDragging] = useState(false)
-  const [showRejectModal, setShowRejectModal] = useState(false)
-  const [rejectReason, setRejectReason] = useState('')
   const [isButtonPressed, setIsButtonPressed] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -60,23 +52,6 @@ export default function ChatInput({
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    // Handle keyboard shortcuts for pending diffs
-    if (hasPendingDiffs && inputValue.trim() === '') {
-      if (e.key === '1') {
-        e.preventDefault()
-        onApproveCurrentDiff?.()
-        return
-      } else if (e.key === '2') {
-        e.preventDefault()
-        setShowRejectModal(true)
-        return
-      } else if (e.key === '3') {
-        e.preventDefault()
-        onSkipToNextDiff?.()
-        return
-      }
-    }
-
     // Normal message sending
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -84,11 +59,6 @@ export default function ChatInput({
     }
   }
 
-  const handleRejectWithReason = () => {
-    onRejectCurrentDiff?.()
-    setShowRejectModal(false)
-    setRejectReason('')
-  }
 
   const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return
@@ -168,7 +138,7 @@ export default function ChatInput({
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder={hasPendingDiffs ? "Press 1 to approve, 2 to reject, 3 to skip..." : "Describe the change you'd like to make..."}
+          placeholder={hasPendingDiffs ? "Review the changes above, then ask me to commit and push..." : "Describe the change you'd like to make..."}
           className="flex-1 resize-none bg-transparent focus:outline-none placeholder:text-muted-foreground/60 min-h-[40px] max-h-[120px] overflow-y-auto"
           disabled={disabled}
           rows={1}
@@ -213,41 +183,6 @@ export default function ChatInput({
         </button>
       </div>
 
-      {/* Reject Reason Modal */}
-      {showRejectModal && (
-        <>
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50" onClick={() => setShowRejectModal(false)} />
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md">
-            <div className="bg-card border-2 border-border rounded-lg shadow-2xl p-6">
-              <h3 className="text-lg font-semibold mb-4">Reject Change</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Why are you rejecting this change? (Optional)
-              </p>
-              <textarea
-                value={rejectReason}
-                onChange={e => setRejectReason(e.target.value)}
-                placeholder="Reason for rejection..."
-                className="w-full h-24 px-3 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none mb-4"
-                autoFocus
-              />
-              <div className="flex gap-2 justify-end">
-                <button
-                  onClick={() => setShowRejectModal(false)}
-                  className="px-4 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleRejectWithReason}
-                  className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors"
-                >
-                  Reject Change
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   )
 }

@@ -554,9 +554,6 @@ export default function ChatInterface({
           disabled={isLoading}
           layout={layout}
           hasPendingDiffs={pendingDiffs.length > 0}
-          onApproveCurrentDiff={handleApproveCurrentDiff}
-          onRejectCurrentDiff={handleRejectCurrentDiff}
-          onSkipToNextDiff={handleSkipToNextDiff}
         />
       </div>
     </div>
