@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import HorizontalToolbar from './HorizontalToolbar'
 import ChatInput from './ChatInput'
-import BranchStatusBar from './BranchStatusBar'
 
 interface PendingDiff {
   changeId: string
@@ -525,12 +524,6 @@ export default function ChatInterface({
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Branch Status Bar */}
-      <BranchStatusBar
-        workingBranch={workingBranch}
-        pendingChanges={pendingDiffs.length}
-      />
-
       {/* Horizontal Toolbar - Only show for left/right layouts */}
       {(layout === 'left' || layout === 'right') && (
         <HorizontalToolbar
