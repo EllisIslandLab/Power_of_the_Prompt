@@ -70,13 +70,59 @@ export default function PreviewPanel({
 
   if (!previewUrl) {
     return (
-      <div className="h-full flex items-center justify-center bg-muted/30">
+      <div className="h-full flex items-center justify-center bg-muted/30 relative">
         <div className="text-center">
           <h3 className="text-lg font-semibold text-foreground">Website Preview</h3>
           <p className="text-sm text-muted-foreground mt-2 max-w-md">
             Your live preview will appear here once changes are implemented.
           </p>
         </div>
+
+        {/* Messages Overlay - Right Side (shown even without preview) */}
+        {messages.length > 0 && (
+          <div className="absolute right-0 top-0 bottom-0 w-1/3 pointer-events-none">
+            <div className="h-full flex flex-col justify-end px-4 py-4 overflow-y-auto">
+              <div className="space-y-3">
+                {messages.map(message => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} pointer-events-auto`}
+                  >
+                    <div
+                      className={`max-w-[90%] rounded-lg px-3 py-2 backdrop-blur-sm ${
+                        message.role === 'user'
+                          ? 'bg-primary/90 text-primary-foreground shadow-lg'
+                          : message.role === 'system'
+                          ? 'bg-destructive/80 text-destructive-foreground border border-destructive/30 shadow-lg'
+                          : 'bg-card/90 text-foreground shadow-lg'
+                      }`}
+                      style={{ fontSize: `${outputFontSize}pt` }}
+                    >
+                      <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
+                      {message.tokens_used && message.cost_usd && (
+                        <div className="text-xs mt-1.5 opacity-70">
+                          {message.tokens_used.toLocaleString()} tokens • ${message.cost_usd.toFixed(4)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start pointer-events-auto">
+                    <div className="bg-card/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
