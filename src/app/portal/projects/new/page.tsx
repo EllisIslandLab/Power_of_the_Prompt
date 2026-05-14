@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -41,7 +41,7 @@ interface ProjectAnalysis {
 
 const STEP_ORDER: Step[] = ['welcome', 'github', 'select_repo', 'analyze', 'connect_services', 'validate', 'complete']
 
-export default function ConnectProjectPage() {
+function ConnectProjectContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [currentStep, setCurrentStep] = useState<Step>('welcome')
@@ -889,5 +889,20 @@ export default function ConnectProjectPage() {
         }
       `}</style>
     </div>
+  )
+}
+
+export default function ConnectProjectPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ConnectProjectContent />
+    </Suspense>
   )
 }
