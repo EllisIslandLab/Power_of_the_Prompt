@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import HorizontalToolbar from './HorizontalToolbar'
-import MessagesDisplay from './MessagesDisplay'
 import ChatInput from './ChatInput'
 import BranchStatusBar from './BranchStatusBar'
 
@@ -30,6 +29,7 @@ interface ChatInterfaceProps {
   onLayoutChange?: (layout: 'left' | 'right' | 'top' | 'bottom' | 'floating') => void
   onImageUploadClick?: () => void
   onPendingDiffsChange?: (diffs: PendingDiff[], currentIndex: number) => void
+  onMessagesChange?: (messages: ChatMessage[], isLoading: boolean) => void
 }
 
 type MessageRole = 'user' | 'assistant' | 'system'
@@ -57,6 +57,7 @@ export default function ChatInterface({
   onLayoutChange,
   onImageUploadClick,
   onPendingDiffsChange,
+  onMessagesChange,
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -87,6 +88,11 @@ export default function ChatInterface({
   useEffect(() => {
     onPendingDiffsChange?.(pendingDiffs, currentDiffIndex)
   }, [pendingDiffs, currentDiffIndex, onPendingDiffsChange])
+
+  // Notify parent when messages or loading state changes
+  useEffect(() => {
+    onMessagesChange?.(messages, isLoading)
+  }, [messages, isLoading, onMessagesChange])
 
   // Poll for pending changes
   useEffect(() => {
@@ -536,13 +542,8 @@ export default function ChatInterface({
         />
       )}
 
-      {/* Messages Display - Takes available space and scrolls */}
-      <div className="flex-1 min-h-0 overflow-auto">
-        <MessagesDisplay messages={messages} isLoading={isLoading} />
-      </div>
-
-      {/* Chat Input - Fixed height, doesn't shrink */}
-      <div className="flex-shrink-0">
+      {/* Chat Input - Fixed at bottom */}
+      <div className="flex-shrink-0 mt-auto">
         <ChatInput
           user={user}
           clientAccount={clientAccount}

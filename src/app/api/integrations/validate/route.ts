@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { decrypt } from '@/lib/encryption'
 import { testStripeConnection } from '@/lib/integrations/stripe-connect'
 import { getVercelUser } from '@/lib/integrations/vercel'
-import { createBrowserClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 interface ValidationResult {
   service: string

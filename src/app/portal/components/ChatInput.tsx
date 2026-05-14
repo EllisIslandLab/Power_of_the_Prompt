@@ -157,24 +157,27 @@ export default function ChatInput({
         className="hidden"
       />
 
-      <div className={isVertical ? 'flex flex-col gap-2 flex-1 min-h-0' : 'flex gap-2 flex-1 min-h-0'}>
+      {/* Sleek input container */}
+      <div className="flex items-center gap-3 flex-1 bg-card/50 backdrop-blur-sm border border-border/50 rounded-full px-4 py-2 shadow-sm hover:shadow-md transition-all">
         <textarea
           ref={textareaRef}
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={hasPendingDiffs ? "Press 1 to approve, 2 to reject, 3 to skip..." : "Describe the change you'd like to make..."}
-          className="flex-1 resize-none border border-border rounded-lg px-4 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent overflow-y-auto min-h-0"
+          className="flex-1 resize-none bg-transparent focus:outline-none placeholder:text-muted-foreground/60 min-h-[40px] max-h-[120px] overflow-y-auto"
           disabled={disabled}
+          rows={1}
         />
         <button
           onClick={handleSend}
           disabled={disabled || !inputValue.trim()}
-          className={`bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0 ${
-            isVertical ? 'px-4 py-2 w-full' : 'px-6 py-2'
-          }`}
+          className="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 flex items-center justify-center shadow-sm"
+          title="Send message (Enter)"
         >
-          Implement
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
         </button>
       </div>
 

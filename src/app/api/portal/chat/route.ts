@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     }
 
     // Fetch project details
-    let project = null
+    let project: any = null
     let projectFiles: { [key: string]: string } = {}
 
     if (projectId) {

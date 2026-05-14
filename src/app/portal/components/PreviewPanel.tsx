@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import DiffOverlay from './DiffOverlay'
 
 interface PendingDiff {
@@ -12,6 +12,15 @@ interface PendingDiff {
   type: 'diff' | 'file_preview'
 }
 
+interface Message {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  timestamp: Date
+  tokens_used?: number
+  cost_usd?: number
+}
+
 interface PreviewPanelProps {
   previewUrl: string | null
   conversationId: string | null
@@ -19,6 +28,9 @@ interface PreviewPanelProps {
   currentDiffIndex?: number
   onNextDiff?: () => void
   onPreviousDiff?: () => void
+  messages?: Message[]
+  isLoading?: boolean
+  outputFontSize?: number
 }
 
 export default function PreviewPanel({
@@ -28,12 +40,21 @@ export default function PreviewPanel({
   currentDiffIndex = 0,
   onNextDiff,
   onPreviousDiff,
+  messages = [],
+  isLoading = false,
+  outputFontSize = 9,
 }: PreviewPanelProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [changedElements, setChangedElements] = useState<string[]>([])
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const currentDiff = pendingDiffs[currentDiffIndex]
+
+  // Auto-scroll messages to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   // Handle ESC key to exit fullscreen
   useEffect(() => {
@@ -137,6 +158,52 @@ export default function PreviewPanel({
               onNext={onNextDiff}
               onPrevious={onPreviousDiff}
             />
+          )}
+
+          {/* Messages Overlay - Right Side */}
+          {messages.length > 0 && (
+            <div className="absolute right-0 top-0 bottom-0 w-1/3 pointer-events-none">
+              <div className="h-full flex flex-col justify-end px-4 py-4 overflow-y-auto">
+                <div className="space-y-3">
+                  {messages.map(message => (
+                    <div
+                      key={message.id}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} pointer-events-auto`}
+                    >
+                      <div
+                        className={`max-w-[90%] rounded-lg px-3 py-2 backdrop-blur-sm ${
+                          message.role === 'user'
+                            ? 'bg-primary/90 text-primary-foreground shadow-lg'
+                            : message.role === 'system'
+                            ? 'bg-destructive/80 text-destructive-foreground border border-destructive/30 shadow-lg'
+                            : 'bg-card/90 text-foreground shadow-lg'
+                        }`}
+                        style={{ fontSize: `${outputFontSize}pt` }}
+                      >
+                        <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
+                        {message.tokens_used && message.cost_usd && (
+                          <div className="text-xs mt-1.5 opacity-70">
+                            {message.tokens_used.toLocaleString()} tokens • ${message.cost_usd.toFixed(4)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {isLoading && (
+                    <div className="flex justify-start pointer-events-auto">
+                      <div className="bg-card/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

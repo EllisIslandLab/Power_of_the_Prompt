@@ -30,7 +30,10 @@ export function DatabaseSafetyModal({
   const [backupCreated, setBackupCreated] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const warning = generateDestructiveOperationWarning(operation, {
+  // Map operation types to expected types
+  const mappedOperation = operation === 'modify' ? 'modify_schema' : operation === 'create' ? 'modify_schema' : operation
+
+  const warning = generateDestructiveOperationWarning(mappedOperation as 'delete' | 'modify_schema' | 'drop_table', {
     recordCount,
     affectedColumns: operation === 'modify' ? [tableName] : undefined,
     affectedTables: operation === 'delete' ? [tableName] : undefined

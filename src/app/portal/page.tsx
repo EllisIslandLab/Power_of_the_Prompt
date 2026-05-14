@@ -79,9 +79,9 @@ export default async function PortalPage() {
       clientAccount={clientAccount}
       session={session}
       userSettings={userSettings}
-      hasProject={projects && projects.length > 0}
+      hasProject={Boolean(projects && projects.length > 0)}
       activeProject={activeProject}
-      connectedServices={connectedServices}
+      connectedServices={connectedServices || []}
     />
   )
 }

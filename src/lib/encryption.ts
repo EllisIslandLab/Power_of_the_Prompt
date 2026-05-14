@@ -1,13 +1,16 @@
 import crypto from 'crypto'
 
-const ENCRYPTION_KEY = process.env.CREDENTIALS_ENCRYPTION_KEY
+const ENCRYPTION_KEY_RAW = process.env.CREDENTIALS_ENCRYPTION_KEY
 
-if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 64) {
+if (!ENCRYPTION_KEY_RAW || ENCRYPTION_KEY_RAW.length !== 64) {
   throw new Error(
     'CREDENTIALS_ENCRYPTION_KEY must be a 64-character hex string (32 bytes). ' +
     'Generate one with: openssl rand -hex 32'
   )
 }
+
+// After validation, we know it's defined
+const ENCRYPTION_KEY: string = ENCRYPTION_KEY_RAW
 
 const ALGORITHM = 'aes-256-cbc'
 const IV_LENGTH = 16

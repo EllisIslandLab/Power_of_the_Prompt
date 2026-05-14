@@ -57,13 +57,15 @@ export async function listInstallations(): Promise<GitHubInstallation[]> {
   try {
     const app = getGitHubApp()
     const { data } = await app.octokit.request('GET /app/installations')
-    return data.map(installation => ({
-      id: installation.id,
-      account: {
-        login: installation.account.login,
-        type: installation.account.type
-      }
-    }))
+    return data
+      .filter(installation => installation.account !== null)
+      .map(installation => ({
+        id: installation.id,
+        account: {
+          login: installation.account!.login,
+          type: installation.account!.type
+        }
+      }))
   } catch (error) {
     console.error('Failed to list installations:', error)
     throw new Error('Failed to list GitHub installations')

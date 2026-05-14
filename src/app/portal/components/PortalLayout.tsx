@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 import ChatInterface from './ChatInterface'
 import PreviewPanel from './PreviewPanel'
 import TokenBudgetBar from './TokenBudgetBar'
@@ -16,6 +17,15 @@ interface PendingDiff {
   newContent: string
   description: string
   type: 'diff' | 'file_preview'
+}
+
+interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  timestamp: Date
+  tokens_used?: number
+  cost_usd?: number
 }
 
 interface PortalLayoutProps {
@@ -48,11 +58,47 @@ export default function PortalLayout({
   const [chatLayout, setChatLayout] = useState<'left' | 'right' | 'top' | 'bottom' | 'floating'>('bottom')
   const [pendingDiffs, setPendingDiffs] = useState<PendingDiff[]>([])
   const [currentDiffIndex, setCurrentDiffIndex] = useState(0)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [outputFontSize, setOutputFontSize] = useState(9)
   const chatFileInputRef = useRef<HTMLInputElement>(null)
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  // Load font size preferences
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const { data } = await supabase
+          .from('client_preferences')
+          .select('output_font_size')
+          .eq('user_id', user.id)
+          .single()
+
+        if (data?.output_font_size) {
+          setOutputFontSize(data.output_font_size)
+        }
+      } catch (error) {
+        console.error('Failed to load font preferences:', error)
+      }
+    }
+
+    if (user?.id) {
+      loadPreferences()
+    }
+  }, [user?.id])
 
   const handleImageUpload = () => {
     // This will be set by ChatInterface and can be triggered from sidebar
     chatFileInputRef.current?.click()
+  }
+
+  const handleMessagesChange = (newMessages: ChatMessage[], loading: boolean) => {
+    setMessages(newMessages)
+    setIsLoading(loading)
   }
 
   const handleLayoutChange = (layout: 'left' | 'right' | 'top' | 'bottom' | 'floating') => {
@@ -95,6 +141,7 @@ export default function PortalLayout({
       onLayoutChange={handleLayoutChange}
       onImageUploadClick={handleImageUpload}
       onPendingDiffsChange={handlePendingDiffsChange}
+      onMessagesChange={handleMessagesChange}
     />
   )
 
@@ -162,6 +209,9 @@ export default function PortalLayout({
                   currentDiffIndex={currentDiffIndex}
                   onNextDiff={handleNextDiff}
                   onPreviousDiff={handlePreviousDiff}
+                  messages={messages}
+                  isLoading={isLoading}
+                  outputFontSize={outputFontSize}
                 />
               </div>
             </>
@@ -177,6 +227,9 @@ export default function PortalLayout({
                   currentDiffIndex={currentDiffIndex}
                   onNextDiff={handleNextDiff}
                   onPreviousDiff={handlePreviousDiff}
+                  messages={messages}
+                  isLoading={isLoading}
+                  outputFontSize={outputFontSize}
                 />
               </div>
               <div className="w-1/4 border-l border-border">
@@ -198,6 +251,9 @@ export default function PortalLayout({
                   currentDiffIndex={currentDiffIndex}
                   onNextDiff={handleNextDiff}
                   onPreviousDiff={handlePreviousDiff}
+                  messages={messages}
+                  isLoading={isLoading}
+                  outputFontSize={outputFontSize}
                 />
               </div>
             </>
@@ -213,6 +269,9 @@ export default function PortalLayout({
                   currentDiffIndex={currentDiffIndex}
                   onNextDiff={handleNextDiff}
                   onPreviousDiff={handlePreviousDiff}
+                  messages={messages}
+                  isLoading={isLoading}
+                  outputFontSize={outputFontSize}
                 />
               </div>
               <div className="border-t border-border flex-shrink-0 max-h-[40vh] flex flex-col">
@@ -231,6 +290,9 @@ export default function PortalLayout({
                   currentDiffIndex={currentDiffIndex}
                   onNextDiff={handleNextDiff}
                   onPreviousDiff={handlePreviousDiff}
+                  messages={messages}
+                  isLoading={isLoading}
+                  outputFontSize={outputFontSize}
                 />
               </div>
               <DraggableChat isDraggable={true}>
