@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import DiffOverlay from './DiffOverlay'
 
 interface PendingDiff {
@@ -48,13 +48,68 @@ export default function PreviewPanel({
   const [changedElements, setChangedElements] = useState<string[]>([])
   const [isFullscreen, setIsFullscreen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+
+  // Drag-to-scroll state
+  const [isDragging, setIsDragging] = useState(false)
+  const [startY, setStartY] = useState(0)
+  const [scrollTop, setScrollTop] = useState(0)
+  const dragThreshold = 5 // pixels to move before considering it a drag
 
   const currentDiff = pendingDiffs[currentDiffIndex]
 
-  // Auto-scroll messages to bottom
+  // Auto-scroll messages to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    if (!isDragging) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages, isDragging])
+
+  // Drag-to-scroll handlers
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Only start drag if clicking on the container (not on a message bubble)
+    if (e.target === messagesContainerRef.current) {
+      setIsDragging(true)
+      setStartY(e.pageY)
+      setScrollTop(messagesContainerRef.current?.scrollTop || 0)
+      e.preventDefault()
+    }
+  }, [])
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging || !messagesContainerRef.current) return
+
+    const y = e.pageY
+    const walk = (startY - y) * 2 // Multiply by 2 for faster scrolling
+    messagesContainerRef.current.scrollTop = scrollTop + walk
+  }, [isDragging, startY, scrollTop])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+  }, [])
+
+  // Add/remove mouse event listeners for dragging
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      // Prevent text selection while dragging
+      document.body.style.userSelect = 'none'
+      document.body.style.cursor = 'grabbing'
+    } else {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.userSelect = ''
+      document.body.style.cursor = ''
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.userSelect = ''
+      document.body.style.cursor = ''
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp])
 
   // Handle ESC key to exit fullscreen
   useEffect(() => {
@@ -81,26 +136,35 @@ export default function PreviewPanel({
         {/* Messages Overlay - Right Side (shown even without preview) */}
         {messages.length > 0 && (
           <div className="absolute right-0 top-0 bottom-0 w-1/3 pointer-events-none">
-            <div className="h-full flex flex-col justify-end px-4 py-4 overflow-y-auto">
+            <div
+              ref={messagesContainerRef}
+              onMouseDown={handleMouseDown}
+              className="h-full flex flex-col justify-end px-4 py-4 overflow-y-auto pointer-events-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-white/10 scrollbar-track-transparent"
+              style={{
+                cursor: isDragging ? 'grabbing' : 'default',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'transparent transparent'
+              }}
+            >
               <div className="space-y-3">
                 {messages.map(message => (
                   <div
                     key={message.id}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} pointer-events-auto`}
+                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[90%] rounded-lg px-3 py-2 backdrop-blur-sm ${
+                      className={`max-w-[90%] rounded-lg px-3 py-2 backdrop-blur-md ${
                         message.role === 'user'
                           ? 'bg-primary/90 text-primary-foreground shadow-lg'
                           : message.role === 'system'
                           ? 'bg-destructive/80 text-destructive-foreground border border-destructive/30 shadow-lg'
-                          : 'bg-card/90 text-foreground shadow-lg'
+                          : 'bg-card/95 text-foreground shadow-lg border border-white/10'
                       }`}
                       style={{ fontSize: `${outputFontSize}pt` }}
                     >
-                      <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
+                      <div className="whitespace-pre-wrap leading-relaxed select-text">{message.content}</div>
                       {message.tokens_used && message.cost_usd && (
-                        <div className="text-xs mt-1.5 opacity-70">
+                        <div className="text-xs mt-1.5 opacity-70 select-text">
                           {message.tokens_used.toLocaleString()} tokens • ${message.cost_usd.toFixed(4)}
                         </div>
                       )}
@@ -108,8 +172,8 @@ export default function PreviewPanel({
                   </div>
                 ))}
                 {isLoading && (
-                  <div className="flex justify-start pointer-events-auto">
-                    <div className="bg-card/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg">
+                  <div className="flex justify-start">
+                    <div className="bg-card/95 backdrop-blur-md rounded-lg px-3 py-2 shadow-lg border border-white/10">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                         <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -209,26 +273,35 @@ export default function PreviewPanel({
           {/* Messages Overlay - Right Side */}
           {messages.length > 0 && (
             <div className="absolute right-0 top-0 bottom-0 w-1/3 pointer-events-none">
-              <div className="h-full flex flex-col justify-end px-4 py-4 overflow-y-auto">
+              <div
+                ref={messagesContainerRef}
+                onMouseDown={handleMouseDown}
+                className="h-full flex flex-col justify-end px-4 py-4 overflow-y-auto pointer-events-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-white/10 scrollbar-track-transparent"
+                style={{
+                  cursor: isDragging ? 'grabbing' : 'default',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'transparent transparent'
+                }}
+              >
                 <div className="space-y-3">
                   {messages.map(message => (
                     <div
                       key={message.id}
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} pointer-events-auto`}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[90%] rounded-lg px-3 py-2 backdrop-blur-sm ${
+                        className={`max-w-[90%] rounded-lg px-3 py-2 backdrop-blur-md ${
                           message.role === 'user'
                             ? 'bg-primary/90 text-primary-foreground shadow-lg'
                             : message.role === 'system'
                             ? 'bg-destructive/80 text-destructive-foreground border border-destructive/30 shadow-lg'
-                            : 'bg-card/90 text-foreground shadow-lg'
+                            : 'bg-card/95 text-foreground shadow-lg border border-white/10'
                         }`}
                         style={{ fontSize: `${outputFontSize}pt` }}
                       >
-                        <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
+                        <div className="whitespace-pre-wrap leading-relaxed select-text">{message.content}</div>
                         {message.tokens_used && message.cost_usd && (
-                          <div className="text-xs mt-1.5 opacity-70">
+                          <div className="text-xs mt-1.5 opacity-70 select-text">
                             {message.tokens_used.toLocaleString()} tokens • ${message.cost_usd.toFixed(4)}
                           </div>
                         )}
@@ -236,8 +309,8 @@ export default function PreviewPanel({
                     </div>
                   ))}
                   {isLoading && (
-                    <div className="flex justify-start pointer-events-auto">
-                      <div className="bg-card/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg">
+                    <div className="flex justify-start">
+                      <div className="bg-card/95 backdrop-blur-md rounded-lg px-3 py-2 shadow-lg border border-white/10">
                         <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                           <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
