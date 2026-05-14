@@ -405,8 +405,22 @@ export async function POST(request: Request) {
         },
       },
       {
+        name: 'commit_all_changes',
+        description: 'Commit all pending changes to the working branch. Call this BEFORE creating a pull request when the user approves the changes. This will push all pending edits to GitHub.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              description: 'Optional commit message summary',
+            },
+          },
+          required: [],
+        },
+      },
+      {
         name: 'create_pull_request',
-        description: 'Create a pull request with all the changes made on the current branch. Only call this after all edits are approved and committed.',
+        description: 'Create a pull request with all the changes made on the current branch. Only call this AFTER calling commit_all_changes.',
         input_schema: {
           type: 'object',
           properties: {
@@ -689,6 +703,37 @@ export async function POST(request: Request) {
             change_id: pendingChange?.id,
             message: `New file proposed: "${filePath}". Showing content for user approval...`,
             preview: toolInput.content.slice(0, 500),
+          }
+        } else if (toolName === 'commit_all_changes') {
+          if (!workingBranch) {
+            return { error: 'No working branch. Create a branch and make changes first.' }
+          }
+
+          console.log('[Tool] commit_all_changes: Committing pending changes to', workingBranch)
+
+          // Call the commit-all-changes API
+          const commitResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/portal/commit-all-changes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ conversationId }),
+          })
+
+          if (!commitResponse.ok) {
+            const error = await commitResponse.json()
+            throw new Error(error.error || 'Failed to commit changes')
+          }
+
+          const result = await commitResponse.json()
+
+          console.log('[Tool] commit_all_changes success:', result.message)
+
+          return {
+            success: result.success,
+            committed: result.committed,
+            failed: result.failed,
+            branch_name: result.branchName,
+            message: result.message,
+            details: result.results,
           }
         } else if (toolName === 'create_pull_request') {
           if (!workingBranch) {
