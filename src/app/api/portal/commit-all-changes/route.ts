@@ -31,7 +31,21 @@ export async function POST(request: Request) {
       .eq('status', 'pending_approval')
       .order('created_at', { ascending: true })
 
-    if (changesError || !changes || changes.length === 0) {
+    console.log('[commit-all-changes] conversationId:', conversationId)
+    console.log('[commit-all-changes] found changes:', changes?.length || 0)
+    console.log('[commit-all-changes] error:', changesError)
+
+    if (changesError) {
+      console.error('[commit-all-changes] Database error:', changesError)
+      return Response.json({
+        success: false,
+        error: changesError.message,
+        committed: 0,
+      }, { status: 500 })
+    }
+
+    if (!changes || changes.length === 0) {
+      console.log('[commit-all-changes] No pending changes found')
       return Response.json({
         success: true,
         message: 'No pending changes to commit',

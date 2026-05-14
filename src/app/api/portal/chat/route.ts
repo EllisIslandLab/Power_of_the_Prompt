@@ -769,12 +769,16 @@ export async function POST(request: Request) {
           console.log('[Tool] create_pull_request:', toolInput.title)
 
           // Check for pending changes and commit them automatically
+          console.log('[Tool] Checking for pending changes, conversationId:', conversationId)
+
           const { data: pendingChanges } = await supabase
             .from('pending_code_changes')
             .select('id')
             .eq('conversation_id', conversationId)
             .eq('status', 'pending_approval')
             .limit(1)
+
+          console.log('[Tool] Found pending changes:', pendingChanges?.length || 0)
 
           let commitResult = null
           if (pendingChanges && pendingChanges.length > 0) {
