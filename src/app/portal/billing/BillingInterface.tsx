@@ -41,6 +41,11 @@ export default function BillingInterface({
       return
     }
 
+    if (!clientAccount?.id) {
+      alert('Unable to process payment. Please contact support.')
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -54,14 +59,22 @@ export default function BillingInterface({
         }),
       })
 
-      const { sessionId } = await response.json()
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session')
+      }
+
+      const { sessionId, error } = await response.json()
+
+      if (error) {
+        throw new Error(error)
+      }
 
       // Redirect to Stripe checkout
       const stripe = await stripePromise
-      const { error } = await stripe!.redirectToCheckout({ sessionId })
+      const { error: stripeError } = await stripe!.redirectToCheckout({ sessionId })
 
-      if (error) {
-        console.error('Stripe error:', error)
+      if (stripeError) {
+        console.error('Stripe error:', stripeError)
         alert('Payment failed. Please try again.')
       }
     } catch (error) {
@@ -170,21 +183,29 @@ export default function BillingInterface({
                 setSelectedAmount(null)
               }}
               placeholder="0.00"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400"
             />
           </div>
 
           {/* Add Funds Button */}
           <button
             onClick={handleAddFunds}
-            disabled={isLoading || (!selectedAmount && !customAmount)}
+            disabled={isLoading || (!selectedAmount && !customAmount) || !clientAccount}
             className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isLoading ? 'Processing...' : 'Add Funds via Stripe'}
+            {isLoading
+              ? 'Processing...'
+              : !clientAccount
+              ? 'Account Setup Required'
+              : (selectedAmount || parseFloat(customAmount))
+              ? `Add $${(selectedAmount || parseFloat(customAmount)).toFixed(2)} via Stripe`
+              : 'Select Amount to Continue'}
           </button>
 
           <p className="text-xs text-gray-500 mt-2 text-center">
-            Secure payment powered by Stripe
+            {clientAccount
+              ? 'Secure payment powered by Stripe'
+              : 'Please contact support to set up your account'}
           </p>
         </div>
 

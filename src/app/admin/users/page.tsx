@@ -23,8 +23,17 @@ import {
 } from '@/components/ui/table'
 import { OnlineIndicator } from '@/components/ui/online-indicator'
 import { SessionCounter } from '@/components/ui/session-counter'
-import { Users, Search, UserCog, Mail, Calendar, Shield } from 'lucide-react'
+import { Users, Search, UserCog, Mail, Calendar, Shield, Settings, Github, Globe } from 'lucide-react'
 import Link from 'next/link'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
 
 // Use browser client for proper cookie handling in client components
 const supabase = createBrowserClient(
@@ -42,6 +51,17 @@ interface User {
   created_at: string
 }
 
+interface ProjectConfig {
+  github_repo_url: string
+  github_branch: string
+  vercel_project_name: string
+  vercel_team_slug: string
+  website_url: string
+  public_folder_path: string
+  images_folder_path: string
+  is_configured: boolean
+}
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
@@ -49,6 +69,19 @@ export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('all')
   const [tierFilter, setTierFilter] = useState<string>('all')
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [projectConfig, setProjectConfig] = useState<ProjectConfig>({
+    github_repo_url: '',
+    github_branch: 'main',
+    vercel_project_name: '',
+    vercel_team_slug: '',
+    website_url: '',
+    public_folder_path: '/public',
+    images_folder_path: '/public/images',
+    is_configured: false,
+  })
+  const [savingProject, setSavingProject] = useState(false)
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false)
 
   useEffect(() => {
     loadUsers()
@@ -114,6 +147,107 @@ export default function AdminUsersPage() {
     } catch (error) {
       console.error('Error updating user role:', error)
       alert('Failed to update user role')
+    }
+  }
+
+  async function loadProjectConfig(user: User) {
+    try {
+      setSelectedUser(user)
+
+      // Get client account ID
+      const { data: clientAccount } = await supabase
+        .from('client_accounts')
+        .select('id')
+        .eq('user_id', user.id)
+        .single()
+
+      if (!clientAccount) {
+        // No client account yet, use default config
+        setProjectConfig({
+          github_repo_url: '',
+          github_branch: 'main',
+          vercel_project_name: '',
+          vercel_team_slug: '',
+          website_url: '',
+          public_folder_path: '/public',
+          images_folder_path: '/public/images',
+          is_configured: false,
+        })
+        setProjectDialogOpen(true)
+        return
+      }
+
+      // Load existing config
+      const { data: config } = await supabase
+        .from('client_website_config')
+        .select('*')
+        .eq('client_account_id', clientAccount.id)
+        .single()
+
+      if (config) {
+        setProjectConfig(config)
+      } else {
+        // No config yet, use defaults
+        setProjectConfig({
+          github_repo_url: '',
+          github_branch: 'main',
+          vercel_project_name: '',
+          vercel_team_slug: '',
+          website_url: '',
+          public_folder_path: '/public',
+          images_folder_path: '/public/images',
+          is_configured: false,
+        })
+      }
+
+      setProjectDialogOpen(true)
+    } catch (error) {
+      console.error('Error loading project config:', error)
+      alert('Failed to load project configuration')
+    }
+  }
+
+  async function saveProjectConfig() {
+    if (!selectedUser) return
+
+    setSavingProject(true)
+    try {
+      // Get or create client account
+      let { data: clientAccount } = await supabase
+        .from('client_accounts')
+        .select('id')
+        .eq('user_id', selectedUser.id)
+        .single()
+
+      if (!clientAccount) {
+        const { data: newAccount, error: accountError } = await supabase
+          .from('client_accounts')
+          .insert({ user_id: selectedUser.id })
+          .select('id')
+          .single()
+
+        if (accountError) throw accountError
+        clientAccount = newAccount
+      }
+
+      // Upsert project config
+      const { error } = await supabase
+        .from('client_website_config')
+        .upsert({
+          client_account_id: clientAccount.id,
+          ...projectConfig,
+          is_configured: true,
+        })
+
+      if (error) throw error
+
+      alert('Project configuration saved successfully!')
+      setProjectDialogOpen(false)
+    } catch (error) {
+      console.error('Error saving project config:', error)
+      alert('Failed to save project configuration')
+    } finally {
+      setSavingProject(false)
     }
   }
 
@@ -328,18 +462,28 @@ export default function AdminUsersPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Select
-                          value={user.role}
-                          onValueChange={(value) => updateUserRole(user.id, value)}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="student">Student</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={user.role}
+                            onValueChange={(value) => updateUserRole(user.id, value)}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="student">Student</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => loadProjectConfig(user)}
+                            title="Configure project"
+                          >
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -349,6 +493,132 @@ export default function AdminUsersPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Project Configuration Dialog */}
+      <Dialog open={projectDialogOpen} onOpenChange={setProjectDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Configure Project for {selectedUser?.full_name || selectedUser?.email}
+            </DialogTitle>
+            <DialogDescription>
+              Set up the client's website project configuration. All fields are managed by you.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* GitHub Configuration */}
+            <div className="space-y-3 p-4 border border-border rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Github className="h-4 w-4" />
+                <h3 className="font-semibold">GitHub Repository</h3>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="github_repo">Repository URL</Label>
+                <Input
+                  id="github_repo"
+                  placeholder="https://github.com/your-org/client-project"
+                  value={projectConfig.github_repo_url}
+                  onChange={(e) => setProjectConfig({ ...projectConfig, github_repo_url: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground">
+                  The GitHub repository where the client's code is stored
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="github_branch">Branch</Label>
+                <Input
+                  id="github_branch"
+                  placeholder="main"
+                  value={projectConfig.github_branch}
+                  onChange={(e) => setProjectConfig({ ...projectConfig, github_branch: e.target.value })}
+                />
+              </div>
+            </div>
+
+            {/* Vercel Configuration */}
+            <div className="space-y-3 p-4 border border-border rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Globe className="h-4 w-4" />
+                <h3 className="font-semibold">Vercel Deployment</h3>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="vercel_project">Project Name</Label>
+                <Input
+                  id="vercel_project"
+                  placeholder="client-website-prod"
+                  value={projectConfig.vercel_project_name}
+                  onChange={(e) => setProjectConfig({ ...projectConfig, vercel_project_name: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="vercel_team">Team Slug (optional)</Label>
+                <Input
+                  id="vercel_team"
+                  placeholder="your-team-slug"
+                  value={projectConfig.vercel_team_slug}
+                  onChange={(e) => setProjectConfig({ ...projectConfig, vercel_team_slug: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="website_url">Live Website URL</Label>
+                <Input
+                  id="website_url"
+                  placeholder="https://client-website.vercel.app"
+                  value={projectConfig.website_url}
+                  onChange={(e) => setProjectConfig({ ...projectConfig, website_url: e.target.value })}
+                />
+              </div>
+            </div>
+
+            {/* File Paths */}
+            <div className="space-y-3 p-4 border border-border rounded-lg">
+              <h3 className="font-semibold mb-2">File Paths</h3>
+
+              <div className="space-y-2">
+                <Label htmlFor="public_folder">Public Folder Path</Label>
+                <Input
+                  id="public_folder"
+                  placeholder="/public"
+                  value={projectConfig.public_folder_path}
+                  onChange={(e) => setProjectConfig({ ...projectConfig, public_folder_path: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="images_folder">Images Folder Path</Label>
+                <Input
+                  id="images_folder"
+                  placeholder="/public/images"
+                  value={projectConfig.images_folder_path}
+                  onChange={(e) => setProjectConfig({ ...projectConfig, images_folder_path: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => setProjectDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={saveProjectConfig}
+              disabled={savingProject}
+            >
+              {savingProject ? 'Saving...' : 'Save Configuration'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

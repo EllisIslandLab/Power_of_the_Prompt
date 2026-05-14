@@ -10,7 +10,6 @@ import { DarkModeProvider } from "@/contexts/DarkModeContext";
 
 // Lazy load non-critical components
 const AnimatedBackground = dynamic(() => import("@/components/effects/AnimatedBackground").then(mod => ({ default: mod.AnimatedBackground })));
-const DarkModeToggle = dynamic(() => import("@/components/ui/DarkModeToggle").then(mod => ({ default: mod.DarkModeToggle })));
 // Environment variables updated - triggering redeploy
 
 const geistSans = Geist({
@@ -117,9 +116,6 @@ export default function RootLayout({
             <Analytics />
             <SpeedInsights />
           </Providers>
-          
-          {/* Dark mode toggle in bottom right */}
-          <DarkModeToggle />
         </DarkModeProvider>
         
       </body>

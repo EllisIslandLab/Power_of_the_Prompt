@@ -2,14 +2,34 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import HorizontalToolbar from './HorizontalToolbar'
+import MessagesDisplay from './MessagesDisplay'
+import ChatInput from './ChatInput'
+import BranchStatusBar from './BranchStatusBar'
+
+interface PendingDiff {
+  changeId: string
+  filePath: string
+  oldContent: string
+  newContent: string
+  description: string
+  type: 'diff' | 'file_preview'
+}
 
 interface ChatInterfaceProps {
   user: any
   clientAccount: any
   session: any
+  activeProject?: any
+  connectedServices?: any[]
   onConversationStart: (id: string) => void
   onPreviewReady: (url: string) => void
   onTokenUpdate: (tokens: { used: number; limit: number; percentage: number }) => void
+  onFileInputRefReady?: (ref: HTMLInputElement | null) => void
+  layout?: 'left' | 'right' | 'top' | 'bottom' | 'floating'
+  onLayoutChange?: (layout: 'left' | 'right' | 'top' | 'bottom' | 'floating') => void
+  onImageUploadClick?: () => void
+  onPendingDiffsChange?: (diffs: PendingDiff[], currentIndex: number) => void
 }
 
 type MessageRole = 'user' | 'assistant' | 'system'
@@ -27,89 +47,208 @@ export default function ChatInterface({
   user,
   clientAccount,
   session,
+  activeProject,
+  connectedServices = [],
   onConversationStart,
   onPreviewReady,
   onTokenUpdate,
+  onFileInputRefReady,
+  layout = 'bottom',
+  onLayoutChange,
+  onImageUploadClick,
+  onPendingDiffsChange,
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [uploadedImages, setUploadedImages] = useState<string[]>([])
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [workingBranch, setWorkingBranch] = useState<string | null>(null)
+  const [currentDiffIndex, setCurrentDiffIndex] = useState(0)
+  const [pendingDiffs, setPendingDiffs] = useState<Array<{
+    changeId: string
+    filePath: string
+    oldContent: string
+    newContent: string
+    description: string
+    type: 'diff' | 'file_preview'
+  }>>([])
+  const diffsContainerRef = useRef<HTMLDivElement>(null)
+
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  // Auto-scroll to bottom when messages change
+  // Load active conversation on mount
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    loadActiveConversation()
+  }, [])
 
-  // Load initial greeting
+  // Notify parent when pending diffs change
   useEffect(() => {
-    const firstName = user?.full_name?.split(' ')[0] || 'there'
-    const greeting: ChatMessage = {
-      id: 'greeting',
-      role: 'assistant',
-      content: `Welcome, ${firstName}. I'm here to help you manage website revisions.
+    onPendingDiffsChange?.(pendingDiffs, currentDiffIndex)
+  }, [pendingDiffs, currentDiffIndex, onPendingDiffsChange])
 
-**How it works:**
-• Describe one change at a time for clarity
-• I'll implement the change and generate a preview
-• Review and approve before deploying to production
+  // Poll for pending changes
+  useEffect(() => {
+    if (!currentConversationId) return
 
-**Your account:**
-Balance: $${clientAccount?.account_balance?.toFixed(2) || '0.00'}
-${clientAccount?.trial_status === 'active' ? `Trial: ${Math.ceil((new Date(clientAccount.trial_expiration_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days remaining` : ''}
+    const loadPendingChanges = async () => {
+      try {
+        const response = await fetch(
+          `/api/portal/pending-changes?conversationId=${currentConversationId}`
+        )
 
-What would you like to update?`,
-      timestamp: new Date(),
+        if (!response.ok) return
+
+        const { changes, workingBranch: branch } = await response.json()
+
+        if (branch) {
+          setWorkingBranch(branch)
+        }
+
+        if (changes && changes.length > 0) {
+          const diffs = changes.map((change: any) => ({
+            changeId: change.id,
+            filePath: change.file_path,
+            oldContent: change.old_content || '',
+            newContent: change.new_content || '',
+            description: change.description,
+            type: change.change_type === 'create' ? 'file_preview' : 'diff',
+          }))
+          setPendingDiffs(diffs)
+        } else {
+          // Clear pending diffs if no changes
+          if (pendingDiffs.length > 0) {
+            setPendingDiffs([])
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load pending changes:', error)
+      }
     }
-    setMessages([greeting])
-  }, [user, clientAccount])
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return
+    // Load immediately
+    loadPendingChanges()
+
+    // Poll every 3 seconds while conversation is active
+    const interval = setInterval(loadPendingChanges, 3000)
+    return () => clearInterval(interval)
+  }, [currentConversationId])
+
+  const loadActiveConversation = async () => {
+    try {
+      // Find the most recent active conversation
+      const { data: conversations } = await supabase
+        .from('revision_conversations')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('status', 'in_progress')
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (conversations && conversations.length > 0) {
+        const conversationId = conversations[0].id
+        setCurrentConversationId(conversationId)
+        onConversationStart(conversationId)
+
+        // Load messages for this conversation
+        const { data: chatMessages } = await supabase
+          .from('revision_chat_messages')
+          .select('*')
+          .eq('conversation_id', conversationId)
+          .order('created_at', { ascending: true })
+
+        if (chatMessages) {
+          const loadedMessages: ChatMessage[] = chatMessages.map(msg => ({
+            id: msg.id,
+            role: msg.message_type === 'user_message' ? 'user' : 'assistant',
+            content: msg.message_text,
+            timestamp: new Date(msg.created_at),
+            tokens_used: (msg.tokens_in || 0) + (msg.tokens_out || 0),
+          }))
+          setMessages(loadedMessages)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load conversation:', error)
+    }
+  }
+
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim() || isLoading) return
+
+    // Check if client account exists
+    if (!clientAccount) {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `error-${Date.now()}`,
+          role: 'system',
+          content: 'Error: Client account not found. Please contact support.',
+          timestamp: new Date(),
+        },
+      ])
+      return
+    }
+
+    // Check if account has sufficient balance
+    const balance = clientAccount.account_balance || 0
+    if (balance <= 0) {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `error-${Date.now()}`,
+          role: 'system',
+          content: 'Insufficient balance. Please add funds to your account to continue using the website builder.',
+          timestamp: new Date(),
+        },
+      ])
+      return
+    }
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: inputValue.trim(),
+      content: content.trim(),
       timestamp: new Date(),
     }
 
     setMessages(prev => [...prev, userMessage])
-    setInputValue('')
     setIsLoading(true)
 
     try {
       // Create or continue conversation
-      let conversationId = currentConversationId
-      if (!conversationId) {
+      let conversationId: string
+      if (!currentConversationId) {
         const { data: conversation, error } = await supabase
           .from('revision_conversations')
           .insert({
-            client_account_id: clientAccount.id,
-            status: 'active',
+            user_id: user.id,
+            project_id: activeProject?.id || null,
+            conversation_type: 'feature_change',
+            is_trial_period: (clientAccount?.account_balance || 0) < 0.01,
+            status: 'in_progress',
           })
           .select()
           .single()
 
-        if (error) throw error
+        if (error || !conversation?.id) {
+          console.error('Failed to create conversation:', error)
+          throw new Error('Failed to create conversation')
+        }
         conversationId = conversation.id
         setCurrentConversationId(conversationId)
         onConversationStart(conversationId)
+      } else {
+        conversationId = currentConversationId
       }
 
       // Save user message
       await supabase.from('revision_chat_messages').insert({
         conversation_id: conversationId,
-        role: 'user',
-        content: userMessage.content,
+        user_id: user.id,
+        message_type: 'user_message',
+        message_text: userMessage.content,
       })
 
       // Call Claude API
@@ -120,6 +259,8 @@ What would you like to update?`,
           conversationId,
           message: userMessage.content,
           clientAccountId: clientAccount.id,
+          projectId: activeProject?.id,
+          connectedServices: connectedServices?.map(s => s.service_name) || [],
         }),
       })
 
@@ -153,8 +294,13 @@ What would you like to update?`,
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
+            const jsonStr = line.slice(6)
+
+            // Skip the [DONE] marker
+            if (jsonStr === '[DONE]') continue
+
             try {
-              const data = JSON.parse(line.slice(6))
+              const data = JSON.parse(jsonStr)
 
               if (data.type === 'content') {
                 assistantContent += data.text
@@ -165,6 +311,35 @@ What would you like to update?`,
                       : m
                   )
                 )
+              } else if (data.type === 'diff') {
+                // Add diff to pending diffs
+                setPendingDiffs(prev => [
+                  ...prev,
+                  {
+                    changeId: data.change_id,
+                    filePath: data.file_path,
+                    oldContent: data.old_content,
+                    newContent: data.new_content,
+                    description: data.description,
+                    type: 'diff',
+                  },
+                ])
+              } else if (data.type === 'file_preview') {
+                // Add file preview to pending diffs
+                setPendingDiffs(prev => [
+                  ...prev,
+                  {
+                    changeId: data.change_id,
+                    filePath: data.file_path,
+                    oldContent: '',
+                    newContent: data.content,
+                    description: data.description,
+                    type: 'file_preview',
+                  },
+                ])
+              } else if (data.type === 'branch_created') {
+                // Update working branch
+                setWorkingBranch(data.branch_name)
               } else if (data.type === 'preview') {
                 onPreviewReady(data.url)
               } else if (data.type === 'usage') {
@@ -210,35 +385,18 @@ What would you like to update?`,
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
-    }
-  }
-
-  const handleFileUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return
-
-    const file = files[0]
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('conversationId', currentConversationId || '')
-
-    try {
-      setIsLoading(true)
-      const response = await fetch('/api/portal/upload-image', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Upload failed')
-      }
-
-      // Add success message
+  const handleFileUploaded = (result: any, error?: Error) => {
+    if (error) {
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `error-${Date.now()}`,
+          role: 'system',
+          content: `Upload failed: ${error.message}`,
+          timestamp: new Date(),
+        },
+      ])
+    } else {
       setMessages(prev => [
         ...prev,
         {
@@ -248,138 +406,158 @@ What would you like to update?`,
           timestamp: new Date(),
         },
       ])
+    }
+  }
 
-      setUploadedImages(prev => [...prev, result.url])
+  const handleApproveChange = async (changeId: string) => {
+    try {
+      const response = await fetch('/api/portal/approve-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ changeId, action: 'approve' }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to approve change')
+      }
+
+      // Remove from pending diffs
+      setPendingDiffs(prev => prev.filter(d => d.changeId !== changeId))
+
+      // Reset index if needed
+      if (currentDiffIndex >= pendingDiffs.length - 1) {
+        setCurrentDiffIndex(Math.max(0, pendingDiffs.length - 2))
+      }
+
+      // Add success message
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `approve-${Date.now()}`,
+          role: 'system',
+          content: '✅ Change approved and committed to branch!',
+          timestamp: new Date(),
+        },
+      ])
     } catch (error) {
-      console.error('Upload error:', error)
+      console.error('Failed to approve change:', error)
       setMessages(prev => [
         ...prev,
         {
           id: `error-${Date.now()}`,
           role: 'system',
-          content: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          content: 'Error: Failed to approve change',
           timestamp: new Date(),
         },
       ])
-    } finally {
-      setIsLoading(false)
     }
   }
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
+  const handleRejectChange = async (changeId: string) => {
+    try {
+      const response = await fetch('/api/portal/approve-change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ changeId, action: 'reject' }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to reject change')
+      }
+
+      // Remove from pending diffs
+      setPendingDiffs(prev => prev.filter(d => d.changeId !== changeId))
+
+      // Reset index if needed
+      if (currentDiffIndex >= pendingDiffs.length - 1) {
+        setCurrentDiffIndex(Math.max(0, pendingDiffs.length - 2))
+      }
+
+      // Add message
+      setMessages(prev => [
+        ...prev,
+        {
+          id: `reject-${Date.now()}`,
+          role: 'system',
+          content: '❌ Change rejected',
+          timestamp: new Date(),
+        },
+      ])
+    } catch (error) {
+      console.error('Failed to reject change:', error)
+    }
   }
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
+  const handleApproveCurrentDiff = () => {
+    if (pendingDiffs[currentDiffIndex]) {
+      handleApproveChange(pendingDiffs[currentDiffIndex].changeId)
+    }
   }
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-    handleFileUpload(e.dataTransfer.files)
+  const handleRejectCurrentDiff = () => {
+    if (pendingDiffs[currentDiffIndex]) {
+      handleRejectChange(pendingDiffs[currentDiffIndex].changeId)
+    }
+  }
+
+  const handleSkipToNextDiff = () => {
+    if (currentDiffIndex < pendingDiffs.length - 1) {
+      setCurrentDiffIndex(currentDiffIndex + 1)
+    }
+  }
+
+  const handleNextDiff = () => {
+    if (currentDiffIndex < pendingDiffs.length - 1) {
+      setCurrentDiffIndex(currentDiffIndex + 1)
+    }
+  }
+
+  const handlePreviousDiff = () => {
+    if (currentDiffIndex > 0) {
+      setCurrentDiffIndex(currentDiffIndex - 1)
+    }
   }
 
   return (
-    <div
-      className="h-full flex flex-col bg-card relative"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      {/* Drag & Drop Overlay */}
-      {isDragging && (
-        <div className="absolute inset-0 bg-primary/10 border-4 border-dashed border-primary z-50 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-primary mb-2">Drop Image Here</p>
-            <p className="text-sm text-muted-foreground">Supported: JPG, PNG, WebP, GIF (max 10MB)</p>
-          </div>
-        </div>
-      )}
-
-      {/* Hidden File Input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-        onChange={(e) => handleFileUpload(e.target.files)}
-        className="hidden"
+    <div className="flex flex-col h-full min-h-0">
+      {/* Branch Status Bar */}
+      <BranchStatusBar
+        workingBranch={workingBranch}
+        pendingChanges={pendingDiffs.length}
       />
 
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map(message => (
-          <div
-            key={message.id}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                message.role === 'user'
-                  ? 'bg-primary text-primary-foreground'
-                  : message.role === 'system'
-                  ? 'bg-destructive/10 text-destructive border border-destructive/20'
-                  : 'bg-muted text-foreground'
-              }`}
-            >
-              <div className="whitespace-pre-wrap">{message.content}</div>
-              {message.tokens_used && message.cost_usd && (
-                <div className="text-xs mt-2 opacity-70">
-                  {message.tokens_used.toLocaleString()} tokens • ${message.cost_usd.toFixed(4)}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-muted rounded-lg px-4 py-2">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
+      {/* Horizontal Toolbar - Only show for left/right layouts */}
+      {(layout === 'left' || layout === 'right') && (
+        <HorizontalToolbar
+          user={user}
+          clientAccount={clientAccount}
+          onImageUpload={onImageUploadClick}
+          onLayoutChange={onLayoutChange}
+          currentLayout={layout}
+        />
+      )}
+
+      {/* Messages Display - Takes available space and scrolls */}
+      <div className="flex-1 min-h-0 overflow-auto">
+        <MessagesDisplay messages={messages} isLoading={isLoading} />
       </div>
 
-      {/* Input Area */}
-      <div className="border-t border-border p-4 bg-muted/30">
-        <div className="flex gap-2">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isLoading}
-            className="px-3 py-2 border border-border rounded-lg hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            title="Upload Image"
-          >
-            <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </button>
-          <textarea
-            value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Describe the change you'd like to make..."
-            className="flex-1 resize-none border border-border rounded-lg px-4 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-            rows={2}
-            disabled={isLoading}
-          />
-          <button
-            onClick={handleSendMessage}
-            disabled={isLoading || !inputValue.trim()}
-            className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Send
-          </button>
-        </div>
-        <p className="text-xs text-muted-foreground mt-2">
-          Tip: Drag & drop images or click the image icon to upload • Request one change at a time
-        </p>
+      {/* Chat Input - Fixed height, doesn't shrink */}
+      <div className="flex-shrink-0">
+        <ChatInput
+          user={user}
+          clientAccount={clientAccount}
+          session={session}
+          onMessageSent={handleSendMessage}
+          onFileInputRefReady={onFileInputRefReady}
+          onFileUploaded={handleFileUploaded}
+          disabled={isLoading}
+          layout={layout}
+          hasPendingDiffs={pendingDiffs.length > 0}
+          onApproveCurrentDiff={handleApproveCurrentDiff}
+          onRejectCurrentDiff={handleRejectCurrentDiff}
+          onSkipToNextDiff={handleSkipToNextDiff}
+        />
       </div>
     </div>
   )

@@ -1,5 +1,4 @@
 import { DarkModeProvider } from "@/contexts/DarkModeContext";
-import { DarkModeToggle } from "@/components/ui/DarkModeToggle";
 import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
 import { AnimatedBackground } from "@/components/effects/AnimatedBackground";
@@ -19,9 +18,6 @@ export default function PortalLayout({
         {children}
         <Analytics />
       </Providers>
-      
-      {/* Dark mode toggle in bottom right */}
-      <DarkModeToggle />
     </DarkModeProvider>
   );
 }

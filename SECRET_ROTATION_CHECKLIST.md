@@ -37,7 +37,7 @@
    - [ o] Update in `.env.local`
 5. **URL** (NEXT_PUBLIC_SUPABASE_URL):
    - Should NOT change, but verify it's correct: `https://[your-project].supabase.co`
-   - [ ] Confirm in Vercel matches dashboard
+   - [ o] Confirm in Vercel matches dashboard
 
 **Important Note:** Supabase project API keys (service_role and anon) typically cannot be rotated. They are generated when the project is created. Since these keys weren't exposed in Vercel's breach (they're stored as encrypted environment variables), you may not need to rotate them unless you have evidence they were compromised.
 

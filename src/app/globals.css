@@ -126,8 +126,9 @@
   }
 }
 
-/* Dark mode - manually controlled with .dark class */
-.dark {
+/* Dark mode */
+.dark,
+[data-theme="dark"] {
   --background: #0f172a;
   --foreground: #f1f5f9;
   --primary: #3b82f6;
@@ -145,6 +146,28 @@
   --card-foreground: #f1f5f9;
   --destructive: #ef4444;
   --destructive-foreground: #f1f5f9;
+}
+
+/* WLA Colorful theme - white, blue, and yellow */
+[data-theme="colorful"] {
+  --background: #fbfcfe;
+  --foreground: #11296b;
+  --primary: #00509d;
+  --primary-foreground: #ffffff;
+  --primary-hover: #00417e;
+  --secondary: #0a1840;
+  --secondary-foreground: #ffffff;
+  --accent: #ffdb57;
+  --accent-foreground: #11296b;
+  --muted: #f4f4f4;
+  --muted-foreground: #1f2937;
+  --border: #bccbf5;
+  --input: #ffffff;
+  --ring: #00509d;
+  --card: #ffffff;
+  --card-foreground: #11296b;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 }
 
 body {

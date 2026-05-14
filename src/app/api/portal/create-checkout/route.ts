@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2025-06-30.basil',
 })
 
 export async function POST(request: Request) {
@@ -29,8 +29,14 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Build base URL from request headers
+    const headers = request.headers
+    const host = headers.get('host') || 'localhost:3000'
+    const protocol = host.includes('localhost') ? 'http' : 'https'
+    const baseUrl = `${protocol}://${host}`
+
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
+    const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
@@ -46,8 +52,8 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/portal/billing?success=true&amount=${amount}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/portal/billing?canceled=true`,
+      success_url: `${baseUrl}/portal/billing?success=true&amount=${amount}`,
+      cancel_url: `${baseUrl}/portal/billing?canceled=true`,
       metadata: {
         clientAccountId,
         userId: session.user.id,
@@ -55,7 +61,7 @@ export async function POST(request: Request) {
       },
     })
 
-    return Response.json({ sessionId: session.id })
+    return Response.json({ sessionId: checkoutSession.id })
   } catch (error) {
     console.error('Stripe checkout error:', error)
     return Response.json(

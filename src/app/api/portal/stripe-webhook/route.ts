@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 import { headers } from 'next/headers'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2025-06-30.basil',
 })
 
 const supabase = createClient(
@@ -14,7 +14,8 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   const body = await request.text()
-  const signature = headers().get('stripe-signature')
+  const headersList = await headers()
+  const signature = headersList.get('stripe-signature')
 
   if (!signature) {
     return Response.json({ error: 'No signature' }, { status: 400 })

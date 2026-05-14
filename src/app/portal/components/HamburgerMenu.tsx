@@ -122,12 +122,12 @@ export default function HamburgerMenu({ user, clientAccount }: HamburgerMenuProp
               </button>
               <button
                 onClick={() => {
-                  window.location.href = '/portal/preferences'
+                  window.location.href = '/portal/settings'
                   setIsOpen(false)
                 }}
                 className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted/50 transition-colors"
               >
-                Preferences
+                Settings
               </button>
             </div>
 
