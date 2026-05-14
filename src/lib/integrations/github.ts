@@ -302,6 +302,38 @@ export async function createBranch(
 }
 
 /**
+ * Get current file SHA from branch (returns null if file doesn't exist)
+ */
+export async function getFileSha(
+  installationId: number,
+  owner: string,
+  repo: string,
+  path: string,
+  branch: string
+): Promise<string | null> {
+  const octokit = await getInstallationOctokit(installationId)
+
+  try {
+    const { data } = await octokit.repos.getContent({
+      owner,
+      repo,
+      path,
+      ref: branch
+    })
+
+    if ('sha' in data) {
+      return data.sha
+    }
+    return null
+  } catch (error: any) {
+    if (error.status === 404) {
+      return null // File doesn't exist
+    }
+    throw error
+  }
+}
+
+/**
  * Create or update a file
  */
 export async function createOrUpdateFile(
@@ -317,6 +349,12 @@ export async function createOrUpdateFile(
   const octokit = await getInstallationOctokit(installationId)
 
   try {
+    // If no SHA provided, try to fetch current file SHA
+    let fileSha = sha
+    if (!fileSha) {
+      fileSha = await getFileSha(installationId, owner, repo, path, branch) || undefined
+    }
+
     await octokit.repos.createOrUpdateFileContents({
       owner,
       repo,
@@ -324,7 +362,7 @@ export async function createOrUpdateFile(
       message,
       content: Buffer.from(content).toString('base64'),
       branch,
-      ...(sha && { sha })
+      ...(fileSha && { sha: fileSha })
     })
   } catch (error) {
     console.error('Failed to create/update file:', error)
