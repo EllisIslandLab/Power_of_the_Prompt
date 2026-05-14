@@ -340,7 +340,7 @@ export async function POST(request: Request) {
       },
       {
         name: 'create_branch',
-        description: 'Create a new git branch for making changes. Always create a branch before editing files. Use descriptive names like "add-airtable-availability" or "fix-booking-form".',
+        description: 'Create a new git branch for making changes. Call this ONCE at the start of your work. If a branch already exists, it will be reused. Use descriptive names like "add-airtable-availability" or "fix-booking-form".',
         input_schema: {
           type: 'object',
           properties: {
@@ -564,6 +564,16 @@ export async function POST(request: Request) {
             matches: matches.map(f => ({ path: f.path, type: f.type }))
           }
         } else if (toolName === 'create_branch') {
+          // Check if we already have a working branch for this conversation
+          if (workingBranch) {
+            console.log('[Tool] create_branch: Already have working branch:', workingBranch)
+            return {
+              success: true,
+              branch: workingBranch,
+              message: `Using existing branch "${workingBranch}". All file edits will be made on this branch.`,
+            }
+          }
+
           const branchName = toolInput.branch_name
           console.log('[Tool] create_branch:', branchName)
 
@@ -642,6 +652,14 @@ export async function POST(request: Request) {
             description: toolInput.description,
           }
 
+          // Clean up any old pending changes for this file to avoid duplicates
+          await supabase
+            .from('pending_code_changes')
+            .delete()
+            .eq('conversation_id', conversationId)
+            .eq('file_path', filePath)
+            .eq('status', 'pending_approval')
+
           // Store pending change for approval
           const { data: pendingChange } = await supabase
             .from('pending_code_changes')
@@ -677,6 +695,14 @@ export async function POST(request: Request) {
 
           const filePath = toolInput.path
           console.log('[Tool] create_file:', filePath, 'on branch:', workingBranch)
+
+          // Clean up any old pending changes for this file to avoid duplicates
+          await supabase
+            .from('pending_code_changes')
+            .delete()
+            .eq('conversation_id', conversationId)
+            .eq('file_path', filePath)
+            .eq('status', 'pending_approval')
 
           // Store pending change for approval
           const { data: pendingChange } = await supabase
