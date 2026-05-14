@@ -60,8 +60,8 @@ export default function PreviewPanel({
 
   // Auto-scroll messages to bottom when new messages arrive
   useEffect(() => {
-    if (!isDragging) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (!isDragging && messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
     }
   }, [messages, isDragging])
 
@@ -139,13 +139,15 @@ export default function PreviewPanel({
             <div
               ref={messagesContainerRef}
               onMouseDown={handleMouseDown}
-              className="h-full flex flex-col justify-end px-4 py-4 overflow-y-auto pointer-events-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-white/10 scrollbar-track-transparent"
+              className="h-full flex flex-col px-4 py-4 overflow-y-auto pointer-events-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-white/10 scrollbar-track-transparent"
               style={{
                 cursor: isDragging ? 'grabbing' : 'default',
                 scrollbarWidth: 'thin',
                 scrollbarColor: 'transparent transparent'
               }}
             >
+              {/* Spacer to push messages to bottom initially */}
+              <div className="flex-1 min-h-0" />
               <div className="space-y-3">
                 {messages.map(message => (
                   <div
@@ -276,13 +278,15 @@ export default function PreviewPanel({
               <div
                 ref={messagesContainerRef}
                 onMouseDown={handleMouseDown}
-                className="h-full flex flex-col justify-end px-4 py-4 overflow-y-auto pointer-events-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-white/10 scrollbar-track-transparent"
+                className="h-full flex flex-col px-4 py-4 overflow-y-auto pointer-events-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-white/10 scrollbar-track-transparent"
                 style={{
                   cursor: isDragging ? 'grabbing' : 'default',
                   scrollbarWidth: 'thin',
                   scrollbarColor: 'transparent transparent'
                 }}
               >
+                {/* Spacer to push messages to bottom initially */}
+                <div className="flex-1 min-h-0" />
                 <div className="space-y-3">
                   {messages.map(message => (
                     <div
