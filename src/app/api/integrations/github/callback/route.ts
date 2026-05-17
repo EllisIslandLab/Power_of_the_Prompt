@@ -13,6 +13,19 @@ export async function GET(request: NextRequest) {
   const setupAction = searchParams.get('setup_action')
   const code = searchParams.get('code') // OAuth code
 
+  // Get the correct origin (handles ngrok, localhost, production)
+  const host = request.headers.get('host') || request.nextUrl.host
+  const protocol = request.headers.get('x-forwarded-proto') || request.nextUrl.protocol.replace(':', '')
+  const origin = `${protocol}://${host}`
+
+  console.log('[GitHub Callback] Received params:', {
+    installationId,
+    setupAction,
+    hasCode: !!code,
+    allParams: Object.fromEntries(searchParams.entries()),
+    origin
+  })
+
   const cookieStore = await cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,21 +42,26 @@ export async function GET(request: NextRequest) {
   // Get user from session
   const { data: { user } } = await supabase.auth.getUser()
 
+  console.log('[GitHub Callback] User authenticated:', !!user)
+
   if (!user) {
+    console.log('[GitHub Callback] No user session, checking cookie...')
     const userId = cookieStore.get('github_install_user_id')?.value
     if (!userId) {
+      console.log('[GitHub Callback] No cookie either, redirecting to signin')
       return NextResponse.redirect(
-        new URL('/signin?error=session_expired', request.url)
+        new URL('/signin?error=session_expired', origin)
       )
     }
     // User ID from cookie - but still need to re-authenticate
+    console.log('[GitHub Callback] Cookie found, redirecting to signin with redirect')
     return NextResponse.redirect(
-      new URL('/signin?redirect=/portal/projects/new', request.url)
+      new URL('/signin?redirect=/portal/projects/new', origin)
     )
   }
 
-  // Handle installation flow
-  if (installationId && setupAction === 'install') {
+  // Handle installation flow (both new installs and updates)
+  if (installationId && (setupAction === 'install' || setupAction === 'update' || setupAction === 'request')) {
     try {
       console.log('[Callback] Processing installation:', installationId)
       console.log('[Callback] User ID:', user.id)
@@ -57,7 +75,7 @@ export async function GET(request: NextRequest) {
       if (!installation) {
         console.error('[Callback] Installation not found:', installationId)
         return NextResponse.redirect(
-          new URL('/portal/projects/new?error=installation_not_found', request.url)
+          new URL('/portal/projects/new?error=installation_not_found', origin)
         )
       }
 
@@ -81,7 +99,7 @@ export async function GET(request: NextRequest) {
       if (installError) {
         console.error('Failed to store installation:', installError)
         return NextResponse.redirect(
-          new URL('/portal/projects/new?error=installation_failed', request.url)
+          new URL('/portal/projects/new?error=installation_failed', origin)
         )
       }
 
@@ -103,17 +121,26 @@ export async function GET(request: NextRequest) {
           })
       }
 
-      // Clear the temporary cookie
-      const response = NextResponse.redirect(
-        new URL('/portal/projects/new?step=select_repo&installation_id=' + installationId, request.url)
-      )
+      // Check if there's a custom redirect URL
+      const redirectTo = cookieStore.get('github_install_redirect')?.value
+      const redirectUrl = redirectTo
+        ? new URL(redirectTo, origin)
+        : new URL('/portal/projects/new?step=select_repo&installation_id=' + installationId, origin)
+
+      console.log('[GitHub Callback] Redirecting to:', redirectUrl.toString())
+      console.log('[GitHub Callback] Installation ID:', installationId)
+      console.log('[GitHub Callback] Custom redirect:', redirectTo || 'none')
+
+      // Clear the temporary cookies
+      const response = NextResponse.redirect(redirectUrl)
       response.cookies.delete('github_install_user_id')
+      response.cookies.delete('github_install_redirect')
 
       return response
     } catch (error) {
       console.error('Error processing installation:', error)
       return NextResponse.redirect(
-        new URL('/portal/projects/new?error=installation_error', request.url)
+        new URL('/portal/projects/new?error=installation_error', origin)
       )
     }
   }
@@ -142,19 +169,26 @@ export async function GET(request: NextRequest) {
           updated_at: new Date().toISOString()
         })
 
-      return NextResponse.redirect(
-        new URL('/portal/projects/new?step=oauth_success', request.url)
-      )
+      // Check if there's a custom redirect URL
+      const redirectTo = cookieStore.get('github_install_redirect')?.value
+      const redirectUrl = redirectTo
+        ? new URL(redirectTo, origin)
+        : new URL('/portal/projects/new?step=oauth_success', origin)
+
+      const response = NextResponse.redirect(redirectUrl)
+      response.cookies.delete('github_install_redirect')
+
+      return response
     } catch (error) {
       console.error('Error processing OAuth:', error)
       return NextResponse.redirect(
-        new URL('/portal/projects/new?error=oauth_failed', request.url)
+        new URL('/portal/projects/new?error=oauth_failed', origin)
       )
     }
   }
 
   // No valid parameters
   return NextResponse.redirect(
-    new URL('/portal/projects/new?error=invalid_callback', request.url)
+    new URL('/portal/projects/new?error=invalid_callback', origin)
   )
 }

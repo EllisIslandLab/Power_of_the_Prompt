@@ -5,9 +5,12 @@ import { encrypt } from '@/lib/encryption'
 
 export async function POST(request: NextRequest) {
   try {
-    const { projectId, serviceName, credentials } = await request.json()
+    const { projectId, serviceName, service, credentials, userId } = await request.json()
 
-    if (!projectId || !serviceName || !credentials) {
+    // Support both 'serviceName' and 'service' for backward compatibility
+    const actualServiceName = serviceName || service
+
+    if (!actualServiceName || !credentials) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -36,54 +39,64 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify project belongs to user
-    const { data: project } = await supabase
-      .from('client_projects')
-      .select('user_id')
-      .eq('id', projectId)
-      .single()
+    // If projectId is provided, verify it belongs to user
+    if (projectId) {
+      const { data: project } = await supabase
+        .from('client_projects')
+        .select('user_id')
+        .eq('id', projectId)
+        .single()
 
-    if (!project || project.user_id !== user.id) {
-      return NextResponse.json(
-        { error: 'Project not found or unauthorized' },
-        { status: 403 }
-      )
+      if (!project || project.user_id !== user.id) {
+        return NextResponse.json(
+          { error: 'Project not found or unauthorized' },
+          { status: 403 }
+        )
+      }
     }
 
     // Encrypt sensitive credentials
     let encryptedData: any = {}
 
-    switch (serviceName) {
+    switch (actualServiceName) {
       case 'supabase':
         encryptedData = {
           metadata: {
-            url: credentials.url // URL is not sensitive
+            url: credentials.url || credentials.project_url // Support both formats
           },
-          api_key_encrypted: encrypt(credentials.anonKey),
-          api_secret_encrypted: credentials.serviceKey
-            ? encrypt(credentials.serviceKey)
+          api_key_encrypted: encrypt(credentials.anonKey || credentials.anon_key),
+          api_secret_encrypted: credentials.serviceKey || credentials.service_role_key
+            ? encrypt(credentials.serviceKey || credentials.service_role_key)
             : null
         }
         break
 
       case 'vercel':
         encryptedData = {
-          access_token_encrypted: encrypt(credentials.token)
+          access_token_encrypted: encrypt(credentials.token || credentials.access_token)
         }
         break
 
       case 'stripe':
         encryptedData = {
-          api_secret_encrypted: encrypt(credentials.secretKey),
+          api_secret_encrypted: encrypt(credentials.secretKey || credentials.secret_key),
+          api_key_encrypted: encrypt(credentials.publishableKey || credentials.publishable_key),
           metadata: {
-            publishableKey: credentials.publishableKey || null
+            publishableKey: credentials.publishableKey || credentials.publishable_key || null,
+            webhookSecret: credentials.webhookSecret || credentials.webhook_secret || null
           }
+        }
+        break
+
+      case 'github':
+        encryptedData = {
+          access_token_encrypted: encrypt(credentials.personalAccessToken || credentials.personal_access_token)
         }
         break
 
       case 'resend':
         encryptedData = {
-          api_key_encrypted: encrypt(credentials.apiKey)
+          api_key_encrypted: encrypt(credentials.apiKey || credentials.api_key)
         }
         break
 
@@ -99,15 +112,15 @@ export async function POST(request: NextRequest) {
       case 'openai':
       case 'anthropic':
         encryptedData = {
-          api_key_encrypted: encrypt(credentials.apiKey)
+          api_key_encrypted: encrypt(credentials.apiKey || credentials.api_key)
         }
         break
 
       case 'airtable':
         encryptedData = {
-          api_key_encrypted: encrypt(credentials.apiKey || credentials.personalAccessToken),
+          api_key_encrypted: encrypt(credentials.apiKey || credentials.api_key || credentials.personalAccessToken),
           metadata: {
-            baseId: credentials.baseId || null,
+            baseId: credentials.baseId || credentials.base_id || null,
             tokenType: credentials.personalAccessToken ? 'pat' : 'api_key'
           }
         }
@@ -121,15 +134,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Upsert credentials
+    const credentialData: any = {
+      user_id: user.id,
+      service_name: actualServiceName,
+      ...encryptedData,
+      is_valid: true,
+      last_validated_at: new Date().toISOString()
+    }
+
+    // Add project_id if provided (project-level), otherwise null (user-level)
+    if (projectId) {
+      credentialData.project_id = projectId
+    }
+
     const { error: credError } = await supabase
       .from('client_service_credentials')
-      .upsert({
-        project_id: projectId,
-        user_id: user.id,
-        service_name: serviceName,
-        ...encryptedData,
-        is_valid: true,
-        last_validated_at: new Date().toISOString()
+      .upsert(credentialData, {
+        onConflict: projectId
+          ? 'user_id,service_name,project_id'
+          : 'user_id,service_name'
       })
 
     if (credError) {
@@ -142,7 +165,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `${serviceName} credentials saved successfully`
+      message: `${actualServiceName} credentials saved successfully`
     })
   } catch (error) {
     console.error('Error in save-credentials:', error)

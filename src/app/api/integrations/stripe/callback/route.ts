@@ -94,13 +94,18 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Success!
-    return NextResponse.redirect(
-      new URL(
-        `/portal/projects/new?step=stripe_connected&account_id=${tokenData.stripe_user_id}`,
-        request.url
-      )
-    )
+    // Check if there's a custom redirect URL
+    const redirectTo = cookieStore.get('stripe_install_redirect')?.value
+    const redirectUrl = redirectTo
+      ? new URL(redirectTo, request.url)
+      : new URL(`/portal/projects/new?step=stripe_connected&account_id=${tokenData.stripe_user_id}`, request.url)
+
+    // Clear temporary cookies
+    const response = NextResponse.redirect(redirectUrl)
+    response.cookies.delete('stripe_install_user_id')
+    response.cookies.delete('stripe_install_redirect')
+
+    return response
   } catch (error: any) {
     console.error('Stripe Connect error:', error)
     return NextResponse.redirect(

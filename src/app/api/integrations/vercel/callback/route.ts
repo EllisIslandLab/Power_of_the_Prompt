@@ -82,13 +82,16 @@ export async function GET(request: NextRequest) {
     // Fetch projects to show user
     const projects = await listVercelProjects(access_token, team_id)
 
-    // Store project count in session for display
-    const response = NextResponse.redirect(
-      new URL(
-        `/portal/projects/new?step=vercel_connected&project_count=${projects.length}`,
-        request.url
-      )
-    )
+    // Check if there's a custom redirect URL
+    const redirectTo = cookieStore.get('vercel_install_redirect')?.value
+    const redirectUrl = redirectTo
+      ? new URL(redirectTo, request.url)
+      : new URL(`/portal/projects/new?step=vercel_connected&project_count=${projects.length}`, request.url)
+
+    // Clear temporary cookies
+    const response = NextResponse.redirect(redirectUrl)
+    response.cookies.delete('vercel_install_user_id')
+    response.cookies.delete('vercel_install_redirect')
 
     return response
   } catch (error) {

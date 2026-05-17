@@ -44,7 +44,10 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    console.log('[GitHub Repositories] Found installations:', installations.length)
+
     if (!installations || installations.length === 0) {
+      console.log('[GitHub Repositories] No installations found')
       return NextResponse.json({
         installations: [],
         repositories: []
@@ -53,6 +56,7 @@ export async function GET(request: NextRequest) {
 
     // Get repositories for these installations
     const installationIds = installations.map(i => i.installation_id)
+    console.log('[GitHub Repositories] Installation IDs:', installationIds)
 
     const { data: repositories, error: repoError } = await supabase
       .from('github_repositories')
@@ -67,6 +71,8 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    console.log('[GitHub Repositories] Found repositories:', repositories?.length || 0)
 
     return NextResponse.json({
       installations,

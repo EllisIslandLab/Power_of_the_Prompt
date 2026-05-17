@@ -3,8 +3,8 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 /**
- * Initiates GitHub App installation
- * Redirects user to GitHub to install the app
+ * Initiates Vercel OAuth flow
+ * Redirects user to Vercel to authorize the app
  */
 export async function GET(request: NextRequest) {
   const cookieStore = await cookies()
@@ -27,17 +27,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/signin', request.url))
   }
 
-  // Get redirect URL from query params (e.g., from settings page)
+  // Get redirect URL from query params
   const searchParams = request.nextUrl.searchParams
   const redirectTo = searchParams.get('redirect_to')
 
-  // Store user ID in session for callback
-  const response = NextResponse.redirect(
-    `https://github.com/apps/${process.env.GITHUB_APP_SLUG}/installations/new`
-  )
+  const callbackUri = `${request.nextUrl.origin}/api/integrations/vercel/callback`
+  const vercelAuthUrl = `https://vercel.com/integrations/${process.env.NEXT_PUBLIC_VERCEL_INTEGRATION_SLUG}/new?redirect_uri=${encodeURIComponent(callbackUri)}`
 
-  // Set a temporary cookie to identify the user after redirect
-  response.cookies.set('github_install_user_id', user.id, {
+  const response = NextResponse.redirect(vercelAuthUrl)
+
+  // Store user ID for callback
+  response.cookies.set('vercel_install_user_id', user.id, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
   // Store redirect URL if provided
   if (redirectTo) {
-    response.cookies.set('github_install_redirect', redirectTo, {
+    response.cookies.set('vercel_install_redirect', redirectTo, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

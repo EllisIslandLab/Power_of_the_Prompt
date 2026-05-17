@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import ConnectServiceModal from '../components/ConnectServiceModal'
 
 interface SettingsInterfaceProps {
   user: any
@@ -38,6 +39,8 @@ export default function SettingsInterface({
   )
   const [paymentMethods, setPaymentMethods] = useState(initialPaymentMethods)
   const [connectedServices, setConnectedServices] = useState(initialConnectedServices)
+  const [connectingService, setConnectingService] = useState<string | null>(null)
+  const [isLoadingServices, setIsLoadingServices] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -406,40 +409,343 @@ export default function SettingsInterface({
             <div className="bg-card rounded-lg border border-border p-6">
               <h2 className="text-lg font-semibold text-foreground mb-4">Connected Services</h2>
 
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-4">
-                <p className="text-sm text-foreground font-medium mb-2">🚀 Coming Soon: Self-Service Setup</p>
-                <p className="text-xs text-muted-foreground">
-                  Currently, your project connections are managed by your administrator. Self-service configuration will be available soon for advanced users who own their own code and infrastructure.
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Connect your services to enable Claude to manage databases, deployments, and more.
+              </p>
 
-              <div className="space-y-3 opacity-50">
-                {['github', 'supabase', 'vercel'].map(service => {
-                  const connected = connectedServices.find(s => s.service_type === service)
+              <div className="space-y-3">
+                {/* GitHub */}
+                {(() => {
+                  const githubConnected = connectedServices.find(s => s.service_name === 'github')
                   return (
-                    <div
-                      key={service}
-                      className="flex items-center justify-between p-4 border border-border rounded-lg"
-                    >
+                    <div className="flex items-center justify-between p-4 border border-border rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="text-sm font-medium text-foreground capitalize">
-                          {service}
-                        </div>
-                        {connected?.is_connected && (
+                        <div className="text-sm font-medium text-foreground">GitHub</div>
+                        {githubConnected?.is_connected && (
                           <span className="text-xs bg-green-500/20 text-green-600 px-2 py-1 rounded">
                             Connected
                           </span>
                         )}
                       </div>
-                      <button
-                        disabled
-                        className="px-4 py-2 rounded-lg text-sm bg-muted text-muted-foreground cursor-not-allowed"
-                      >
-                        Coming Soon
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {githubConnected ? (
+                          <>
+                            <button
+                              onClick={() => setConnectingService('github')}
+                              className="px-4 py-2 rounded-lg text-sm border border-border hover:bg-muted/50 transition-colors"
+                            >
+                              Reconnect
+                            </button>
+                            <button
+                              disabled
+                              className="px-4 py-2 rounded-lg text-sm bg-muted text-muted-foreground cursor-not-allowed"
+                              title="GitHub disconnection requires uninstalling the app from GitHub settings"
+                            >
+                              Disconnect
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setConnectingService('github')}
+                            className="px-4 py-2 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                          >
+                            Connect
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )
-                })}
+                })()}
+
+                {/* Airtable */}
+                {(() => {
+                  const airtableConnected = connectedServices.find(s => s.service_name === 'airtable')
+                  return (
+                    <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm font-medium text-foreground">Airtable</div>
+                        {airtableConnected?.is_connected && (
+                          <span className="text-xs bg-green-500/20 text-green-600 px-2 py-1 rounded">
+                            Connected
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {airtableConnected ? (
+                          <>
+                            <button
+                              onClick={() => setConnectingService('airtable')}
+                              className="px-4 py-2 rounded-lg text-sm border border-border hover:bg-muted/50 transition-colors"
+                            >
+                              Reconnect
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm('Are you sure you want to disconnect Airtable?')) {
+                                  setIsLoadingServices(true)
+                                  try {
+                                    const response = await fetch('/api/portal/connect-service?service=airtable', {
+                                      method: 'DELETE',
+                                    })
+                                    if (response.ok) {
+                                      setConnectedServices(connectedServices.filter(s => s.service_name !== 'airtable'))
+                                    }
+                                  } catch (error) {
+                                    console.error('Failed to disconnect:', error)
+                                  } finally {
+                                    setIsLoadingServices(false)
+                                  }
+                                }
+                              }}
+                              className="px-4 py-2 rounded-lg text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                            >
+                              Disconnect
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setConnectingService('airtable')}
+                            className="px-4 py-2 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                          >
+                            Connect
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })()}
+
+                {/* Supabase */}
+                {(() => {
+                  const supabaseConnected = connectedServices.find(s => s.service_name === 'supabase')
+                  return (
+                    <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm font-medium text-foreground">Supabase</div>
+                        {supabaseConnected?.is_connected && (
+                          <span className="text-xs bg-green-500/20 text-green-600 px-2 py-1 rounded">
+                            Connected
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {supabaseConnected ? (
+                          <>
+                            <button
+                              onClick={() => setConnectingService('supabase')}
+                              className="px-4 py-2 rounded-lg text-sm border border-border hover:bg-muted/50 transition-colors"
+                            >
+                              Reconnect
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm('Are you sure you want to disconnect Supabase?')) {
+                                  setIsLoadingServices(true)
+                                  try {
+                                    const response = await fetch('/api/portal/connect-service?service=supabase', {
+                                      method: 'DELETE',
+                                    })
+                                    if (response.ok) {
+                                      setConnectedServices(connectedServices.filter(s => s.service_name !== 'supabase'))
+                                    }
+                                  } catch (error) {
+                                    console.error('Failed to disconnect:', error)
+                                  } finally {
+                                    setIsLoadingServices(false)
+                                  }
+                                }
+                              }}
+                              className="px-4 py-2 rounded-lg text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                            >
+                              Disconnect
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setConnectingService('supabase')}
+                            className="px-4 py-2 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                          >
+                            Connect
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })()}
+
+                {/* Vercel */}
+                {(() => {
+                  const vercelConnected = connectedServices.find(s => s.service_name === 'vercel')
+                  return (
+                    <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm font-medium text-foreground">Vercel</div>
+                        {vercelConnected?.is_connected && (
+                          <span className="text-xs bg-green-500/20 text-green-600 px-2 py-1 rounded">
+                            Connected
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {vercelConnected ? (
+                          <>
+                            <button
+                              onClick={() => setConnectingService('vercel')}
+                              className="px-4 py-2 rounded-lg text-sm border border-border hover:bg-muted/50 transition-colors"
+                            >
+                              Reconnect
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm('Are you sure you want to disconnect Vercel?')) {
+                                  setIsLoadingServices(true)
+                                  try {
+                                    const response = await fetch('/api/portal/connect-service?service=vercel', {
+                                      method: 'DELETE',
+                                    })
+                                    if (response.ok) {
+                                      setConnectedServices(connectedServices.filter(s => s.service_name !== 'vercel'))
+                                    }
+                                  } catch (error) {
+                                    console.error('Failed to disconnect:', error)
+                                  } finally {
+                                    setIsLoadingServices(false)
+                                  }
+                                }
+                              }}
+                              className="px-4 py-2 rounded-lg text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                            >
+                              Disconnect
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setConnectingService('vercel')}
+                            className="px-4 py-2 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                          >
+                            Connect
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })()}
+
+                {/* Resend */}
+                {(() => {
+                  const resendConnected = connectedServices.find(s => s.service_name === 'resend')
+                  return (
+                    <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm font-medium text-foreground">Resend</div>
+                        {resendConnected?.is_connected && (
+                          <span className="text-xs bg-green-500/20 text-green-600 px-2 py-1 rounded">
+                            Connected
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {resendConnected ? (
+                          <>
+                            <button
+                              onClick={() => setConnectingService('resend')}
+                              className="px-4 py-2 rounded-lg text-sm border border-border hover:bg-muted/50 transition-colors"
+                            >
+                              Reconnect
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm('Are you sure you want to disconnect Resend?')) {
+                                  setIsLoadingServices(true)
+                                  try {
+                                    const response = await fetch('/api/portal/connect-service?service=resend', {
+                                      method: 'DELETE',
+                                    })
+                                    if (response.ok) {
+                                      setConnectedServices(connectedServices.filter(s => s.service_name !== 'resend'))
+                                    }
+                                  } catch (error) {
+                                    console.error('Failed to disconnect:', error)
+                                  } finally {
+                                    setIsLoadingServices(false)
+                                  }
+                                }
+                              }}
+                              className="px-4 py-2 rounded-lg text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                            >
+                              Disconnect
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setConnectingService('resend')}
+                            className="px-4 py-2 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                          >
+                            Connect
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })()}
+
+                {/* Stripe */}
+                {(() => {
+                  const stripeConnected = connectedServices.find(s => s.service_name === 'stripe')
+                  return (
+                    <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm font-medium text-foreground">Stripe</div>
+                        {stripeConnected?.is_connected && (
+                          <span className="text-xs bg-green-500/20 text-green-600 px-2 py-1 rounded">
+                            Connected
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {stripeConnected ? (
+                          <>
+                            <button
+                              onClick={() => setConnectingService('stripe')}
+                              className="px-4 py-2 rounded-lg text-sm border border-border hover:bg-muted/50 transition-colors"
+                            >
+                              Reconnect
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (confirm('Are you sure you want to disconnect Stripe?')) {
+                                  setIsLoadingServices(true)
+                                  try {
+                                    const response = await fetch('/api/portal/connect-service?service=stripe', {
+                                      method: 'DELETE',
+                                    })
+                                    if (response.ok) {
+                                      setConnectedServices(connectedServices.filter(s => s.service_name !== 'stripe'))
+                                    }
+                                  } catch (error) {
+                                    console.error('Failed to disconnect:', error)
+                                  } finally {
+                                    setIsLoadingServices(false)
+                                  }
+                                }
+                              }}
+                              className="px-4 py-2 rounded-lg text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                            >
+                              Disconnect
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setConnectingService('stripe')}
+                            className="px-4 py-2 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                          >
+                            Connect
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
             </div>
           </div>
@@ -606,6 +912,20 @@ export default function SettingsInterface({
             </div>
           </div>
         </>
+      )}
+
+      {/* Service Connection Modal */}
+      {connectingService && (
+        <ConnectServiceModal
+          serviceName={connectingService}
+          onClose={() => setConnectingService(null)}
+          onSuccess={() => {
+            setConnectingService(null)
+            // Refresh connected services
+            window.location.reload()
+          }}
+          userId={user.id}
+        />
       )}
     </div>
   )

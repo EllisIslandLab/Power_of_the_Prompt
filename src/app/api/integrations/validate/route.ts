@@ -40,11 +40,30 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { services } = await request.json()
+    const body = await request.json()
+
+    // Mode 1: Validate new credentials (before saving)
+    if (body.service && body.credentials) {
+      const { service, credentials } = body
+
+      try {
+        const validation = await validateServiceWithPlainCredentials(service, credentials)
+        return NextResponse.json(validation)
+      } catch (error: any) {
+        return NextResponse.json({
+          service,
+          valid: false,
+          error: error.message || 'Validation failed'
+        }, { status: 400 })
+      }
+    }
+
+    // Mode 2: Validate existing saved credentials
+    const { services } = body
 
     if (!services || !Array.isArray(services)) {
       return NextResponse.json(
-        { error: 'Services array required' },
+        { error: 'Services array or service/credentials required' },
         { status: 400 }
       )
     }
@@ -110,6 +129,49 @@ export async function POST(request: NextRequest) {
       { error: 'Validation failed' },
       { status: 500 }
     )
+  }
+}
+
+/**
+ * Validate plain credentials (before saving)
+ */
+async function validateServiceWithPlainCredentials(
+  serviceName: string,
+  credentials: any
+): Promise<ValidationResult> {
+  try {
+    switch (serviceName) {
+      case 'stripe':
+        return await validateStripePlain(credentials)
+
+      case 'vercel':
+        return await validateVercelPlain(credentials)
+
+      case 'supabase':
+        return await validateSupabasePlain(credentials)
+
+      case 'github':
+        return await validateGitHubPlain(credentials)
+
+      case 'airtable':
+        return await validateAirtablePlain(credentials)
+
+      case 'resend':
+        return await validateResendPlain(credentials)
+
+      default:
+        return {
+          service: serviceName,
+          valid: false,
+          error: 'Service validation not implemented'
+        }
+    }
+  } catch (error: any) {
+    return {
+      service: serviceName,
+      valid: false,
+      error: error.message
+    }
   }
 }
 
@@ -362,6 +424,242 @@ async function validateResend(credential: any): Promise<ValidationResult> {
     if (!response.ok) {
       const error = await response.json().catch(() => ({}))
       throw new Error(error.message || 'Resend API request failed')
+    }
+
+    return {
+      service: 'resend',
+      valid: true,
+      details: {
+        connected: true
+      }
+    }
+  } catch (error: any) {
+    return {
+      service: 'resend',
+      valid: false,
+      error: error.message || 'Connection failed'
+    }
+  }
+}
+
+// ===== Plain Credential Validation Functions =====
+
+async function validateStripePlain(credentials: any): Promise<ValidationResult> {
+  try {
+    const { secret_key, publishable_key } = credentials
+
+    if (!secret_key || !publishable_key) {
+      throw new Error('Stripe secret key and publishable key are required')
+    }
+
+    // Validate key formats
+    if (!secret_key.startsWith('sk_')) {
+      throw new Error('Invalid secret key format (must start with sk_)')
+    }
+    if (!publishable_key.startsWith('pk_')) {
+      throw new Error('Invalid publishable key format (must start with pk_)')
+    }
+
+    // Test the secret key by fetching account info
+    const response = await fetch('https://api.stripe.com/v1/account', {
+      headers: {
+        'Authorization': `Bearer ${secret_key}`
+      }
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}))
+      throw new Error(error.error?.message || 'Invalid Stripe credentials')
+    }
+
+    const account = await response.json()
+
+    return {
+      service: 'stripe',
+      valid: true,
+      details: {
+        accountId: account.id,
+        livemode: !secret_key.includes('test')
+      }
+    }
+  } catch (error: any) {
+    return {
+      service: 'stripe',
+      valid: false,
+      error: error.message || 'Connection failed'
+    }
+  }
+}
+
+async function validateVercelPlain(credentials: any): Promise<ValidationResult> {
+  try {
+    const { access_token } = credentials
+
+    if (!access_token) {
+      throw new Error('Vercel access token is required')
+    }
+
+    const { user } = await getVercelUser(access_token)
+
+    return {
+      service: 'vercel',
+      valid: true,
+      details: {
+        userId: user.id,
+        username: user.username,
+        email: user.email
+      }
+    }
+  } catch (error: any) {
+    return {
+      service: 'vercel',
+      valid: false,
+      error: error.message || 'Connection failed'
+    }
+  }
+}
+
+async function validateSupabasePlain(credentials: any): Promise<ValidationResult> {
+  try {
+    const { project_url, anon_key, service_role_key } = credentials
+
+    if (!project_url || !anon_key || !service_role_key) {
+      throw new Error('Supabase URL, anon key, and service role key are required')
+    }
+
+    // Validate URL format
+    if (!project_url.startsWith('https://') || !project_url.includes('supabase')) {
+      throw new Error('Invalid Supabase URL format')
+    }
+
+    // Test connection with anon key
+    const testClient = createSupabaseClient(project_url, anon_key)
+    const { error } = await testClient.from('_supabase_migrations').select('version').limit(1)
+
+    // Error is expected if table doesn't exist, we just want to verify connection
+
+    return {
+      service: 'supabase',
+      valid: true,
+      details: {
+        url: project_url,
+        connected: true
+      }
+    }
+  } catch (error: any) {
+    return {
+      service: 'supabase',
+      valid: false,
+      error: error.message || 'Connection failed'
+    }
+  }
+}
+
+async function validateGitHubPlain(credentials: any): Promise<ValidationResult> {
+  try {
+    const { personal_access_token } = credentials
+
+    if (!personal_access_token) {
+      throw new Error('GitHub personal access token is required')
+    }
+
+    // Test with a simple API call
+    const response = await fetch('https://api.github.com/user', {
+      headers: {
+        'Authorization': `Bearer ${personal_access_token}`,
+        'Accept': 'application/vnd.github+json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error('Invalid GitHub token')
+    }
+
+    const user = await response.json()
+
+    return {
+      service: 'github',
+      valid: true,
+      details: {
+        login: user.login,
+        id: user.id
+      }
+    }
+  } catch (error: any) {
+    return {
+      service: 'github',
+      valid: false,
+      error: error.message || 'Connection failed'
+    }
+  }
+}
+
+async function validateAirtablePlain(credentials: any): Promise<ValidationResult> {
+  try {
+    const { api_key, base_id } = credentials
+
+    if (!api_key) {
+      throw new Error('Airtable API key is required')
+    }
+
+    // Test connection by fetching bases
+    const url = base_id
+      ? `https://api.airtable.com/v0/${base_id}/`
+      : 'https://api.airtable.com/v0/meta/bases'
+
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${api_key}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}))
+      throw new Error(error.error?.message || 'Invalid Airtable credentials')
+    }
+
+    return {
+      service: 'airtable',
+      valid: true,
+      details: {
+        baseId: base_id || 'No base specified',
+        connected: true
+      }
+    }
+  } catch (error: any) {
+    return {
+      service: 'airtable',
+      valid: false,
+      error: error.message || 'Connection failed'
+    }
+  }
+}
+
+async function validateResendPlain(credentials: any): Promise<ValidationResult> {
+  try {
+    const { api_key } = credentials
+
+    if (!api_key) {
+      throw new Error('Resend API key is required')
+    }
+
+    // Validate key format
+    if (!api_key.startsWith('re_')) {
+      throw new Error('Invalid Resend API key format (must start with re_)')
+    }
+
+    // Test connection by fetching API keys
+    const response = await fetch('https://api.resend.com/api-keys', {
+      headers: {
+        'Authorization': `Bearer ${api_key}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}))
+      throw new Error(error.message || 'Invalid Resend credentials')
     }
 
     return {

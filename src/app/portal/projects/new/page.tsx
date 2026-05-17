@@ -105,11 +105,14 @@ function ConnectProjectContent() {
     const errorParam = searchParams.get('error')
     const installationId = searchParams.get('installation_id')
 
+    console.log('[Project Wizard] URL params:', { step, errorParam, installationId })
+
     if (errorParam) {
       setError(getErrorMessage(errorParam))
     }
 
     if (step === 'select_repo' && installationId) {
+      console.log('[Project Wizard] Setting step to select_repo and fetching repositories')
       setCurrentStep('select_repo')
       fetchRepositories()
     } else if (step === 'vercel_connected') {
@@ -143,6 +146,35 @@ function ConnectProjectContent() {
       // Check for GitHub repositories
       const response = await fetch('/api/integrations/github/repositories')
       const data = await response.json()
+
+      console.log('[Project Wizard] Repositories response:', data)
+
+      // If there are installations but no repositories, sync them from GitHub
+      if (data.installations && data.installations.length > 0 && (!data.repositories || data.repositories.length === 0)) {
+        console.log('[Project Wizard] Installation exists but no repos, syncing from GitHub...')
+        const installationId = data.installations[0].installation_id
+
+        try {
+          const syncResponse = await fetch('/api/integrations/github/repositories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ installationId })
+          })
+
+          const syncData = await syncResponse.json()
+          console.log('[Project Wizard] Sync result:', syncData)
+
+          if (syncData.repositories && syncData.repositories.length > 0) {
+            setRepositories(syncData.repositories)
+            if (!searchParams.get('step')) {
+              setCurrentStep('select_repo')
+            }
+            return
+          }
+        } catch (syncErr) {
+          console.error('[Project Wizard] Failed to sync repositories:', syncErr)
+        }
+      }
 
       if (data.repositories && data.repositories.length > 0) {
         // User has repositories, skip to select_repo step
