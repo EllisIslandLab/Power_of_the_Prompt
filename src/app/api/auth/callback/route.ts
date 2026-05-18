@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
+  const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next') || '/portal'
 
@@ -15,43 +12,117 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/signin?error=no_code', request.url))
   }
 
+  const cookieStore = await cookies()
+  const response = NextResponse.redirect(new URL(next, origin))
+
   try {
-    // Exchange the code for a session
+    // Create Supabase client with cookie handling to properly set session
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value
+          },
+          set(name: string, value: string, options: any) {
+            response.cookies.set(name, value, options)
+          },
+          remove(name: string, options: any) {
+            response.cookies.delete(name)
+          },
+        },
+      }
+    )
+
+    // Exchange the code for a session (automatically sets cookies)
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-    
+
     if (error) {
-      // console.error('❌ Auth callback error:', error) // Commented out for auth transition
-      return NextResponse.redirect(new URL('/signin?error=auth_failed', request.url))
+      console.error('Auth callback error:', error)
+      return NextResponse.redirect(new URL('/signin?error=auth_failed', origin))
     }
 
     if (data.user) {
-      // console.log('✅ Email verified for user:', data.user.id) // Commented out for auth transition
-      
-      // Manually sync the email verification status to our users table
-      try {
-        const { error: updateError } = await supabase
-          .from('users' as any)
-          .update({
-            email_verified: !!data.user.email_confirmed_at,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', data.user.id)
+      console.log('User authenticated:', data.user.id)
 
-        if (updateError) {
-          // console.error('Failed to sync email verification:', updateError) // Commented out for auth transition
+      // Use service role client to create/update user records
+      const adminClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      )
+
+      try {
+        // Check if user exists in users table
+        const { data: existingUser } = await adminClient
+          .from('users')
+          .select('id')
+          .eq('id', data.user.id)
+          .single()
+
+        if (!existingUser) {
+          // First time OAuth sign-in - create user record
+          console.log('Creating new user record for OAuth user:', data.user.id)
+
+          // Extract name from GitHub metadata
+          const fullName = data.user.user_metadata?.full_name ||
+                          data.user.user_metadata?.name ||
+                          data.user.email?.split('@')[0] ||
+                          'User'
+
+          // Create user record
+          await adminClient
+            .from('users')
+            .insert({
+              id: data.user.id,
+              email: data.user.email,
+              full_name: fullName,
+              email_verified: !!data.user.email_confirmed_at,
+              role: 'client',
+            })
+
+          // Create client_account
+          const { data: newAccount } = await adminClient
+            .from('client_accounts')
+            .insert({
+              user_id: data.user.id,
+              account_balance: 0,
+              total_spent: 0,
+            })
+            .select()
+            .single()
+
+          // Create user_settings
+          if (newAccount) {
+            await adminClient
+              .from('user_settings')
+              .insert({
+                user_id: data.user.id,
+                theme_preference: 'dark',
+                enable_notifications: true,
+              })
+          }
+
+          console.log('Successfully created user records')
         } else {
-          // console.log('✅ Email verification synced to users table') // Commented out for auth transition
+          // Existing user - just sync email verification
+          await adminClient
+            .from('users')
+            .update({
+              email_verified: !!data.user.email_confirmed_at,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', data.user.id)
         }
       } catch (syncError) {
-        // console.error('Sync error:', syncError) // Commented out for auth transition
+        console.error('User creation/sync error:', syncError)
       }
     }
 
-    // Redirect to success page or portal
-    return NextResponse.redirect(new URL('/email-verified', request.url))
+    return response
 
   } catch (error) {
-    // console.error('Callback error:', error) // Commented out for auth transition
-    return NextResponse.redirect(new URL('/signin?error=callback_failed', request.url))
+    console.error('Callback error:', error)
+    return NextResponse.redirect(new URL('/signin?error=callback_failed', origin))
   }
 }

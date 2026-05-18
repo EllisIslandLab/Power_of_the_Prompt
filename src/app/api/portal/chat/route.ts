@@ -57,7 +57,7 @@ function buildServiceContext(connectedServices: string[]) {
 
 export async function POST(request: Request) {
   try {
-    const { conversationId, message, clientAccountId, projectId, connectedServices } = await request.json()
+    const { conversationId, message, clientAccountId, projectId, connectedServices, attachments } = await request.json()
 
     const cookieStore = await cookies()
     const supabase = createServerClient(
@@ -260,11 +260,71 @@ export async function POST(request: Request) {
     // Build messages array for Claude
     const messages: Anthropic.MessageParam[] = []
 
-    // Add conversation history
-    for (const msg of history || []) {
+    // Add conversation history (all messages except possibly the last one if it has attachments)
+    const historyMessages = history || []
+    const lastHistoryMessage = historyMessages[historyMessages.length - 1]
+
+    // Add all history messages
+    for (let i = 0; i < historyMessages.length; i++) {
+      const msg = historyMessages[i]
+      const isLastMessage = i === historyMessages.length - 1
+
+      // If this is the last message and it matches the current message text AND we have attachments,
+      // we'll replace it below with the version that includes attachments
+      if (isLastMessage && msg.message_text === message && attachments && attachments.length > 0) {
+        continue // Skip adding it here, we'll add the enhanced version below
+      }
+
       messages.push({
         role: msg.message_type === 'user_message' ? 'user' : 'assistant',
         content: msg.message_text,
+      })
+    }
+
+    // Add current message with attachments if present
+    if (attachments && attachments.length > 0) {
+      // Format message content with text and images for Claude
+      const contentBlocks: Array<Anthropic.TextBlockParam | Anthropic.ImageBlockParam> = []
+
+      // Add text first
+      contentBlocks.push({
+        type: 'text',
+        text: message,
+      })
+
+      // Add each attachment
+      for (const attachment of attachments) {
+        if (attachment.type === 'image') {
+          contentBlocks.push({
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: attachment.mimeType,
+              data: attachment.data,
+            },
+          })
+        } else if (attachment.type === 'document' && attachment.mimeType === 'application/pdf') {
+          // For PDFs, use document block (PDF support in Claude)
+          contentBlocks.push({
+            type: 'document',
+            source: {
+              type: 'base64',
+              media_type: 'application/pdf',
+              data: attachment.data,
+            },
+          } as any) // TypeScript might not have document type definition yet
+        }
+      }
+
+      messages.push({
+        role: 'user',
+        content: contentBlocks,
+      })
+    } else if (!lastHistoryMessage || lastHistoryMessage.message_text !== message) {
+      // If the message wasn't in history (edge case), add it now
+      messages.push({
+        role: 'user',
+        content: message,
       })
     }
 
@@ -1077,10 +1137,18 @@ export async function POST(request: Request) {
             : false
 
           // Update client account balance only if not waived
+          // Charge 10x the actual token cost for profit margin
           if (!waiveCost && cost > 0) {
-            await supabase.rpc('decrement_balance', {
+            // Use service role client to bypass RLS for balance update
+            const { createClient } = await import('@supabase/supabase-js')
+            const adminClient = createClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              process.env.SUPABASE_SERVICE_ROLE_KEY!
+            )
+
+            await adminClient.rpc('decrement_balance', {
               account_id: clientAccountId,
-              amount: cost,
+              amount: cost * 10,
             })
           }
 

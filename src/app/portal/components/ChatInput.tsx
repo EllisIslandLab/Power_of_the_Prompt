@@ -8,12 +8,12 @@ interface ChatInputProps {
   user: any
   clientAccount: any
   session: any
-  onMessageSent: (content: string) => void
-  onFileInputRefReady?: (ref: HTMLInputElement | null) => void
-  onFileUploaded?: (result: any, error?: Error) => void
+  onMessageSent: (content: string, files?: File[]) => void
   disabled?: boolean
   layout?: 'left' | 'right' | 'top' | 'bottom' | 'floating'
   hasPendingDiffs?: boolean
+  attachedFiles?: File[]
+  onRemoveFile?: (index: number) => void
 }
 
 export default function ChatInput({
@@ -21,33 +21,21 @@ export default function ChatInput({
   clientAccount,
   session,
   onMessageSent,
-  onFileInputRefReady,
-  onFileUploaded,
   disabled = false,
   layout = 'bottom',
   hasPendingDiffs = false,
+  attachedFiles = [],
+  onRemoveFile,
 }: ChatInputProps) {
   const [inputValue, setInputValue] = useState('')
-  const [isDragging, setIsDragging] = useState(false)
   const [isButtonPressed, setIsButtonPressed] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-
-  useEffect(() => {
-    if (onFileInputRefReady && fileInputRef.current) {
-      onFileInputRefReady(fileInputRef.current)
-    }
-  }, [onFileInputRefReady])
 
   const handleSend = () => {
     if (!inputValue.trim() || disabled) return
 
-    // Send message
-    onMessageSent(inputValue.trim())
+    // Send message with attached files
+    onMessageSent(inputValue.trim(), attachedFiles.length > 0 ? attachedFiles : undefined)
     setInputValue('')
   }
 
@@ -59,77 +47,50 @@ export default function ChatInput({
     }
   }
 
-
-  const handleFileUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return
-
-    const file = files[0]
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('conversationId', '')
-
-    try {
-      const response = await fetch('/api/portal/upload-image', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Upload failed')
-      }
-
-      onFileUploaded?.(result)
-    } catch (error) {
-      console.error('Upload error:', error)
-      onFileUploaded?.(null, error as Error)
-    }
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-    handleFileUpload(e.dataTransfer.files)
-  }
-
   const isVertical = layout === 'left' || layout === 'right'
 
   return (
-    <div
-      className="border-t border-border p-2 bg-muted/30 relative flex-1 flex flex-col min-h-0"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      {/* Drag & Drop Overlay */}
-      {isDragging && (
-        <div className="absolute inset-0 bg-primary/10 border-4 border-dashed border-primary z-50 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-primary mb-2">Drop Image Here</p>
-            <p className="text-sm text-muted-foreground">Supported: JPG, PNG, WebP, GIF (max 10MB)</p>
-          </div>
+    <div className="border-t border-border p-2 bg-muted/30 relative flex-1 flex flex-col min-h-0">
+      {/* Attached Files Preview */}
+      {attachedFiles.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-2">
+          {attachedFiles.map((file, index) => (
+            <div
+              key={index}
+              className="relative group bg-card border border-border rounded-lg p-2 flex items-center gap-2 pr-8"
+            >
+              {file.type.startsWith('image/') ? (
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={file.name}
+                  className="w-12 h-12 object-cover rounded"
+                />
+              ) : (
+                <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
+                  <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {(file.size / 1024).toFixed(1)} KB
+                </p>
+              </div>
+              <button
+                onClick={() => onRemoveFile?.(index)}
+                className="absolute top-1 right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                title="Remove file"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ))}
         </div>
       )}
-
-      {/* Hidden File Input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-        onChange={(e) => handleFileUpload(e.target.files)}
-        className="hidden"
-      />
 
       {/* Sleek input container */}
       <div className="flex items-center gap-3 flex-1 bg-card/50 backdrop-blur-sm border border-border/50 rounded-full px-4 py-2 shadow-sm hover:shadow-md transition-all">

@@ -5,7 +5,6 @@ import { useState } from 'react'
 interface HorizontalToolbarProps {
   user?: any
   clientAccount?: any
-  onImageUpload?: () => void
   onLayoutChange?: (layout: 'left' | 'right' | 'top' | 'bottom' | 'floating') => void
   currentLayout: string
 }
@@ -13,65 +12,36 @@ interface HorizontalToolbarProps {
 export default function HorizontalToolbar({
   user,
   clientAccount,
-  onImageUpload,
   onLayoutChange,
   currentLayout
 }: HorizontalToolbarProps) {
-  const [showLayoutMenu, setShowLayoutMenu] = useState(false)
   const [showHelpMenu, setShowHelpMenu] = useState(false)
   const [showExplorer, setShowExplorer] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [showGit, setShowGit] = useState(false)
   const [showTargets, setShowTargets] = useState(false)
 
+  const handleLayoutToggle = () => {
+    const newLayout = currentLayout === 'bottom' ? 'floating' : 'bottom'
+    onLayoutChange?.(newLayout)
+  }
+
   return (
     <div className="bg-card border-b border-border p-1 grid grid-cols-6 gap-0.5">
-      {/* Upload Image */}
+      {/* Layout Toggle */}
       <button
-        onClick={onImageUpload}
+        onClick={handleLayoutToggle}
         className="p-1 hover:bg-muted/50 rounded transition-colors"
-        title="Upload Image • Drag & drop images into chat or click here"
+        title={currentLayout === 'bottom' ? 'Switch to Fullscreen Preview' : 'Switch to Conversation Mode'}
       >
         <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          {currentLayout === 'bottom' ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+          )}
         </svg>
       </button>
-
-      {/* Layout Config */}
-      <div className="relative">
-        <button
-          onClick={() => setShowLayoutMenu(!showLayoutMenu)}
-          className="p-1 hover:bg-muted/50 rounded transition-colors"
-          title="Chat Layout Configuration"
-        >
-          <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h14a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3z" />
-          </svg>
-        </button>
-        {showLayoutMenu && (
-          <>
-            <div className="fixed inset-0 z-10" onClick={() => setShowLayoutMenu(false)} />
-            <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-lg p-2 z-20 min-w-[150px]">
-              {['left', 'right', 'top', 'bottom', 'floating'].map(layout => (
-                <button
-                  key={layout}
-                  onClick={() => {
-                    onLayoutChange?.(layout as any)
-                    setShowLayoutMenu(false)
-                  }}
-                  className={`w-full px-3 py-2 text-left rounded transition-colors text-sm ${
-                    currentLayout === layout
-                      ? 'bg-primary text-primary-foreground'
-                      : 'hover:bg-muted/50'
-                  }`}
-                >
-                  <span className="capitalize">{layout}</span>
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
 
       {/* Explorer */}
       <button

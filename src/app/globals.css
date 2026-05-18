@@ -327,3 +327,45 @@ a:focus-visible {
 .scrollbar-thin:hover {
   scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
+
+/* Custom left-side scrollbar that's hidden until hover */
+.custom-scrollbar-left {
+  overflow-y: auto;
+  direction: rtl; /* Flip direction to move scrollbar to left */
+}
+
+.custom-scrollbar-left > * {
+  direction: ltr; /* Reset content direction */
+}
+
+.custom-scrollbar-left::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar-left::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar-left::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.custom-scrollbar-left.group:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.custom-scrollbar-left::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox */
+.custom-scrollbar-left {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.custom-scrollbar-left.group:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}

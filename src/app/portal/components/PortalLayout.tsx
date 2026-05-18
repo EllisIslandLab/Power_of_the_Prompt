@@ -9,6 +9,7 @@ import DeploymentNotifications from './DeploymentNotifications'
 import Sidebar from './Sidebar'
 import WelcomeMessage from './WelcomeMessage'
 import DraggableChat from './DraggableChat'
+import FileDropZone from './FileDropZone'
 
 interface PendingDiff {
   changeId: string
@@ -61,7 +62,7 @@ export default function PortalLayout({
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [outputFontSize, setOutputFontSize] = useState(9)
-  const chatFileInputRef = useRef<HTMLInputElement>(null)
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([])
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -91,11 +92,6 @@ export default function PortalLayout({
     }
   }, [user?.id])
 
-  const handleImageUpload = () => {
-    // This will be set by ChatInterface and can be triggered from sidebar
-    chatFileInputRef.current?.click()
-  }
-
   const handleMessagesChange = (newMessages: ChatMessage[], loading: boolean) => {
     setMessages(newMessages)
     setIsLoading(loading)
@@ -122,6 +118,30 @@ export default function PortalLayout({
     }
   }
 
+  const handleFilesAttached = (files: File[]) => {
+    setAttachedFiles(files)
+  }
+
+  const handleRemoveFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleClearAttachedFiles = () => {
+    setAttachedFiles([])
+  }
+
+  const handleFilesSaved = async (files: File[], folderPath: string) => {
+    // TODO: Implement file saving to staging area
+    // This will create the files in the specified folder and stage them for commit
+    console.log('Saving files to:', folderPath, files)
+
+    // For now, show a success message
+    // In the future, this should:
+    // 1. Upload files to the server
+    // 2. Create them in the git repository folder
+    // 3. Stage them (but not commit until user says so)
+  }
+
   const firstName = user?.full_name?.split(' ')[0] || 'there'
 
   const chatComponent = (
@@ -134,14 +154,12 @@ export default function PortalLayout({
       onConversationStart={(id) => setCurrentConversation(id)}
       onPreviewReady={(url) => setPreviewUrl(url)}
       onTokenUpdate={(tokens) => setTokenBudget(tokens)}
-      onFileInputRefReady={(ref) => {
-        chatFileInputRef.current = ref
-      }}
       layout={chatLayout}
       onLayoutChange={handleLayoutChange}
-      onImageUploadClick={handleImageUpload}
       onPendingDiffsChange={handlePendingDiffsChange}
       onMessagesChange={handleMessagesChange}
+      attachedFiles={attachedFiles}
+      onRemoveFile={handleRemoveFile}
     />
   )
 
@@ -165,9 +183,14 @@ export default function PortalLayout({
   }
 
   return (
-    <div className="h-screen flex flex-col bg-background">
-      {/* Welcome Message */}
-      <WelcomeMessage userName={firstName} hasProject={hasProject} />
+    <FileDropZone
+      userId={user.id}
+      onFilesAttached={handleFilesAttached}
+      onFilesSaved={handleFilesSaved}
+    >
+      <div className="h-screen flex flex-col bg-background">
+        {/* Welcome Message */}
+        <WelcomeMessage userName={firstName} hasProject={hasProject} />
 
       {/* Sidebar - VS Code style - Hide when chat is left/right */}
       {chatLayout !== 'left' && chatLayout !== 'right' && (
@@ -177,7 +200,6 @@ export default function PortalLayout({
           user={user}
           clientAccount={clientAccount}
           onLayoutChange={handleLayoutChange}
-          onImageUpload={handleImageUpload}
           modifiedFiles={pendingDiffs.map(diff => ({
             path: diff.filePath,
             type: diff.type === 'file_preview' ? 'created' as const : 'modified' as const
@@ -282,7 +304,7 @@ export default function PortalLayout({
 
           {chatLayout === 'floating' && (
             <>
-              <div className="flex-1">
+              <div className="flex-1 relative">
                 <PreviewPanel
                   previewUrl={previewUrl}
                   conversationId={currentConversation}
@@ -293,11 +315,9 @@ export default function PortalLayout({
                   messages={messages}
                   isLoading={isLoading}
                   outputFontSize={outputFontSize}
+                  isFullscreenLayout={true}
                 />
               </div>
-              <DraggableChat isDraggable={true}>
-                {chatComponent}
-              </DraggableChat>
             </>
           )}
         </div>
@@ -306,5 +326,6 @@ export default function PortalLayout({
         <DeploymentNotifications userId={user?.id} />
       </div>
     </div>
+    </FileDropZone>
   )
 }

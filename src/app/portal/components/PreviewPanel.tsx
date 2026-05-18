@@ -31,6 +31,7 @@ interface PreviewPanelProps {
   messages?: Message[]
   isLoading?: boolean
   outputFontSize?: number
+  isFullscreenLayout?: boolean
 }
 
 export default function PreviewPanel({
@@ -43,6 +44,7 @@ export default function PreviewPanel({
   messages = [],
   isLoading = false,
   outputFontSize = 9,
+  isFullscreenLayout = false,
 }: PreviewPanelProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [changedElements, setChangedElements] = useState<string[]>([])
@@ -133,17 +135,15 @@ export default function PreviewPanel({
           </p>
         </div>
 
-        {/* Messages Overlay - Right Side (shown even without preview) */}
-        {messages.length > 0 && (
+        {/* Messages Overlay - Right Side (shown even without preview) - Hidden in fullscreen layout */}
+        {messages.length > 0 && !isFullscreenLayout && (
           <div className="absolute right-0 top-0 bottom-0 w-1/3 pointer-events-none">
             <div
               ref={messagesContainerRef}
               onMouseDown={handleMouseDown}
-              className="h-full flex flex-col px-4 py-4 overflow-y-auto pointer-events-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-white/10 scrollbar-track-transparent"
+              className="h-full flex flex-col px-4 py-4 overflow-y-auto pointer-events-auto group custom-scrollbar-left"
               style={{
-                cursor: isDragging ? 'grabbing' : 'default',
-                scrollbarWidth: 'thin',
-                scrollbarColor: 'transparent transparent'
+                cursor: isDragging ? 'grabbing' : 'default'
               }}
             >
               {/* Spacer to push messages to bottom initially */}
@@ -165,11 +165,6 @@ export default function PreviewPanel({
                       style={{ fontSize: `${outputFontSize}pt` }}
                     >
                       <div className="whitespace-pre-wrap leading-relaxed select-text">{message.content}</div>
-                      {message.tokens_used && message.cost_usd && (
-                        <div className="text-xs mt-1.5 opacity-70 select-text">
-                          {message.tokens_used.toLocaleString()} tokens • ${message.cost_usd.toFixed(4)}
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -272,17 +267,15 @@ export default function PreviewPanel({
             />
           )}
 
-          {/* Messages Overlay - Right Side */}
-          {messages.length > 0 && (
+          {/* Messages Overlay - Right Side - Hidden in fullscreen layout */}
+          {messages.length > 0 && !isFullscreenLayout && (
             <div className="absolute right-0 top-0 bottom-0 w-1/3 pointer-events-none">
               <div
                 ref={messagesContainerRef}
                 onMouseDown={handleMouseDown}
-                className="h-full flex flex-col px-4 py-4 overflow-y-auto pointer-events-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-white/10 scrollbar-track-transparent"
+                className="h-full flex flex-col px-4 py-4 overflow-y-auto pointer-events-auto group custom-scrollbar-left"
                 style={{
-                  cursor: isDragging ? 'grabbing' : 'default',
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: 'transparent transparent'
+                  cursor: isDragging ? 'grabbing' : 'default'
                 }}
               >
                 {/* Spacer to push messages to bottom initially */}
@@ -304,11 +297,6 @@ export default function PreviewPanel({
                         style={{ fontSize: `${outputFontSize}pt` }}
                       >
                         <div className="whitespace-pre-wrap leading-relaxed select-text">{message.content}</div>
-                        {message.tokens_used && message.cost_usd && (
-                          <div className="text-xs mt-1.5 opacity-70 select-text">
-                            {message.tokens_used.toLocaleString()} tokens • ${message.cost_usd.toFixed(4)}
-                          </div>
-                        )}
                       </div>
                     </div>
                   ))}

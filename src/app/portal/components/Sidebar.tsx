@@ -8,13 +8,12 @@ interface SidebarProps {
   user?: any
   clientAccount?: any
   onLayoutChange?: (layout: 'left' | 'right' | 'top' | 'bottom' | 'floating') => void
-  onImageUpload?: () => void
   modifiedFiles?: Array<{ path: string; type: 'modified' | 'created' | 'deleted' }>
 }
 
 type SidebarTool = 'explorer' | 'search' | 'git' | 'targets' | 'mode' | 'balance' | 'settings' | 'layout' | 'upload' | 'help'
 
-export default function Sidebar({ onModeChange, initialTheme = 'dark', user, clientAccount, onLayoutChange, onImageUpload, modifiedFiles = [] }: SidebarProps) {
+export default function Sidebar({ onModeChange, initialTheme = 'dark', user, clientAccount, onLayoutChange, modifiedFiles = [] }: SidebarProps) {
   const [activeTool, setActiveTool] = useState<SidebarTool | null>(null)
   const [currentMode, setCurrentMode] = useState<'builder' | 'chat'>('builder')
   const [chatLayout, setChatLayout] = useState<'left' | 'right' | 'top' | 'bottom' | 'floating'>('left')
@@ -39,23 +38,22 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
 
   const mainTools = [
     {
-      id: 'upload' as const,
-      label: 'Upload Image • Drag & drop images into chat or click here',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-      action: () => onImageUpload?.(),
-    },
-    {
       id: 'layout' as const,
-      label: 'Chat Layout Configuration',
+      label: chatLayout === 'bottom' ? 'Switch to Fullscreen Preview' : 'Switch to Conversation Mode',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h14a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3z" />
+          {chatLayout === 'bottom' ? (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+          )}
         </svg>
       ),
+      action: () => {
+        const newLayout = chatLayout === 'bottom' ? 'floating' : 'bottom'
+        setChatLayout(newLayout)
+        onLayoutChange?.(newLayout)
+      },
     },
     {
       id: 'explorer' as const,
@@ -369,34 +367,6 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
                 </div>
               )}
 
-              {/* Layout Configuration Content */}
-              {activeTool === 'layout' && (
-                <div className="text-sm">
-                  <p className="text-muted-foreground mb-3">Chat Position</p>
-                  <div className="space-y-2">
-                    {['left', 'right', 'top', 'bottom', 'floating'].map(layout => (
-                      <button
-                        key={layout}
-                        onClick={() => {
-                          setChatLayout(layout as any)
-                          onLayoutChange?.(layout as any)
-                          setActiveTool(null)
-                        }}
-                        className={`w-full px-3 py-2 text-left rounded-lg transition-colors ${
-                          chatLayout === layout
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted/50 hover:bg-muted'
-                        }`}
-                      >
-                        <span className="capitalize">{layout}</span>
-                        {layout === 'floating' && (
-                          <span className="text-xs ml-2">(Draggable)</span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Help Content */}
               {activeTool === 'help' && (

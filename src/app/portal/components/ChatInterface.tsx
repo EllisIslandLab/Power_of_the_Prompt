@@ -23,12 +23,12 @@ interface ChatInterfaceProps {
   onConversationStart: (id: string) => void
   onPreviewReady: (url: string) => void
   onTokenUpdate: (tokens: { used: number; limit: number; percentage: number }) => void
-  onFileInputRefReady?: (ref: HTMLInputElement | null) => void
   layout?: 'left' | 'right' | 'top' | 'bottom' | 'floating'
   onLayoutChange?: (layout: 'left' | 'right' | 'top' | 'bottom' | 'floating') => void
-  onImageUploadClick?: () => void
   onPendingDiffsChange?: (diffs: PendingDiff[], currentIndex: number) => void
   onMessagesChange?: (messages: ChatMessage[], isLoading: boolean) => void
+  attachedFiles?: File[]
+  onRemoveFile?: (index: number) => void
 }
 
 type MessageRole = 'user' | 'assistant' | 'system'
@@ -51,14 +51,15 @@ export default function ChatInterface({
   onConversationStart,
   onPreviewReady,
   onTokenUpdate,
-  onFileInputRefReady,
   layout = 'bottom',
   onLayoutChange,
-  onImageUploadClick,
   onPendingDiffsChange,
   onMessagesChange,
+  attachedFiles = [],
+  onRemoveFile,
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [archivedMessages, setArchivedMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null)
   const [workingBranch, setWorkingBranch] = useState<string | null>(null)
@@ -72,6 +73,35 @@ export default function ChatInterface({
     type: 'diff' | 'file_preview'
   }>>([])
   const diffsContainerRef = useRef<HTMLDivElement>(null)
+
+  // Archive messages when total character count exceeds 5000
+  const archiveOldMessages = (messageList: ChatMessage[]) => {
+    const totalChars = messageList.reduce((sum, msg) => sum + msg.content.length, 0)
+
+    if (totalChars > 5000) {
+      let currentChars = 0
+      const recentMessages: ChatMessage[] = []
+      const toArchive: ChatMessage[] = []
+
+      // Keep most recent messages up to ~5000 characters
+      for (let i = messageList.length - 1; i >= 0; i--) {
+        const msg = messageList[i]
+        if (currentChars + msg.content.length <= 5000) {
+          recentMessages.unshift(msg)
+          currentChars += msg.content.length
+        } else {
+          toArchive.unshift(msg)
+        }
+      }
+
+      if (toArchive.length > 0) {
+        setArchivedMessages(prev => [...prev, ...toArchive])
+        return recentMessages
+      }
+    }
+
+    return messageList
+  }
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -170,7 +200,7 @@ export default function ChatInterface({
             timestamp: new Date(msg.created_at),
             tokens_used: (msg.tokens_in || 0) + (msg.tokens_out || 0),
           }))
-          setMessages(loadedMessages)
+          setMessages(archiveOldMessages(loadedMessages))
         }
       }
     } catch (error) {
@@ -178,8 +208,57 @@ export default function ChatInterface({
     }
   }
 
-  const handleSendMessage = async (content: string) => {
+  const convertFilesToBase64 = async (files: File[]): Promise<Array<{ type: string; data: string; name: string; mimeType: string }>> => {
+    const conversions = files.map(file => {
+      return new Promise<{ type: string; data: string; name: string; mimeType: string }>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const base64 = (reader.result as string).split(',')[1] // Remove data:image/png;base64, prefix
+          resolve({
+            type: file.type.startsWith('image/') ? 'image' : 'document',
+            data: base64,
+            name: file.name,
+            mimeType: file.type,
+          })
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+    })
+    return Promise.all(conversions)
+  }
+
+  const handleSendMessage = async (content: string, files?: File[]) => {
     if (!content.trim() || isLoading) return
+
+    // Convert files to base64 if present
+    let fileAttachments: Array<{ type: string; data: string; name: string; mimeType: string }> | undefined
+    if (files && files.length > 0) {
+      try {
+        fileAttachments = await convertFilesToBase64(files)
+      } catch (error) {
+        console.error('Failed to convert files:', error)
+        setMessages(prev => [
+          ...prev,
+          {
+            id: `error-${Date.now()}`,
+            role: 'system',
+            content: 'Error: Failed to process attached files. Please try again.',
+            timestamp: new Date(),
+          },
+        ])
+        return
+      }
+
+      // Clear attached files after converting
+      if (onRemoveFile) {
+        setTimeout(() => {
+          for (let i = attachedFiles.length - 1; i >= 0; i--) {
+            onRemoveFile(i)
+          }
+        }, 100)
+      }
+    }
 
     // Check if client account exists
     if (!clientAccount) {
@@ -217,7 +296,7 @@ export default function ChatInterface({
       timestamp: new Date(),
     }
 
-    setMessages(prev => [...prev, userMessage])
+    setMessages(prev => archiveOldMessages([...prev, userMessage]))
     setIsLoading(true)
 
     try {
@@ -265,6 +344,7 @@ export default function ChatInterface({
           clientAccountId: clientAccount.id,
           projectId: activeProject?.id,
           connectedServices: connectedServices?.map(s => s.service_name) || [],
+          attachments: fileAttachments,
         }),
       })
 
@@ -309,10 +389,12 @@ export default function ChatInterface({
               if (data.type === 'content') {
                 assistantContent += data.text
                 setMessages(prev =>
-                  prev.map(m =>
-                    m.id === assistantMessageId
-                      ? { ...m, content: assistantContent }
-                      : m
+                  archiveOldMessages(
+                    prev.map(m =>
+                      m.id === assistantMessageId
+                        ? { ...m, content: assistantContent }
+                        : m
+                    )
                   )
                 )
               } else if (data.type === 'diff') {
@@ -354,10 +436,12 @@ export default function ChatInterface({
 
                 // Update message with token info
                 setMessages(prev =>
-                  prev.map(m =>
-                    m.id === assistantMessageId
-                      ? { ...m, tokens_used: totalTokens, cost_usd: cost }
-                      : m
+                  archiveOldMessages(
+                    prev.map(m =>
+                      m.id === assistantMessageId
+                        ? { ...m, tokens_used: totalTokens, cost_usd: cost }
+                        : m
+                    )
                   )
                 )
 
@@ -529,7 +613,6 @@ export default function ChatInterface({
         <HorizontalToolbar
           user={user}
           clientAccount={clientAccount}
-          onImageUpload={onImageUploadClick}
           onLayoutChange={onLayoutChange}
           currentLayout={layout}
         />
@@ -542,11 +625,11 @@ export default function ChatInterface({
           clientAccount={clientAccount}
           session={session}
           onMessageSent={handleSendMessage}
-          onFileInputRefReady={onFileInputRefReady}
-          onFileUploaded={handleFileUploaded}
           disabled={isLoading}
           layout={layout}
           hasPendingDiffs={pendingDiffs.length > 0}
+          attachedFiles={attachedFiles}
+          onRemoveFile={onRemoveFile}
         />
       </div>
     </div>

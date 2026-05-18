@@ -25,11 +25,28 @@ export default async function PortalPage() {
   }
 
   // Fetch user profile
-  const { data: user } = await supabase
+  let { data: user } = await supabase
     .from('users')
     .select('*')
     .eq('id', session.user.id)
     .single()
+
+  // If user doesn't exist yet (first OAuth sign-in timing issue), use session data as fallback
+  if (!user) {
+    console.log('User record not found yet, using session fallback')
+    user = {
+      id: session.user.id,
+      email: session.user.email || '',
+      full_name: session.user.user_metadata?.full_name ||
+                 session.user.user_metadata?.name ||
+                 session.user.email?.split('@')[0] ||
+                 'User',
+      role: 'client',
+      email_verified: !!session.user.email_confirmed_at,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as any
+  }
 
   // Fetch or create client account
   const { data: clientAccount } = await supabase
