@@ -49,6 +49,26 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
     const supabase = getAdminClient()
 
     try {
+      // Check if this is a client account balance top-up
+      const metadata = session.metadata || {}
+      if (metadata.clientAccountId && metadata.amount) {
+        checkoutLogger.info({
+          clientAccountId: metadata.clientAccountId,
+          amount: metadata.amount
+        }, 'Processing client account balance top-up')
+
+        await this.handleBalanceTopUp(
+          metadata.clientAccountId,
+          parseFloat(metadata.amount),
+          session,
+          supabase,
+          checkoutLogger
+        )
+
+        const duration = Date.now() - startTime
+        checkoutLogger.info({ duration }, 'Successfully processed balance top-up')
+        return
+      }
       // Get the product details from Stripe
       const lineItems = await stripeAdapter.listLineItems(session.id, ['data.price.product'])
 
@@ -574,6 +594,64 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
         'Exception in affiliate compensation handling'
       )
       // Don't re-throw - compensation failure shouldn't fail the webhook
+    }
+  }
+
+  /**
+   * Handle client account balance top-up
+   */
+  private async handleBalanceTopUp(
+    clientAccountId: string,
+    amount: number,
+    session: Stripe.Checkout.Session,
+    supabase: any,
+    checkoutLogger: any
+  ): Promise<void> {
+    try {
+      // Get current account balance
+      const { data: account, error: fetchError } = await supabase
+        .from('client_accounts')
+        .select('account_balance')
+        .eq('id', clientAccountId)
+        .single()
+
+      if (fetchError || !account) {
+        checkoutLogger.error({ error: fetchError, clientAccountId }, 'Failed to fetch client account')
+        throw new Error('Client account not found')
+      }
+
+      // Update account balance
+      const newBalance = (account.account_balance || 0) + amount
+
+      const { error: updateError } = await supabase
+        .from('client_accounts')
+        .update({
+          account_balance: newBalance,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', clientAccountId)
+
+      if (updateError) {
+        checkoutLogger.error({ error: updateError, clientAccountId }, 'Failed to update account balance')
+        throw updateError
+      }
+
+      checkoutLogger.info({
+        clientAccountId,
+        amount,
+        newBalance
+      }, 'Successfully updated client account balance')
+
+      // Log the transaction for audit trail
+      logPayment('balance_topup', 'succeeded', amount * 100, 'usd', {
+        clientAccountId,
+        sessionId: session.id,
+        newBalance
+      })
+
+    } catch (error) {
+      checkoutLogger.error({ error, clientAccountId }, 'Failed to process balance top-up')
+      throw error
     }
   }
 }
