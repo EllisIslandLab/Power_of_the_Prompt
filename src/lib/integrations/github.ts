@@ -8,7 +8,18 @@ let githubApp: App | null = null
 
 function getGitHubApp(): App {
   if (!githubApp) {
-    const privateKey = fs.readFileSync(process.env.GITHUB_APP_PRIVATE_KEY_PATH!, 'utf-8')
+    // Support both file path (local dev) and direct key (production)
+    let privateKey: string
+    if (process.env.GITHUB_APP_PRIVATE_KEY) {
+      // Production: key content directly in env var
+      privateKey = process.env.GITHUB_APP_PRIVATE_KEY.replace(/\\n/g, '\n')
+    } else if (process.env.GITHUB_APP_PRIVATE_KEY_PATH) {
+      // Local dev: read from file path
+      privateKey = fs.readFileSync(process.env.GITHUB_APP_PRIVATE_KEY_PATH, 'utf-8')
+    } else {
+      throw new Error('Either GITHUB_APP_PRIVATE_KEY or GITHUB_APP_PRIVATE_KEY_PATH must be set')
+    }
+
     const appId = parseInt(process.env.GITHUB_APP_ID!, 10)
 
     console.log('[GitHub] Initializing app with ID:', appId, 'type:', typeof appId)
@@ -80,7 +91,7 @@ export async function getInstallationToken(installationId: number): Promise<stri
   try {
     console.log('[GitHub] Getting installation token for installation:', installationId)
     console.log('[GitHub] App ID:', process.env.GITHUB_APP_ID)
-    console.log('[GitHub] Private key path:', process.env.GITHUB_APP_PRIVATE_KEY_PATH)
+    console.log('[GitHub] Private key source:', process.env.GITHUB_APP_PRIVATE_KEY ? 'direct' : 'file path')
 
     const app = getGitHubApp()
     console.log('[GitHub] App initialized, making request...')
