@@ -607,6 +607,9 @@ async function validateAirtablePlain(credentials: any): Promise<ValidationResult
       ? `https://api.airtable.com/v0/${base_id}/`
       : 'https://api.airtable.com/v0/meta/bases'
 
+    console.log('[Airtable Validation] Testing connection to:', url)
+    console.log('[Airtable Validation] API key format:', api_key?.substring(0, 10) + '...')
+
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${api_key}`,
@@ -614,10 +617,24 @@ async function validateAirtablePlain(credentials: any): Promise<ValidationResult
       }
     })
 
+    console.log('[Airtable Validation] Response status:', response.status)
+
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.error?.message || 'Invalid Airtable credentials')
+      const errorText = await response.text()
+      console.error('[Airtable Validation] Error response:', errorText)
+
+      let errorData: any = {}
+      try {
+        errorData = JSON.parse(errorText)
+      } catch (e) {
+        console.error('[Airtable Validation] Could not parse error as JSON')
+      }
+
+      const errorMessage = errorData.error?.message || errorData.error?.type || `Airtable API returned ${response.status}: ${errorText.substring(0, 100)}`
+      throw new Error(errorMessage)
     }
+
+    console.log('[Airtable Validation] Success!')
 
     return {
       service: 'airtable',
@@ -628,6 +645,7 @@ async function validateAirtablePlain(credentials: any): Promise<ValidationResult
       }
     }
   } catch (error: any) {
+    console.error('[Airtable Validation] Failed:', error.message)
     return {
       service: 'airtable',
       valid: false,
