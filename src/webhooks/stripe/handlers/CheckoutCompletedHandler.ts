@@ -50,16 +50,16 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
 
     try {
       // Check if this is a client account balance top-up
-      const metadata = session.metadata || {}
-      if (metadata.clientAccountId && metadata.amount) {
+      const sessionMetadata = session.metadata || {}
+      if (sessionMetadata.clientAccountId && sessionMetadata.amount) {
         checkoutLogger.info({
-          clientAccountId: metadata.clientAccountId,
-          amount: metadata.amount
+          clientAccountId: sessionMetadata.clientAccountId,
+          amount: sessionMetadata.amount
         }, 'Processing client account balance top-up')
 
         await this.handleBalanceTopUp(
-          metadata.clientAccountId,
-          parseFloat(metadata.amount),
+          sessionMetadata.clientAccountId,
+          parseFloat(sessionMetadata.amount),
           session,
           supabase,
           checkoutLogger
