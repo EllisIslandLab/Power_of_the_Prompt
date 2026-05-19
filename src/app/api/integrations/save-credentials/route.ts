@@ -150,9 +150,7 @@ export async function POST(request: NextRequest) {
     const { error: credError } = await supabase
       .from('client_service_credentials')
       .upsert(credentialData, {
-        onConflict: projectId
-          ? 'user_id,service_name,project_id'
-          : 'user_id,service_name'
+        onConflict: 'user_id,project_id,service_name'
       })
 
     if (credError) {
