@@ -129,21 +129,6 @@ export default function BillingInterface({
           </div>
         </div>
 
-        {/* Trial Status */}
-        {clientAccount?.trial_status === 'active' && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-            <h2 className="text-lg font-semibold text-blue-900 mb-2">
-              🎉 Trial Period Active
-            </h2>
-            <p className="text-sm text-blue-700 mb-2">
-              You have {trialDaysRemaining} days remaining in your 90-day trial.
-            </p>
-            <p className="text-sm text-blue-600">
-              ✅ Free bug fixes during trial period
-            </p>
-          </div>
-        )}
-
         {/* Add Funds */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Add Funds</h2>
