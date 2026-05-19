@@ -26,7 +26,7 @@ export default function BillingInterface({
     const convTotal = conv.revision_chat_messages?.reduce(
       (msgSum: number, msg: any) => {
         const tokens = msg.tokens_used || 0
-        const cost = (tokens / 1000) * 0.003
+        const cost = (tokens / 1000) * 0.03
         return msgSum + cost
       },
       0
@@ -201,7 +201,7 @@ export default function BillingInterface({
           <div className="space-y-3 text-sm text-gray-700">
             <div className="flex justify-between">
               <span>AI-powered revisions:</span>
-              <span className="font-semibold">$0.003 per 1K tokens</span>
+              <span className="font-semibold">$0.03 per 1K tokens</span>
             </div>
             <div className="flex justify-between">
               <span>Typical small change:</span>
@@ -243,7 +243,7 @@ export default function BillingInterface({
                 const convCost = conv.revision_chat_messages?.reduce(
                   (sum: number, msg: any) => {
                     const tokens = msg.tokens_used || 0
-                    return sum + (tokens / 1000) * 0.003
+                    return sum + (tokens / 1000) * 0.03
                   },
                   0
                 ) || 0

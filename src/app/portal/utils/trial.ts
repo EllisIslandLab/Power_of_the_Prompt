@@ -5,7 +5,7 @@
  * - Trial period: 90 days from account creation
  * - During trial: Free bug fixes (revisions under $0.50)
  * - After trial: $5/month basic support or $9/month enhanced support (optional)
- * - All AI revisions charged at cost: $0.003 per 1K tokens
+ * - All AI revisions charged at 10x API cost: $0.03 per 1K tokens (~10x markup)
  */
 
 export interface ClientAccount {
@@ -103,8 +103,11 @@ export function formatTrialStatus(account: ClientAccount): string {
 }
 
 export function calculateRevisionCost(tokens: number): number {
-  // Sonnet 3.5 pricing: $0.003 per 1K tokens
-  return (tokens / 1000) * 0.003
+  // API base cost: ~$0.003 per 1K tokens
+  // Client markup: 10x = $0.03 per 1K tokens
+  const BASE_COST_PER_1K = 0.003
+  const MARKUP_MULTIPLIER = 10
+  return (tokens / 1000) * BASE_COST_PER_1K * MARKUP_MULTIPLIER
 }
 
 export function estimateTokensForChange(description: string): number {
