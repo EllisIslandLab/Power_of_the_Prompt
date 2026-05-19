@@ -77,7 +77,7 @@ export default function PortalLayout({
           .from('client_preferences')
           .select('output_font_size')
           .eq('user_id', user.id)
-          .single()
+          .maybeSingle()
 
         if (data?.output_font_size) {
           setOutputFontSize(data.output_font_size)

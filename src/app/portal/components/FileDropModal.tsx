@@ -95,7 +95,7 @@ export default function FileDropModal({
         .from('client_preferences')
         .select('folder_preferences')
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
       if (data?.folder_preferences) {
         setFolderPreferences(data.folder_preferences)
