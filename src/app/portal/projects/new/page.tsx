@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import ConnectServiceModal from '../components/ConnectServiceModal'
 
 type Step = 'welcome' | 'github' | 'select_repo' | 'analyze' | 'connect_services' | 'validate' | 'complete'
 
@@ -54,27 +55,8 @@ function ConnectProjectContent() {
   const [analysis, setAnalysis] = useState<ProjectAnalysis | null>(null)
   const [connectedServices, setConnectedServices] = useState<Set<string>>(new Set())
   const [validationResults, setValidationResults] = useState<Record<string, boolean>>({})
-
-  // Airtable modal state
-  const [showAirtableModal, setShowAirtableModal] = useState(false)
-  const [airtableCredentials, setAirtableCredentials] = useState({
-    apiKey: '',
-    baseId: ''
-  })
-
-  // Resend modal state
-  const [showResendModal, setShowResendModal] = useState(false)
-  const [resendApiKey, setResendApiKey] = useState('')
-
-  // Pending credentials to save after project creation
-  const [pendingCredentials, setPendingCredentials] = useState<Record<string, any>>(() => {
-    // Load from localStorage on mount
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('wizard-pending-credentials')
-      return saved ? JSON.parse(saved) : {}
-    }
-    return {}
-  })
+  const [connectingService, setConnectingService] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -84,20 +66,13 @@ function ConnectProjectContent() {
   // Check for existing installations on mount
   useEffect(() => {
     checkExistingInstallation()
-  }, [])
-
-  // Persist pending credentials to localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('wizard-pending-credentials', JSON.stringify(pendingCredentials))
-
-      // Update connectedServices based on pendingCredentials
-      const services = Object.keys(pendingCredentials)
-      if (services.length > 0) {
-        setConnectedServices(new Set(services))
-      }
+    // Get user ID for service connections
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) setUserId(user.id)
     }
-  }, [pendingCredentials])
+    getUser()
+  }, [])
 
   // Handle OAuth callbacks and URL params
   useEffect(() => {
@@ -244,56 +219,10 @@ function ConnectProjectContent() {
   }
 
   const handleConnectService = (serviceName: string) => {
-    if (serviceName === 'vercel') {
-      window.location.href = `https://vercel.com/integrations/${process.env.NEXT_PUBLIC_VERCEL_INTEGRATION_SLUG}/new`
-    } else if (serviceName === 'stripe') {
-      const redirectUri = `${window.location.origin}/api/integrations/stripe/callback`
-      window.location.href = `https://connect.stripe.com/oauth/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_STRIPE_CLIENT_ID}&scope=read_write&redirect_uri=${redirectUri}`
-    } else if (serviceName === 'airtable') {
-      setShowAirtableModal(true)
-    } else if (serviceName === 'resend') {
-      setShowResendModal(true)
-    } else if (serviceName === 'supabase') {
-      // Show manual input modal (to be implemented)
-      alert('Manual Supabase configuration coming soon')
-    }
+    // Open the unified ConnectServiceModal for all services
+    setConnectingService(serviceName)
   }
 
-  const handleSaveAirtable = async () => {
-    if (!airtableCredentials.apiKey) {
-      setError('API Key is required')
-      return
-    }
-
-    // Store credentials temporarily - will be saved after project is created
-    setPendingCredentials(prev => ({
-      ...prev,
-      airtable: airtableCredentials
-    }))
-
-    setConnectedServices(prev => new Set(prev).add('airtable'))
-    setShowAirtableModal(false)
-    setAirtableCredentials({ apiKey: '', baseId: '' })
-    setError(null)
-  }
-
-  const handleSaveResend = async () => {
-    if (!resendApiKey) {
-      setError('API Key is required')
-      return
-    }
-
-    // Store credentials temporarily - will be saved after project is created
-    setPendingCredentials(prev => ({
-      ...prev,
-      resend: { apiKey: resendApiKey }
-    }))
-
-    setConnectedServices(prev => new Set(prev).add('resend'))
-    setShowResendModal(false)
-    setResendApiKey('')
-    setError(null)
-  }
 
   const handleValidateAndFinish = async () => {
     if (!selectedRepo) return
@@ -326,22 +255,7 @@ function ConnectProjectContent() {
 
       if (projectError) throw projectError
 
-      // Save pending credentials
-      for (const [serviceName, credentials] of Object.entries(pendingCredentials)) {
-        await fetch('/api/integrations/save-credentials', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            projectId: project.id,
-            serviceName,
-            credentials
-          })
-        })
-      }
-
-      // Clear pending credentials from localStorage after successful save
-      localStorage.removeItem('wizard-pending-credentials')
-
+      // Credentials already saved at user level by ConnectServiceModal
       // Validate connections
       const validation: Record<string, boolean> = {}
 
@@ -779,130 +693,18 @@ function ConnectProjectContent() {
         )}
       </div>
 
-      {/* Airtable Connection Modal */}
-      {showAirtableModal && (
-        <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowAirtableModal(false)} />
-          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div className="bg-card rounded-xl border border-border shadow-2xl max-w-md w-full p-6">
-              <h3 className="text-xl font-bold text-foreground mb-4">Connect Airtable</h3>
-
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    API Key or Personal Access Token *
-                  </label>
-                  <input
-                    type="password"
-                    value={airtableCredentials.apiKey}
-                    onChange={(e) => setAirtableCredentials({ ...airtableCredentials, apiKey: e.target.value })}
-                    placeholder="patXXXXXXXXXXXXXX or keyXXXXXXXXXXXXXX"
-                    className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Get this from{' '}
-                    <a
-                      href="https://airtable.com/create/tokens"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      airtable.com/create/tokens
-                    </a>
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Base ID (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={airtableCredentials.baseId}
-                    onChange={(e) => setAirtableCredentials({ ...airtableCredentials, baseId: e.target.value })}
-                    placeholder="appXXXXXXXXXXXXXX"
-                    className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Found in your Airtable base URL
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowAirtableModal(false)}
-                  className="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors text-foreground"
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveAirtable}
-                  disabled={loading || !airtableCredentials.apiKey}
-                  className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Connecting...' : 'Connect'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Resend Connection Modal */}
-      {showResendModal && (
-        <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowResendModal(false)} />
-          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div className="bg-card rounded-xl border border-border shadow-2xl max-w-md w-full p-6">
-              <h3 className="text-xl font-bold text-foreground mb-4">Connect Resend</h3>
-
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    API Key *
-                  </label>
-                  <input
-                    type="password"
-                    value={resendApiKey}
-                    onChange={(e) => setResendApiKey(e.target.value)}
-                    placeholder="re_XXXXXXXXXXXXXXXXXXXXXXXX"
-                    className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Get this from{' '}
-                    <a
-                      href="https://resend.com/api-keys"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      resend.com/api-keys
-                    </a>
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowResendModal(false)}
-                  className="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors text-foreground"
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveResend}
-                  disabled={loading || !resendApiKey}
-                  className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Connecting...' : 'Connect'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
+      {/* Unified Service Connection Modal */}
+      {connectingService && userId && (
+        <ConnectServiceModal
+          serviceName={connectingService}
+          onClose={() => setConnectingService(null)}
+          onSuccess={() => {
+            // Mark service as connected (credentials saved at user level)
+            setConnectedServices(prev => new Set(prev).add(connectingService))
+            setConnectingService(null)
+          }}
+          userId={userId}
+        />
       )}
 
       <style jsx>{`
