@@ -559,8 +559,8 @@ function ConnectProjectContent() {
                       <div className="flex items-center gap-3">
                         <span className="text-3xl">{getServiceIcon(service.name)}</span>
                         <div>
-                          <h3 className="font-semibold text-lg capitalize">{service.name}</h3>
-                          <p className="text-sm text-muted-foreground">
+                          <h3 className="font-semibold text-lg capitalize text-foreground">{service.name}</h3>
+                          <p className="text-sm text-foreground/70">
                             {isConnected ? 'Connected ✓' : 'Not connected'}
                           </p>
                         </div>
@@ -599,7 +599,7 @@ function ConnectProjectContent() {
               </button>
             </div>
 
-            <p className="text-xs text-muted-foreground mt-4 text-center">
+            <p className="text-xs text-foreground/60 mt-4 text-center">
               You can connect more services later from your project settings
             </p>
           </div>
@@ -611,7 +611,7 @@ function ConnectProjectContent() {
             <div className="text-center">
               <div className="text-6xl mb-4 animate-pulse"></div>
               <h2 className="text-2xl font-bold text-card-foreground mb-2">Validating Connections</h2>
-              <p className="text-muted-foreground mb-8">
+              <p className="text-foreground/70 mb-8">
                 Testing your service connections...
               </p>
 
@@ -632,7 +632,7 @@ function ConnectProjectContent() {
                       }`}
                     >
                       <span className="text-2xl">{getServiceIcon(service)}</span>
-                      <span className="flex-1 text-left font-medium capitalize">{service}</span>
+                      <span className="flex-1 text-left font-medium capitalize text-foreground">{service}</span>
                       {!isValidated && (
                         <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                       )}
