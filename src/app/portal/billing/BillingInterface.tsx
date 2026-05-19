@@ -205,11 +205,11 @@ export default function BillingInterface({
             </div>
             <div className="flex justify-between">
               <span>Typical small change:</span>
-              <span className="font-semibold">~$0.05 - $0.15</span>
+              <span className="font-semibold">~$0.50 - $1.50</span>
             </div>
             <div className="flex justify-between">
               <span>Typical medium change:</span>
-              <span className="font-semibold">~$0.20 - $0.50</span>
+              <span className="font-semibold">~$2.00 - $5.00</span>
             </div>
             <div className="flex justify-between">
               <span>Monthly maintenance (optional):</span>
@@ -223,7 +223,7 @@ export default function BillingInterface({
 
           <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded">
             <p className="text-xs text-green-800">
-              💡 <strong>Tip:</strong> Most clients find $10-$20 covers several months
+              💡 <strong>Tip:</strong> Most clients find $20-$50 covers a few months
               of small updates and fixes!
             </p>
           </div>
