@@ -602,9 +602,10 @@ async function validateAirtablePlain(credentials: any): Promise<ValidationResult
       throw new Error('Airtable API key is required')
     }
 
-    // Test connection by fetching bases
+    // Test connection by fetching bases or tables
+    // Note: When testing with a base_id, we need to list tables using the meta API
     const url = base_id
-      ? `https://api.airtable.com/v0/${base_id}/`
+      ? `https://api.airtable.com/v0/meta/bases/${base_id}/tables`
       : 'https://api.airtable.com/v0/meta/bases'
 
     console.log('[Airtable Validation] Testing connection to:', url)
