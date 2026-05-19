@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import ConnectServiceModal from '../components/ConnectServiceModal'
+import ConnectServiceModal from '../../components/ConnectServiceModal'
 
 type Step = 'welcome' | 'github' | 'select_repo' | 'analyze' | 'connect_services' | 'validate' | 'complete'
 
