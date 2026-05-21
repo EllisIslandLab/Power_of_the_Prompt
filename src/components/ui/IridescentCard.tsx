@@ -143,12 +143,7 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
           overflow: hidden;
           border-top: 2px solid rgba(255, 255, 255, 0.9);
           background: transparent;
-          box-shadow:
-            0 30px 60px -20px oklch(0 0 0 / 0.65),
-            0 8px 20px -8px oklch(0 0 0 / 0.5),
-            0 0 44px oklch(0.72 0.22 228 / 0.5),
-            0 0 110px oklch(0.7 0.22 228 / 0.55),
-            0 0 220px oklch(0.65 0.15 228 / 0.28);
+          box-shadow: none;
         }
 
         .iridescence-overlay {
