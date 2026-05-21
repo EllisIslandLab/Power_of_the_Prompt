@@ -32,7 +32,7 @@ export function FleetShowcase() {
             </div>
 
             <IridescentCard>
-              <div className="relative h-[400px] overflow-hidden">
+              <div className="relative h-[300px] overflow-hidden">
                 <Image
                   src={sample.image}
                   alt={sample.title}
