@@ -175,7 +175,7 @@ export function logService(
  * logPayment('charge', 'succeeded', 9900, 'usd', { customerId: 'cus_123' })
  */
 export function logPayment(
-  operation: 'charge' | 'refund' | 'subscription',
+  operation: 'charge' | 'refund' | 'subscription' | 'balance_topup',
   status: 'succeeded' | 'failed' | 'pending',
   amount: number,
   currency: string,
