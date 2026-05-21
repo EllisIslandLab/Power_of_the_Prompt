@@ -95,13 +95,14 @@ export function SpaceTestimonials() {
                 <div key={testimonial.id} className="glass-panel rounded-xl p-6">
                   <div className="flex gap-1 mb-3">
                     {[...Array(5)].map((_, i) => (
-                      <span
+                      <Image
                         key={i}
-                        className="material-symbols-outlined text-[#e8ea23] text-xs"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        star
-                      </span>
+                        src="/images/elements/rank-star.png"
+                        alt="star"
+                        width={16}
+                        height={16}
+                        className="w-4 h-4"
+                      />
                     ))}
                   </div>
                   <blockquote className="text-sm mb-4 italic text-white leading-relaxed">
