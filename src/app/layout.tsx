@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Navigation } from "@/components/sections/navigation";
+import { SpaceNavigation } from "@/components/sections/space-navigation";
 import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -75,6 +75,12 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://qaaautcjhztvjhizklxr.supabase.co" />
         <link rel="dns-prefetch" href="https://yourwebsitescore.com" />
 
+        {/* Material Symbols Icons */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+        />
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -111,7 +117,7 @@ export default function RootLayout({
           <AnimatedBackground />
 
           <Providers>
-            <Navigation />
+            <SpaceNavigation />
             {children}
             <Analytics />
             <SpeedInsights />
