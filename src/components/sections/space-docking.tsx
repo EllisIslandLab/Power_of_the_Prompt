@@ -13,8 +13,7 @@ export function SpaceDocking() {
         </p>
 
         <button className="bg-[#e8ea23] text-[#1c1d00] px-12 py-5 rounded-lg text-xs font-bold uppercase tracking-wider gold-glow hover:scale-105 transition-all flex items-center gap-3">
-          INITIALIZE SEQUENCE
-          <span className="material-symbols-outlined">trending_flat</span>
+          INITIALIZE SEQUENCE →
         </button>
 
         <div className="mt-8 flex flex-col md:flex-row gap-4 opacity-50">

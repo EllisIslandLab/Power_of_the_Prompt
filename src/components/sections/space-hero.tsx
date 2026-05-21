@@ -165,9 +165,8 @@ export function SpaceHero() {
           <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
             <div className="flex flex-col md:flex-row w-full gap-2">
               <div className="relative flex-grow">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8e9192]">alternate_email</span>
                 <input
-                  className="w-full bg-[#080c25] border border-white/10 rounded-lg pl-12 py-4 text-[13px] font-medium tracking-[0.05em] text-white placeholder:text-white/30 focus:border-white focus:ring-0 transition-all"
+                  className="w-full bg-[#080c25] border border-white/10 rounded-lg px-4 py-4 text-[13px] font-medium tracking-[0.05em] text-white placeholder:text-white/30 focus:border-white focus:ring-0 transition-all"
                   placeholder="your.email@example.com"
                   type="email"
                   value={email}
@@ -183,7 +182,6 @@ export function SpaceHero() {
                 className="bg-[#e8ea23] text-[#1c1d00] px-8 py-4 rounded-lg text-xs font-bold uppercase tracking-wider gold-glow hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 JOIN WAITLIST
-                <span className="material-symbols-outlined text-sm">rocket_launch</span>
               </button>
             </div>
 
