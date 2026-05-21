@@ -102,6 +102,7 @@ export function SpaceTestimonials() {
                         width={16}
                         height={16}
                         className="w-4 h-4"
+                        style={{ mixBlendMode: 'lighten' }}
                       />
                     ))}
                   </div>
