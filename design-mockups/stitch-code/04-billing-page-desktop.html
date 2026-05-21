@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Web Launch Academy - Billing Command</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .laser-top {
+            border-top: 2px solid #ffffff;
+        }
+        .laser-gold {
+            border-top: 2px solid #e8ea23;
+        }
+        .glow-hover:hover {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        body {
+            background-color: #0d112a;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(26, 30, 55, 0.8) 0%, transparent 100%),
+                url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1h1v1H1z' fill='rgba(255,255,255,0.1)'/%3E%3C/svg%3E");
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-dim": "#0d112a",
+                      "on-tertiary-fixed": "#1c1d00",
+                      "background": "#0d112a",
+                      "tertiary": "#ffffff",
+                      "on-secondary-fixed": "#001945",
+                      "error-container": "#93000a",
+                      "surface": "#0d112a",
+                      "on-secondary-container": "#9bb7ff",
+                      "surface-container-highest": "#2f334e",
+                      "on-error-container": "#ffdad6",
+                      "primary-container": "#e2e2e2",
+                      "on-surface-variant": "#c4c7c8",
+                      "inverse-primary": "#5d5f5f",
+                      "tertiary-fixed": "#e8ea23",
+                      "on-tertiary-container": "#676800",
+                      "error": "#ffb4ab",
+                      "on-surface": "#dee0ff",
+                      "surface-container": "#1a1e37",
+                      "on-primary": "#2f3131",
+                      "on-error": "#690005",
+                      "on-primary-container": "#636565",
+                      "surface-tint": "#c6c6c7",
+                      "inverse-on-surface": "#2b2f49",
+                      "tertiary-container": "#e8ea23",
+                      "primary": "#ffffff",
+                      "secondary": "#b0c6ff",
+                      "secondary-fixed-dim": "#b0c6ff",
+                      "on-primary-fixed-variant": "#454747",
+                      "secondary-fixed": "#d9e2ff",
+                      "on-secondary-fixed-variant": "#244485",
+                      "on-primary-fixed": "#1a1c1c",
+                      "on-tertiary-fixed-variant": "#494900",
+                      "on-tertiary": "#323200",
+                      "inverse-surface": "#dee0ff",
+                      "tertiary-fixed-dim": "#cccd00",
+                      "primary-fixed": "#e2e2e2",
+                      "surface-container-lowest": "#080c25",
+                      "surface-container-high": "#242842",
+                      "primary-fixed-dim": "#c6c6c7",
+                      "on-secondary": "#032d6e",
+                      "surface-container-low": "#161a33",
+                      "surface-bright": "#343752",
+                      "surface-variant": "#2f334e",
+                      "outline-variant": "#444748",
+                      "on-background": "#dee0ff",
+                      "secondary-container": "#274788",
+                      "outline": "#8e9192"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "20",
+                      "margin-desktop": "64",
+                      "container-max": "1440",
+                      "unit": "8",
+                      "gutter": "24"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Inter"],
+                      "headline-xl": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "mono-label": ["Inter"],
+                      "label-caps": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                      "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="text-on-surface font-body-md selection:bg-tertiary-fixed selection:text-on-tertiary-fixed">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col py-8 bg-surface-container-low/50 backdrop-blur-xl border-r border-white/10 z-50">
+<div class="px-6 mb-12">
+<h1 class="font-headline-lg text-headline-lg text-primary">WL Academy</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant tracking-widest mt-1">MISSION CONTROL</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-white/5 hover:text-primary transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined mr-4">dashboard</span>
+<span class="font-label-caps text-label-caps">Command</span>
+</a>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-white/5 hover:text-primary transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined mr-4">terminal</span>
+<span class="font-label-caps text-label-caps">Terminal</span>
+</a>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-white/5 hover:text-primary transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined mr-4">rocket_launch</span>
+<span class="font-label-caps text-label-caps">Deployments</span>
+</a>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-white/5 hover:text-primary transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined mr-4">database</span>
+<span class="font-label-caps text-label-caps">Registry</span>
+</a>
+<!-- Active Tab -->
+<a class="flex items-center px-6 py-3 text-primary bg-white/10 border-r-2 border-tertiary-fixed translate-x-1 duration-150" href="#">
+<span class="material-symbols-outlined mr-4" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="font-label-caps text-label-caps">Billing</span>
+</a>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-white/5 hover:text-primary transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined mr-4">description</span>
+<span class="font-label-caps text-label-caps">Docs</span>
+</a>
+</nav>
+<div class="px-6 mt-auto space-y-4">
+<button class="w-full py-3 bg-primary text-on-primary font-bold tracking-widest text-label-caps hover:opacity-90 transition-opacity flex items-center justify-center">
+                NEW PROJECT
+            </button>
+<div class="pt-6 border-t border-white/5">
+<a class="flex items-center py-2 text-on-surface-variant hover:text-primary text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3 text-sm">help</span> Support
+                </a>
+<a class="flex items-center py-2 text-on-surface-variant hover:text-primary text-label-caps" href="#">
+<span class="material-symbols-outlined mr-3 text-sm">history</span> Logs
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- Top App Bar -->
+<header class="fixed top-0 right-0 left-64 z-40 flex justify-between items-center px-12 py-4 bg-surface-dim/80 backdrop-blur-md border-b border-white/10">
+<div class="flex items-center space-x-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant opacity-60">Portal</span>
+<span class="material-symbols-outlined text-sm opacity-30">chevron_right</span>
+<span class="font-label-caps text-label-caps text-primary font-bold">Billing</span>
+</div>
+<div class="flex items-center space-x-6">
+<div class="flex space-x-4 mr-6 border-r border-white/10 pr-6">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 font-label-caps text-label-caps" href="#">Portal</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-label-caps text-label-caps" href="#">Billing</a>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="Developer Profile Avatar" class="w-10 h-10 rounded-full border border-white/20" data-alt="A professional studio portrait of a young male software developer with a focused expression, wearing dark minimalist techwear. The lighting is dramatic and cinematic, with soft blue and white key lights that highlight the contours of his face. The background is a clean, dark navy, maintaining a premium, high-tech academy aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0nmYi48pmI-q4p_3WnQuxMPnOPIS_R-bffxMlvGPmZA8l_jxNNUOF4xNbH1a2kcuP5Mawrqm953KA3jSMCZ9fTWWwbIElYAloJqOGlcx1CSCovGcRJFhlGmMu5DJ4KQriCO0_xHeuyhrvHVvZEDtVAHLqQlKM_Oq1Cfio9qPGfUZK79LJC_vLHGeMNc5yu_c_b3D3A24-6-UgRSOo0AB8zdT2RKU5dPVlTLrYOHpaFIZfG5NOPpx6qjoVuBFEK0RIY0j9xlXLcA4"/>
+</div>
+</header>
+<!-- Content Body -->
+<div class="max-w-[1000px] mx-auto pt-32 pb-24 px-8">
+<div class="mb-12">
+<h2 class="font-headline-xl text-headline-xl tracking-[0.3em] uppercase text-primary border-l-4 border-tertiary-fixed pl-6">BILLING</h2>
+<p class="text-on-surface-variant mt-2 font-mono-label opacity-60">COMMAND CENTER / FINANCE_CORE / ACCOUNT_ID_8829</p>
+</div>
+<!-- Balance Card -->
+<div class="glass-panel laser-gold p-8 mb-12 flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden group">
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-tertiary-fixed/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-2 tracking-widest">AVAILABLE BALANCE</span>
+<div class="flex items-baseline space-x-2">
+<span class="font-headline-xl text-headline-xl text-primary">$42.50</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant opacity-50 uppercase">USD</span>
+</div>
+<div class="flex items-center mt-4 text-on-surface-variant font-mono-label text-xs opacity-70">
+<span class="material-symbols-outlined text-sm mr-2">schedule</span>
+                        Last updated: Jan 15, 2026 at 3:45 PM
+                    </div>
+</div>
+<div class="mt-8 md:mt-0 flex flex-col items-end z-10 w-full md:w-auto">
+<button class="px-10 py-4 bg-tertiary-fixed text-on-tertiary-fixed font-bold tracking-widest text-label-caps hover:brightness-110 transition-all shadow-[0_0_20px_rgba(216,218,0,0.2)] mb-4 w-full md:w-auto">
+                        ADD FUNDS
+                    </button>
+<div class="flex space-x-2 w-full md:w-auto justify-end">
+<button class="px-3 py-1 border border-white/10 hover:border-white/40 font-mono-label text-xs transition-colors">$10</button>
+<button class="px-3 py-1 border border-white/10 hover:border-white/40 font-mono-label text-xs transition-colors">$25</button>
+<button class="px-3 py-1 border border-white/10 hover:border-white/40 font-mono-label text-xs transition-colors">$50</button>
+<button class="px-3 py-1 border border-white/10 hover:border-white/40 font-mono-label text-xs transition-colors">$100</button>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-12 bg-white/5 flex items-center px-8 border-t border-white/5">
+<div class="flex items-center space-x-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant flex items-center">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed mr-2 animate-pulse"></span>
+                            Auto-reload: <span class="text-primary ml-1">ENABLED</span>
+</span>
+<span class="w-px h-4 bg-white/10"></span>
+<a class="font-label-caps text-label-caps text-tertiary-fixed hover:underline" href="#">Configure Auto-Reload</a>
+</div>
+</div>
+</div>
+<!-- Usage Stats Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+<!-- Conversations -->
+<div class="glass-panel p-6 laser-top glow-hover transition-all text-center">
+<span class="material-symbols-outlined text-tertiary-fixed mb-4">forum</span>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant tracking-wider mb-2">Conversations</h3>
+<p class="font-headline-lg text-headline-lg text-primary">1,248</p>
+</div>
+<!-- Tokens -->
+<div class="glass-panel p-6 laser-top glow-hover transition-all text-center">
+<span class="material-symbols-outlined text-tertiary-fixed mb-4">generating_tokens</span>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant tracking-wider mb-2">Tokens</h3>
+<p class="font-headline-lg text-headline-lg text-primary">4.2M</p>
+</div>
+<!-- Avg Cost -->
+<div class="glass-panel p-6 laser-top glow-hover transition-all text-center">
+<span class="material-symbols-outlined text-tertiary-fixed mb-4">query_stats</span>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant tracking-wider mb-2">Avg Cost</h3>
+<p class="font-headline-lg text-headline-lg text-primary">$0.04</p>
+</div>
+<!-- Deployments -->
+<div class="glass-panel p-6 laser-top glow-hover transition-all text-center">
+<span class="material-symbols-outlined text-tertiary-fixed mb-4">rocket_launch</span>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant tracking-wider mb-2">Deployments</h3>
+<p class="font-headline-lg text-headline-lg text-primary">24</p>
+</div>
+</div>
+<!-- Pricing / Pay for usage -->
+<div class="glass-panel p-8 mb-12 relative">
+<div class="flex items-start space-x-6">
+<div class="w-12 h-12 flex-shrink-0 bg-white/5 border border-white/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">info</span>
+</div>
+<div>
+<h3 class="font-label-caps text-label-caps text-primary mb-3">SYSTEM ARCHITECTURE: PAY-PER-COMPUTE</h3>
+<p class="text-on-surface-variant max-w-2xl">
+                            Our academy utilizes a transparent metered billing system. You pay only for what you use—calculated by token consumption, compute hours, and network bandwidth. Custom website deployments are billed at a flat rate of <span class="text-tertiary-fixed">$5.00/mo</span> per active origin.
+                        </p>
+<button class="mt-6 font-label-caps text-label-caps text-primary border-b border-white/20 pb-1 hover:border-white/100 transition-all">
+                            VIEW DETAILED RATE CARD
+                        </button>
+</div>
+</div>
+</div>
+<!-- Ledger / Ledger.v1 -->
+<div class="glass-panel overflow-hidden">
+<div class="px-8 py-6 border-b border-white/10 bg-white/5 flex justify-between items-center">
+<h3 class="font-label-caps text-label-caps text-primary tracking-widest">TRANSACTION LEDGER</h3>
+<div class="flex space-x-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">download</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">filter_list</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-mono-label">
+<thead>
+<tr class="text-label-caps text-[10px] tracking-widest text-on-surface-variant opacity-50 bg-white/5">
+<th class="px-8 py-4 font-bold">DATE &amp; TIME</th>
+<th class="px-8 py-4 font-bold">DESCRIPTION</th>
+<th class="px-8 py-4 font-bold">TYPE</th>
+<th class="px-8 py-4 font-bold">AMOUNT</th>
+<th class="px-8 py-4 font-bold">BALANCE AFTER</th>
+<th class="px-8 py-4 font-bold">STATUS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<!-- Row 1 -->
+<tr class="hover:bg-white/5 transition-colors group cursor-default">
+<td class="px-8 py-5 text-on-surface-variant">JAN 15, 2026 - 03:45 PM</td>
+<td class="px-8 py-5 text-primary">Model Inference - LLM_ORBIT_4</td>
+<td class="px-8 py-5">
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] tracking-tighter uppercase font-bold">Usage</span>
+</td>
+<td class="px-8 py-5 text-error">-$1.24</td>
+<td class="px-8 py-5 text-primary font-bold">$42.50</td>
+<td class="px-8 py-5">
+<span class="flex items-center text-tertiary-fixed">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed mr-2"></span>
+                                        COMPLETED
+                                    </span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-white/5 transition-colors group cursor-default">
+<td class="px-8 py-5 text-on-surface-variant">JAN 14, 2026 - 11:20 AM</td>
+<td class="px-8 py-5 text-primary">Auto-Reload Credit - VISA 4421</td>
+<td class="px-8 py-5">
+<span class="px-2 py-1 bg-tertiary-container text-on-tertiary-container text-[10px] tracking-tighter uppercase font-bold">Deposit</span>
+</td>
+<td class="px-8 py-5 text-tertiary-fixed">+$50.00</td>
+<td class="px-8 py-5 text-primary font-bold">$43.74</td>
+<td class="px-8 py-5">
+<span class="flex items-center text-tertiary-fixed">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed mr-2"></span>
+                                        COMPLETED
+                                    </span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-white/5 transition-colors group cursor-default">
+<td class="px-8 py-5 text-on-surface-variant">JAN 12, 2026 - 09:05 PM</td>
+<td class="px-8 py-5 text-primary">Registry Storage (50GB)</td>
+<td class="px-8 py-5">
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] tracking-tighter uppercase font-bold">Storage</span>
+</td>
+<td class="px-8 py-5 text-error">-$5.00</td>
+<td class="px-8 py-5 text-primary font-bold">$6.26</td>
+<td class="px-8 py-5">
+<span class="flex items-center text-tertiary-fixed">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed mr-2"></span>
+                                        COMPLETED
+                                    </span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-white/5 transition-colors group cursor-default">
+<td class="px-8 py-5 text-on-surface-variant">JAN 10, 2026 - 02:15 PM</td>
+<td class="px-8 py-5 text-primary">Model Inference - LLM_ORBIT_4</td>
+<td class="px-8 py-5">
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] tracking-tighter uppercase font-bold">Usage</span>
+</td>
+<td class="px-8 py-5 text-error">-$2.15</td>
+<td class="px-8 py-5 text-primary font-bold">$11.26</td>
+<td class="px-8 py-5">
+<span class="flex items-center text-tertiary-fixed">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed mr-2"></span>
+                                        COMPLETED
+                                    </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 border-t border-white/5 flex justify-center">
+<button class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all">LOAD PREVIOUS DEPLOYMENT LOGS</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Visual Atmosphere FX -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-40">
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-secondary/10 rounded-full blur-[150px]"></div>
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-tertiary-fixed/5 rounded-full blur-[150px]"></div>
+</div>
+<script>
+        // Micro-interactions for atmosphere
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 20;
+            const y = (e.clientY / window.innerHeight) * 20;
+            document.body.style.backgroundPosition = `${x}px ${y}px`;
+        });
+    </script>
+</body></html>

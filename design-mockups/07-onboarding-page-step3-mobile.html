@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=375, initial-scale=1.0" name="viewport"/>
+<title>Connect Services - Web Launch Academy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d112a;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .laser-line {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+        }
+        .power-cell-segment {
+            height: 4px;
+            width: 33%;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+        }
+        .power-cell-active {
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        .nebula-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a1e37 0%, #0d112a 100%);
+            z-index: -1;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#001945",
+                        "on-secondary": "#032d6e",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#e2e2e2",
+                        "on-primary-container": "#636565",
+                        "outline-variant": "#444748",
+                        "on-primary-fixed": "#1a1c1c",
+                        "on-primary": "#2f3131",
+                        "inverse-primary": "#5d5f5f",
+                        "on-error-container": "#ffdad6",
+                        "on-background": "#dee0ff",
+                        "surface-container-low": "#161a33",
+                        "inverse-surface": "#dee0ff",
+                        "secondary-fixed-dim": "#b0c6ff",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-error": "#690005",
+                        "surface-container": "#1a1e37",
+                        "surface-dim": "#0d112a",
+                        "primary": "#ffffff",
+                        "secondary-fixed": "#d9e2ff",
+                        "tertiary-container": "#e8ea23",
+                        "on-tertiary-fixed": "#1c1d00",
+                        "on-surface-variant": "#c4c7c8",
+                        "inverse-on-surface": "#2b2f49",
+                        "primary-container": "#e2e2e2",
+                        "tertiary-fixed-dim": "#cccd00",
+                        "tertiary-fixed": "#e8ea23",
+                        "tertiary": "#ffffff",
+                        "secondary-container": "#274788",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#2f334e",
+                        "background": "#0d112a",
+                        "on-tertiary-container": "#676800",
+                        "on-tertiary": "#323200",
+                        "on-secondary-container": "#9bb7ff",
+                        "surface": "#0d112a",
+                        "on-surface": "#dee0ff",
+                        "surface-container-lowest": "#080c25",
+                        "surface-bright": "#343752",
+                        "secondary": "#b0c6ff",
+                        "surface-tint": "#c6c6c7",
+                        "on-tertiary-fixed-variant": "#494900",
+                        "on-secondary-fixed-variant": "#244485",
+                        "outline": "#8e9192",
+                        "surface-container-highest": "#2f334e",
+                        "surface-container-high": "#242842",
+                        "primary-fixed-dim": "#c6c6c7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "container-max": "1440px",
+                        "unit": "8px",
+                        "margin-mobile": "20px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "mono-label": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col">
+<div class="nebula-bg"></div>
+<!-- Top Navigation Bar -->
+<header class="bg-background/80 backdrop-blur-xl border-b border-white/10 docked full-width top-0 sticky flex justify-between items-center px-margin-mobile h-20 w-full z-50">
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary tracking-tighter">
+            Web Launch Academy
+        </div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="help">help</span>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="close">close</span>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow px-margin-mobile py-8 flex flex-col gap-8 max-w-[375px] mx-auto">
+<!-- Progress Indicator (Power Cells) -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-primary uppercase">Mission Status</span>
+<span class="font-mono-label text-mono-label text-on-surface-variant">Step 03 / 03</span>
+</div>
+<div class="flex gap-2 w-full">
+<div class="power-cell-segment power-cell-active"></div>
+<div class="power-cell-segment power-cell-active"></div>
+<div class="power-cell-segment power-cell-active"></div>
+</div>
+</div>
+<!-- Header Section -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-end">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary leading-tight">CONNECT YOUR TOOLS</h1>
+<div class="bg-tertiary-container/10 border border-tertiary-container/30 px-2 py-1 rounded-full">
+<span class="font-label-caps text-label-caps text-tertiary-fixed">0 of 4 connected</span>
+</div>
+</div>
+<div class="laser-line w-full opacity-30 mt-2"></div>
+</div>
+<!-- Services Grid (v1) -->
+<section class="flex flex-col gap-4">
+<!-- GitHub Card -->
+<div class="glass-card p-6 rounded-lg flex flex-col gap-4 group transition-all duration-300 hover:border-primary/40">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-white flex items-center justify-center rounded-lg shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+<img alt="GitHub Logo" class="w-8 h-8" data-alt="A sleek and professional GitHub logo isolated on a dark minimalist background, representing code repositories and software development version control. The aesthetic is high-tech with clean lines and high contrast, echoing a premium mission control dashboard style with white and deep navy tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwADlxWIQwF_ZdjKYbIxdDb__I1EHugfaBa_DSWC8HWrD5FlwDc7w5_2Qxu2j0W9hwoqDKVY6NE-QBe43mKLGczqnw5_jxSS9BNYH1V-InadffIvlM2y_TIZwdTls7Wv5xn_wvK1d45nCcxuzr9kxalhDCoWLCrXQrH-1sytjTei1FCNXmNIptWvs3_ROKcXmMzCKA68moq-NsSjHRXscWLOqnFeE8DP3KELWHg-9dUgdOcIEJJ6aPEn0mtP3hP1o4ZNYV_MDgKGI"/>
+</div>
+<div>
+<h3 class="font-body-md text-body-md font-bold text-primary">GitHub</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-70">REPOS &amp; VERSIONING</p>
+</div>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant/80">Automate your code deployments and manage mission-critical repositories.</p>
+<button class="w-full py-3 bg-white text-on-secondary-fixed font-label-caps text-label-caps uppercase hover:brightness-110 active:scale-[0.98] transition-all">Connect</button>
+</div>
+<!-- Vercel Card -->
+<div class="glass-card p-6 rounded-lg flex flex-col gap-4 group transition-all duration-300 hover:border-primary/40">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-black flex items-center justify-center rounded-lg border border-white/20">
+<img alt="Vercel Logo" class="w-8 h-8" data-alt="The Vercel triangle logo rendered in a futuristic, high-contrast digital environment. The scene is illuminated by glowing white edges against a deep space void background, symbolizing high-performance web hosting and edge computing. The mood is sophisticated, technical, and aligned with a premium command-center UI theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBePGg37XPWpv5IMlw0KA4rIs2s_DuoIuWe5tY1ZPTsdU9C35TeToo1zJpuRCaHOakKhqdGSHFbRr5KCVFZEmGcmeWis1OE8HqZexAVzISsO6QF5SCA73Ufjb81Hqjtz7aFATfAOs62EMjcaRVeqt_Z8oMO6zLwN0mOhy_AMeBNTt2x1lapvvoWbV6_ST8F6PAxtEjNpsilztvCVSy98icxoqBoQ5hjG2Odouzf9njchtAOWhJHyORv9zURIwDJKYddAZ735Fd6-Qc"/>
+</div>
+<div>
+<h3 class="font-body-md text-body-md font-bold text-primary">Vercel</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-70">EDGE DEPLOYMENT</p>
+</div>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant/80">Launch your frontend to the global edge network with zero configuration.</p>
+<button class="w-full py-3 bg-white text-on-secondary-fixed font-label-caps text-label-caps uppercase hover:brightness-110 active:scale-[0.98] transition-all">Connect</button>
+</div>
+<!-- Stripe Card -->
+<div class="glass-card p-6 rounded-lg flex flex-col gap-4 group transition-all duration-300 hover:border-primary/40">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-[#635BFF] flex items-center justify-center rounded-lg">
+<img alt="Stripe Logo" class="w-8 h-8" data-alt="A stylized Stripe payment logo integrated into a glassmorphic dashboard interface. The environment features soft atmospheric lighting in shades of electric blue and white, representing secure financial transactions and global commerce. The visual style is premium and precise, following a high-stakes command center aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdOppkDRC-fN-B6ZjxpDCrhgNrtx2JU1nTCAtzG5_EvgBMtVR4oFIajy6AwIimmLZgP_AuK9fhXPvJNnMatH3b81LDKGrjgBP_cNuQVVNk7j-zJrsMy_RipG8s_s373xBPVZWZt6GsSCn1PzpCwpyTve1ZW55DpkrE9Z9SqfIvvWlZhI2ZIKrHZRxEdKJU0vhnfsgMSXydn3ayTBwdntL79HXD9OD_eYSwEf3tD6bX1W5MDOS6Vd34Swikjlfs9a71Z6J4PdjPpAs"/>
+</div>
+<div>
+<h3 class="font-body-md text-body-md font-bold text-primary">Stripe</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-70">PAYMENT GATEWAY</p>
+</div>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant/80">Integrate global payment processing and monetization infrastructure.</p>
+<button class="w-full py-3 bg-white text-on-secondary-fixed font-label-caps text-label-caps uppercase hover:brightness-110 active:scale-[0.98] transition-all">Connect</button>
+</div>
+<!-- Supabase Card -->
+<div class="glass-card p-6 rounded-lg flex flex-col gap-4 group transition-all duration-300 hover:border-primary/40 relative">
+<div class="absolute top-0 right-0 h-1 w-24 bg-tertiary-fixed glow-sm"></div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-[#1C1C1C] flex items-center justify-center rounded-lg border border-tertiary-fixed/30">
+<img alt="Supabase Logo" class="w-8 h-8" data-alt="The Supabase lightning bolt logo glowing in a vibrant electric lime and green hue. It is positioned within a dark, technical HUD interface characterized by thin laser-line separators and semi-transparent glass panels. The scene evokes a sense of rapid data processing and high-performance backend infrastructure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1tnJd0ORXsxxn-shsYf20aiE8CPs_PwpSfBtikvEQGX-XmUmI4HC7jPO-4cwS_xrR0y4AWGnqDccAQBupljOyuQJRaGHe6XGB23D757SgRtsvKSo0apJp3jMai7qCMT5SNOHk4pD3oIaV0NPTBAewhdSYmhnnYUGik9YdXvnuTxJ6g6VkDi3QzQ0vjLEmHsV3cUFaA0pgK3d4SwsuolwwhAr7VvaUbwsPrIwD8nJWyR8zpUGJO5Zs0CrRV0EKg2J_xarHcEPOSZg"/>
+</div>
+<div>
+<h3 class="font-body-md text-body-md font-bold text-primary">Supabase</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-70">DATABASE &amp; AUTH</p>
+</div>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant/80">Provision a high-speed Postgres database and authentication suite.</p>
+<button class="w-full py-3 bg-white text-on-secondary-fixed font-label-caps text-label-caps uppercase hover:brightness-110 active:scale-[0.98] transition-all">Connect</button>
+</div>
+</section>
+<!-- Action Footer -->
+<div class="mt-8 mb-12 flex flex-col gap-4">
+<button class="w-full py-5 bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(232,234,35,0.4)] hover:shadow-[0_0_30px_rgba(232,234,35,0.6)] active:scale-[0.97] transition-all">
+                Finish Setup
+            </button>
+<button class="w-full py-3 border border-white/20 text-on-surface-variant font-label-caps text-label-caps uppercase hover:bg-white/5 transition-colors">
+                Skip for now
+            </button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-white/5 full-width flex flex-col justify-between items-center py-8 px-margin-mobile w-full mt-auto">
+<div class="font-label-caps text-label-caps text-primary mb-4 uppercase">Web Launch Academy</div>
+<div class="flex flex-col items-center gap-4">
+<div class="flex gap-6">
+<a class="text-on-surface-variant font-body-md text-label-caps hover:text-primary transition-all" href="#">Privacy</a>
+<a class="text-on-surface-variant font-body-md text-label-caps hover:text-primary transition-all" href="#">Terms</a>
+<a class="text-on-surface-variant font-body-md text-label-caps hover:text-primary transition-all" href="#">Support</a>
+</div>
+<p class="font-body-md text-label-caps text-on-surface-variant opacity-50 text-center">
+                © 2024 Web Launch Academy. All rights reserved.
+            </p>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for connection buttons
+        document.querySelectorAll('button').forEach(button => {
+            if (button.innerText === 'CONNECT') {
+                button.addEventListener('click', function() {
+                    this.innerHTML = '<span class="material-symbols-outlined text-sm">sync</span> CONNECTING...';
+                    this.classList.add('opacity-80');
+                    this.disabled = true;
+
+                    setTimeout(() => {
+                        this.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> CONNECTED';
+                        this.classList.remove('bg-white', 'text-on-secondary-fixed');
+                        this.classList.add('bg-tertiary-container/20', 'text-tertiary-fixed', 'border', 'border-tertiary-fixed/30');
+
+                        // Update badge
+                        const badge = document.querySelector('.bg-tertiary-container\\/10 span');
+                        const current = parseInt(badge.innerText.split(' ')[0]);
+                        badge.innerText = `${current + 1} of 4 connected`;
+                    }, 1500);
+                });
+            }
+        });
+
+        // Atmospheric star flicker
+        const starField = document.createElement('div');
+        starField.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;';
+        document.body.appendChild(starField);
+
+        for(let i=0; i<30; i++) {
+            const star = document.createElement('div');
+            const size = Math.random() * 2;
+            star.style.cssText = `
+                position:absolute;
+                top:${Math.random() * 100}%;
+                left:${Math.random() * 100}%;
+                width:${size}px;
+                height:${size}px;
+                background:white;
+                border-radius:50%;
+                opacity:${Math.random() * 0.5};
+                box-shadow: 0 0 ${size*2}px white;
+            `;
+            starField.appendChild(star);
+        }
+    </script>
+</body></html>

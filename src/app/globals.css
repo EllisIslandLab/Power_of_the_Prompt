@@ -97,6 +97,21 @@
   --color-jonquil-800: #685300;
   --color-jonquil-900: #342a00;
 
+  /* Space theme colors - Celestial Command */
+  --color-space-bg: #0d112a;
+  --color-space-surface: #0d112a;
+  --color-on-surface: #dee0ff;
+  --color-on-surface-variant: #c4c7c8;
+  --color-logo-blue: #b0c6ff;
+  --color-secondary-blue: #b0c6ff;
+  --color-secondary-container: #274788;
+  --color-gold: #e8ea23;
+  --color-gold-foreground: #1c1d00;
+  --color-surface-container: #1a1e37;
+  --color-surface-container-low: #161a33;
+  --color-surface-container-lowest: #080c25;
+  --color-outline: #8e9192;
+
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 
   /* Accordion animations - fast and snappy */
@@ -146,6 +161,42 @@
   --card-foreground: #f1f5f9;
   --destructive: #ef4444;
   --destructive-foreground: #f1f5f9;
+}
+
+/* Celestial Command Space theme */
+[data-theme="space"] {
+  --background: #0d112a;
+  --foreground: #dee0ff;
+  --primary: #ffffff;
+  --primary-foreground: #2f3131;
+  --primary-hover: #f0f0f0;
+  --secondary: #b0c6ff;
+  --secondary-foreground: #001945;
+  --accent: #e8ea23;
+  --accent-foreground: #1c1d00;
+  --muted: rgba(255, 255, 255, 0.05);
+  --muted-foreground: #c4c7c8;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: #080c25;
+  --ring: #b0c6ff;
+  --card: rgba(255, 255, 255, 0.05);
+  --card-foreground: #dee0ff;
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
+
+  /* Additional space theme colors */
+  --surface: #0d112a;
+  --on-surface: #dee0ff;
+  --on-surface-variant: #c4c7c8;
+  --primary-container: #e2e2e2;
+  --on-primary-container: #636565;
+  --surface-container: #1a1e37;
+  --surface-container-low: #161a33;
+  --surface-container-lowest: #080c25;
+  --outline: #8e9192;
+  --outline-variant: #444748;
+  --logo-blue: #b0c6ff;
+  --secondary-container: #274788;
 }
 
 /* WLA Colorful theme - white, blue, and yellow */
@@ -368,4 +419,63 @@ a:focus-visible {
 
 .custom-scrollbar-left.group:hover {
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* ============================================ */
+/* Celestial Command Theme Styles */
+/* ============================================ */
+
+.starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 100px 100px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 150px 150px, #ffffff, rgba(0,0,0,0));
+  background-size: 200px 200px;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+.laser-line-blue {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #b0c6ff, transparent);
+  box-shadow: 0 0 8px #b0c6ff;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gold-glow {
+  box-shadow: 0 0 15px rgba(232, 234, 35, 0.4);
+}
+
+.pulse-blue {
+  animation: pulse-blue-animation 2s infinite;
+}
+
+@keyframes pulse-blue-animation {
+  0% { box-shadow: 0 0 0 0px rgba(176, 198, 255, 0.7); }
+  100% { box-shadow: 0 0 0 10px rgba(176, 198, 255, 0); }
+}
+
+/* Feature cards fade-in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
 }

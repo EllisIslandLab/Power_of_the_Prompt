@@ -2,42 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { ComingSoonBanner } from "@/components/sections/coming-soon-banner"
-import { Footer } from "@/components/sections/footer"
+import { SpaceHero } from "@/components/sections/space-hero"
+import { FleetShowcase } from "@/components/sections/fleet-showcase"
+import { SpaceTestimonials } from "@/components/sections/space-testimonials"
+import { SpaceDocking } from "@/components/sections/space-docking"
+import { SpaceFooter } from "@/components/sections/space-footer"
 import { ExpiredLinkModal } from "@/components/modals/ExpiredLinkModal"
 
-// Lazy load components below the fold for better performance
-const SiteSamples = dynamic(() => import("@/components/sections/site-samples").then(mod => ({ default: mod.SiteSamples })), {
-  loading: () => (
-    <div className="py-24 bg-muted/30" style={{ minHeight: '700px' }} aria-label="Loading content">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16 animate-pulse">
-          <div className="h-12 bg-muted rounded w-2/3 mx-auto mb-6"></div>
-          <div className="h-6 bg-muted rounded w-1/2 mx-auto"></div>
-        </div>
-        <div className="h-96 bg-muted/50 rounded-lg flex items-center justify-center">
-          <p className="text-muted-foreground">Loading gallery...</p>
-        </div>
-      </div>
-    </div>
-  ),
-  ssr: false
-})
-const Testimonials = dynamic(() => import("@/components/sections/testimonials").then(mod => ({ default: mod.Testimonials })), {
-  loading: () => (
-    <div className="py-16" style={{ minHeight: '400px' }}>
-      <div className="max-w-6xl mx-auto px-4 animate-pulse">
-        <div className="h-8 bg-muted rounded w-1/3 mx-auto mb-8"></div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[1,2,3].map(i => (
-            <div key={i} className="h-48 bg-muted rounded-lg"></div>
-          ))}
-        </div>
-      </div>
-    </div>
-  ),
-  ssr: false
-})
 const ScrollProgress = dynamic(() => import("@/components/scroll-progress").then(mod => ({ default: mod.ScrollProgress })), {
   ssr: false
 })
@@ -85,40 +56,14 @@ export default function Home() {
         isOpen={showExpiredModal}
         onClose={() => setShowExpiredModal(false)}
       />
-      <main className="scroll-smooth">
-        {/* Coming Soon Page - Simplified Version */}
-        <div id="coming-soon">
-          <ComingSoonBanner />
-        </div>
-        <div id="site-samples">
-          <SiteSamples />
-        </div>
-        <div id="testimonials">
-          <Testimonials />
-        </div>
-        <Footer />
-
-        {/* Commented out sections for coming soon page */}
-        {/*
-        <div id="new-hero">
-          <NewHero />
-        </div>
-        <div id="unique-approach">
-          <ResponsiveComparison />
-        </div>
-        <div id="build-with-you">
-          <BuildWithYou />
-        </div>
-        <div id="build-4-you">
-          <Build4You />
-        </div>
-        <div id="site-tlc">
-          <SiteTLC />
-        </div>
-        <div id="test-audit">
-          <TestAudit />
-        </div>
-        */}
+      <div className="starfield"></div>
+      <main className="scroll-smooth bg-[#0d112a] min-h-screen relative">
+        {/* Space-themed homepage */}
+        <SpaceHero />
+        <FleetShowcase />
+        <SpaceTestimonials />
+        <SpaceDocking />
+        <SpaceFooter />
       </main>
     </>
   )

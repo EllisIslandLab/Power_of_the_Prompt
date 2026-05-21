@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Web Launch Academy | Onboarding - Step 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0d112a;
+            color: #dee0ff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .laser-strip {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffffff, transparent);
+            box-shadow: 0 0 10px #ffffff;
+        }
+        .power-cell-active {
+            background: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+        }
+        .glow-button:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+        .glow-button:active {
+            transform: scale(0.98);
+            filter: brightness(1.2);
+        }
+        .star-field {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#ffffff",
+                        "secondary": "#b0c6ff",
+                        "tertiary": "#ffffff",
+                        "background": "#0d112a",
+                        "surface": "#0d112a",
+                        "on-surface": "#dee0ff",
+                        "on-surface-variant": "#c4c7c8",
+                        "secondary-container": "#274788",
+                        "surface-container-lowest": "#080c25",
+                        "tertiary-container": "#e8ea23"
+                    },
+                    "fontFamily": {
+                        "mono-label": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="star-field min-h-screen flex flex-col items-center">
+    <!-- Top Navigation / Progress Indicator -->
+    <header class="w-full pt-16 px-8 flex flex-col items-center gap-8 z-10">
+        <div class="flex items-center gap-3">
+            <span class="text-primary font-headline-lg text-[36px] font-black tracking-tighter">CELESTIAL</span>
+            <span class="text-on-surface-variant/40 font-mono-label text-[15px]">COMMAND.v1</span>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="w-full max-w-[600px] flex justify-between items-center gap-3">
+            <div class="flex-1 h-2 rounded-full power-cell-active relative">
+                <div class="absolute -top-8 left-1/2 -translate-x-1/2 font-label-caps text-[11px] text-primary tracking-wider">CONTACT INFO</div>
+                <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-background text-sm">1</div>
+            </div>
+            <div class="flex-1 h-2 rounded-full bg-white/10 relative">
+                <div class="absolute -top-8 left-1/2 -translate-x-1/2 font-label-caps text-[11px] text-on-surface-variant/40 tracking-wider">PROJECT SETUP</div>
+                <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-on-surface-variant/40 text-sm">2</div>
+            </div>
+            <div class="flex-1 h-2 rounded-full bg-white/10 relative">
+                <div class="absolute -top-8 left-1/2 -translate-x-1/2 font-label-caps text-[11px] text-on-surface-variant/40 tracking-wider">CONNECT SERVICES</div>
+                <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-bold text-on-surface-variant/40 text-sm">3</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Canvas -->
+    <main class="w-full max-w-[800px] px-8 py-16 flex-grow">
+        <div class="mb-12 text-center">
+            <p class="font-label-caps text-secondary tracking-widest mb-3 opacity-80 text-[13px]">INITIALIZING SESSION</p>
+            <h1 class="font-headline-lg text-headline-lg text-primary leading-tight">WELCOME TO WEB LAUNCH ACADEMY</h1>
+            <p class="font-mono-label text-on-surface-variant/60 mt-3">Initialize your command profile</p>
+        </div>
+
+        <!-- Onboarding Container: Init.v1 -->
+        <div class="glass-container rounded-xl p-10 relative overflow-hidden">
+            <!-- Laser accent -->
+            <div class="absolute top-0 left-0 w-full laser-strip"></div>
+
+            <div class="flex flex-col gap-10">
+                <div class="text-center">
+                    <h2 class="font-label-caps text-primary mb-2 text-[13px]">COMMANDER IDENTITY</h2>
+                    <p class="font-mono-label text-on-surface-variant/60 text-[12px]">VERIFY CONTACT COORDINATES</p>
+                </div>
+
+                <form class="flex flex-col gap-8 max-w-[500px] mx-auto w-full">
+                    <!-- Full Name Field -->
+                    <div class="flex flex-col gap-3">
+                        <label class="font-label-caps text-on-surface-variant text-[11px] tracking-wider">FULL NAME *</label>
+                        <div class="relative">
+                            <input class="w-full bg-surface-container-lowest/50 border border-white/10 rounded-lg px-5 py-4 text-primary font-body-md focus:border-primary focus:ring-2 focus:ring-primary/50 outline-none transition-all duration-300" placeholder="John Pilot" type="text"/>
+                            <span class="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-[22px]">person</span>
+                        </div>
+                    </div>
+
+                    <!-- Phone Number Field -->
+                    <div class="flex flex-col gap-3">
+                        <label class="font-label-caps text-on-surface-variant text-[11px] tracking-wider">PHONE NUMBER (OPTIONAL)</label>
+                        <div class="relative">
+                            <input class="w-full bg-surface-container-lowest/50 border border-white/10 rounded-lg px-5 py-4 text-primary font-body-md focus:border-primary focus:ring-2 focus:ring-primary/50 outline-none transition-all duration-300" placeholder="+1 (555) 000-0000" type="tel"/>
+                            <span class="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-[22px]">call</span>
+                        </div>
+                        <p class="font-mono-label text-[11px] text-on-surface-variant/50">For important project updates</p>
+                    </div>
+
+                    <!-- Email Field (Read Only) -->
+                    <div class="flex flex-col gap-3">
+                        <label class="font-label-caps text-on-surface-variant text-[11px] tracking-wider">EMAIL ADDRESS</label>
+                        <div class="relative">
+                            <input class="w-full bg-white/5 border border-white/5 rounded-lg px-5 py-4 text-on-surface-variant/50 font-body-md cursor-not-allowed italic" readonly="" type="email" value="cadet@weblaunch.io"/>
+                            <span class="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant/20 text-[22px]">lock</span>
+                        </div>
+                        <p class="font-mono-label text-[11px] text-secondary/40 text-right">Logged in as cadet@weblaunch.io</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Floating Decorative Element -->
+        <div class="mt-12 flex justify-center opacity-20">
+            <div class="w-[200px] h-[1px] bg-gradient-to-r from-transparent via-white to-transparent"></div>
+        </div>
+    </main>
+
+    <!-- Action Bar -->
+    <footer class="w-full max-w-[800px] p-8 pb-16 flex flex-col gap-5">
+        <button class="glow-button w-full bg-tertiary-container py-5 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 shadow-[0_0_30px_rgba(232,234,35,0.3)]">
+            <span class="font-label-caps text-[#1c1d00] tracking-widest text-[15px]">CONTINUE MISSION</span>
+            <span class="material-symbols-outlined text-[#1c1d00] text-[24px]" style="font-variation-settings: 'FILL' 1;">arrow_forward</span>
+        </button>
+        <button class="w-full py-3 flex items-center justify-center gap-2 text-on-surface-variant/60 hover:text-primary transition-colors">
+            <span class="font-label-caps text-[11px] tracking-wider">SKIP FOR NOW</span>
+        </button>
+    </footer>
+
+    <!-- Ambient Visual Effects -->
+    <div class="fixed bottom-0 left-0 w-full h-[400px] pointer-events-none" style="background: radial-gradient(circle at 50% 100%, rgba(39,71,136,0.15) 0%, transparent 70%);"></div>
+    <div class="fixed top-0 left-0 w-full h-[300px] pointer-events-none" style="background: radial-gradient(circle at 50% 0%, rgba(39,71,136,0.08) 0%, transparent 60%);"></div>
+
+    <script>
+        // Simple micro-interaction for the inputs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                const label = input.parentElement.previousElementSibling;
+                label.style.color = '#ffffff';
+                label.style.letterSpacing = '0.15em';
+                label.style.transition = 'all 0.3s ease';
+            });
+            input.addEventListener('blur', () => {
+                const label = input.parentElement.previousElementSibling;
+                label.style.color = '';
+                label.style.letterSpacing = '';
+            });
+        });
+    </script>
+</body></html>

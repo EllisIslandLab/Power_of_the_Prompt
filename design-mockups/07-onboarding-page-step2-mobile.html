@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Launch Academy | Project Setup</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0A0E27;
+            background-image:
+                radial-gradient(circle at 50% -20%, rgba(39, 71, 136, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(216, 218, 0, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .laser-strip {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffffff, transparent);
+            box-shadow: 0 0 10px #ffffff;
+        }
+
+        .power-cell-active {
+            background: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+        }
+
+        .glow-button:active {
+            transform: scale(0.98);
+            filter: brightness(1.2);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom Radio Card Styling */
+        input[type="radio"]:checked + label {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #FFFFFF;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        input[type="radio"]:checked + label .check-dot {
+            opacity: 1;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#ffffff",
+                        "secondary": "#b0c6ff",
+                        "tertiary": "#ffffff",
+                        "background": "#0d112a",
+                        "surface": "#0d112a",
+                        "on-surface": "#dee0ff",
+                        "on-surface-variant": "#c4c7c8",
+                        "secondary-container": "#274788",
+                        "surface-container-lowest": "#080c25",
+                        "tertiary-container": "#e8ea23",
+                        "on-tertiary-fixed": "#1c1d00",
+                        "surface-container": "#1a1e37",
+                        "tertiary-fixed": "#e8ea23"
+                    },
+                    "fontFamily": {
+                        "mono-label": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center">
+    <!-- Top Navigation / Progress Indicator -->
+    <header class="w-full pt-12 px-6 flex flex-col items-center gap-6 z-10">
+        <div class="flex items-center gap-2">
+            <span class="text-primary font-headline-lg-mobile font-black tracking-tighter">CELESTIAL</span>
+            <span class="text-on-surface-variant/40 font-mono-label text-[13px]">COMMAND.v1</span>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="w-full flex justify-between items-center gap-2 px-4">
+            <div class="flex-1 h-1.5 rounded-full power-cell-active relative">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 font-label-caps text-[10px] text-primary">01</div>
+            </div>
+            <div class="flex-1 h-1.5 rounded-full power-cell-active relative">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 font-label-caps text-[10px] text-primary">02</div>
+            </div>
+            <div class="flex-1 h-1.5 rounded-full bg-white/10 relative">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 font-label-caps text-[10px] text-on-surface-variant/40">03</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Canvas -->
+    <main class="w-full max-w-[375px] px-5 py-8 flex-grow">
+        <div class="mb-8 text-center">
+            <p class="font-label-caps text-secondary tracking-widest mb-2 opacity-80 text-[11px]">PROJECT CONFIGURATION</p>
+            <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary leading-tight">TELL US ABOUT<br/>YOUR PROJECT</h1>
+        </div>
+
+        <!-- Onboarding Container: Setup.v1 -->
+        <div class="glass-panel rounded-xl p-6 relative overflow-hidden">
+            <!-- Laser accent -->
+            <div class="absolute top-0 left-0 w-full laser-strip"></div>
+
+            <div class="flex flex-col gap-6">
+                <div>
+                    <h2 class="font-label-caps text-primary mb-1 text-[11px]">SETUP.v1</h2>
+                    <p class="font-mono-label text-on-surface-variant/60 text-[10px]">MISSION PARAMETERS</p>
+                </div>
+
+                <form class="flex flex-col gap-6">
+                    <!-- Project Name Field -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-label-caps text-on-surface-variant text-[10px]">PROJECT NAME *</label>
+                        <input class="w-full bg-surface-container-lowest/50 border border-white/10 rounded-lg px-4 py-3 text-primary font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 placeholder:text-white/20" placeholder="e.g. Project Nebula" type="text"/>
+                    </div>
+
+                    <!-- Project Description Field -->
+                    <div class="flex flex-col gap-2">
+                        <label class="font-label-caps text-on-surface-variant text-[10px]">PROJECT DESCRIPTION</label>
+                        <textarea class="w-full bg-surface-container-lowest/50 border border-white/10 rounded-lg px-4 py-3 text-primary font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 placeholder:text-white/20 resize-none" placeholder="Briefly describe the mission objective..." rows="3"></textarea>
+                        <p class="font-mono-label text-[10px] text-on-surface-variant/50 text-right">Optional</p>
+                    </div>
+
+                    <!-- Website Type Radio Cards -->
+                    <div class="flex flex-col gap-3">
+                        <label class="font-label-caps text-on-surface-variant text-[10px]">WEBSITE TYPE</label>
+
+                        <!-- Landing Page -->
+                        <div class="relative">
+                            <input checked="" class="hidden" id="landing" name="site_type" type="radio"/>
+                            <label class="flex items-center justify-between p-4 rounded-lg border border-white/10 glass-panel cursor-pointer active:scale-[0.98] transition-all" for="landing">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center flex-shrink-0">
+                                        <span class="material-symbols-outlined text-primary text-[20px]">rocket_launch</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-body-md font-bold text-primary text-[14px]">Landing Page</p>
+                                        <p class="font-mono-label text-on-surface-variant text-[10px]">CONVERSION FOCUSED</p>
+                                    </div>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center flex-shrink-0">
+                                    <div class="w-2 h-2 rounded-full bg-white opacity-0 transition-opacity check-dot"></div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Portfolio -->
+                        <div class="relative">
+                            <input class="hidden" id="portfolio" name="site_type" type="radio"/>
+                            <label class="flex items-center justify-between p-4 rounded-lg border border-white/10 glass-panel cursor-pointer active:scale-[0.98] transition-all" for="portfolio">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center flex-shrink-0">
+                                        <span class="material-symbols-outlined text-primary text-[20px]">art_track</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-body-md font-bold text-primary text-[14px]">Portfolio</p>
+                                        <p class="font-mono-label text-on-surface-variant text-[10px]">SHOWCASE WORK</p>
+                                    </div>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center flex-shrink-0">
+                                    <div class="w-2 h-2 rounded-full bg-white opacity-0 transition-opacity check-dot"></div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- SaaS Platform -->
+                        <div class="relative">
+                            <input class="hidden" id="saas" name="site_type" type="radio"/>
+                            <label class="flex items-center justify-between p-4 rounded-lg border border-white/10 glass-panel cursor-pointer active:scale-[0.98] transition-all" for="saas">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center flex-shrink-0">
+                                        <span class="material-symbols-outlined text-primary text-[20px]">dashboard</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-body-md font-bold text-primary text-[14px]">SaaS Platform</p>
+                                        <p class="font-mono-label text-on-surface-variant text-[10px]">COMPLEX DATA</p>
+                                    </div>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center flex-shrink-0">
+                                    <div class="w-2 h-2 rounded-full bg-white opacity-0 transition-opacity check-dot"></div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Floating Decorative Element -->
+        <div class="mt-8 flex justify-center opacity-20">
+            <div class="w-[100px] h-[1px] bg-gradient-to-r from-transparent via-white to-transparent"></div>
+        </div>
+    </main>
+
+    <!-- Fixed Action Bar -->
+    <footer class="w-full max-w-[375px] p-6 pb-10 flex flex-col gap-3">
+        <button class="glow-button w-full bg-tertiary-container py-4 rounded-xl flex items-center justify-center gap-3 transition-transform duration-200 shadow-[0_0_20px_rgba(232,234,35,0.3)]">
+            <span class="font-label-caps text-on-tertiary-fixed tracking-widest text-[14px]">CONTINUE MISSION</span>
+            <span class="material-symbols-outlined text-on-tertiary-fixed" style="font-variation-settings: 'FILL' 1;">arrow_forward</span>
+        </button>
+        <button class="w-full py-2 border border-white/20 rounded-lg flex items-center justify-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span class="font-label-caps text-[10px]">BACK</span>
+        </button>
+    </footer>
+
+    <!-- Ambient Visual Effects -->
+    <div class="fixed bottom-0 left-0 w-full h-[300px] pointer-events-none" style="background: radial-gradient(circle at 50% 100%, rgba(39,71,136,0.15) 0%, transparent 70%);"></div>
+
+    <script>
+        // Simple micro-interaction for the inputs
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('focus', () => {
+                const label = input.parentElement.previousElementSibling || input.parentElement.querySelector('label');
+                if (label) {
+                    label.style.color = '#ffffff';
+                    label.style.letterSpacing = '0.15em';
+                    label.style.transition = 'all 0.3s ease';
+                }
+            });
+            input.addEventListener('blur', () => {
+                const label = input.parentElement.previousElementSibling || input.parentElement.querySelector('label');
+                if (label) {
+                    label.style.color = '';
+                    label.style.letterSpacing = '';
+                }
+            });
+        });
+    </script>
+</body></html>

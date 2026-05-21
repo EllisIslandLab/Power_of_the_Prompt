@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Web Launch Academy | Build Once, Own Forever</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050714;
+            color: #e5e7eb;
+            overflow-x: hidden;
+        }
+        .starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at center, #0a0e27 0%, #050714 100%);
+            background-image:
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+        }
+        .nebula-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(177, 198, 249, 0.05) 0%, rgba(13, 17, 42, 0) 70%);
+            filter: blur(80px);
+            z-index: -1;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .glass-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 6px solid rgba(255, 255, 255, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+        .container-header {
+            background: #000000;
+            padding: 3px 10px;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #ffffff;
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .orbital-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(177, 198, 249, 0.2);
+            pointer-events: none;
+        }
+        .circular-frame {
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+        }
+        .animate-orbit {
+            animation: orbit-rotation 120s linear infinite;
+        }
+        @keyframes orbit-rotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#050714",
+                        "on-surface": "#e5e7eb",
+                        "primary": "#ffffff",
+                        "primary-container": "#FFB800",
+                        "on-primary-container": "#271900",
+                        "secondary": "#9ca3af",
+                        "surface-container": "rgba(255,255,255,0.05)",
+                        "outline": "rgba(255,255,255,0.2)",
+                        "logo-blue": "#b1c6f9"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface">
+<div class="starfield"></div>
+<div class="nebula-glow" style="top: 5%; left: -10%;"></div>
+<div class="nebula-glow" style="bottom: 10%; right: -15%;"></div>
+<div class="page-content-wrapper min-h-screen">
+<!-- Navigation -->
+<header class="bg-black/40 backdrop-blur-md border-b border-white/10 top-0 sticky z-50">
+<div class="flex justify-between items-center w-full px-5 py-4">
+<div class="font-bold text-lg text-white tracking-tight uppercase flex items-center gap-2">
+<span class="w-1.5 h-5 bg-logo-blue rounded-full shadow-[0_0_10px_rgba(177,198,249,0.5)]"></span>
+                    Web Launch Academy
+                </div>
+<button class="material-symbols-outlined text-primary">menu</button>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative pt-16 pb-20 px-5 overflow-hidden">
+<div class="space-y-8">
+<div class="space-y-6 text-center">
+<div class="h-0.5 w-12 bg-logo-blue shadow-[0_0_8px_#b1c6f9] mx-auto"></div>
+<h1 class="text-4xl font-black text-white leading-tight">
+                            Build Once<br/>
+<span class="text-primary-container">Own Forever</span>
+</h1>
+<p class="text-base text-secondary max-w-sm mx-auto">
+                            Experience starship-grade infrastructure. Build a startup website where you own the code - no hosting fees, no hidden costs. Pure architectural freedom.
+                        </p>
+</div>
+
+<!-- Feature Cards -->
+<div class="grid grid-cols-3 gap-3">
+<div class="glass-container p-4 rounded-lg">
+<div class="container-header">Warp.v1</div>
+<span class="material-symbols-outlined text-primary-container text-[20px] mb-1 mt-3 block">bolt</span>
+<div class="text-[8px] font-bold uppercase tracking-widest text-white leading-tight">Warp<br/>Speed</div>
+</div>
+<div class="glass-container p-4 rounded-lg">
+<div class="container-header">Core.v1</div>
+<span class="material-symbols-outlined text-primary-container text-[20px] mb-1 mt-3 block">neurology</span>
+<div class="text-[8px] font-bold uppercase tracking-widest text-white leading-tight">Core<br/>AI</div>
+</div>
+<div class="glass-container p-4 rounded-lg">
+<div class="container-header">Auth.v1</div>
+<span class="material-symbols-outlined text-primary-container text-[20px] mb-1 mt-3 block">key</span>
+<div class="text-[8px] font-bold uppercase tracking-widest text-white leading-tight">Full<br/>Access</div>
+</div>
+</div>
+
+<!-- Signup Form -->
+<div class="relative flex items-center justify-center py-8">
+<div class="orbital-ring w-[105%] h-[105%] animate-orbit border-logo-blue/20"></div>
+<div class="orbital-ring w-[115%] h-[115%] border-logo-blue/10"></div>
+<div class="glass-container circular-frame relative w-[90%] max-w-[340px] shadow-2xl p-10">
+<div class="container-header">Terminal Access</div>
+<div class="mb-6 text-center mt-3">
+<h3 class="text-primary-container font-black uppercase tracking-[0.15em] text-xs">Secure Your Uplink</h3>
+</div>
+<form class="space-y-3 w-full relative z-10">
+<div class="space-y-1">
+<label class="text-[9px] font-bold text-secondary block uppercase text-center tracking-widest">Commander Name</label>
+<input class="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2.5 text-sm focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none transition-all text-center text-white" placeholder="Optional" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="text-[9px] font-bold text-secondary block uppercase text-center tracking-widest">Terminal Email</label>
+<input class="w-full bg-white/5 border border-white/20 rounded-lg px-3 py-2.5 text-sm focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none transition-all text-center text-white" placeholder="required@mission.com" required="" type="email"/>
+</div>
+<label class="flex items-center justify-center gap-2 cursor-pointer group py-1">
+<input class="w-4 h-4 rounded border-white/30 bg-transparent text-primary-container focus:ring-primary-container" type="checkbox"/>
+<span class="text-[10px] font-medium text-secondary group-hover:text-white transition-colors uppercase tracking-tight">I authorize code ownership</span>
+</label>
+<button class="w-full bg-primary-container text-on-primary-container font-black py-3.5 rounded-lg hover:brightness-110 hover:shadow-[0_0_30px_rgba(255,184,0,0.4)] transition-all uppercase tracking-[0.15em] text-xs relative group" type="submit">
+<span class="absolute top-0 left-0 w-full h-[1px] bg-logo-blue/50"></span>
+                                    Initialize Uplink
+                                </button>
+</form>
+</div>
+</div>
+
+<div class="text-xs font-mono font-medium text-secondary/60 text-center">
+                        OFFICIAL ENROLLMENT: STARTING AT $50/MONTH
+                    </div>
+</div>
+</section>
+
+<!-- Featured Work Section -->
+<section class="py-16 bg-black/30">
+<div class="px-5">
+<div class="flex flex-col mb-10">
+<div class="h-0.5 w-10 bg-logo-blue mb-3"></div>
+<h2 class="text-3xl font-black uppercase tracking-tight text-white">Fleet Showcase</h2>
+</div>
+<div class="space-y-6">
+<!-- Project 1 -->
+<div class="glass-container rounded-xl overflow-hidden relative">
+<div class="container-header">Vanguard.01</div>
+<div class="aspect-video relative overflow-hidden mt-5">
+<img class="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaSCyqo5oYcHPvLjCbfDvYWFlqP5DlWhsAVTfC4Yin5Yxz5knFUntNgy12lNGLTHE3CLbDNYIZVZwb6t4NsoxR2RHlG4fa0TbJMc5dzo6QblfHfQvmVwDHlcAI-iDQyvxesbHAFzuduT495s51xiutNvHKAgSF_b7PnypaZ0yNwJHI-Sa8BbvqdA_0q-OTMJkkCmt6XqaRCjni8-ysAZwsMcYzdFeQh_No7ld8ffSrmcHd6xcMs_0VMYts0qjx0nmKTRMk85CqCPQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+</div>
+<div class="p-6">
+<h4 class="text-lg font-bold mb-2 text-white">Nexus Portal</h4>
+<p class="text-sm text-secondary mb-5 leading-relaxed">Precision-engineered SaaS infrastructure with modular deployment capabilities.</p>
+<a class="inline-flex items-center gap-2 text-primary-container font-black text-[9px] uppercase tracking-widest" href="#">
+                                    Launch View <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</a>
+</div>
+</div>
+
+<!-- Project 2 -->
+<div class="glass-container rounded-xl overflow-hidden relative">
+<div class="container-header">Vanguard.02</div>
+<div class="aspect-video relative overflow-hidden mt-5">
+<img class="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3jyQ7IOOnA4dDmsbQR-otb0rFhNL9MD7INlJ-IraBZFVbfN-C7qNEBbiSZgGAylNlAj8mXBgUq0o15Ctj54V6HpkCfv3768E9KhO9kJFhBIyH8cmEBNJV4_JC6W--LtJVZZow07KoVP3M8871kbWOxiLnODjplHmRgUiZhd3Nfw93htRde_swDXVrQSwFfyPtvmPpWXvD4vugxWwVNQEVrhAX_xNuEFoUyB0Mi0pF7gHGW3o63PHwjxynXumzEAJ_t7_ZUu1Clxo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+</div>
+<div class="p-6">
+<h4 class="text-lg font-bold mb-2 text-white">Alpha Stream</h4>
+<p class="text-sm text-secondary mb-5 leading-relaxed">Integrated content delivery architecture with zero-latency data nodes.</p>
+<a class="inline-flex items-center gap-2 text-primary-container font-black text-[9px] uppercase tracking-widest" href="#">
+                                    Launch View <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</a>
+</div>
+</div>
+
+<!-- Project 3 -->
+<div class="glass-container rounded-xl overflow-hidden relative">
+<div class="container-header">Vanguard.03</div>
+<div class="aspect-video relative overflow-hidden mt-5">
+<img class="w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSjtfjl2fbtRNdz_95LyPkswgbZOfddz02eWZeU5Fo8yfC2sUj1QA7CSq8S48EZmCgj8PgkplYokCUUqkJg-5hizpEHH95LEqESVS9DJvh4Kjj6FabH2Mtx8VuFlbMOkZK8soE0bjTjcuVBsV0cmH9NIK-a3CdHrPNdsXgINh0KCIrv5NMAVGJ9rRQSWobRUPfheMvd2ny6_F-qnN53Ity8ZA5J3aZm8CwqHbL__rvSGm_8o8P87WsJeNUiCnowv-RYROp-J2tXtY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+</div>
+<div class="p-6">
+<h4 class="text-lg font-bold mb-2 text-white">Void Commerce</h4>
+<p class="text-sm text-secondary mb-5 leading-relaxed">High-volume transactional systems with decentralized ownership.</p>
+<a class="inline-flex items-center gap-2 text-primary-container font-black text-[9px] uppercase tracking-widest" href="#">
+                                    Launch View <span class="material-symbols-outlined text-xs">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-20 relative">
+<div class="px-5 relative z-10">
+<div class="text-center mb-12">
+<h2 class="text-3xl font-black text-white mb-3 uppercase tracking-widest">Comm Logs</h2>
+<div class="h-1 w-20 bg-primary-container mx-auto shadow-[0_0_10px_rgba(255,184,0,0.4)]"></div>
+</div>
+<div class="space-y-8">
+<!-- Testimonial 1 -->
+<div class="relative flex justify-center">
+<div class="orbital-ring w-[105%] h-[105%] animate-orbit border-logo-blue/20"></div>
+<div class="glass-container circular-frame w-[280px] p-8 text-center relative">
+<div class="container-header">Log.721</div>
+<div class="flex gap-1 mb-3 mt-5 justify-center">
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-[11px] text-white font-medium mb-5 italic leading-relaxed">"Web Launch Academy didn't just build me a site; they gave me the keys to my own digital kingdom. The sovereignty is real."</p>
+<div>
+<p class="text-[9px] font-black uppercase tracking-[0.15em] text-primary-container">Sarah Jenkins</p>
+<p class="text-[8px] uppercase text-secondary">CEO of TechStream</p>
+</div>
+</div>
+</div>
+
+<!-- Testimonial 2 -->
+<div class="relative flex justify-center">
+<div class="orbital-ring w-[105%] h-[105%] animate-orbit border-primary-container/20"></div>
+<div class="glass-container circular-frame w-[280px] p-8 text-center border-white relative">
+<div class="container-header">Log.804</div>
+<div class="flex gap-1 mb-3 mt-5 justify-center">
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-[11px] text-white font-medium mb-5 italic leading-relaxed">"The performance benchmarks are exceptional. Their philosophy of independent code is the future of the open web."</p>
+<div>
+<p class="text-[9px] font-black uppercase tracking-[0.15em] text-primary-container">Marcus Thorne</p>
+<p class="text-[8px] uppercase text-secondary">Founder of ArchiVoid</p>
+</div>
+</div>
+</div>
+
+<!-- Testimonial 3 -->
+<div class="relative flex justify-center">
+<div class="orbital-ring w-[105%] h-[105%] animate-orbit border-logo-blue/20"></div>
+<div class="glass-container circular-frame w-[280px] p-8 text-center relative">
+<div class="container-header">Log.912</div>
+<div class="flex gap-1 mb-3 mt-5 justify-center">
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary-container text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-[11px] text-white font-medium mb-5 italic leading-relaxed">"Owning my code changed my business valuation. Highly modular, transparent pricing. Absolute precision."</p>
+<div>
+<p class="text-[9px] font-black uppercase tracking-[0.15em] text-primary-container">Elena Rossi</p>
+<p class="text-[8px] uppercase text-secondary">Creative Director</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-black/80 border-t border-white/10 py-16 px-5">
+<div class="space-y-8">
+<div class="space-y-5">
+<div class="text-xl font-black uppercase text-white flex items-center gap-2">
+<span class="w-1 h-6 bg-primary-container shadow-[0_0_10px_#FFB800]"></span>
+                            WLA
+                        </div>
+<p class="text-sm text-secondary leading-relaxed max-w-xs">Leading the vanguard of digital ownership. Precision engineering for the independent creator.</p>
+<div class="flex gap-5">
+<a class="text-secondary hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-lg">terminal</span></a>
+<a class="text-secondary hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-lg">chat</span></a>
+<a class="text-secondary hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-lg">rss_feed</span></a>
+</div>
+</div>
+
+<div class="space-y-6">
+<div>
+<h5 class="text-[9px] font-black uppercase tracking-widest text-primary-container mb-4">Navigation</h5>
+<ul class="space-y-3">
+<li><a class="text-sm font-medium text-secondary hover:text-white transition-colors" href="#">Fleet Showcase</a></li>
+<li><a class="text-sm font-medium text-secondary hover:text-white transition-colors" href="#">Core Templates</a></li>
+<li><a class="text-sm font-medium text-secondary hover:text-white transition-colors" href="#">Infrastructure</a></li>
+</ul>
+</div>
+
+<div>
+<h5 class="text-[9px] font-black uppercase tracking-widest text-primary-container mb-4">Protocols</h5>
+<ul class="space-y-3">
+<li><a class="text-sm font-medium text-secondary hover:text-white transition-colors" href="#">Terms of Use</a></li>
+<li><a class="text-sm font-medium text-secondary hover:text-white transition-colors" href="#">Privacy Log</a></li>
+<li><a class="text-sm font-medium text-secondary hover:text-white transition-colors" href="#">Ownership Rights</a></li>
+</ul>
+</div>
+
+<div>
+<h5 class="text-[9px] font-black uppercase tracking-widest text-primary-container mb-4">Communications</h5>
+<ul class="space-y-3">
+<li><a class="text-sm font-medium text-secondary hover:text-white transition-colors" href="#">Discord Terminal</a></li>
+<li><a class="text-sm font-medium text-secondary hover:text-white transition-colors" href="#">Command Center</a></li>
+</ul>
+</div>
+</div>
+
+<div class="border-t border-white/10 pt-6 flex flex-col gap-3 text-[9px] font-bold text-secondary/40 tracking-widest uppercase text-center">
+<div>© 2024 Web Launch Academy. Build Once, Own Forever.</div>
+<div class="flex items-center justify-center gap-3">
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-400 rounded-full shadow-[0_0_5px_#4ade80]"></span> SYSTEM OPERATIONAL</span>
+<span class="w-px h-3 bg-white/20"></span>
+<span>LATENCY: 12ms</span>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<script>
+        // Micro-interactions for subtle movement
+        document.addEventListener('mousemove', (e) => {
+            const nebulas = document.querySelectorAll('.nebula-glow');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            nebulas.forEach((nebula, index) => {
+                const speed = (index + 1) * 20;
+                nebula.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Billing Mobile Command | Web Launch Academy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Shared Components JSON Mapping Logic -->
+<!--
+        TopAppBar active: Billing (Exact Match)
+        SideNavBar active: Billing (Exact Match)
+    -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#0d112a",
+                    "on-tertiary-fixed": "#1c1d00",
+                    "background": "#0d112a",
+                    "tertiary": "#ffffff",
+                    "on-secondary-fixed": "#001945",
+                    "error-container": "#93000a",
+                    "surface": "#0d112a",
+                    "on-secondary-container": "#9bb7ff",
+                    "surface-container-highest": "#2f334e",
+                    "on-error-container": "#ffdad6",
+                    "primary-container": "#e2e2e2",
+                    "on-surface-variant": "#c4c7c8",
+                    "inverse-primary": "#5d5f5f",
+                    "tertiary-fixed": "#e8ea23",
+                    "on-tertiary-container": "#676800",
+                    "error": "#ffb4ab",
+                    "on-surface": "#dee0ff",
+                    "surface-container": "#1a1e37",
+                    "on-primary": "#2f3131",
+                    "on-error": "#690005",
+                    "on-primary-container": "#636565",
+                    "surface-tint": "#c6c6c7",
+                    "inverse-on-surface": "#2b2f49",
+                    "tertiary-fixed-dim": "#cccd00",
+                    "primary-fixed": "#e2e2e2",
+                    "surface-container-lowest": "#080c25",
+                    "surface-container-high": "#242842",
+                    "primary-fixed-dim": "#c6c6c7",
+                    "on-secondary": "#032d6e",
+                    "surface-container-low": "#161a33",
+                    "surface-bright": "#343752",
+                    "surface-variant": "#2f334e",
+                    "outline-variant": "#444748",
+                    "on-background": "#dee0ff",
+                    "secondary-container": "#274788",
+                    "outline": "#8e9192"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "20",
+                    "margin-desktop": "64",
+                    "container-max": "1440",
+                    "unit": "8",
+                    "gutter": "24"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-xl": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "mono-label": ["JetBrains Mono"],
+                    "label-caps": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0d112a;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(20, 30, 80, 0.5) 0%, transparent 70%),
+                radial-gradient(circle at 20% 30%, rgba(216, 218, 0, 0.03) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: #dee0ff;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .laser-glow {
+            box-shadow: 0 -2px 10px rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md overflow-x-hidden">
+<!-- STARFIELD BACKGROUND CANVAS -->
+<canvas class="fixed inset-0 pointer-events-none z-0" id="starfield"></canvas>
+<!-- TopAppBar Shell (Mobile Version) -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-5 py-4 bg-surface-dim/80 backdrop-blur-md border-b border-white/10">
+<div class="flex items-center gap-3">
+<button class="p-1 text-primary" onclick="toggleSidebar()">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-lg text-headline-lg-mobile font-bold text-primary tracking-tighter">Web Launch Academy</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden border border-white/20">
+<img alt="Developer Profile Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_13oZol7bwon7B8wvjKiJFUF4id8fl4ntIN-NNs2809YZ0DniYywwQbA3v6mf4Cby_Ievs0j1dQyNnjIdMQrAjTSTA5jP7H_mupFZ9_SUwARy58BBTyr7Xlmc4PfnPw_e1Qu_7qea_Yu2JfRUFKlcy3LlDW8rS-ihkstQma9vXaNTdh2QW9oNMDWJ9pFdGztdwZt6p0aIpEdoiBXSGstOBvbW-dM8nuI_QW6dxMSJhCr1KYF6TiHuRTq05BjNSK3wBXokz3pe9PY"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar / Mobile Menu Overlay -->
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden transition-opacity duration-300 opacity-0" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low/95 backdrop-blur-xl z-[70] border-r border-white/10 transition-transform duration-300 -translate-x-full flex flex-col py-8 px-4" id="sidebar">
+<div class="flex items-center gap-4 mb-10 px-2">
+<div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-on-primary font-bold">WLA</div>
+<div>
+<h2 class="text-primary font-bold">WL Academy</h2>
+<p class="text-on-surface-variant text-xs uppercase tracking-widest">Mission Control</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant font-medium rounded hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Command</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant font-medium rounded hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-label-caps text-label-caps">Terminal</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant font-medium rounded hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">rocket_launch</span>
+<span class="font-label-caps text-label-caps">Deployments</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant font-medium rounded hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-caps text-label-caps">Registry</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-primary bg-white/10 border-r-2 border-tertiary-fixed font-bold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="font-label-caps text-label-caps">Billing</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant font-medium rounded hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps text-label-caps">Docs</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-white/5 pt-6 space-y-1">
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant font-medium rounded hover:bg-white/5" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant font-medium rounded hover:bg-white/5" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-caps text-label-caps">Logs</span>
+</a>
+</div>
+</aside>
+<main class="relative z-10 pt-24 pb-12 px-5 max-w-[375px] mx-auto min-h-screen">
+<!-- BREADCRUMB -->
+<nav class="flex items-center gap-2 mb-4">
+<span class="text-on-surface-variant font-mono-label text-mono-label">Portal</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
+<span class="text-primary font-mono-label text-mono-label">Billing</span>
+</nav>
+<!-- PAGE HEADING -->
+<header class="mb-8">
+<h1 class="text-primary font-headline-lg text-headline-lg-mobile tracking-[0.3em] font-extrabold">BILLING</h1>
+<div class="w-12 h-1 bg-tertiary-fixed mt-2 rounded-full shadow-[0_0_8px_rgba(232,234,35,0.8)]"></div>
+</header>
+<!-- BALANCE CARD -->
+<section class="glass-panel rounded-xl mb-6 overflow-hidden laser-glow">
+<div class="p-6">
+<p class="text-on-surface-variant font-label-caps text-label-caps mb-1 uppercase tracking-widest">Available Balance</p>
+<div class="flex items-baseline gap-1 mb-6">
+<span class="text-primary font-headline-xl text-headline-lg tracking-tight">$42.50</span>
+<span class="text-on-surface-variant font-mono-label text-mono-label">USD</span>
+</div>
+<div class="grid grid-cols-4 gap-2 mb-6">
+<button class="py-2 glass-panel rounded font-mono-label text-xs hover:bg-white/10 transition-colors">$10</button>
+<button class="py-2 glass-panel rounded font-mono-label text-xs hover:bg-white/10 transition-colors">$25</button>
+<button class="py-2 glass-panel rounded font-mono-label text-xs hover:bg-white/10 transition-colors">$50</button>
+<button class="py-2 glass-panel rounded font-mono-label text-xs hover:bg-white/10 transition-colors">$100</button>
+</div>
+<button class="w-full bg-tertiary-fixed text-on-tertiary-fixed py-4 rounded font-bold tracking-widest text-sm hover:brightness-110 active:opacity-80 transition-all uppercase">
+                    Add Funds
+                </button>
+</div>
+<div class="bg-surface-container-high/40 px-6 py-3 flex items-center justify-between border-t border-white/10">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-tertiary-fixed animate-pulse"></div>
+<span class="text-on-surface font-label-caps text-[10px] uppercase">Auto-reload: ENABLED</span>
+</div>
+<span class="material-symbols-outlined text-primary text-sm">settings</span>
+</div>
+</section>
+<!-- USAGE GRID (2x2) -->
+<section class="grid grid-cols-2 gap-4 mb-6">
+<div class="glass-panel p-4 rounded-lg flex flex-col">
+<span class="material-symbols-outlined text-primary text-lg mb-2">forum</span>
+<p class="text-on-surface-variant text-[10px] uppercase font-label-caps mb-1">Conversations</p>
+<p class="text-primary font-bold text-headline-lg-mobile leading-none">142</p>
+<p class="text-tertiary-fixed text-[10px] mt-2">+12% vs last week</p>
+</div>
+<div class="glass-panel p-4 rounded-lg flex flex-col">
+<span class="material-symbols-outlined text-primary text-lg mb-2">toll</span>
+<p class="text-on-surface-variant text-[10px] uppercase font-label-caps mb-1">Tokens Used</p>
+<p class="text-primary font-bold text-headline-lg-mobile leading-none">245k</p>
+<p class="text-on-surface-variant text-[10px] mt-2">$2.45 generated</p>
+</div>
+<div class="glass-panel p-4 rounded-lg flex flex-col">
+<span class="material-symbols-outlined text-primary text-lg mb-2">payments</span>
+<p class="text-on-surface-variant text-[10px] uppercase font-label-caps mb-1">Avg Cost</p>
+<p class="text-primary font-bold text-headline-lg-mobile leading-none">$0.08</p>
+<p class="text-on-surface-variant text-[10px] mt-2">Per conversation</p>
+</div>
+<div class="glass-panel p-4 rounded-lg flex flex-col">
+<span class="material-symbols-outlined text-primary text-lg mb-2">rocket_launch</span>
+<p class="text-on-surface-variant text-[10px] uppercase font-label-caps mb-1">Deployments</p>
+<p class="text-primary font-bold text-headline-lg-mobile leading-none">12</p>
+<p class="text-on-surface-variant text-[10px] mt-2">Active instances</p>
+</div>
+</section>
+<!-- PRICING INFO -->
+<section class="glass-panel p-6 rounded-xl mb-6 relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-24 h-24 bg-tertiary-fixed/10 blur-3xl rounded-full"></div>
+<div class="flex gap-4 items-start relative z-10">
+<div class="p-2 bg-white/10 rounded">
+<span class="material-symbols-outlined text-tertiary-fixed">info</span>
+</div>
+<div>
+<h3 class="text-primary font-bold mb-1">Pay-as-you-go Pricing</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-4">Pay only for what you use with no minimum monthly commitment or overhead fees.</p>
+<a class="text-tertiary-fixed font-bold text-xs uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all" href="#">
+                        Learn More <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<!-- LEDGER / TRANSACTIONS -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-primary font-bold tracking-widest text-xs uppercase">Ledger Activity</h3>
+<button class="text-on-surface-variant text-[10px] font-mono-label">Download PDF</button>
+</div>
+<div class="space-y-3">
+<!-- Transaction Item -->
+<div class="glass-panel p-4 rounded-lg flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-on-surface-variant font-mono-label text-[10px]">MAY 24, 2024</span>
+<span class="text-primary text-sm font-medium">Platform Usage Fee</span>
+</div>
+<div class="text-right">
+<span class="text-error font-mono-label">-$12.40</span>
+<div class="text-[9px] text-on-surface-variant uppercase mt-1">Charge</div>
+</div>
+</div>
+<!-- Transaction Item -->
+<div class="glass-panel p-4 rounded-lg flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-on-surface-variant font-mono-label text-[10px]">MAY 20, 2024</span>
+<span class="text-primary text-sm font-medium">Funds Added</span>
+</div>
+<div class="text-right">
+<span class="text-tertiary-fixed font-mono-label">+$50.00</span>
+<div class="text-[9px] text-tertiary-fixed uppercase mt-1">Credit</div>
+</div>
+</div>
+<!-- Transaction Item -->
+<div class="glass-panel p-4 rounded-lg flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-on-surface-variant font-mono-label text-[10px]">MAY 18, 2024</span>
+<span class="text-primary text-sm font-medium">Token Allocation</span>
+</div>
+<div class="text-right">
+<span class="text-error font-mono-label">-$4.15</span>
+<div class="text-[9px] text-on-surface-variant uppercase mt-1">Charge</div>
+</div>
+</div>
+<!-- Transaction Item -->
+<div class="glass-panel p-4 rounded-lg flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-on-surface-variant font-mono-label text-[10px]">MAY 12, 2024</span>
+<span class="text-primary text-sm font-medium">Auto-Reload Sync</span>
+</div>
+<div class="text-right">
+<span class="text-tertiary-fixed font-mono-label">+$25.00</span>
+<div class="text-[9px] text-tertiary-fixed uppercase mt-1">Credit</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-3 border border-white/10 rounded text-on-surface-variant font-label-caps text-[10px] uppercase tracking-widest hover:bg-white/5 transition-colors">
+                View All Activity
+            </button>
+</section>
+</main>
+<!-- FOOTER NAV SUPPRESSED FOR TRANSACTIONAL FEELING PAGE PER "DESTINATION RULE" -->
+<script>
+        // Sidebar Toggle Logic
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+
+            if (isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        // Atmospheric Starfield Logic
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 1.5,
+                    opacity: Math.random(),
+                    speed: Math.random() * 0.05
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                star.opacity += star.speed;
+                if (star.opacity > 1 || star.opacity < 0.1) {
+                    star.speed = -star.speed;
+                }
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        drawStars();
+    </script>
+</body></html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Launch Academy | Project Setup</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0A0E27;
+            background-image:
+                radial-gradient(circle at 50% -20%, rgba(39, 71, 136, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(216, 218, 0, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .laser-top {
+            position: relative;
+        }
+        .laser-top::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #FFFFFF;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .glow-active {
+            box-shadow: 0 0 15px rgba(176, 198, 255, 0.5);
+            border-color: #ffffff;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .power-cell-segment {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .power-cell-active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: #FFFFFF;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Custom Radio Card Styling */
+        input[type="radio"]:checked + label {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #FFFFFF;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed": "#001945",
+                      "on-secondary": "#032d6e",
+                      "error-container": "#93000a",
+                      "primary-fixed": "#e2e2e2",
+                      "on-primary-container": "#636565",
+                      "outline-variant": "#444748",
+                      "on-primary-fixed": "#1a1c1c",
+                      "on-primary": "#2f3131",
+                      "inverse-primary": "#5d5f5f",
+                      "on-error-container": "#ffdad6",
+                      "on-background": "#dee0ff",
+                      "surface-container-low": "#161a33",
+                      "inverse-surface": "#dee0ff",
+                      "secondary-fixed-dim": "#b0c6ff",
+                      "on-primary-fixed-variant": "#454747",
+                      "on-error": "#690005",
+                      "surface-container": "#1a1e37",
+                      "surface-dim": "#0d112a",
+                      "primary": "#ffffff",
+                      "secondary-fixed": "#d9e2ff",
+                      "tertiary-container": "#e8ea23",
+                      "on-tertiary-fixed": "#1c1d00",
+                      "on-surface-variant": "#c4c7c8",
+                      "inverse-on-surface": "#2b2f49",
+                      "primary-container": "#e2e2e2",
+                      "tertiary-fixed-dim": "#cccd00",
+                      "tertiary-fixed": "#e8ea23",
+                      "tertiary": "#ffffff",
+                      "secondary-container": "#274788",
+                      "error": "#ffb4ab",
+                      "surface-variant": "#2f334e",
+                      "background": "#0d112a",
+                      "on-tertiary-container": "#676800",
+                      "on-tertiary": "#323200",
+                      "on-secondary-container": "#9bb7ff",
+                      "surface": "#0d112a",
+                      "on-surface": "#dee0ff",
+                      "surface-container-lowest": "#080c25",
+                      "surface-bright": "#343752",
+                      "secondary": "#b0c6ff",
+                      "surface-tint": "#c6c6c7",
+                      "on-tertiary-fixed-variant": "#494900",
+                      "on-secondary-fixed-variant": "#244485",
+                      "outline": "#8e9192",
+                      "surface-container-highest": "#2f334e",
+                      "surface-container-high": "#242842",
+                      "primary-fixed-dim": "#c6c6c7"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-desktop": "64",
+                      "container-max": "1440",
+                      "unit": "8",
+                      "margin-mobile": "20",
+                      "gutter": "24"
+              },
+              "fontFamily": {
+                      "mono-label": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "headline-xl": ["Inter"],
+                      "headline-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                      "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="flex flex-col items-center">
+<!-- Header / App Bar -->
+<header class="w-full flex justify-between items-center px-16 py-8">
+<div class="flex items-center gap-4">
+<span class="text-headline-lg font-headline-lg font-bold tracking-widest text-primary">LAUNCH_ACADEMY.v1</span>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-label-caps font-label-caps text-on-surface-variant/70 hover:text-primary transition-opacity">SUPPORT</button>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-[1440px] px-16 flex flex-col items-center pt-8 pb-20">
+<!-- Progress Indicator System -->
+<div class="w-full max-w-[800px] mb-16 grid grid-cols-4 gap-4">
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-fixed text-[20px]" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-mono-label font-mono-label text-on-surface/60">01 AUTHENTICATION</span>
+</div>
+<div class="power-cell-segment power-cell-active"></div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-full border border-primary flex items-center justify-center bg-primary/10 shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+</div>
+<span class="text-mono-label font-mono-label text-primary">02 PROJECT SETUP</span>
+</div>
+<div class="power-cell-segment power-cell-active"></div>
+</div>
+<div class="flex flex-col gap-3 opacity-40">
+<div class="flex items-center gap-2">
+<span class="text-mono-label font-mono-label text-on-surface/60">03 CORE STACK</span>
+</div>
+<div class="power-cell-segment"></div>
+</div>
+<div class="flex flex-col gap-3 opacity-40">
+<div class="flex items-center gap-2">
+<span class="text-mono-label font-mono-label text-on-surface/60">04 DEPLOYMENT</span>
+</div>
+<div class="power-cell-segment"></div>
+</div>
+</div>
+<!-- Setup Card -->
+<section class="glass-panel laser-top w-full max-w-[800px] p-12 rounded-xl">
+<div class="mb-10">
+<span class="text-mono-label font-mono-label text-on-surface-variant mb-2 block">SETUP.v1</span>
+<h1 class="text-headline-lg font-headline-lg text-primary tracking-tight">TELL US ABOUT YOUR PROJECT</h1>
+</div>
+<form class="space-y-8">
+<!-- Project Name -->
+<div class="space-y-2">
+<label class="text-label-caps font-label-caps text-on-surface-variant block">PROJECT NAME</label>
+<input class="w-full bg-surface-container-lowest border border-white/10 rounded-lg px-4 py-4 text-primary focus:outline-none focus:ring-1 focus:ring-white focus:border-white transition-all placeholder:text-white/20" placeholder="e.g. Project Nebula" type="text"/>
+</div>
+<!-- Project Description -->
+<div class="space-y-2">
+<label class="text-label-caps font-label-caps text-on-surface-variant block">PROJECT DESCRIPTION</label>
+<textarea class="w-full bg-surface-container-lowest border border-white/10 rounded-lg px-4 py-4 text-primary focus:outline-none focus:ring-1 focus:ring-white focus:border-white transition-all placeholder:text-white/20 resize-none" placeholder="Briefly describe the mission objective..." rows="4"></textarea>
+</div>
+<!-- Website Type Radio List -->
+<div class="space-y-4">
+<label class="text-label-caps font-label-caps text-on-surface-variant block">WEBSITE TYPE</label>
+<div class="space-y-3">
+<!-- Landing Page -->
+<div class="relative">
+<input checked="" class="hidden" id="landing" name="site_type" type="radio"/>
+<label class="flex items-center justify-between p-5 rounded-lg border border-white/10 glass-panel cursor-pointer hover:bg-white/5 transition-all group" for="landing">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="rocket_launch">rocket_launch</span>
+</div>
+<div>
+<p class="text-body-md font-bold text-primary">Landing Page</p>
+<p class="text-mono-label text-on-surface-variant text-[11px]">OPTIMIZED FOR CONVERSION</p>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white transition-colors">
+<div class="w-2.5 h-2.5 rounded-full bg-white opacity-0 transition-opacity check-dot"></div>
+</div>
+</label>
+</div>
+<!-- Portfolio -->
+<div class="relative">
+<input class="hidden" id="portfolio" name="site_type" type="radio"/>
+<label class="flex items-center justify-between p-5 rounded-lg border border-white/10 glass-panel cursor-pointer hover:bg-white/5 transition-all group" for="portfolio">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="art_track">art_track</span>
+</div>
+<div>
+<p class="text-body-md font-bold text-primary">Portfolio</p>
+<p class="text-mono-label text-on-surface-variant text-[11px]">SHOWCASE YOUR ARTIFACTS</p>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white transition-colors">
+<div class="w-2.5 h-2.5 rounded-full bg-white opacity-0 transition-opacity check-dot"></div>
+</div>
+</label>
+</div>
+<!-- SaaS Platform -->
+<div class="relative">
+<input class="hidden" id="saas" name="site_type" type="radio"/>
+<label class="flex items-center justify-between p-5 rounded-lg border border-white/10 glass-panel cursor-pointer hover:bg-white/5 transition-all group" for="saas">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="dashboard">dashboard</span>
+</div>
+<div>
+<p class="text-body-md font-bold text-primary">SaaS Platform</p>
+<p class="text-mono-label text-on-surface-variant text-[11px]">COMPLEX DATA MANAGEMENT</p>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white transition-colors">
+<div class="w-2.5 h-2.5 rounded-full bg-white opacity-0 transition-opacity check-dot"></div>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex justify-between items-center pt-10">
+<button class="px-8 py-3 rounded border border-white/20 text-label-caps font-label-caps text-primary hover:bg-white/5 transition-all" type="button">
+                        BACK
+                    </button>
+<button class="px-12 py-3 rounded bg-tertiary-fixed text-on-tertiary-fixed text-label-caps font-label-caps hover:brightness-110 transition-all shadow-[0_0_20px_rgba(216,218,0,0.4)]" type="button">
+                        CONTINUE
+                    </button>
+</div>
+</form>
+</section>
+<!-- Visual Background Accents -->
+<div class="fixed top-1/4 right-0 w-96 h-96 bg-primary/5 blur-[120px] rounded-full -z-10"></div>
+<div class="fixed bottom-0 left-0 w-[500px] h-[500px] bg-secondary-container/5 blur-[150px] rounded-full -z-10"></div>
+</main>
+<style>
+        /* Specific radio logic for showing checkmark dot */
+        input[type="radio"]:checked + label .check-dot {
+            opacity: 1;
+        }
+    </style>
+<script>
+        // Micro-interaction for the laser lines or glow effects
+        document.querySelectorAll('input, textarea').forEach(el => {
+            el.addEventListener('focus', () => {
+                el.parentElement.querySelector('label').style.color = '#FFFFFF';
+            });
+            el.addEventListener('blur', () => {
+                el.parentElement.querySelector('label').style.color = '';
+            });
+        });
+    </script>
+</body></html>
