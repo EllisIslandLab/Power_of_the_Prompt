@@ -139,8 +139,9 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
           position: relative;
           width: 100%;
           height: 100%;
-          border-radius: 12px;
+          border-radius: 5px;
           overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.2);
           background: linear-gradient(
             145deg,
             oklch(0.22 0.006 250) 0%,

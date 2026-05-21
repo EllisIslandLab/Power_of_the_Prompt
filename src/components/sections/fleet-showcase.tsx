@@ -32,7 +32,7 @@ export function FleetShowcase() {
             </div>
 
             <IridescentCard>
-              <div className="relative h-[400px] overflow-hidden rounded-xl">
+              <div className="relative h-[400px] overflow-hidden">
                 <Image
                   src={sample.image}
                   alt={sample.title}
@@ -49,8 +49,6 @@ export function FleetShowcase() {
                 </div>
               </div>
             </IridescentCard>
-
-            <div className="h-1 w-0 bg-white group-hover:w-full transition-all duration-500 mt-2"></div>
           </a>
         ))}
       </div>
