@@ -35,7 +35,7 @@ export function FleetShowcase() {
                 src={sample.image}
                 alt={sample.title}
                 fill
-                className="object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
+                className="object-cover opacity-100 md:grayscale md:opacity-50 md:group-hover:grayscale-0 md:group-hover:opacity-100 transition-all duration-700"
                 style={index === 1 ? { objectPosition: 'center -300px' } : {}}
                 quality={85}
               />
