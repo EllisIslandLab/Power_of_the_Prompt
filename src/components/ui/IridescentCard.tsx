@@ -142,12 +142,7 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
           border-radius: 5px;
           overflow: hidden;
           border-top: 2px solid rgba(255, 255, 255, 0.9);
-          background: linear-gradient(
-            145deg,
-            oklch(0.22 0.006 250) 0%,
-            oklch(0.14 0.006 250) 55%,
-            oklch(0.10 0.006 250) 100%
-          );
+          background: transparent;
           box-shadow:
             0 30px 60px -20px oklch(0 0 0 / 0.65),
             0 8px 20px -8px oklch(0 0 0 / 0.5),
