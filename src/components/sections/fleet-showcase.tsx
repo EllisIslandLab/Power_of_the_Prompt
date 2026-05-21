@@ -39,7 +39,7 @@ export function FleetShowcase() {
                 style={index === 1 ? { objectPosition: 'center -300px' } : {}}
                 quality={85}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0d112a] to-transparent opacity-60"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0d112a] to-transparent opacity-60 group-hover:opacity-0 transition-opacity duration-700"></div>
 
               {/* HUD overlay elements */}
               <div className={`absolute ${index === 0 ? 'bottom-4 right-4' : 'bottom-4 left-4'} p-4 text-[13px] font-medium tracking-[0.05em] text-white flex flex-col ${index === 0 ? 'items-end' : 'items-start'}`}>
