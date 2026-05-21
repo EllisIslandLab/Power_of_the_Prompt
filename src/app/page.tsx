@@ -1,17 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
 import { SpaceHero } from "@/components/sections/space-hero"
 import { FleetShowcase } from "@/components/sections/fleet-showcase"
 import { SpaceTestimonials } from "@/components/sections/space-testimonials"
 import { SpaceDocking } from "@/components/sections/space-docking"
 import { SpaceFooter } from "@/components/sections/space-footer"
 import { ExpiredLinkModal } from "@/components/modals/ExpiredLinkModal"
-
-const ScrollProgress = dynamic(() => import("@/components/scroll-progress").then(mod => ({ default: mod.ScrollProgress })), {
-  ssr: false
-})
+import { ScrollProgressBar } from "@/components/scroll-progress-bar"
 
 // Commented out sections for coming soon page
 // import { NewHero } from "@/components/sections/new-hero"
@@ -51,7 +47,7 @@ export default function Home() {
 
   return (
     <>
-      <ScrollProgress />
+      <ScrollProgressBar />
       <ExpiredLinkModal
         isOpen={showExpiredModal}
         onClose={() => setShowExpiredModal(false)}

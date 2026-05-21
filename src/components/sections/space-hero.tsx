@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import type { HCaptchaRef } from "@/components/common/HCaptcha"
 
@@ -21,7 +21,105 @@ export function SpaceHero() {
   const [shouldLoadCaptcha, setShouldLoadCaptcha] = useState(false)
   const captchaRef = useRef<HCaptchaRef>(null)
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
-  const [clickedCard, setClickedCard] = useState<number | null>(null)
+  const [typedText, setTypedText] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const [userInteracted, setUserInteracted] = useState(false)
+  const [autoPlayCard, setAutoPlayCard] = useState<number>(0)
+  const [showLaser, setShowLaser] = useState(false)
+  const [lastHoveredCard, setLastHoveredCard] = useState<number | null>(null)
+  const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const cardDescriptions = [
+    '— Built with Next.js on Vercel, integrated with best-in-class services offering generous free tiers.',
+    '— Secure by design, thoroughly tested with AI-generated checklists, and test-driven for a full day before launch.',
+    '— Complete source code and deployment setup delivered to you for maintaining and updating your website as needed, with full transparency and zero lock-ins.'
+  ]
+
+  // Auto-play cards sequentially until user interacts
+  useEffect(() => {
+    if (userInteracted) return
+
+    const autoPlayInterval = setInterval(() => {
+      setAutoPlayCard((prev) => (prev + 1) % 3)
+    }, 4000) // Change card every 4 seconds
+
+    return () => clearInterval(autoPlayInterval)
+  }, [userInteracted])
+
+  // Handle hover end with delay before resuming autoplay
+  useEffect(() => {
+    if (hoveredCard === null && userInteracted && lastHoveredCard !== null) {
+      // User stopped hovering, wait 1 second before resuming autoplay
+      resumeTimeoutRef.current = setTimeout(() => {
+        setUserInteracted(false)
+        setLastHoveredCard(null)
+      }, 1000)
+
+      return () => {
+        if (resumeTimeoutRef.current) {
+          clearTimeout(resumeTimeoutRef.current)
+        }
+      }
+    }
+  }, [hoveredCard, userInteracted, lastHoveredCard])
+
+  // Main effect for card descriptions
+  useEffect(() => {
+    // Determine which card to show and speed
+    let activeCard: number | null = null
+    let isFastAnimation = false
+
+    if (hoveredCard !== null) {
+      // Hovering: fast animation with laser
+      activeCard = hoveredCard
+      isFastAnimation = true
+    } else if (lastHoveredCard !== null && userInteracted) {
+      // Just stopped hovering, show last hovered card text (no animation)
+      activeCard = lastHoveredCard
+      isFastAnimation = false
+      // Keep the text as-is, don't re-animate
+      return
+    } else if (!userInteracted) {
+      // Autoplay: slow animation
+      activeCard = autoPlayCard
+      isFastAnimation = false
+    }
+
+    if (activeCard === null) {
+      setTypedText('')
+      setIsTyping(false)
+      setShowLaser(false)
+      return
+    }
+
+    const fullText = cardDescriptions[activeCard]
+
+    // Show laser for fast (hover) animation
+    if (isFastAnimation) {
+      setShowLaser(true)
+      setTimeout(() => setShowLaser(false), 600)
+    } else {
+      setShowLaser(false)
+    }
+
+    // Typewriter effect (fast on hover, slow on autoplay)
+    setIsTyping(true)
+    setTypedText('')
+
+    let currentIndex = 0
+    const speed = isFastAnimation ? 3 : 20 // 3ms for hover, 20ms for autoplay
+    const typingInterval = setInterval(() => {
+      if (currentIndex <= fullText.length) {
+        setTypedText(fullText.slice(0, currentIndex))
+        currentIndex++
+      } else {
+        setIsTyping(false)
+        clearInterval(typingInterval)
+      }
+    }, speed)
+
+    return () => clearInterval(typingInterval)
+  }, [hoveredCard, autoPlayCard, userInteracted, lastHoveredCard])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -105,31 +203,43 @@ export function SpaceHero() {
             {/* Speed Card */}
             <div
               className="glass-panel rounded-lg p-4 md:p-6 cursor-pointer transition-all duration-300 hover:border-white/50 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-              onMouseEnter={() => setHoveredCard(0)}
+              onMouseEnter={() => {
+                setHoveredCard(0);
+                setLastHoveredCard(0);
+                setUserInteracted(true);
+                if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+              }}
               onMouseLeave={() => setHoveredCard(null)}
-              onClick={() => setClickedCard(clickedCard === 0 ? null : 0)}
             >
               <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#e8ea23] mb-2">Speed</div>
               <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white leading-tight">Tech-stack</div>
             </div>
 
-            {/* Security Card */}
+            {/* Quality Card */}
             <div
               className="glass-panel rounded-lg p-4 md:p-6 cursor-pointer transition-all duration-300 hover:border-white/50 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-              onMouseEnter={() => setHoveredCard(1)}
+              onMouseEnter={() => {
+                setHoveredCard(1);
+                setLastHoveredCard(1);
+                setUserInteracted(true);
+                if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+              }}
               onMouseLeave={() => setHoveredCard(null)}
-              onClick={() => setClickedCard(clickedCard === 1 ? null : 1)}
             >
-              <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#e8ea23] mb-2">Security</div>
-              <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white leading-tight">Patient Testing</div>
+              <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#e8ea23] mb-2">Quality</div>
+              <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white leading-tight">Patient Implementation</div>
             </div>
 
             {/* Control Card */}
             <div
               className="glass-panel rounded-lg p-4 md:p-6 cursor-pointer transition-all duration-300 hover:border-white/50 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-              onMouseEnter={() => setHoveredCard(2)}
+              onMouseEnter={() => {
+                setHoveredCard(2);
+                setLastHoveredCard(2);
+                setUserInteracted(true);
+                if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+              }}
               onMouseLeave={() => setHoveredCard(null)}
-              onClick={() => setClickedCard(clickedCard === 2 ? null : 2)}
             >
               <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#e8ea23] mb-2">Control</div>
               <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white leading-tight">Code-ownership</div>
@@ -137,29 +247,52 @@ export function SpaceHero() {
           </div>
 
           {/* Feature description text */}
-          <div className="mt-4 min-h-[40px] w-full">
-            {(hoveredCard !== null || clickedCard !== null) && (
-              <div className="text-[10px] md:text-[11px] text-[#c4c7c8] leading-relaxed animate-fade-in">
-                {hoveredCard === 0 || clickedCard === 0 ? '— Next.js hosted on Vercel' : ''}
-                {hoveredCard === 1 || clickedCard === 1 ? '— AI generated checklist that is manually tested' : ''}
-                {hoveredCard === 2 || clickedCard === 2 ? '— Full code extraction and ecosystem for maintaining/updating website as-needed with full transparency and zero lock-ins' : ''}
+          <div className="mt-4 min-h-[40px] w-full flex justify-start">
+            {typedText && (
+              <div className="relative text-[10px] md:text-[11px] text-[#c4c7c8] leading-relaxed">
+                {typedText}
+                {isTyping && <span className="inline-block w-[2px] h-3 bg-[#c4c7c8] ml-0.5 animate-pulse"></span>}
+                {showLaser && (
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div className="laser-beam"></div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
 
+        {/* Goal Text */}
+        <p className="text-sm md:text-base text-[#c4c7c8] max-w-2xl mb-6 leading-relaxed text-center">
+          If you'd like a website you actually own, or would simply like to learn more about what that means, just input your email in the field below.
+        </p>
+
         {/* Email Signup Form */}
         {success ? (
-          <div className="text-center py-6 w-full max-w-md">
+          <div className="glass-panel rounded-xl p-8 w-full max-w-lg border border-[#e8ea23]/30">
             <div className="flex justify-center mb-4">
-              <span className="material-symbols-outlined text-[#e8ea23] text-[48px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                check_circle
-              </span>
+              <div className="w-16 h-16 rounded-full bg-[#e8ea23]/20 flex items-center justify-center">
+                <span className="text-[#e8ea23] text-4xl">✓</span>
+              </div>
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-white">You're on the list!</h3>
-            <p className="text-[#c4c7c8]">
-              We'll notify you when we launch.
-            </p>
+            <h3 className="text-2xl font-bold mb-4 text-white text-center">Check Your Inbox!</h3>
+            <div className="space-y-3 text-[#c4c7c8] text-sm leading-relaxed">
+              <p className="text-center">
+                <strong className="text-white">Please check your inbox and spam folder</strong> for an email from:
+              </p>
+              <div className="bg-[#080c25] border border-white/10 rounded-lg px-4 py-3 text-center">
+                <code className="text-[#e8ea23] font-mono">hello@weblaunchacademy.com</code>
+              </div>
+              <p className="text-center">
+                <strong className="text-white">Reply to that email</strong> and I'll get back to you ASAP. I read and respond to all emails personally.
+              </p>
+            </div>
+            <button
+              onClick={() => setSuccess(false)}
+              className="mt-6 w-full bg-white/5 hover:bg-white/10 border border-white/20 text-white px-6 py-3 rounded-lg text-sm font-medium transition-all"
+            >
+              Close
+            </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
@@ -181,8 +314,22 @@ export function SpaceHero() {
                 disabled={isSubmitting || !email || !captchaToken}
                 className="bg-[#e8ea23] text-[#1c1d00] px-8 py-4 rounded-lg text-xs font-bold uppercase tracking-wider gold-glow hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                JOIN WAITLIST
+                LEARN MORE
               </button>
+            </div>
+
+            {/* Ownership Checkbox */}
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="wantsOwnership"
+                checked={wantsOwnership}
+                onChange={(e) => setWantsOwnership(e.target.checked)}
+                className="w-5 h-5 rounded border-white/20 bg-[#080c25] text-[#e8ea23] focus:ring-[#e8ea23] focus:ring-offset-0 cursor-pointer"
+              />
+              <label htmlFor="wantsOwnership" className="text-sm text-[#c4c7c8] cursor-pointer">
+                Yes, I want to own the code for my website!
+              </label>
             </div>
 
             {/* hCaptcha Widget */}
@@ -211,6 +358,33 @@ export function SpaceHero() {
       </div>
 
       <style jsx>{`
+        @keyframes laserSweep {
+          0% {
+            left: -100%;
+          }
+          100% {
+            left: 100%;
+          }
+        }
+
+        .laser-beam {
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 20%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(176, 198, 255, 0.3) 30%,
+            rgba(176, 198, 255, 0.8) 50%,
+            rgba(176, 198, 255, 0.3) 70%,
+            transparent 100%
+          );
+          box-shadow: 0 0 20px rgba(176, 198, 255, 0.8);
+          animation: laserSweep 0.6s ease-out;
+        }
+
         .material-symbols-outlined {
           font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }

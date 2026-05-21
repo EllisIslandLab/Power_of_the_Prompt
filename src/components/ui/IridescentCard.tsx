@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import Image from 'next/image'
 
 interface IridescentCardProps {
   children: React.ReactNode
@@ -13,8 +12,6 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
   const [transform, setTransform] = useState({ rx: 0, ry: 0 })
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
   const [isHovered, setIsHovered] = useState(false)
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const [tiltEnabled, setTiltEnabled] = useState(false)
 
   useEffect(() => {
     const card = cardRef.current
@@ -27,31 +24,20 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
 
       setMouse({ x, y })
 
-      // Only apply tilt if enabled (after delay)
-      if (tiltEnabled) {
-        // 3D tilt effect - very subtle
-        const tiltAmount = 1
-        const ry = (x - 0.5) * 2 * tiltAmount
-        const rx = -(y - 0.5) * 2 * tiltAmount
+      // 3D tilt effect - instant response
+      const tiltAmount = 3
+      const ry = (x - 0.5) * 2 * tiltAmount
+      const rx = -(y - 0.5) * 2 * tiltAmount
 
-        setTransform({ rx, ry })
-      }
+      setTransform({ rx, ry })
     }
 
     const handleMouseEnter = () => {
       setIsHovered(true)
-      // Delay tilt activation to prevent abrupt flick
-      hoverTimeoutRef.current = setTimeout(() => {
-        setTiltEnabled(true)
-      }, 200)
     }
 
     const handleMouseLeave = () => {
       setIsHovered(false)
-      setTiltEnabled(false)
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current)
-      }
       setTransform({ rx: 0, ry: 0 })
       setMouse({ x: 0.5, y: 0.5 })
     }
@@ -64,86 +50,93 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
       card.removeEventListener('mousemove', handleMouseMove)
       card.removeEventListener('mouseenter', handleMouseEnter)
       card.removeEventListener('mouseleave', handleMouseLeave)
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current)
-      }
     }
-  }, [tiltEnabled])
+  }, [])
 
   return (
     <div
-      ref={cardRef}
-      className={`iridescent-card-wrapper ${className}`}
+      className={`card-wrapper ${className}`}
       style={{
         perspective: '1100px',
       }}
     >
       <div
-        className="iridescent-card"
+        ref={cardRef}
+        className="card"
         style={{
+          '--mx': mouse.x,
+          '--my': mouse.y,
           transform: `rotateX(${transform.rx}deg) rotateY(${transform.ry}deg) scale(${isHovered ? 1.02 : 1})`,
-          transition: tiltEnabled ? 'transform 0.15s ease-out' : 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)',
+          transition: 'transform 0.15s ease-out',
           transformStyle: 'preserve-3d',
-        }}
+          willChange: 'transform',
+        } as React.CSSProperties}
       >
-        <div className="iridescent-card-inner">
-          {children}
+        <div className="card-inner">
+          <div className="well">
+            {children}
 
           {/* Iridescence overlay */}
           <div
             className="iridescence-overlay"
             style={{
-              '--mx': mouse.x,
-              '--my': mouse.y,
               opacity: 0,
-            } as React.CSSProperties}
+            }}
           />
 
           {/* Specular highlight */}
           <div
             className="specular-overlay"
             style={{
-              '--mx': mouse.x,
-              '--my': mouse.y,
               opacity: isHovered ? 0.55 : 0.22,
-            } as React.CSSProperties}
+            }}
           />
 
           {/* Rim light */}
           <div
             className="rim-overlay"
             style={{
-              '--mx': mouse.x,
-              '--my': mouse.y,
               opacity: isHovered ? 0.18 : 0,
-            } as React.CSSProperties}
+            }}
           />
+          </div>
         </div>
       </div>
 
       <style jsx>{`
-        .iridescent-card-wrapper {
+        .card-wrapper {
           position: relative;
           width: 100%;
           height: 100%;
         }
 
-        .iridescent-card {
+        .card {
+          --radius: 5px;
+          --padding: 14px;
           position: relative;
           width: 100%;
           height: 100%;
-          will-change: transform;
         }
 
-        .iridescent-card-inner {
+        .card-inner {
           position: relative;
-          width: 100%;
-          height: 100%;
-          border-radius: 5px;
+          padding: var(--padding);
+          border-radius: var(--radius);
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.01) 100%
+          );
+        }
+
+        .well {
+          position: relative;
+          border-radius: calc(var(--radius) - var(--padding) * 0.4);
           overflow: hidden;
-          border-top: 2px solid rgba(255, 255, 255, 0.9);
-          background: transparent;
-          box-shadow: none;
+          box-shadow:
+            inset 0 2px 6px 0 rgba(0, 0, 0, 0.15),
+            0 6px 12px -4px rgba(0, 0, 0, 0.3),
+            0 1px 0 0 rgba(255, 255, 255, 0.8);
         }
 
         .iridescence-overlay {
