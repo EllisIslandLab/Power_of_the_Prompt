@@ -26,7 +26,7 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
       setMouse({ x, y })
 
       // 3D tilt effect
-      const tiltAmount = 14
+      const tiltAmount = 5
       const ry = (x - 0.5) * 2 * tiltAmount
       const rx = -(y - 0.5) * 2 * tiltAmount
 
@@ -76,7 +76,7 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
             style={{
               '--mx': mouse.x,
               '--my': mouse.y,
-              opacity: isHovered ? 0.85 : 0.35,
+              opacity: 0,
             } as React.CSSProperties}
           />
 
