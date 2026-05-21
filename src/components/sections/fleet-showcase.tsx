@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { siteSamples } from '@/data/site-samples'
+import { IridescentCard } from '@/components/ui/IridescentCard'
 
 export function FleetShowcase() {
   // Use the first 2 featured samples
@@ -21,34 +22,35 @@ export function FleetShowcase() {
             href={sample.liveUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="glass-panel group relative overflow-hidden rounded-xl block cursor-pointer"
+            className="group relative block cursor-pointer"
           >
-            <div className="p-8 pb-0">
+            <div className="mb-4">
               <span className="text-xs font-bold tracking-[0.1em] text-[#e8ea23] mb-2 block uppercase">
                 VESSEL_0{index + 1}: {index === 0 ? 'ENGINE CORE' : 'UI HUB'}
               </span>
-              <p className="text-[#c4c7c8] mb-6">{sample.description}</p>
+              <p className="text-[#c4c7c8] text-sm">{sample.description}</p>
             </div>
 
-            <div className="relative h-[400px] overflow-hidden">
-              <Image
-                src={sample.image}
-                alt={sample.title}
-                fill
-                className="object-cover opacity-100 md:grayscale md:opacity-50 md:group-hover:grayscale-0 md:group-hover:opacity-100 transition-all duration-700"
-                style={index === 1 ? { objectPosition: 'center -300px' } : {}}
-                quality={85}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0d112a] to-transparent opacity-60 group-hover:opacity-0 transition-opacity duration-700"></div>
+            <IridescentCard>
+              <div className="relative h-[400px] overflow-hidden rounded-xl">
+                <Image
+                  src={sample.image}
+                  alt={sample.title}
+                  fill
+                  className="object-cover"
+                  style={index === 1 ? { objectPosition: 'center -300px' } : {}}
+                  quality={85}
+                />
 
-              {/* HUD overlay elements */}
-              <div className={`absolute ${index === 0 ? 'bottom-4 right-4' : 'bottom-4 left-4'} p-4 text-[13px] font-medium tracking-[0.05em] text-white flex flex-col ${index === 0 ? 'items-end' : 'items-start'}`}>
-                <span className="text-[10px]">{index === 0 ? 'STABILITY: 99.8%' : 'UI_REV: 04.2'}</span>
-                <span className="text-[10px]">{index === 0 ? 'TEMP: OPTIMAL' : 'SYNC: ACTIVE'}</span>
+                {/* HUD overlay elements */}
+                <div className={`absolute ${index === 0 ? 'bottom-4 right-4' : 'bottom-4 left-4'} p-4 text-[13px] font-medium tracking-[0.05em] text-white flex flex-col ${index === 0 ? 'items-end' : 'items-start'} z-10`}>
+                  <span className="text-[10px]">{index === 0 ? 'STABILITY: 99.8%' : 'UI_REV: 04.2'}</span>
+                  <span className="text-[10px]">{index === 0 ? 'TEMP: OPTIMAL' : 'SYNC: ACTIVE'}</span>
+                </div>
               </div>
-            </div>
+            </IridescentCard>
 
-            <div className="h-1 w-0 bg-white group-hover:w-full transition-all duration-500"></div>
+            <div className="h-1 w-0 bg-white group-hover:w-full transition-all duration-500 mt-2"></div>
           </a>
         ))}
       </div>
