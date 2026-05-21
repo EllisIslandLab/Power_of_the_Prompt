@@ -13,6 +13,8 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
   const [transform, setTransform] = useState({ rx: 0, ry: 0 })
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
   const [isHovered, setIsHovered] = useState(false)
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [tiltEnabled, setTiltEnabled] = useState(false)
 
   useEffect(() => {
     const card = cardRef.current
@@ -25,17 +27,31 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
 
       setMouse({ x, y })
 
-      // 3D tilt effect
-      const tiltAmount = 5
-      const ry = (x - 0.5) * 2 * tiltAmount
-      const rx = -(y - 0.5) * 2 * tiltAmount
+      // Only apply tilt if enabled (after delay)
+      if (tiltEnabled) {
+        // 3D tilt effect - very subtle
+        const tiltAmount = 1
+        const ry = (x - 0.5) * 2 * tiltAmount
+        const rx = -(y - 0.5) * 2 * tiltAmount
 
-      setTransform({ rx, ry })
+        setTransform({ rx, ry })
+      }
     }
 
-    const handleMouseEnter = () => setIsHovered(true)
+    const handleMouseEnter = () => {
+      setIsHovered(true)
+      // Delay tilt activation to prevent abrupt flick
+      hoverTimeoutRef.current = setTimeout(() => {
+        setTiltEnabled(true)
+      }, 200)
+    }
+
     const handleMouseLeave = () => {
       setIsHovered(false)
+      setTiltEnabled(false)
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current)
+      }
       setTransform({ rx: 0, ry: 0 })
       setMouse({ x: 0.5, y: 0.5 })
     }
@@ -48,8 +64,11 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
       card.removeEventListener('mousemove', handleMouseMove)
       card.removeEventListener('mouseenter', handleMouseEnter)
       card.removeEventListener('mouseleave', handleMouseLeave)
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current)
+      }
     }
-  }, [])
+  }, [tiltEnabled])
 
   return (
     <div
@@ -63,7 +82,7 @@ export function IridescentCard({ children, className = '' }: IridescentCardProps
         className="iridescent-card"
         style={{
           transform: `rotateX(${transform.rx}deg) rotateY(${transform.ry}deg) scale(${isHovered ? 1.02 : 1})`,
-          transition: isHovered ? 'none' : 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)',
+          transition: tiltEnabled ? 'transform 0.15s ease-out' : 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)',
           transformStyle: 'preserve-3d',
         }}
       >
