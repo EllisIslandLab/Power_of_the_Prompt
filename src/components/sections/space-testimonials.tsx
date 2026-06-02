@@ -23,6 +23,13 @@ export function SpaceTestimonials() {
       avatar: 'IS',
       projectName: 'A Thyme to Heal',
       projectUrl: 'https://athymetoheal.org'
+    },
+    {
+      id: '2',
+      name: 'Davey',
+      testimonial: 'Matthew has been very helpful in getting our web site up. Working through modification and optimizations has been straight forward. Scheduling our training has been a problem at our end, so I don\'t have any opinion formed on that yet.',
+      title: 'Business Owner',
+      avatar: 'D'
     }
   ]
 
