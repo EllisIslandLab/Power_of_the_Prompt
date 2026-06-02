@@ -5,32 +5,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Lock, Crown, Mail } from 'lucide-react'
 import Link from 'next/link'
-import { 
-  canAccessFeature, 
-  needsUpgradeFor, 
+import {
+  canAccessFeature,
+  needsUpgradeFor,
   getUpgradeMessage,
   getAccessLevelDescription,
-  type Student, 
-  type Feature 
+  type Client,
+  type Feature
 } from '@/lib/permissions'
 
 interface FeatureGateProps {
-  student: Student
+  client: Client
   feature: Feature
   fallback?: ReactNode
   children: ReactNode
   showUpgradePrompt?: boolean
 }
 
-export function FeatureGate({ 
-  student, 
-  feature, 
-  fallback, 
-  children, 
+export function FeatureGate({
+  client,
+  feature,
+  fallback,
+  children,
   showUpgradePrompt = true 
 }: FeatureGateProps) {
-  // Check if student can access the feature
-  if (canAccessFeature(student, feature)) {
+  // Check if client can access the feature
+  if (canAccessFeature(client, feature)) {
     return <>{children}</>
   }
 
@@ -40,7 +40,7 @@ export function FeatureGate({
   }
 
   // Email verification required
-  if (!student.email_verified) {
+  if (!client.email_verified) {
     return (
       <Card className="border-orange-200 bg-orange-50">
         <CardContent className="pt-6">
@@ -59,7 +59,7 @@ export function FeatureGate({
   }
 
   // Show upgrade prompt for premium features
-  if (showUpgradePrompt && needsUpgradeFor(student, feature)) {
+  if (showUpgradePrompt && needsUpgradeFor(client, feature)) {
     return (
       <Card className="border-blue-200 bg-blue-50">
         <CardHeader>
@@ -98,7 +98,7 @@ export function FeatureGate({
           <div>
             <h3 className="font-medium text-gray-800">Access Restricted</h3>
             <p className="text-sm text-gray-600">
-              {getAccessLevelDescription(student)}
+              {getAccessLevelDescription(client)}
             </p>
           </div>
         </div>
@@ -108,23 +108,23 @@ export function FeatureGate({
 }
 
 // Hook for checking permissions in components
-export function usePermissions(student: Student) {
+export function usePermissions(client: Client) {
   return {
-    canAccess: (feature: Feature) => canAccessFeature(student, feature),
-    needsUpgrade: (feature: Feature) => needsUpgradeFor(student, feature),
-    getDescription: () => getAccessLevelDescription(student)
+    canAccess: (feature: Feature) => canAccessFeature(client, feature),
+    needsUpgrade: (feature: Feature) => needsUpgradeFor(client, feature),
+    getDescription: () => getAccessLevelDescription(client)
   }
 }
 
 // Simple permission check component
 interface RequirePermissionProps {
-  student: Student
+  client: Client
   feature: Feature
   children: ReactNode
 }
 
-export function RequirePermission({ student, feature, children }: RequirePermissionProps) {
-  if (!canAccessFeature(student, feature)) {
+export function RequirePermission({ client, feature, children }: RequirePermissionProps) {
+  if (!canAccessFeature(client, feature)) {
     return null
   }
   
@@ -133,11 +133,11 @@ export function RequirePermission({ student, feature, children }: RequirePermiss
 
 // Access level indicator component
 interface AccessLevelBadgeProps {
-  student: Student
+  client: Client
   className?: string
 }
 
-export function AccessLevelBadge({ student, className = '' }: AccessLevelBadgeProps) {
+export function AccessLevelBadge({ client, className = '' }: AccessLevelBadgeProps) {
   const badgeColors = {
     free: 'bg-gray-100 text-gray-800 border-gray-200',
     full: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -145,20 +145,20 @@ export function AccessLevelBadge({ student, className = '' }: AccessLevelBadgePr
   }
 
   const getBadgeType = () => {
-    if (student.tier === 'full' && student.payment_status === 'expired') {
+    if (client.tier === 'full' && client.payment_status === 'expired') {
       return 'expired'
     }
-    return student.tier
+    return client.tier
   }
 
   const getBadgeText = () => {
-    if (!student.email_verified) {
+    if (!client.email_verified) {
       return 'Unverified'
     }
-    if (student.tier === 'full' && student.payment_status === 'expired') {
+    if (client.tier === 'full' && client.payment_status === 'expired') {
       return 'Expired'
     }
-    return student.tier === 'full' ? 'Full Access' : 'Free Tier'
+    return client.tier === 'full' ? 'Full Access' : 'Free Tier'
   }
 
   const badgeType = getBadgeType()

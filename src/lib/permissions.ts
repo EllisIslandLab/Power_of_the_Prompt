@@ -1,6 +1,6 @@
 // Feature gating system for client tiers
 
-export type StudentTier = 'free' | 'full'
+export type ClientTier = 'free' | 'full'
 export type Feature = 
   | 'basic_courses'
   | 'premium_courses' 
@@ -15,13 +15,13 @@ export type Feature =
 
 export interface Client {
   id: string
-  tier: StudentTier
+  tier: ClientTier
   payment_status: 'pending' | 'paid' | 'trial' | 'expired'
   email_verified: boolean
 }
 
 // Define permissions for each tier
-const tierPermissions: Record<StudentTier, Feature[]> = {
+const tierPermissions: Record<ClientTier, Feature[]> = {
   'free': [
     'basic_courses',
     'community_forum'
