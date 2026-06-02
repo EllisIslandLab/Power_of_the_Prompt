@@ -70,7 +70,7 @@ export function hasPremiumAccess(client: Client): boolean {
 /**
  * Get all available features for a client
  */
-export function getStudentFeatures(client: Client): Feature[] {
+export function getClientFeatures(client: Client): Feature[] {
   if (!client.email_verified) {
     return []
   }
@@ -158,7 +158,7 @@ export interface FeatureGateProps {
 export const FeaturePermissions = {
   canAccessFeature,
   hasPremiumAccess,
-  getStudentFeatures,
+  getClientFeatures,
   getAccessLevelDescription,
   needsUpgradeFor,
   getUpgradeMessage
