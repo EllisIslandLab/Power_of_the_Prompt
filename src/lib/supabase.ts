@@ -32,14 +32,5 @@ export function createClientSupabase() {
   })
 }
 
-// Re-export types for backwards compatibility
-export type {
-  UserProfile,
-  AdminProfile,
-  Clients,
-  CourseSession,
-  StudentPoints,
-  Badge,
-  Referral,
-  Database
-} from '@/types/database'
+// Re-export database type
+export type { Database } from '@/types/database'
