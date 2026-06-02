@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
           email: email.toLowerCase(),
           full_name: fullName,
           email_verified: false,
-          role: 'student',
+          role: 'client',
           tier: invite.tier,
           payment_status: invite.tier === 'full' ? 'paid' : 'trial'
         })

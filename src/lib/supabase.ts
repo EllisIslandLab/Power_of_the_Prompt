@@ -36,7 +36,7 @@ export function createClientSupabase() {
 export type {
   UserProfile,
   AdminProfile,
-  Students,
+  Clients,
   CourseSession,
   StudentPoints,
   Badge,

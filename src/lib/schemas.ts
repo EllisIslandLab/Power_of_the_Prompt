@@ -51,7 +51,7 @@ export const verifyEmailSchema = z.object({
 
 export const generateInviteSchema = z.object({
   email: z.string().email('Invalid email address').toLowerCase(),
-  role: z.enum(['student', 'admin']).default('student'),
+  role: z.enum(['client', 'admin']).default('client'),
 })
 
 // ============================================================================
@@ -183,7 +183,7 @@ export const createAuthUserSchema = z.object({
   email: z.string().email('Invalid email address').toLowerCase(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   fullName: z.string().min(2, 'Full name must be at least 2 characters').max(100),
-  role: z.enum(['student', 'admin']).default('student'),
+  role: z.enum(['client', 'admin']).default('client'),
 })
 
 export const sendCampaignSchema = z.object({

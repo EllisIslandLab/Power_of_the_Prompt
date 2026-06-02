@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
             <!-- Info Box -->
             <div style="background-color: #f0f9ff; border-left: 4px solid #1e40af; padding: 15px; margin: 25px 0; border-radius: 4px;">
               <p style="color: #1e3a8a; margin: 0; font-size: 14px; line-height: 1.5;">
-                <strong>What's Next?</strong> After confirming your email, you can sign in and start exploring your student portal, accessing resources, and beginning your web development journey!
+                <strong>What's Next?</strong> After confirming your email, you can sign in and start exploring your client portal, accessing resources, and beginning your web development journey!
               </p>
             </div>
 

@@ -8,10 +8,10 @@ export function TripleGuarantee() {
     <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl p-8">
       <div className="text-center mb-8">
         <h3 className="text-2xl font-bold text-foreground mb-2">
-          Our Triple Guarantee
+          WLA Triple Guarantee
         </h3>
         <p className="text-muted-foreground">
-          We stand behind our training with these concrete commitments
+          WLA stands behind every website build with these concrete commitments
         </p>
       </div>
 
@@ -24,7 +24,7 @@ export function TripleGuarantee() {
             Fully-Functional Site
           </h4>
           <p className="text-sm text-muted-foreground">
-            You will have a hosted website that is live and interactive on the internet with at least one contact form for client data capture and responsive design within 2 weeks after completing the 8-week course program.
+            Your website will be hosted, live, and interactive on the internet with responsive design, professional branding, and at least one contact form for client data capture.
           </p>
         </div>
 
@@ -36,7 +36,7 @@ export function TripleGuarantee() {
             90+ Lighthouse Scores
           </h4>
           <p className="text-sm text-muted-foreground">
-            Your website will achieve a minimum score of 90 or higher on Google Lighthouse metrics for Performance, Accessibility, Best Practices, and SEO, ensuring your site meets industry-leading standards.
+            WLA will work with you to achieve a minimum score of 90 or higher on Google Lighthouse metrics for Performance, Accessibility, Best Practices, and SEO, ensuring your site meets industry-leading standards.
           </p>
         </div>
 
@@ -45,10 +45,10 @@ export function TripleGuarantee() {
             <Shield className="h-8 w-8 text-purple-600" />
           </div>
           <h4 className="font-semibold text-foreground">
-            1 Full Year of Basic Support
+            90 Days of Free Fixes
           </h4>
           <p className="text-sm text-muted-foreground">
-            Web Launch Academy provides 1 full year of basic support including SEO, Best Practices, Performance, and Accessibility testing and consultation via email after your site goes live.
+            WLA provides 90 days of free fixes and monthly check-ins after your site goes live, ensuring your website continues to perform at its best during the critical launch period.
           </p>
         </div>
       </div>
@@ -77,13 +77,13 @@ export function TripleGuarantee() {
           </h4>
         </div>
         <p className="text-center text-foreground/80 leading-relaxed">
-          If Web Launch Academy cannot deliver on all three guarantees above, you will receive a <strong>full refund</strong> of your course fee. We are committed to your success, and we stand behind our ability to help you build a professional, high-performing website.
+          If WLA cannot deliver on all three guarantees above, you will receive a <strong>full refund</strong> of your project fee. WLA is committed to your success and stands behind the ability to build you a professional, high-performing website.
         </p>
       </div>
 
       <div className="mt-4 text-center">
         <p className="text-sm text-muted-foreground mb-2">
-          *Guarantees apply to course participants who follow all recommended guidance.{' '}
+          *Individual contracts and service agreements take precedence over this general guarantee. Guarantees apply to clients who follow all recommended guidance and provide timely feedback.{' '}
           <Link href="/guarantee" className="text-primary hover:text-primary/80 underline font-medium">
             View full guarantee details and terms
           </Link>

@@ -285,7 +285,7 @@ function SignupContent() {
             Join Web Launch Academy
           </h1>
           <p className="text-xl text-muted-foreground">
-            Complete your student account setup
+            Complete your client account setup
           </p>
           
           {/* Show invite details */}

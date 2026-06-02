@@ -370,7 +370,7 @@ export class CheckoutCompletedHandler extends BaseWebhookHandler {
           email: customerEmail.toLowerCase(),
           full_name: lead?.name || customerName || '',
           email_verified: true,
-          role: 'student',
+          role: 'client',
           tier: 'basic',
           payment_status: 'pending'
         })

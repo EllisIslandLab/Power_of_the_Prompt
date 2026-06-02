@@ -26,7 +26,7 @@ export interface User {
   id: string
   email: string
   full_name: string
-  role: 'student' | 'admin'
+  role: 'client' | 'admin'
   tier: 'basic' | 'premium' | 'vip'
   payment_status: 'pending' | 'paid' | 'failed' | 'trial'
   email_verified: boolean
@@ -40,7 +40,7 @@ export interface CreateUserInput {
   id: string // Auth user ID
   email: string
   full_name: string
-  role?: 'student' | 'admin'
+  role?: 'client' | 'admin'
   tier?: 'basic' | 'premium' | 'vip'
   payment_status?: 'pending' | 'paid' | 'failed' | 'trial'
   email_verified?: boolean
@@ -110,7 +110,7 @@ export class UserRepository extends BaseRepository<User> {
         id: input.id,
         email: input.email.toLowerCase(),
         full_name: input.full_name,
-        role: input.role || 'student',
+        role: input.role || 'client',
         tier: input.tier || 'basic',
         payment_status: input.payment_status || 'pending',
         email_verified: input.email_verified || false,
@@ -342,7 +342,7 @@ export class UserRepository extends BaseRepository<User> {
   /**
    * Get all users by role
    */
-  async findByRole(role: 'student' | 'admin'): Promise<User[]> {
+  async findByRole(role: 'client' | 'admin'): Promise<User[]> {
     return this.findMany({ role } as Partial<User>)
   }
 

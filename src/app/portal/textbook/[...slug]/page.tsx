@@ -231,7 +231,7 @@ export default function TextbookChapterPage() {
               )}
             >
               <BookOpen className="h-5 w-5" />
-              <span>Student Textbook</span>
+              <span>Client Textbook</span>
             </Link>
 
             <Button

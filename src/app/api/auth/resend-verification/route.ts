@@ -112,7 +112,7 @@ async function sendVerificationEmail(email: string, name: string, verificationUr
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Welcome to Web Launch Academy, ${name}!</h2>
         
-        <p>Thank you for creating your student account. To get started, please verify your email address by clicking the button below:</p>
+        <p>Thank you for creating your client account. To get started, please verify your email address by clicking the button below:</p>
         
         <div style="text-align: center; margin: 30px 0;">
           <a href="${verificationUrl}" 

@@ -27,11 +27,11 @@ export default function TextbookPortalPage() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 px-6 py-3 rounded-full border border-primary/20 mb-6">
             <BookOpen className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg text-primary">Student Textbook</span>
+            <span className="font-bold text-lg text-primary">Client Textbook</span>
           </div>
           
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
-            WebLaunchCoach Student Textbook
+            WebLaunchCoach Client Textbook
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
 &quot;Build Once, Own Forever&quot; - Complete Guide to Professional Web Development
@@ -55,9 +55,9 @@ export default function TextbookPortalPage() {
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <Users className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Student Exclusive</h3>
+                <h3 className="font-semibold text-lg mb-2">Client Exclusive</h3>
                 <p className="text-sm text-muted-foreground">
-                  Access restricted to enrolled students only
+                  Access restricted to enrolled clients only
                 </p>
               </div>
               <div className="text-center">

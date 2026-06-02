@@ -26,13 +26,13 @@ export function WelcomeEmail({
       </Heading>
 
       <Text style={paragraph}>
-        Welcome to Web Launch Academy! We're excited to have you join our
+        Welcome to Web Launch Academy! WLA is excited to have you join the
         community of aspiring web developers. You're about to embark on an
         amazing journey to build professional websites with modern technology.
       </Text>
 
       <Text style={paragraph}>
-        You can now sign in to access your student portal and start exploring
+        You can now sign in to access your client portal and start exploring
         resources and lessons.
       </Text>
 
@@ -42,7 +42,7 @@ export function WelcomeEmail({
           What's Next?
         </Heading>
         <ul style={list}>
-          <li style={listItem}>Sign in to your student portal</li>
+          <li style={listItem}>Sign in to your client portal</li>
           <li style={listItem}>Complete your profile</li>
           <li style={listItem}>Start exploring resources and lessons</li>
         </ul>

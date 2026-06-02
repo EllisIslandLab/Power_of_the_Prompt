@@ -19,7 +19,6 @@ export { WebhookRegistry } from './WebhookRegistry'
 export { CheckoutCompletedHandler } from './handlers/CheckoutCompletedHandler'
 export { PaymentSucceededHandler } from './handlers/PaymentSucceededHandler'
 export { ToolkitPurchaseHandler } from './handlers/ToolkitPurchaseHandler'
-export { AIPremiumHandler } from './handlers/AIPremiumHandler'
 export { TextbookHandler } from './handlers/TextbookHandler'
 
 // Factory function to create a registry with all handlers registered
@@ -27,7 +26,6 @@ import { WebhookRegistry } from './WebhookRegistry'
 import { CheckoutCompletedHandler } from './handlers/CheckoutCompletedHandler'
 import { PaymentSucceededHandler } from './handlers/PaymentSucceededHandler'
 import { ToolkitPurchaseHandler } from './handlers/ToolkitPurchaseHandler'
-import { AIPremiumHandler } from './handlers/AIPremiumHandler'
 import { TextbookHandler } from './handlers/TextbookHandler'
 
 /**
@@ -41,7 +39,6 @@ export function createStripeWebhookRegistry(): WebhookRegistry {
   // More specific handlers should be registered first
   registry.registerAll([
     new PaymentSucceededHandler(),
-    new AIPremiumHandler(),        // Phase 2A: AI Premium Builder ($5)
     new TextbookHandler(),          // Phase 2A: Launch Guide ($19)
     new ToolkitPurchaseHandler(),   // Architecture Mastery Toolkit ($190)
     new CheckoutCompletedHandler(), // Fallback for other purchases

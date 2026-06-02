@@ -63,7 +63,7 @@ export function PaymentConfirmationEmail({
           🔐 Set Up Your Password
         </Heading>
         <Text style={accountSetupText}>
-          Your enrollment is complete! Click the button below to create your password and access the student portal.
+          Your enrollment is complete! Click the button below to create your password and access the client portal.
         </Text>
         <Section style={buttonSection}>
           <Button style={passwordButton} href={resetUrl}>
@@ -82,7 +82,7 @@ export function PaymentConfirmationEmail({
         </Heading>
         <ol style={list}>
           <li style={listItem}>Click "Create New Password" above to set your password</li>
-          <li style={listItem}>Sign in to the student portal</li>
+          <li style={listItem}>Sign in to the client portal</li>
           <li style={listItem}>Complete your profile and generate an anonymous username if desired</li>
           <li style={listItem}>Start accessing your course materials</li>
           {sessions > 0 && (

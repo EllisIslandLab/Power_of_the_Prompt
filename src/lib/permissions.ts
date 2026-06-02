@@ -1,4 +1,4 @@
-// Feature gating system for student tiers
+// Feature gating system for client tiers
 
 export type StudentTier = 'free' | 'full'
 export type Feature = 
@@ -13,7 +13,7 @@ export type Feature =
   | 'course_certificates'
   | 'advanced_tools'
 
-export interface Student {
+export interface Client {
   id: string
   tier: StudentTier
   payment_status: 'pending' | 'paid' | 'trial' | 'expired'
@@ -41,64 +41,64 @@ const tierPermissions: Record<StudentTier, Feature[]> = {
 }
 
 /**
- * Check if a student can access a specific feature
+ * Check if a client can access a specific feature
  */
-export function canAccessFeature(student: Student, feature: Feature): boolean {
+export function canAccessFeature(client: Client, feature: Feature): boolean {
   // Must be email verified to access any features
-  if (!student.email_verified) {
+  if (!client.email_verified) {
     return false
   }
 
   // Check if payment is required for full tier features
-  if (student.tier === 'full' && student.payment_status === 'expired') {
+  if (client.tier === 'full' && client.payment_status === 'expired') {
     // Downgrade to free tier permissions if payment expired
     return tierPermissions.free.includes(feature)
   }
 
-  return tierPermissions[student.tier]?.includes(feature) || false
+  return tierPermissions[client.tier]?.includes(feature) || false
 }
 
 /**
- * Check if student can access any premium features
+ * Check if client can access any premium features
  */
-export function hasPremiumAccess(student: Student): boolean {
-  return student.tier === 'full' && 
-         student.payment_status !== 'expired' && 
-         student.email_verified
+export function hasPremiumAccess(client: Client): boolean {
+  return client.tier === 'full' && 
+         client.payment_status !== 'expired' && 
+         client.email_verified
 }
 
 /**
- * Get all available features for a student
+ * Get all available features for a client
  */
-export function getStudentFeatures(student: Student): Feature[] {
-  if (!student.email_verified) {
+export function getStudentFeatures(client: Client): Feature[] {
+  if (!client.email_verified) {
     return []
   }
 
-  if (student.tier === 'full' && student.payment_status === 'expired') {
+  if (client.tier === 'full' && client.payment_status === 'expired') {
     return tierPermissions.free
   }
 
-  return tierPermissions[student.tier] || []
+  return tierPermissions[client.tier] || []
 }
 
 /**
  * Get a user-friendly description of access level
  */
-export function getAccessLevelDescription(student: Student): string {
-  if (!student.email_verified) {
+export function getAccessLevelDescription(client: Client): string {
+  if (!client.email_verified) {
     return 'Please verify your email to access course materials'
   }
 
-  if (student.tier === 'free') {
+  if (client.tier === 'free') {
     return 'Free Tier - Access to basic course materials and community'
   }
 
-  if (student.tier === 'full') {
-    if (student.payment_status === 'expired') {
+  if (client.tier === 'full') {
+    if (client.payment_status === 'expired') {
       return 'Payment Expired - Currently limited to free tier access'
     }
-    if (student.payment_status === 'pending') {
+    if (client.payment_status === 'pending') {
       return 'Full Access - Payment processing'
     }
     return 'Full Access - All course materials and premium features'
@@ -108,15 +108,15 @@ export function getAccessLevelDescription(student: Student): string {
 }
 
 /**
- * Check if student needs to upgrade for a specific feature
+ * Check if client needs to upgrade for a specific feature
  */
-export function needsUpgradeFor(student: Student, feature: Feature): boolean {
-  if (!student.email_verified) {
+export function needsUpgradeFor(client: Client, feature: Feature): boolean {
+  if (!client.email_verified) {
     return false // Need to verify email first
   }
 
   // If they already have access, no upgrade needed
-  if (canAccessFeature(student, feature)) {
+  if (canAccessFeature(client, feature)) {
     return false
   }
 
@@ -148,7 +148,7 @@ export function getUpgradeMessage(feature: Feature): string {
  * Feature gate component props helper
  */
 export interface FeatureGateProps {
-  student: Student
+  client: Client
   feature: Feature
   fallback?: React.ReactNode
   children: React.ReactNode

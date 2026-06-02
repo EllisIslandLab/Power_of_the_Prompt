@@ -24,7 +24,7 @@ export default function EmailVerifiedPage() {
             </p>
             <div className="p-3 bg-accent/10 border border-accent/20 rounded-md">
               <p className="text-sm text-accent-foreground">
-                <strong>Welcome!</strong> Your student account is now active and ready to use.
+                <strong>Welcome!</strong> Your client account is now active and ready to use.
               </p>
             </div>
           </div>

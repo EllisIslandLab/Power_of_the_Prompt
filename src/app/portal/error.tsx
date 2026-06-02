@@ -8,7 +8,7 @@ import Link from 'next/link'
 /**
  * Portal Error Boundary
  *
- * Catches errors specific to the student portal and displays a contextual fallback UI.
+ * Catches errors specific to the client portal and displays a contextual fallback UI.
  * This error boundary is scoped to /portal routes only.
  *
  * Features:
@@ -67,7 +67,7 @@ export default function PortalErrorPage({ error, reset }: PortalErrorPageProps) 
 
           {/* Error Description */}
           <p className="text-gray-600 mb-6">
-            We encountered an error while loading this page in your student portal.
+            We encountered an error while loading this page in your client portal.
             Your progress and data are safe.
           </p>
 

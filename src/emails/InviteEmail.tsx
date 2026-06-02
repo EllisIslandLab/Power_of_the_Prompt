@@ -39,7 +39,7 @@ export function InviteEmail({
 
       <Text style={paragraph}>
         {inviterName} has invited you to join <strong>Web Launch Academy</strong> with <strong>{tierName}</strong>!
-        We're excited to help you build professional websites with modern technology.
+        WLA is excited to help you build professional websites with modern technology.
       </Text>
 
       {/* Tier Info Section */}
@@ -72,14 +72,14 @@ export function InviteEmail({
       </Text>
 
       <ul style={list}>
-        <li style={listItem}>Access your student portal</li>
+        <li style={listItem}>Access your client portal</li>
         <li style={listItem}>Browse course resources</li>
         <li style={listItem}>Submit revision requests</li>
         <li style={listItem}>Schedule video conferences</li>
       </ul>
 
       <Text style={paragraph}>
-        We can't wait to see what you'll build!
+        WLA can't wait to see what you'll build!
         <br />
         <strong>The Web Launch Academy Team</strong>
       </Text>

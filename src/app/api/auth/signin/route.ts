@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
           email: data.user.email!,
           full_name: data.user.user_metadata?.full_name || '',
           email_verified: !!data.user.email_confirmed_at,
-          role: 'student',
+          role: 'client',
           tier: 'basic',
           payment_status: 'pending',
         })

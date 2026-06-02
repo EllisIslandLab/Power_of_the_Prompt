@@ -13,7 +13,7 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="text-2xl font-semibold text-foreground mb-4">Introduction</h2>
           <p className="text-muted-foreground">
-            Welcome to Web Launch Academy ("we," "our," or "us"). We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website coaching services, courses, and student portal.
+            Welcome to Web Launch Academy ("we," "our," or "us"). We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website coaching services, courses, and client portal.
           </p>
         </section>
 
@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
           </p>
           <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
             <li>Register for our courses or services</li>
-            <li>Create a student account</li>
+            <li>Create a client account</li>
             <li>Contact us for <a href="mailto:hello@weblaunchacademy.com?subject=Support Request" className="text-primary hover:text-primary/80 underline">support</a></li>
             <li>Sign up for SMS notifications</li>
             <li>Make a payment</li>
@@ -62,7 +62,7 @@ export default function PrivacyPolicy() {
             <li>Code repositories and projects you create</li>
             <li>Attendance records for group classes and 1-on-1 sessions</li>
             <li>Cohort assignment and development tracking</li>
-            <li>Communication within the student portal</li>
+            <li>Communication within the client portal</li>
           </ul>
         </section>
 
@@ -101,7 +101,7 @@ export default function PrivacyPolicy() {
 
           <h3 className="text-lg font-semibold text-foreground mb-2">Data Storage and Authentication</h3>
           <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
-            <li>Supabase: Student portal authentication, user data, and cohort tracking</li>
+            <li>Supabase: Client portal authentication, user data, and cohort tracking</li>
             <li>Airtable: Client data management and course administration</li>
           </ul>
 

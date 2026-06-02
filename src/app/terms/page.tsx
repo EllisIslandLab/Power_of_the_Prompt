@@ -29,7 +29,7 @@ export default function TermsOfService() {
             <li>Hands-on website building from start to finish</li>
           </ul>
           <p className="text-muted-foreground">
-            Our goal is to empower students to own their website code and infrastructure.
+            Our goal is to empower clients to own their website code and infrastructure.
           </p>
         </section>
 
@@ -47,13 +47,13 @@ export default function TermsOfService() {
           <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
             <li>You must complete the registration process and provide accurate information</li>
             <li>Payment must be processed successfully through Stripe</li>
-            <li>You will receive access to the student portal upon enrollment confirmation</li>
+            <li>You will receive access to the client portal upon enrollment confirmation</li>
           </ul>
 
           <h3 className="text-lg font-semibold text-foreground mb-2 mt-4">Course Access</h3>
           <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-4">
             <li>Access to course materials is granted upon successful enrollment and payment</li>
-            <li>You will receive login credentials for the student portal (authenticated through Supabase)</li>
+            <li>You will receive login credentials for the client portal (authenticated through Supabase)</li>
             <li>Course access includes group classes, 1-on-1 sessions, and online course materials</li>
             <li>Access duration depends on your specific enrollment package</li>
           </ul>
@@ -129,7 +129,7 @@ export default function TermsOfService() {
             <li>You own the code you create during the course</li>
             <li>You retain all rights to websites, applications, and projects you build</li>
             <li>Your GitHub repositories are your property</li>
-            <li>We may use anonymized examples of student work for promotional purposes (with your permission)</li>
+            <li>We may use anonymized examples of client work for promotional purposes (with your permission)</li>
           </ul>
 
           <h3 className="text-lg font-semibold text-foreground mb-2 mt-4">Technology Stack</h3>
@@ -141,13 +141,13 @@ export default function TermsOfService() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold text-foreground mb-4">Student Responsibilities</h2>
+          <h2 className="text-2xl font-semibold text-foreground mb-4">Client Responsibilities</h2>
           <p className="text-muted-foreground mb-3">You agree to:</p>
           <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
             <li>Attend scheduled group classes and 1-on-1 sessions or notify us of absences</li>
             <li>Complete coursework and exercises in a timely manner</li>
-            <li>Treat instructors and fellow students with respect</li>
-            <li>Use the student portal and services appropriately</li>
+            <li>Treat instructors and fellow clients with respect</li>
+            <li>Use the client portal and services appropriately</li>
             <li>Not engage in any activity that disrupts the learning environment</li>
             <li>Maintain your own backups of your code and projects</li>
           </ul>
@@ -284,7 +284,7 @@ export default function TermsOfService() {
 
           <p className="text-muted-foreground mb-3">Upon termination:</p>
           <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-            <li>Your access to the student portal will be revoked</li>
+            <li>Your access to the client portal will be revoked</li>
             <li>You may retain access to materials you downloaded</li>
             <li>Outstanding payments remain due</li>
           </ul>
