@@ -103,11 +103,10 @@ export function formatTrialStatus(account: ClientAccount): string {
 }
 
 export function calculateRevisionCost(tokens: number): number {
-  // API base cost: ~$0.003 per 1K tokens
-  // Client markup: 10x = $0.03 per 1K tokens
+  // API base cost: ~$0.003 per 1K tokens (what we pay)
+  // Note: Markup is applied in the route (10x for chat, 2x for help, etc.)
   const BASE_COST_PER_1K = 0.003
-  const MARKUP_MULTIPLIER = 10
-  return (tokens / 1000) * BASE_COST_PER_1K * MARKUP_MULTIPLIER
+  return (tokens / 1000) * BASE_COST_PER_1K
 }
 
 export function estimateTokensForChange(description: string): number {

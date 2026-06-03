@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { loadStripe } from '@stripe/stripe-js'
 import ConnectServiceModal from '../components/ConnectServiceModal'
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 interface SettingsInterfaceProps {
   user: any
@@ -10,7 +13,9 @@ interface SettingsInterfaceProps {
   userSettings: any
   paymentMethods: any[]
   connectedServices: any[]
+  conversations: any[]
   authEmail: string
+  initialTab: 'account' | 'billing' | 'connectors' | 'context' | 'preferences'
 }
 
 type SettingsTab = 'account' | 'billing' | 'connectors' | 'context' | 'preferences'
@@ -21,9 +26,11 @@ export default function SettingsInterface({
   userSettings: initialSettings,
   paymentMethods: initialPaymentMethods,
   connectedServices: initialConnectedServices,
+  conversations,
   authEmail,
+  initialTab,
 }: SettingsInterfaceProps) {
-  const [activeTab, setActiveTab] = useState<SettingsTab>('account')
+  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab)
   const [settings, setSettings] = useState(
     initialSettings || {
       username_for_claude: user?.full_name?.split(' ')[0] || '',
@@ -44,6 +51,11 @@ export default function SettingsInterface({
   const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  // Billing state
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
+  const [customAmount, setCustomAmount] = useState('')
+  const [isAddingFunds, setIsAddingFunds] = useState(false)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -102,6 +114,59 @@ export default function SettingsInterface({
     window.location.href = '/'
   }
 
+  const handleAddFunds = async () => {
+    const amount = selectedAmount || parseFloat(customAmount)
+    if (!amount || amount < 1) {
+      alert('Please select or enter an amount of at least $1')
+      return
+    }
+
+    if (!clientAccount?.id) {
+      alert('Unable to process payment. Please contact support.')
+      return
+    }
+
+    setIsAddingFunds(true)
+
+    try {
+      // Create Stripe checkout session
+      const response = await fetch('/api/portal/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount,
+          clientAccountId: clientAccount.id,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session')
+      }
+
+      const { sessionId, error } = await response.json()
+
+      if (error) {
+        throw new Error(error)
+      }
+
+      // Redirect to Stripe checkout
+      const stripe = await stripePromise
+      const { error: stripeError } = await stripe!.redirectToCheckout({ sessionId })
+
+      if (stripeError) {
+        console.error('Stripe error:', stripeError)
+        alert('Payment failed. Please try again.')
+      }
+    } catch (error) {
+      console.error('Checkout error:', error)
+      alert('Failed to initiate payment. Please try again.')
+    } finally {
+      setIsAddingFunds(false)
+    }
+  }
+
+  const presetAmounts = [5, 10, 20, 50]
+
   const tabs = [
     { id: 'account' as const, label: 'Account' },
     { id: 'billing' as const, label: 'Billing' },
@@ -111,14 +176,14 @@ export default function SettingsInterface({
   ]
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#050714]">
       {/* Header */}
-      <div className="border-b border-border bg-card">
+      <div className="border-b border-white/10 bg-[#080c25]/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+          <h1 className="text-2xl font-bold text-white uppercase tracking-wider">Settings</h1>
           <button
             onClick={() => (window.location.href = '/portal')}
-            className="text-primary hover:underline text-sm"
+            className="text-[#b1c6f9] hover:text-white text-xs font-bold uppercase tracking-wider transition-colors"
           >
             ← Back to Portal
           </button>
@@ -126,17 +191,17 @@ export default function SettingsInterface({
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-border bg-card">
+      <div className="border-b border-white/10 bg-[#080c25]/50 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex gap-8">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-3 text-sm font-medium border-b-2 transition-colors ${
+                className={`py-3 text-[10px] font-bold uppercase tracking-widest border-b-2 transition-colors ${
                   activeTab === tab.id
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                    ? 'border-[#FFB800] text-[#FFB800]'
+                    : 'border-transparent text-[#c4c7c8] hover:text-white'
                 }`}
               >
                 {tab.label}
@@ -150,255 +215,311 @@ export default function SettingsInterface({
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Account Settings */}
         {activeTab === 'account' && (
-          <div className="space-y-6">
-            <div className="bg-card rounded-lg border border-border p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Account Information</h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={authEmail}
-                    disabled
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-muted text-muted-foreground cursor-not-allowed"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Contact support to change your email
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Username (What Claude should call you)
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.username_for_claude}
-                    onChange={e =>
-                      setSettings({ ...settings, username_for_claude: e.target.value })
-                    }
-                    placeholder="e.g., Sarah"
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-card focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Profile Icon
-                  </label>
-                  <div className="flex items-center gap-4">
-                    {settings.profile_icon_url && (
-                      <img
-                        src={settings.profile_icon_url}
-                        alt="Profile"
-                        className="w-16 h-16 rounded-full object-cover border-2 border-border"
-                      />
-                    )}
+          <div className="space-y-4 max-w-5xl mx-auto">
+            {/* Account Info & Notifications */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Account Information */}
+              <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+                <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Account Info</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Email</label>
                     <input
-                      type="file"
-                      accept="image/*"
-                      className="text-sm text-foreground"
+                      type="email"
+                      value={authEmail}
+                      disabled
+                      className="w-full px-3 py-2 text-sm border border-white/10 rounded bg-muted/50 text-muted-foreground cursor-not-allowed"
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Upload a profile picture (max 2MB)
-                  </p>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      value={user?.full_name || ''}
+                      disabled
+                      className="w-full px-3 py-2 text-sm border border-white/10 rounded bg-muted/50 text-muted-foreground cursor-not-allowed"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
+                      Username (for Claude)
+                    </label>
+                    <input
+                      type="text"
+                      value={settings.username_for_claude}
+                      onChange={e =>
+                        setSettings({ ...settings, username_for_claude: e.target.value })
+                      }
+                      placeholder="e.g., Sarah, John"
+                      className="w-full px-3 py-2 text-sm border border-white/10 rounded bg-card/50 text-foreground focus:outline-none focus:border-primary/50"
+                    />
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      How Claude addresses you
+                    </p>
+                  </div>
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Chat Font
+              {/* Email Notifications */}
+              <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+                <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Email Notifications</p>
+                <div className="space-y-2.5">
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.notification_errors}
+                      onChange={e =>
+                        setSettings({ ...settings, notification_errors: e.target.checked })
+                      }
+                      className="w-4 h-4 mt-0.5 text-primary border-border rounded focus:ring-primary cursor-pointer"
+                    />
+                    <div>
+                      <div className="text-xs font-medium text-foreground">System Errors</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Errors & deployment failures
+                      </div>
+                    </div>
                   </label>
-                  <select
-                    value={settings.chat_font}
-                    onChange={e => setSettings({ ...settings, chat_font: e.target.value })}
-                    className="w-full px-4 py-2 border border-border rounded-lg bg-card focus:outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    <option value="system">System Default</option>
-                    <option value="serif">Anthropic Serif</option>
-                    <option value="arial">Arial</option>
-                    <option value="monospace">Monospace</option>
-                  </select>
+
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.notification_deployments}
+                      onChange={e =>
+                        setSettings({ ...settings, notification_deployments: e.target.checked })
+                      }
+                      className="w-4 h-4 mt-0.5 text-primary border-border rounded focus:ring-primary cursor-pointer"
+                    />
+                    <div>
+                      <div className="text-xs font-medium text-foreground">Deployments</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Successful production deploys
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.notification_email}
+                      onChange={e =>
+                        setSettings({ ...settings, notification_email: e.target.checked })
+                      }
+                      className="w-4 h-4 mt-0.5 text-primary border-border rounded focus:ring-primary cursor-pointer"
+                    />
+                    <div>
+                      <div className="text-xs font-medium text-foreground">Product Updates</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        New features & tips
+                      </div>
+                    </div>
+                  </label>
                 </div>
               </div>
             </div>
 
-            <div className="bg-card rounded-lg border border-border p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Notifications</h2>
-
-              <div className="space-y-3">
-                <label className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={settings.notification_errors}
-                    onChange={e =>
-                      setSettings({ ...settings, notification_errors: e.target.checked })
-                    }
-                    className="w-4 h-4 text-primary border-border rounded focus:ring-ring"
-                  />
-                  <div>
-                    <div className="text-sm font-medium text-foreground">Error Notifications</div>
-                    <div className="text-xs text-muted-foreground">
-                      Get notified when errors occur
-                    </div>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={settings.notification_deployments}
-                    onChange={e =>
-                      setSettings({ ...settings, notification_deployments: e.target.checked })
-                    }
-                    className="w-4 h-4 text-primary border-border rounded focus:ring-ring"
-                  />
-                  <div>
-                    <div className="text-sm font-medium text-foreground">
-                      Deployment Notifications
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Get notified when deployments complete
-                    </div>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={settings.notification_email}
-                    onChange={e =>
-                      setSettings({ ...settings, notification_email: e.target.checked })
-                    }
-                    className="w-4 h-4 text-primary border-border rounded focus:ring-ring"
-                  />
-                  <div>
-                    <div className="text-sm font-medium text-foreground">Email Notifications</div>
-                    <div className="text-xs text-muted-foreground">
-                      Receive notifications via email
-                    </div>
-                  </div>
-                </label>
+            {/* Security & Actions */}
+            <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Danger Zone</p>
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="px-4 py-1.5 bg-destructive/80 text-destructive-foreground rounded hover:bg-destructive transition-colors text-xs font-medium"
+                  >
+                    Delete Account
+                  </button>
+                </div>
+                <div className="flex items-center gap-3">
+                  {saved && (
+                    <span className="text-green-400 font-semibold text-xs">✓ Saved!</span>
+                  )}
+                  <button
+                    onClick={handleSaveSettings}
+                    disabled={isSaving}
+                    className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded hover:bg-primary/90 disabled:opacity-50 transition-all text-sm shadow-lg shadow-primary/20"
+                  >
+                    {isSaving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div className="bg-card rounded-lg border border-border p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Security</h2>
-
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors text-sm"
-              >
-                Delete Account
-              </button>
-              <p className="text-xs text-muted-foreground mt-2">
-                Permanently delete your account and all associated data
-              </p>
-            </div>
-
-            <div className="flex items-center justify-end gap-4">
-              <button
-                onClick={handleSaveSettings}
-                disabled={isSaving}
-                className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
-              >
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </button>
-              {saved && (
-                <span className="text-foreground font-semibold text-sm">✓ Saved!</span>
-              )}
             </div>
           </div>
         )}
 
         {/* Billing Settings */}
         {activeTab === 'billing' && (
-          <div className="space-y-6">
-            <div className="bg-card rounded-lg border border-border p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Current Plan</h2>
+          <div className="space-y-4 max-w-5xl mx-auto">
+            {/* Balance & Quick Add - Top Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Balance Card */}
+              <div className="md:col-span-1 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-5 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent pointer-events-none"></div>
+                <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Balance</p>
+                <p className={`text-4xl font-bold mb-0.5 relative z-10 ${
+                  (clientAccount?.account_balance || 0) === 0
+                    ? 'text-red-400'
+                    : (clientAccount?.account_balance || 0) < 10
+                    ? 'text-yellow-400'
+                    : 'text-green-400'
+                }`}
+                style={{
+                  textShadow: (clientAccount?.account_balance || 0) >= 10
+                    ? '0 0 20px rgba(74, 222, 128, 0.3), 0 0 40px rgba(74, 222, 128, 0.1)'
+                    : (clientAccount?.account_balance || 0) < 10 && (clientAccount?.account_balance || 0) > 0
+                    ? '0 0 20px rgba(250, 204, 21, 0.3)'
+                    : '0 0 20px rgba(248, 113, 113, 0.3)'
+                }}>
+                  ${clientAccount?.account_balance?.toFixed(2) || '0.00'}
+                </p>
+                <p className="text-[10px] text-muted-foreground">AI chat · Help · Services</p>
+              </div>
 
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="text-sm font-medium text-foreground">
-                    {clientAccount?.subscription_tier === 'trial' ? 'Trial' :
-                     clientAccount?.subscription_tier === 'full' ? 'Full Service' :
-                     'Free'}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Balance: ${(clientAccount?.account_balance || 0).toFixed(2)}
-                  </div>
+              {/* Quick Add Funds */}
+              <div className="md:col-span-2 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+                <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Quick Add</p>
+                <div className="grid grid-cols-4 gap-2 mb-3">
+                  {presetAmounts.map(amount => (
+                    <button
+                      key={amount}
+                      onClick={() => {
+                        setSelectedAmount(amount)
+                        setCustomAmount('')
+                      }}
+                      className={`py-2 px-3 rounded border transition-all text-sm font-semibold ${
+                        selectedAmount === amount
+                          ? 'border-primary bg-primary/10 text-primary shadow-lg shadow-primary/20'
+                          : 'border-white/10 bg-white/5 text-foreground hover:border-primary/50 hover:bg-primary/5'
+                      }`}
+                    >
+                      ${amount}
+                    </button>
+                  ))}
                 </div>
-                <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm">
-                  Upgrade Plan
-                </button>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    value={customAmount}
+                    onChange={e => {
+                      setCustomAmount(e.target.value)
+                      setSelectedAmount(null)
+                    }}
+                    placeholder="Custom amount"
+                    className="flex-1 px-3 py-2 text-sm border border-white/10 rounded bg-card/50 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50"
+                  />
+                  <button
+                    onClick={handleAddFunds}
+                    disabled={isAddingFunds || (!selectedAmount && !customAmount)}
+                    className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm shadow-lg shadow-primary/20"
+                  >
+                    {isAddingFunds ? 'Processing...' : 'Add Funds'}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="bg-card rounded-lg border border-border p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Payment Methods</h2>
-
-              {paymentMethods.length === 0 ? (
-                <p className="text-sm text-muted-foreground mb-4">No payment methods added</p>
-              ) : (
-                <div className="space-y-3 mb-4">
-                  {paymentMethods.map(method => (
-                    <div
-                      key={method.id}
-                      className="flex items-center justify-between p-3 border border-border rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="text-sm font-medium text-foreground">
-                          {method.payment_type === 'card' &&
-                            `${method.card_brand} •••• ${method.card_last4}`}
-                          {method.payment_type === 'ach' &&
-                            `${method.bank_name} •••• ${method.account_last4}`}
-                          {method.payment_type === 'check' && 'Check Payment'}
-                        </div>
-                        {method.is_default && (
-                          <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-                            Default
-                          </span>
-                        )}
-                      </div>
-                      <button className="text-destructive hover:text-destructive/80 text-sm">
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <button className="w-full px-4 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors text-sm text-foreground">
-                  Add Credit Card
-                </button>
-                <button className="w-full px-4 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors text-sm text-foreground">
-                  Add ACH Bank Account
-                </button>
-                <div className="pt-2 border-t border-border mt-4">
-                  <p className="text-sm font-medium text-foreground mb-2">Pay by Check</p>
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <p>Make checks payable to: <strong>Web Launch Academy LLC</strong></p>
-                    <p>Mail to:</p>
-                    <p className="ml-4">
-                      1968 Torrey Park Trl<br />
-                      Painesville, OH 44077
-                    </p>
+            {/* Pricing & Payment Info - Middle Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Pricing */}
+              <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+                <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Pricing Guide</p>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">AI Chat:</span>
+                    <span className="text-foreground font-medium">$0.03/1K tokens</span>
                   </div>
-                </div>
-                <div className="pt-2 border-t border-border mt-4">
-                  <p className="text-sm font-medium text-foreground mb-2">ACH Details</p>
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <p>Bank: <strong>Huntington Bank</strong></p>
-                    <p>Routing Number: <strong>041000153</strong></p>
-                    <p>Account Number: <strong>01663471965</strong></p>
-                    <p>Business Name: <strong>Web Launch Academy LLC</strong></p>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Small change:</span>
+                    <span className="text-foreground font-medium">~$0.50-$1.50</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Medium change:</span>
+                    <span className="text-foreground font-medium">~$2.00-$5.00</span>
                   </div>
                 </div>
               </div>
+
+              {/* Alternative Payment */}
+              <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+                <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Alternative Payment</p>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs font-medium text-foreground mb-1">Pay by Check</p>
+                    <div className="text-[10px] text-muted-foreground space-y-0.5">
+                      <p>Web Launch Academy LLC</p>
+                      <p>1968 Torrey Park Trl, Painesville, OH 44077</p>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-white/10">
+                    <p className="text-xs font-medium text-foreground mb-1">ACH Transfer</p>
+                    <div className="text-[10px] text-muted-foreground space-y-0.5">
+                      <p>Huntington Bank · Routing: 041000153</p>
+                      <p>Account: 01663471965</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Transaction History - Bottom */}
+            <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Recent Activity</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {conversations.length > 0 ? `${conversations.length} conversation${conversations.length === 1 ? '' : 's'}` : 'AI chat history'}
+                </p>
+              </div>
+
+              {!conversations || conversations.length === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-muted-foreground text-xs">No conversations yet</p>
+                  <p className="text-muted-foreground text-[10px] mt-1">Start chatting with Claude to see activity here</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-[200px] overflow-y-auto panel-scroll">
+                  {conversations.slice(0, 10).map(conv => {
+                    const messages = conv.revision_chat_messages || []
+                    const convCost = messages.reduce(
+                      (sum: number, msg: any) => {
+                        const tokens = msg.tokens_used || 0
+                        return sum + (tokens / 1000) * 0.03
+                      },
+                      0
+                    )
+
+                    return (
+                      <div
+                        key={conv.id}
+                        className="flex justify-between items-center py-1.5 px-2 rounded bg-white/5 hover:bg-white/10 transition-colors"
+                      >
+                        <div>
+                          <p className="text-xs font-medium text-foreground">
+                            {new Date(conv.created_at).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {messages.length} message{messages.length === 1 ? '' : 's'}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs font-semibold text-foreground">
+                            ${convCost.toFixed(4)}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground capitalize">
+                            {conv.status || 'active'}
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -753,110 +874,235 @@ export default function SettingsInterface({
 
         {/* Context & Instructions */}
         {activeTab === 'context' && (
-          <div className="space-y-6">
-            <div className="bg-card rounded-lg border border-border p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">
-                Custom Context for Claude
-              </h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                Provide background information about your business, brand, or projects that Claude should always keep in mind.
-              </p>
-              <textarea
-                value={settings.claude_context}
-                onChange={e => setSettings({ ...settings, claude_context: e.target.value })}
-                placeholder="e.g., I run a bakery called Sweet Dreams. We focus on organic ingredients..."
-                className="w-full px-4 py-3 border border-border rounded-lg bg-card focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                rows={6}
-              />
+          <div className="space-y-4 max-w-5xl mx-auto">
+            {/* Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Business Context */}
+              <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Business Context</p>
+                  <span className="text-[10px] text-muted-foreground">
+                    {settings.claude_context?.length || 0} chars
+                  </span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mb-3">
+                  Your business, brand, audience, and key info
+                </p>
+
+                <div className="mb-2">
+                  <div className="text-[11px] text-muted-foreground bg-white/5 p-2 rounded border border-white/10">
+                    <strong>Example:</strong> "Sweet Dreams Bakery - organic gluten-free pastries. Target: health-conscious millennials. Brand: warm, eco-conscious. Colors: pink (#FFB6C1), green (#9DC183)"
+                  </div>
+                </div>
+
+                <textarea
+                  value={settings.claude_context}
+                  onChange={e => setSettings({ ...settings, claude_context: e.target.value })}
+                  placeholder="Business, industry, brand, audience, values..."
+                  className="w-full px-3 py-2 text-xs border border-white/10 rounded bg-card/50 text-foreground focus:outline-none focus:border-primary/50 resize-none"
+                  rows={10}
+                />
+              </div>
+
+              {/* Working Preferences */}
+              <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Working Preferences</p>
+                  <span className="text-[10px] text-muted-foreground">
+                    {settings.claude_instructions?.length || 0} chars
+                  </span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mb-3">
+                  Communication style, approach, technical preferences
+                </p>
+
+                <div className="mb-2">
+                  <div className="text-[11px] text-muted-foreground bg-white/5 p-2 rounded border border-white/10">
+                    <strong>Example:</strong> "Always ask before major changes. Use simple language. Prefer mobile-first, minimalist design. Explain 'why' behind recommendations."
+                  </div>
+                </div>
+
+                <textarea
+                  value={settings.claude_instructions}
+                  onChange={e => setSettings({ ...settings, claude_instructions: e.target.value })}
+                  placeholder="Style, preferences, technical approach..."
+                  className="w-full px-3 py-2 text-xs border border-white/10 rounded bg-card/50 text-foreground focus:outline-none focus:border-primary/50 resize-none"
+                  rows={10}
+                />
+              </div>
             </div>
 
-            <div className="bg-card rounded-lg border border-border p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">
-                Custom Instructions for Claude
-              </h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                Tell Claude how you'd like it to work - tone, style, level of detail, or specific preferences.
-              </p>
-              <textarea
-                value={settings.claude_instructions}
-                onChange={e => setSettings({ ...settings, claude_instructions: e.target.value })}
-                placeholder="e.g., Always ask before making changes. Use simple language. Prefer modern design..."
-                className="w-full px-4 py-3 border border-border rounded-lg bg-card focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                rows={6}
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-4">
+            {/* Save Button */}
+            <div className="flex items-center justify-end gap-3">
+              {saved && (
+                <span className="text-green-400 font-semibold text-xs">✓ Saved!</span>
+              )}
               <button
                 onClick={handleSaveSettings}
                 disabled={isSaving}
-                className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded hover:bg-primary/90 disabled:opacity-50 transition-all text-sm shadow-lg shadow-primary/20"
               >
                 {isSaving ? 'Saving...' : 'Save Changes'}
               </button>
-              {saved && (
-                <span className="text-foreground font-semibold text-sm">✓ Saved!</span>
-              )}
             </div>
           </div>
         )}
 
         {/* Preferences */}
         {activeTab === 'preferences' && (
-          <div className="space-y-6">
-            <div className="bg-card rounded-lg border border-border p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Theme</h2>
-
-              <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-4 max-w-5xl mx-auto">
+            {/* Theme Selection */}
+            <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+              <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Visual Theme</p>
+              <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setSettings({ ...settings, theme: 'light' })}
-                  className={`p-4 border-2 rounded-lg transition-all ${
+                  className={`p-3 border rounded transition-all ${
                     settings.theme === 'light'
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-border/60'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-white/10 hover:border-primary/30'
                   }`}
                 >
-                  <div className="w-full h-24 bg-white border border-gray-300 rounded mb-2" />
-                  <div className="text-sm font-medium text-foreground">Light</div>
+                  <div className="w-full h-16 bg-white border border-gray-300 rounded mb-2" />
+                  <div className="text-xs font-medium text-foreground">Light</div>
                 </button>
 
                 <button
                   onClick={() => setSettings({ ...settings, theme: 'dark' })}
-                  className={`p-4 border-2 rounded-lg transition-all ${
+                  className={`p-3 border rounded transition-all ${
                     settings.theme === 'dark'
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-border/60'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-white/10 hover:border-primary/30'
                   }`}
                 >
-                  <div className="w-full h-24 bg-gray-900 border border-gray-700 rounded mb-2" />
-                  <div className="text-sm font-medium text-foreground">Dark</div>
+                  <div className="w-full h-16 bg-gray-900 border border-gray-700 rounded mb-2" />
+                  <div className="text-xs font-medium text-foreground">Dark</div>
                 </button>
 
                 <button
                   onClick={() => setSettings({ ...settings, theme: 'colorful' })}
-                  className={`p-4 border-2 rounded-lg transition-all ${
+                  className={`p-3 border rounded transition-all ${
                     settings.theme === 'colorful'
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-border/60'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-white/10 hover:border-primary/30'
                   }`}
                 >
-                  <div className="w-full h-24 bg-gradient-to-br from-blue-500 via-white to-yellow-400 rounded mb-2" />
-                  <div className="text-sm font-medium text-foreground">WLA Colorful</div>
+                  <div className="w-full h-16 bg-gradient-to-br from-blue-500 via-white to-yellow-400 rounded mb-2" />
+                  <div className="text-xs font-medium text-foreground">Colorful</div>
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-4">
+            {/* Behavior & Editor - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Portal Behavior */}
+              <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+                <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Portal Behavior</p>
+                <div className="space-y-2.5">
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.auto_save_enabled !== false}
+                      onChange={e =>
+                        setSettings({ ...settings, auto_save_enabled: e.target.checked })
+                      }
+                      className="w-4 h-4 mt-0.5 text-primary border-border rounded focus:ring-primary cursor-pointer"
+                    />
+                    <div>
+                      <div className="text-xs font-medium text-foreground">Auto-save settings</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Save preferences automatically
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.show_file_tree !== false}
+                      onChange={e =>
+                        setSettings({ ...settings, show_file_tree: e.target.checked })
+                      }
+                      className="w-4 h-4 mt-0.5 text-primary border-border rounded focus:ring-primary cursor-pointer"
+                    />
+                    <div>
+                      <div className="text-xs font-medium text-foreground">Expand file tree</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Show file explorer by default
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.enable_keyboard_shortcuts !== false}
+                      onChange={e =>
+                        setSettings({ ...settings, enable_keyboard_shortcuts: e.target.checked })
+                      }
+                      className="w-4 h-4 mt-0.5 text-primary border-border rounded focus:ring-primary cursor-pointer"
+                    />
+                    <div>
+                      <div className="text-xs font-medium text-foreground">Keyboard shortcuts</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Enable Cmd+K and other shortcuts
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Code Editor */}
+              <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
+                <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Code Editor</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-foreground mb-1.5">
+                      Font Size
+                    </label>
+                    <select
+                      value={settings.editor_font_size || 'medium'}
+                      onChange={e => setSettings({ ...settings, editor_font_size: e.target.value })}
+                      className="w-full px-3 py-2 text-sm border border-white/10 rounded bg-card/50 text-foreground focus:outline-none focus:border-primary/50"
+                    >
+                      <option value="small">Small (12px)</option>
+                      <option value="medium">Medium (14px)</option>
+                      <option value="large">Large (16px)</option>
+                    </select>
+                  </div>
+
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.show_line_numbers !== false}
+                      onChange={e =>
+                        setSettings({ ...settings, show_line_numbers: e.target.checked })
+                      }
+                      className="w-4 h-4 mt-0.5 text-primary border-border rounded focus:ring-primary cursor-pointer"
+                    />
+                    <div>
+                      <div className="text-xs font-medium text-foreground">Show line numbers</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Display line numbers in code
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="flex items-center justify-end gap-3">
+              {saved && (
+                <span className="text-green-400 font-semibold text-xs">✓ Saved!</span>
+              )}
               <button
                 onClick={handleSaveSettings}
                 disabled={isSaving}
-                className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                className="px-6 py-2 bg-primary text-primary-foreground font-semibold rounded hover:bg-primary/90 disabled:opacity-50 transition-all text-sm shadow-lg shadow-primary/20"
               >
                 {isSaving ? 'Saving...' : 'Save Changes'}
               </button>
-              {saved && (
-                <span className="text-foreground font-semibold text-sm">✓ Saved!</span>
-              )}
             </div>
           </div>
         )}

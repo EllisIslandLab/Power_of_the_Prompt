@@ -3,7 +3,14 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import SettingsInterface from './SettingsInterface'
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>
+}) {
+  const params = await searchParams
+  const initialTab = (params.tab || 'account') as 'account' | 'billing' | 'connectors' | 'context' | 'preferences'
+
   const cookieStore = await cookies()
 
   const supabase = createServerClient(
@@ -136,6 +143,30 @@ export default async function SettingsPage() {
   }
   const allServices = Array.from(serviceMap.values())
 
+  // Get conversations for billing history (optional - may not exist yet)
+  let conversations: any[] = []
+  try {
+    const { data, error } = await supabase
+      .from('revision_conversations')
+      .select(`
+        *,
+        revision_chat_messages (
+          tokens_used
+        )
+      `)
+      .eq('client_account_id', clientAccount?.id)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.log('Settings - Conversations table not available yet (this is OK):', error.message || error.code)
+    } else {
+      conversations = data || []
+      console.log('Settings - Conversations:', conversations.length, 'found')
+    }
+  } catch (err) {
+    console.log('Settings - Conversations query failed (table may not exist yet)')
+  }
+
   // Debug logging
   console.log('Settings - Old connected services:', oldConnectedServices)
   console.log('Settings - User service credentials:', userServiceCredentials)
@@ -151,7 +182,9 @@ export default async function SettingsPage() {
       userSettings={userSettings}
       paymentMethods={paymentMethods || []}
       connectedServices={allServices}
+      conversations={conversations || []}
       authEmail={session.user.email || ''}
+      initialTab={initialTab}
     />
   )
 }

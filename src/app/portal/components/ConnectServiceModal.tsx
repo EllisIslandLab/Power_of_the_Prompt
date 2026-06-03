@@ -188,7 +188,7 @@ export default function ConnectServiceModal({
 
   if (!config) {
     return (
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div className="bg-card rounded-lg border border-border p-6 max-w-md w-full">
           <h3 className="text-lg font-semibold text-foreground mb-4">Service Not Configured</h3>
           <p className="text-sm text-muted-foreground mb-4">
@@ -271,9 +271,9 @@ export default function ConnectServiceModal({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-40" onClick={onClose} />
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-        <div className="bg-card rounded-lg border border-border shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="bg-card rounded-lg border border-border shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="border-b border-border p-6">
             <div className="flex items-center justify-between">
