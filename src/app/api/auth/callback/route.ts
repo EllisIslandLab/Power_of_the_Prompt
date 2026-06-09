@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
                           'User'
 
           // Create user record
-          await adminClient
+          const { error: userError } = await adminClient
             .from('users')
             .insert({
               id: data.user.id,
@@ -81,26 +81,39 @@ export async function GET(request: NextRequest) {
               role: 'client',
             })
 
+          if (userError) {
+            console.error('Failed to create user record:', userError)
+            throw userError
+          }
+
           // Create client_account
-          const { data: newAccount } = await adminClient
+          const { data: newAccount, error: accountError } = await adminClient
             .from('client_accounts')
             .insert({
               user_id: data.user.id,
               account_balance: 0,
-              total_spent: 0,
+              total_lifetime_spent: 0,
             })
             .select()
             .single()
 
+          if (accountError) {
+            console.error('Failed to create client account:', accountError)
+            throw accountError
+          }
+
           // Create user_settings
-          if (newAccount) {
-            await adminClient
-              .from('user_settings')
-              .insert({
-                user_id: data.user.id,
-                theme_preference: 'dark',
-                enable_notifications: true,
-              })
+          const { error: settingsError } = await adminClient
+            .from('user_settings')
+            .insert({
+              user_id: data.user.id,
+              theme_preference: 'dark',
+              enable_notifications: true,
+            })
+
+          if (settingsError) {
+            console.error('Failed to create user settings:', settingsError)
+            throw settingsError
           }
 
           console.log('Successfully created user records')
