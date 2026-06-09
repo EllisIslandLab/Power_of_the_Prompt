@@ -7,12 +7,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Copy, Mail, UserPlus } from 'lucide-react'
+import { Copy, Mail, UserPlus, Crown, Users } from 'lucide-react'
 
 export default function AdminInvitesPage() {
   const [formData, setFormData] = useState({
     email: '',
     fullName: '',
+    tier: 'free',
     expiresInDays: '7',
     initialBalance: '0',
     discountPercentage: '0',
@@ -23,6 +24,7 @@ export default function AdminInvitesPage() {
   const [success, setSuccess] = useState<{
     signupUrl: string
     email: string
+    tier: string
   } | null>(null)
   const [error, setError] = useState('')
 
@@ -41,6 +43,7 @@ export default function AdminInvitesPage() {
         body: JSON.stringify({
           email: formData.email,
           fullName: formData.fullName || null,
+          tier: formData.tier,
           expiresInDays: parseInt(formData.expiresInDays),
           initialBalance: parseFloat(formData.initialBalance) || 0,
           discountPercentage: parseInt(formData.discountPercentage) || 0,
@@ -57,13 +60,15 @@ export default function AdminInvitesPage() {
 
       setSuccess({
         signupUrl: data.invite.signup_url,
-        email: formData.email
+        email: formData.email,
+        tier: formData.tier
       })
 
       // Reset form
       setFormData({
         email: '',
         fullName: '',
+        tier: 'free',
         expiresInDays: '7',
         initialBalance: '0',
         discountPercentage: '0',
@@ -149,6 +154,32 @@ export default function AdminInvitesPage() {
                     onChange={(e) => handleChange('fullName', e.target.value)}
                     placeholder="Pre-fill student's name"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tier">Access Level *</Label>
+                  <Select 
+                    value={formData.tier} 
+                    onValueChange={(value) => handleChange('tier', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="free">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          Free Tier - Basic Access
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="full">
+                        <div className="flex items-center gap-2">
+                          <Crown className="h-4 w-4" />
+                          Full Access - Premium Features
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
@@ -247,7 +278,8 @@ export default function AdminInvitesPage() {
                   <div className="p-4 bg-green-50 border border-green-200 rounded-md">
                     <p className="text-sm text-green-800">
                       <Mail className="h-4 w-4 inline mr-1" />
-                      <strong>Invite created and email sent!</strong> Invitation sent to <strong>{success.email}</strong>
+                      <strong>Invite created and email sent!</strong> Invitation sent to <strong>{success.email}</strong> with{' '}
+                      <strong>{success.tier === 'full' ? 'Full Access' : 'Free Tier'}</strong> privileges
                     </p>
                   </div>
 
