@@ -14,7 +14,10 @@ export default function AdminInvitesPage() {
     email: '',
     fullName: '',
     tier: 'free',
-    expiresInDays: '7'
+    expiresInDays: '7',
+    initialBalance: '0',
+    discountPercentage: '0',
+    discountDurationDays: '0'
   })
   
   const [loading, setLoading] = useState(false)
@@ -42,6 +45,9 @@ export default function AdminInvitesPage() {
           fullName: formData.fullName || null,
           tier: formData.tier,
           expiresInDays: parseInt(formData.expiresInDays),
+          initialBalance: parseFloat(formData.initialBalance) || 0,
+          discountPercentage: parseInt(formData.discountPercentage) || 0,
+          discountDurationDays: parseInt(formData.discountDurationDays) || 0,
           createdBy: 'admin' // In a real app, this would be the current admin's ID
         })
       })
@@ -63,7 +69,10 @@ export default function AdminInvitesPage() {
         email: '',
         fullName: '',
         tier: 'free',
-        expiresInDays: '7'
+        expiresInDays: '7',
+        initialBalance: '0',
+        discountPercentage: '0',
+        discountDurationDays: '0'
       })
 
     } catch (err) {
@@ -175,8 +184,8 @@ export default function AdminInvitesPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="expires">Expires In (Days)</Label>
-                  <Select 
-                    value={formData.expiresInDays} 
+                  <Select
+                    value={formData.expiresInDays}
                     onValueChange={(value) => handleChange('expiresInDays', value)}
                   >
                     <SelectTrigger>
@@ -190,6 +199,59 @@ export default function AdminInvitesPage() {
                       <SelectItem value="30">30 Days</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <h3 className="text-sm font-semibold mb-3">Account Benefits (Optional)</h3>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="initialBalance">Initial Balance ($)</Label>
+                    <Input
+                      id="initialBalance"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.initialBalance}
+                      onChange={(e) => handleChange('initialBalance', e.target.value)}
+                      placeholder="0.00"
+                    />
+                    <p className="text-xs text-muted-foreground">Upfront credit for token usage</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="discountPercentage">Discount Percentage (%)</Label>
+                    <Input
+                      id="discountPercentage"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={formData.discountPercentage}
+                      onChange={(e) => handleChange('discountPercentage', e.target.value)}
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-muted-foreground">e.g., 90 for 90% off token usage</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="discountDuration">Discount Duration (Days)</Label>
+                    <Select
+                      value={formData.discountDurationDays}
+                      onValueChange={(value) => handleChange('discountDurationDays', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0">No Discount</SelectItem>
+                        <SelectItem value="7">1 Week</SelectItem>
+                        <SelectItem value="14">2 Weeks</SelectItem>
+                        <SelectItem value="30">1 Month</SelectItem>
+                        <SelectItem value="60">2 Months</SelectItem>
+                        <SelectItem value="90">3 Months</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">How long the discount is valid</p>
+                  </div>
                 </div>
 
                 <Button type="submit" disabled={loading} className="w-full">

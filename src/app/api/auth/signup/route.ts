@@ -341,6 +341,101 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Create or update client_accounts with initial balance from invite
+    try {
+      const initialBalance = invite.initial_balance || 0
+
+      // Check if client account exists
+      const { data: existingAccount } = await supabase
+        .from('client_accounts' as any)
+        .select('id')
+        .eq('user_id', userId)
+        .single() as any
+
+      if (existingAccount) {
+        // Update existing account with initial balance
+        const { error: updateError } = await supabase
+          .from('client_accounts' as any)
+          .update({
+            account_balance: initialBalance,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+
+        if (updateError) {
+          logger.error(
+            { type: 'auth', userId, error: updateError },
+            'Failed to update client account balance'
+          )
+        } else {
+          logger.info(
+            { type: 'auth', userId, initialBalance },
+            'Updated client account with initial balance'
+          )
+        }
+      } else {
+        // Create new client account
+        const { error: insertError } = await supabase
+          .from('client_accounts' as any)
+          .insert({
+            user_id: userId,
+            account_balance: initialBalance,
+            total_lifetime_spent: 0
+          })
+
+        if (insertError) {
+          logger.error(
+            { type: 'auth', userId, error: insertError },
+            'Failed to create client account'
+          )
+        } else {
+          logger.info(
+            { type: 'auth', userId, initialBalance },
+            'Created client account with initial balance'
+          )
+        }
+      }
+    } catch (accountErr) {
+      logger.error({ type: 'auth', userId, error: accountErr }, 'Client account setup error')
+    }
+
+    // Apply discount if provided in invite
+    try {
+      const discountPercentage = invite.discount_percentage || 0
+      const discountDurationDays = invite.discount_duration_days || 0
+
+      if (discountPercentage > 0 && discountDurationDays > 0) {
+        const startDate = new Date()
+        const endDate = new Date()
+        endDate.setDate(endDate.getDate() + discountDurationDays)
+
+        const { error: discountError } = await supabase
+          .from('user_discounts' as any)
+          .insert({
+            user_id: userId,
+            discount_percentage: discountPercentage,
+            start_date: startDate.toISOString(),
+            end_date: endDate.toISOString(),
+            is_active: true,
+            created_from_invite_id: invite.id
+          })
+
+        if (discountError) {
+          logger.error(
+            { type: 'auth', userId, error: discountError },
+            'Failed to create user discount'
+          )
+        } else {
+          logger.info(
+            { type: 'auth', userId, discountPercentage, discountDurationDays },
+            'Created user discount from invite'
+          )
+        }
+      }
+    } catch (discountErr) {
+      logger.error({ type: 'auth', userId, error: discountErr }, 'Discount setup error')
+    }
+
     // Auto-assign to active cohort (if exists)
     try {
       const { data: activeCohort } = await supabase

@@ -13,7 +13,17 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, fullName, tier, expiresInDays = 7, createdBy, stripeSessionId } = await request.json()
+    const {
+      email,
+      fullName,
+      tier,
+      expiresInDays = 7,
+      initialBalance = 0,
+      discountPercentage = 0,
+      discountDurationDays = 0,
+      createdBy,
+      stripeSessionId
+    } = await request.json()
 
     // Create a Supabase client with cookie access for server-side auth
     const cookieStore = await cookies()
@@ -142,6 +152,9 @@ export async function POST(request: NextRequest) {
         full_name: fullName || null,
         tier,
         expires_at: expiresAt.toISOString(),
+        initial_balance: initialBalance,
+        discount_percentage: discountPercentage,
+        discount_duration_days: discountDurationDays,
         created_by: authenticatedUserId // Use authenticated user's UUID or NULL for payment system
       })
       .select()
