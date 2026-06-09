@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const {
       email,
       fullName,
-      tier,
+      tier = 'basic', // Default tier
       expiresInDays = 7,
       initialBalance = 0,
       discountPercentage = 0,
@@ -106,16 +106,17 @@ export async function POST(request: NextRequest) {
     })
 
     // Validate input
-    if (!email || !tier) {
+    if (!email) {
       return NextResponse.json(
-        { error: 'Email and tier are required' },
+        { error: 'Email is required' },
         { status: 400 }
       )
     }
 
-    if (!['free', 'full'].includes(tier)) {
+    // Tier is optional, defaults to 'basic'
+    if (tier && !['free', 'full', 'basic'].includes(tier)) {
       return NextResponse.json(
-        { error: 'Tier must be either "free" or "full"' },
+        { error: 'Tier must be "free", "full", or "basic"' },
         { status: 400 }
       )
     }
