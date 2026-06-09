@@ -255,6 +255,9 @@ export async function analyzeRepository(
         '.env.local.example',
         'next.config.js',
         'next.config.mjs',
+        'next.config.ts',
+        'vercel.json',
+        'vercel.ts',
         'vite.config.ts',
         'tsconfig.json',
         'package-lock.json',
@@ -418,6 +421,37 @@ function detectServices(packageJson: any, files: Record<string, string | null>):
         detected: true,
         requiredCredentials: config.requiredCreds,
         optionalCredentials: config.optionalCreds
+      })
+    }
+  }
+
+  // Special detection for Vercel (check for config files)
+  if (files['vercel.json'] || files['vercel.ts']) {
+    const hasVercel = detected.find(s => s.name === 'vercel')
+    if (!hasVercel) {
+      detected.push({
+        name: 'vercel',
+        confidence: 'high',
+        detected: true,
+        requiredCredentials: ['token'],
+        optionalCredentials: []
+      })
+    } else {
+      hasVercel.confidence = 'high'
+    }
+  }
+
+  // Special detection for Airtable (check package.json for usage patterns)
+  const packageJsonStr = JSON.stringify(packageJson)
+  if (packageJsonStr.includes('airtable') || envExamples.toLowerCase().includes('airtable')) {
+    const hasAirtable = detected.find(s => s.name === 'airtable')
+    if (!hasAirtable) {
+      detected.push({
+        name: 'airtable',
+        confidence: 'medium',
+        detected: true,
+        requiredCredentials: ['apiKey', 'baseId'],
+        optionalCredentials: ['pat']
       })
     }
   }
