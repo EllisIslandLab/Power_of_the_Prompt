@@ -81,7 +81,9 @@ export async function getVercelUser(accessToken: string): Promise<{
   })
 
   if (!response.ok) {
-    throw new Error('Failed to fetch Vercel user')
+    const error = await response.text()
+    console.error('Failed to fetch Vercel user:', response.status, error)
+    throw new Error(`Failed to fetch Vercel user: ${response.status}`)
   }
 
   return response.json()
