@@ -64,9 +64,9 @@ export async function exchangeVercelCode(code: string): Promise<{
 }
 
 /**
- * Get user details
+ * Get user details (works for both personal and team tokens)
  */
-export async function getVercelUser(accessToken: string): Promise<{
+export async function getVercelUser(accessToken: string, teamId?: string): Promise<{
   user: {
     id: string
     email: string
@@ -74,7 +74,12 @@ export async function getVercelUser(accessToken: string): Promise<{
     username: string
   }
 }> {
-  const response = await fetch('https://api.vercel.com/v2/user', {
+  // If teamId is provided, fetch team details instead
+  const endpoint = teamId
+    ? `https://api.vercel.com/v2/teams/${teamId}`
+    : 'https://api.vercel.com/v2/user'
+
+  const response = await fetch(endpoint, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -86,7 +91,21 @@ export async function getVercelUser(accessToken: string): Promise<{
     throw new Error(`Failed to fetch Vercel user: ${response.status}`)
   }
 
-  return response.json()
+  const data = await response.json()
+
+  // Normalize team response to match user response format
+  if (teamId && data.id) {
+    return {
+      user: {
+        id: data.id,
+        email: data.email || '',
+        name: data.name || data.slug,
+        username: data.slug
+      }
+    }
+  }
+
+  return data
 }
 
 /**

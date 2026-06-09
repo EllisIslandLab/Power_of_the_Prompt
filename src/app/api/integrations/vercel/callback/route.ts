@@ -10,6 +10,7 @@ import { encrypt } from '@/lib/encryption'
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const code = searchParams.get('code')
+  const teamId = searchParams.get('teamId') // Team-based installation
   const next = searchParams.get('next') // Vercel passes this
   const error = searchParams.get('error')
 
@@ -50,8 +51,9 @@ export async function GET(request: NextRequest) {
     // Exchange code for access token
     const { access_token, team_id, user_id } = await exchangeVercelCode(code)
 
-    // Get user details
-    const { user: vercelUser } = await getVercelUser(access_token)
+    // Get user/team details (prefer team_id from token response, fallback to URL param)
+    const effectiveTeamId = team_id || teamId || undefined
+    const { user: vercelUser } = await getVercelUser(access_token, effectiveTeamId)
 
     // Store access token
     const { error: saveError } = await supabase
