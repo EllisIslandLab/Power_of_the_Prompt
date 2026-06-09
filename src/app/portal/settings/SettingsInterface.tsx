@@ -1112,10 +1112,12 @@ export default function SettingsInterface({
       <div className="border-t border-border bg-card mt-12">
         <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
           <a
-            href="mailto:support@weblaunchacademy.com"
+            href="/support"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-sm text-primary hover:underline"
           >
-            Get Help
+            Support Center
           </a>
           <button
             onClick={handleSignOut}

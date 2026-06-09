@@ -220,6 +220,18 @@ export default function HelpAssistant() {
         </div>
       </div>
 
+      {/* Support Link */}
+      <div className="flex-shrink-0 mb-3">
+        <a
+          href="/support"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block text-center text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
+        >
+          Need more help? Visit our Support Center
+        </a>
+      </div>
+
       {/* Input */}
       <form onSubmit={handleSubmit} className="flex-shrink-0">
         <div className="flex gap-2">
