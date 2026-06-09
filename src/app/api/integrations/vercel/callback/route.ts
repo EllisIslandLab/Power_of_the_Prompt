@@ -51,9 +51,23 @@ export async function GET(request: NextRequest) {
     // Exchange code for access token
     const { access_token, team_id, user_id } = await exchangeVercelCode(code)
 
-    // Get user/team details (prefer team_id from token response, fallback to URL param)
+    // Determine effective team ID
     const effectiveTeamId = team_id || teamId || undefined
-    const { user: vercelUser } = await getVercelUser(access_token, effectiveTeamId)
+
+    // For team installations, we don't need to fetch team details
+    // Just use the teamId and access token directly
+    let vercelIdentifier = {
+      id: effectiveTeamId || user_id,
+      email: '', // Not available for teams
+      name: effectiveTeamId || 'Vercel User',
+      username: effectiveTeamId || user_id
+    }
+
+    // Only fetch user details for personal installations
+    if (!effectiveTeamId) {
+      const { user: vercelUser } = await getVercelUser(access_token)
+      vercelIdentifier = vercelUser
+    }
 
     // Store access token
     const { error: saveError } = await supabase
@@ -64,9 +78,9 @@ export async function GET(request: NextRequest) {
         access_token_encrypted: encrypt(access_token),
         metadata: {
           vercel_user_id: user_id,
-          vercel_team_id: team_id,
-          vercel_username: vercelUser.username,
-          vercel_email: vercelUser.email
+          vercel_team_id: effectiveTeamId,
+          vercel_username: vercelIdentifier.username,
+          vercel_email: vercelIdentifier.email
         },
         is_valid: true,
         last_validated_at: new Date().toISOString()
