@@ -69,11 +69,12 @@ export async function GET(request: NextRequest) {
       vercelIdentifier = vercelUser
     }
 
-    // Store access token
+    // Store access token (user-level, not project-specific)
     const { error: saveError } = await supabase
       .from('client_service_credentials')
       .upsert({
         user_id: user.id,
+        project_id: null, // User-level credential, not project-specific
         service_name: 'vercel',
         access_token_encrypted: encrypt(access_token),
         metadata: {
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
         is_valid: true,
         last_validated_at: new Date().toISOString()
       }, {
-        onConflict: 'user_id,service_name'
+        onConflict: 'user_id,project_id,service_name'
       })
 
     if (saveError) {
