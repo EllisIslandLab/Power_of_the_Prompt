@@ -64,11 +64,26 @@ export async function GET(request: NextRequest) {
           // First time OAuth sign-in - create user record
           console.log('Creating new user record for OAuth user:', data.user.id)
 
-          // Extract name from GitHub metadata
-          const fullName = data.user.user_metadata?.full_name ||
+          // Check for active invite for this email
+          const { data: invite } = await adminClient
+            .from('invite_tokens')
+            .select('*')
+            .eq('email', data.user.email?.toLowerCase())
+            .is('used_at', null)
+            .gt('expires_at', new Date().toISOString())
+            .single()
+
+          // Extract name from GitHub metadata or invite
+          const fullName = invite?.full_name ||
+                          data.user.user_metadata?.full_name ||
                           data.user.user_metadata?.name ||
                           data.user.email?.split('@')[0] ||
                           'User'
+
+          const tier = invite?.tier || 'basic'
+          const initialBalance = invite?.initial_balance || 0
+
+          console.log('OAuth signup settings:', { fullName, tier, initialBalance, hasInvite: !!invite })
 
           // Create user record
           const { error: userError } = await adminClient
@@ -79,6 +94,8 @@ export async function GET(request: NextRequest) {
               full_name: fullName,
               email_verified: !!data.user.email_confirmed_at,
               role: 'client',
+              tier: tier,
+              payment_status: tier === 'full' ? 'paid' : 'trial'
             })
 
           if (userError) {
@@ -86,12 +103,12 @@ export async function GET(request: NextRequest) {
             throw userError
           }
 
-          // Create client_account
+          // Create client_account with initial balance from invite (if any)
           const { data: newAccount, error: accountError } = await adminClient
             .from('client_accounts')
             .insert({
               user_id: data.user.id,
-              account_balance: 0,
+              account_balance: initialBalance,
               total_lifetime_spent: 0,
             })
             .select()
@@ -114,6 +131,18 @@ export async function GET(request: NextRequest) {
           if (settingsError) {
             console.error('Failed to create user settings:', settingsError)
             throw settingsError
+          }
+
+          // Mark invite as used if one was found
+          if (invite) {
+            await adminClient
+              .from('invite_tokens')
+              .update({
+                used_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', invite.id)
+            console.log('Marked invite as used:', invite.id)
           }
 
           console.log('Successfully created user records')
