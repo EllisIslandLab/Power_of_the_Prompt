@@ -18,57 +18,49 @@ export default async function PortalPage() {
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (authError || !authUser) {
     redirect('/signin?redirect=/portal')
   }
 
-  // Fetch user profile
-  let { data: user } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', session.user.id)
-    .single()
+  // Fetch all data in parallel for faster loading
+  const [
+    { data: user },
+    { data: clientAccount },
+    { data: userSettings },
+    { data: projects }
+  ] = await Promise.all([
+    supabase.from('users').select('*').eq('id', authUser.id).single(),
+    supabase.from('client_accounts').select('*').eq('user_id', authUser.id).single(),
+    supabase.from('user_settings').select('*').eq('user_id', authUser.id).single(),
+    supabase.from('client_projects').select('*').eq('user_id', authUser.id).eq('is_active', true).limit(1)
+  ])
 
-  // If user doesn't exist yet (first OAuth sign-in timing issue), use session data as fallback
-  if (!user) {
-    console.log('User record not found yet, using session fallback')
-    user = {
-      id: session.user.id,
-      email: session.user.email || '',
-      full_name: session.user.user_metadata?.full_name ||
-                 session.user.user_metadata?.name ||
-                 session.user.email?.split('@')[0] ||
+  // If user doesn't exist yet (first OAuth sign-in timing issue), use auth data as fallback
+  let userProfile = user
+  if (!userProfile) {
+    console.log('User record not found yet, using auth fallback')
+    userProfile = {
+      id: authUser.id,
+      email: authUser.email || '',
+      full_name: authUser.user_metadata?.full_name ||
+                 authUser.user_metadata?.name ||
+                 authUser.email?.split('@')[0] ||
                  'User',
       role: 'client',
-      email_verified: !!session.user.email_confirmed_at,
+      email_verified: !!authUser.email_confirmed_at,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as any
   }
 
-  // Fetch or create client account
-  const { data: clientAccount } = await supabase
-    .from('client_accounts')
-    .select('*')
-    .eq('user_id', session.user.id)
-    .single()
-
-  // Fetch user settings for theme
-  const { data: userSettings } = await supabase
-    .from('user_settings')
-    .select('*')
-    .eq('user_id', session.user.id)
-    .single()
-
-  // Check if user has any active projects
-  const { data: projects } = await supabase
-    .from('client_projects')
-    .select('*')
-    .eq('user_id', session.user.id)
-    .eq('is_active', true)
-    .limit(1)
+  // Create session object from authenticated user (no getSession() needed)
+  const session = {
+    user: authUser,
+    access_token: '', // Not needed for component logic
+    refresh_token: '', // Not needed for component logic
+  }
 
   // If no projects and has account balance, redirect to project setup
   if ((!projects || projects.length === 0) && clientAccount?.account_balance > 0) {
@@ -92,7 +84,7 @@ export default async function PortalPage() {
 
   return (
     <PortalLayout
-      user={user}
+      user={userProfile}
       clientAccount={clientAccount}
       session={session}
       userSettings={userSettings}
