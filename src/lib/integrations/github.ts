@@ -111,10 +111,18 @@ export async function getInstallationToken(installationId: number): Promise<stri
   try {
     console.log('[GitHub] Getting installation token for installation:', installationId)
     console.log('[GitHub] App ID:', process.env.GITHUB_APP_ID)
-    console.log('[GitHub] Private key source:', process.env.GITHUB_APP_PRIVATE_KEY ? 'direct' : 'file path')
+    console.log('[GitHub] Private key configured:', !!process.env.GITHUB_APP_PRIVATE_KEY || !!process.env.GITHUB_APP_PRIVATE_KEY_PATH)
+
+    if (!process.env.GITHUB_APP_ID) {
+      throw new Error('GITHUB_APP_ID environment variable is not set')
+    }
+
+    if (!process.env.GITHUB_APP_PRIVATE_KEY && !process.env.GITHUB_APP_PRIVATE_KEY_PATH) {
+      throw new Error('Neither GITHUB_APP_PRIVATE_KEY nor GITHUB_APP_PRIVATE_KEY_PATH is set')
+    }
 
     const app = getGitHubApp()
-    console.log('[GitHub] App initialized, making request...')
+    console.log('[GitHub] App initialized, requesting access token...')
 
     const { data } = await app.octokit.request(
       'POST /app/installations/{installation_id}/access_tokens',
@@ -123,13 +131,24 @@ export async function getInstallationToken(installationId: number): Promise<stri
     console.log('[GitHub] Successfully got installation token')
     return data.token
   } catch (error: any) {
-    console.error('Failed to get installation token:', error)
-    console.error('Error details:', {
+    console.error('[GitHub] Failed to get installation token')
+    console.error('[GitHub] Error details:', {
       status: error.status,
       message: error.message,
+      installationId,
       response: error.response?.data
     })
-    throw new Error('Failed to authenticate with GitHub')
+
+    // Provide more specific error message based on status
+    if (error.status === 404) {
+      throw new Error(`GitHub App installation ${installationId} not found or has been uninstalled. Please reconnect GitHub in Settings.`)
+    } else if (error.status === 401 || error.status === 403) {
+      throw new Error(`GitHub App authentication failed for installation ${installationId}. Please reconnect GitHub in Settings.`)
+    } else if (error.message?.includes('GITHUB_APP')) {
+      throw error // Re-throw env var errors as-is
+    }
+
+    throw new Error('Failed to authenticate with GitHub. Please reconnect in Settings.')
   }
 }
 
@@ -302,14 +321,25 @@ export async function listDirectory(
     if (error.status === 404) {
       throw new Error(`Directory not found: ${path || '(root)'}`)
     } else if (error.status === 401 || error.status === 403) {
-      console.error('[GitHub] Authentication failed - installation may be revoked or expired:', error.message)
+      console.error('[GitHub] Authentication failed - installation may be revoked or expired')
+      console.error('[GitHub] Error details:', {
+        status: error.status,
+        message: error.message,
+        installationId,
+        path
+      })
       throw new Error('GitHub authentication failed. Please reconnect your GitHub account in Settings.')
-    } else if (error.message?.includes('installation')) {
-      console.error('[GitHub] Installation error:', error.message)
+    } else if (error.message?.includes('installation') || error.message?.includes('authenticate')) {
+      console.error('[GitHub] Installation/auth error:', error.message)
       throw new Error('GitHub App installation issue. Please reconnect GitHub in Settings.')
     }
 
-    console.error('Failed to list directory:', error)
+    console.error('[GitHub] Failed to list directory:', {
+      error: error.message,
+      status: error.status,
+      installationId,
+      path
+    })
     throw new Error(`Failed to read directory: ${error.message || 'Unknown error'}`)
   }
 }
