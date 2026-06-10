@@ -230,13 +230,25 @@ export async function GET(request: NextRequest) {
 
       // Check if there's a custom redirect URL
       const redirectTo = cookieStore.get('github_install_redirect')?.value
-      const redirectUrl = redirectTo
-        ? new URL(redirectTo, origin)
-        : new URL('/portal/projects/new?step=select_repo&installation_id=' + installationId, origin)
+      let redirectUrl: URL
+
+      if (redirectTo) {
+        // If redirectTo is a full URL (starts with http), use it directly
+        // Otherwise treat as relative path and construct with current origin
+        if (redirectTo.startsWith('http://') || redirectTo.startsWith('https://')) {
+          redirectUrl = new URL(redirectTo)
+        } else {
+          redirectUrl = new URL(redirectTo, origin)
+        }
+      } else {
+        // Default redirect if none specified
+        redirectUrl = new URL('/portal/projects/new?step=select_repo&installation_id=' + installationId, origin)
+      }
 
       console.log('[GitHub Callback] Redirecting to:', redirectUrl.toString())
       console.log('[GitHub Callback] Installation ID:', installationId)
       console.log('[GitHub Callback] Custom redirect:', redirectTo || 'none')
+      console.log('[GitHub Callback] Is full URL:', redirectTo?.startsWith('http'))
 
       // Clear the temporary cookies
       const response = NextResponse.redirect(redirectUrl)
@@ -279,9 +291,18 @@ export async function GET(request: NextRequest) {
 
       // Check if there's a custom redirect URL
       const redirectTo = cookieStore.get('github_install_redirect')?.value
-      const redirectUrl = redirectTo
-        ? new URL(redirectTo, origin)
-        : new URL('/portal/projects/new?step=oauth_success', origin)
+      let redirectUrl: URL
+
+      if (redirectTo) {
+        // If redirectTo is a full URL, use it directly; otherwise construct with origin
+        if (redirectTo.startsWith('http://') || redirectTo.startsWith('https://')) {
+          redirectUrl = new URL(redirectTo)
+        } else {
+          redirectUrl = new URL(redirectTo, origin)
+        }
+      } else {
+        redirectUrl = new URL('/portal/projects/new?step=oauth_success', origin)
+      }
 
       const response = NextResponse.redirect(redirectUrl)
       response.cookies.delete('github_install_redirect')

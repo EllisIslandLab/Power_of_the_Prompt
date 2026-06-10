@@ -560,7 +560,9 @@ export default function SettingsInterface({
                                       // Short delay to show success, then redirect to install
                                       alert('✓ Stale data cleared!\n\nYou\'ll now be redirected to GitHub.\nSelect your repositories, then you\'ll return here automatically.')
                                       setTimeout(() => {
-                                        window.location.href = '/api/integrations/github/install?redirect_to=/portal/settings'
+                                        // Include full origin in redirect so callback knows where to return
+                                        const returnUrl = `${window.location.origin}/portal/settings`
+                                        window.location.href = `/api/integrations/github/install?redirect_to=${encodeURIComponent(returnUrl)}`
                                       }, 1000)
                                     })
                                     .catch(err => {
