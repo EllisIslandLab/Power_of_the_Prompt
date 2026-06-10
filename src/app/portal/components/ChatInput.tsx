@@ -50,14 +50,14 @@ export default function ChatInput({
   const isVertical = layout === 'left' || layout === 'right'
 
   return (
-    <div className="border-t border-border p-2 bg-muted/30 relative flex-1 flex flex-col min-h-0">
+    <div className="border-t border-white/20 p-2 bg-[#0a0e27] backdrop-blur-md relative flex-1 flex flex-col min-h-0">
       {/* Attached Files Preview */}
       {attachedFiles.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-2">
           {attachedFiles.map((file, index) => (
             <div
               key={index}
-              className="relative group bg-card border border-border rounded-lg p-2 flex items-center gap-2 pr-8"
+              className="relative group bg-[#080c25] border border-white/20 rounded-lg p-2 flex items-center gap-2 pr-8 shadow-lg"
             >
               {file.type.startsWith('image/') ? (
                 <img
@@ -66,15 +66,15 @@ export default function ChatInput({
                   className="w-12 h-12 object-cover rounded"
                 />
               ) : (
-                <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
-                  <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-white/10 rounded flex items-center justify-center">
+                  <svg className="w-6 h-6 text-[#c4c7c8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs font-bold text-white truncate uppercase tracking-wider">{file.name}</p>
+                <p className="text-[10px] text-[#c4c7c8] font-medium">
                   {(file.size / 1024).toFixed(1)} KB
                 </p>
               </div>
@@ -93,54 +93,26 @@ export default function ChatInput({
       )}
 
       {/* Sleek input container */}
-      <div className="flex items-center gap-3 flex-1 bg-card/50 backdrop-blur-sm border border-border/50 rounded-full px-4 py-2 shadow-sm hover:shadow-md transition-all">
+      <div className="flex items-center gap-3 flex-1 bg-[#080c25] backdrop-blur-sm border-2 border-white/30 rounded-full px-4 py-2 hover:border-white/40 focus-within:border-[#b1c6f9]/50 transition-all shadow-lg shadow-black/50">
         <textarea
           ref={textareaRef}
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={hasPendingDiffs ? "Review the changes above, then ask me to commit and push..." : "Describe the change you'd like to make..."}
-          className="flex-1 resize-none bg-transparent focus:outline-none placeholder:text-muted-foreground/60 min-h-[40px] max-h-[120px] overflow-y-auto"
+          className="flex-1 resize-none bg-transparent focus:outline-none placeholder:text-muted-foreground/60 min-h-[40px] max-h-[120px] overflow-y-auto text-white"
           disabled={disabled}
           rows={1}
         />
         <button
           onClick={handleSend}
-          onMouseDown={() => setIsButtonPressed(true)}
-          onMouseUp={() => {
-            // Keep glow for a moment, then fade back
-            setTimeout(() => setIsButtonPressed(false), 150)
-          }}
-          onMouseLeave={() => setIsButtonPressed(false)}
           disabled={disabled || !inputValue.trim()}
-          className="flex-shrink-0 w-12 h-12 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-transform hover:scale-[1.02] active:scale-95 relative overflow-hidden"
+          className="flex-shrink-0 w-10 h-10 rounded-full bg-[#FFB800] hover:brightness-110 disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95 flex items-center justify-center shadow-md shadow-[#FFB800]/20"
           title="Send message (Enter)"
-          style={{ background: 'transparent' }}
         >
-          {/* Base button image */}
-          <Image
-            src="/images/elements/button.webp"
-            alt="Send"
-            fill
-            className={`object-cover transition-all ${
-              isButtonPressed
-                ? 'opacity-0 duration-150 ease-in'
-                : 'opacity-100 duration-200 ease-out'
-            }`}
-            priority
-          />
-          {/* Glow button image - crossfades in when pressed */}
-          <Image
-            src="/images/elements/glow-button.webp"
-            alt="Send"
-            fill
-            className={`object-cover transition-all ${
-              isButtonPressed
-                ? 'opacity-100 duration-150 ease-out'
-                : 'opacity-0 duration-200 ease-in'
-            }`}
-            priority
-          />
+          <svg className="w-5 h-5 text-[#271900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
         </button>
       </div>
 

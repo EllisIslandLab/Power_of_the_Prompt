@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <!-- Shared Components JSON Mapping Logic -->
-<!--
+<!-- 
         TopAppBar active: Billing (Exact Match)
         SideNavBar active: Billing (Exact Match)
     -->
@@ -92,7 +92,7 @@
 <style>
         body {
             background-color: #0d112a;
-            background-image:
+            background-image: 
                 radial-gradient(circle at 50% 50%, rgba(20, 30, 80, 0.5) 0%, transparent 70%),
                 radial-gradient(circle at 20% 30%, rgba(216, 218, 0, 0.03) 0%, transparent 40%);
             background-attachment: fixed;
@@ -378,7 +378,7 @@
                 ctx.beginPath();
                 ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
                 ctx.fill();
-
+                
                 star.opacity += star.speed;
                 if (star.opacity > 1 || star.opacity < 0.1) {
                     star.speed = -star.speed;

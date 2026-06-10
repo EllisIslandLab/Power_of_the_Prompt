@@ -1,0 +1,27 @@
+{
+  "name": "@weblaunchacademy/env-sync",
+  "version": "1.0.0",
+  "description": "Automatically sync environment variables from Web Launch Academy portal",
+  "main": "src/index.js",
+  "bin": {
+    "wla": "src/cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "weblaunchacademy",
+    "env",
+    "environment",
+    "variables",
+    "sync"
+  ],
+  "author": "Web Launch Academy",
+  "license": "MIT",
+  "files": [
+    "src/"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

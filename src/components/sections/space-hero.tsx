@@ -181,16 +181,16 @@ export function SpaceHero() {
       {/* Decorative Nebula Background */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-20 bg-[radial-gradient(circle_at_50%_50%,_#274788_0%,_transparent_50%)]"></div>
 
-      <div className="glass-panel relative z-10 max-w-4xl w-full p-8 md:p-12 rounded-xl text-center flex flex-col items-center border-t-2 border-white">
+      <div className="glass-panel relative z-10 max-w-4xl w-full p-8 md:p-12 rounded-xl text-center flex flex-col items-center border-t-8 border-white">
         <div className="flex items-center gap-3 mb-6">
-          <span className="flex h-3 w-3 rounded-full bg-[#b0c6ff] pulse-blue"></span>
-          <span className="text-[13px] font-medium tracking-[0.05em] text-[#b0c6ff] uppercase">SYSTEMS READY</span>
+          <span className="flex h-3 w-3 rounded-full bg-[#b1c6f9] pulse-blue"></span>
+          <span className="text-[13px] font-medium tracking-[0.05em] text-[#b1c6f9] uppercase">SYSTEMS READY</span>
         </div>
 
-        <span className="text-xs font-bold tracking-[0.3em] text-[#b0c6ff] mb-4 uppercase">PRIMARY MODULE</span>
+        <span className="text-xs font-bold tracking-[0.3em] text-[#b1c6f9] mb-4 uppercase">PRIMARY MODULE</span>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-none tracking-tight">
-          Build Once, <br/> <span className="text-[#e8ea23]">Own Forever.</span>
+          Build Once, <br/> <span className="text-[#FFB800]">Own Forever.</span>
         </h1>
 
         <p className="text-base text-[#c4c7c8] max-w-2xl mb-8 leading-relaxed">
@@ -211,7 +211,7 @@ export function SpaceHero() {
               }}
               onMouseLeave={() => setHoveredCard(null)}
             >
-              <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#e8ea23] mb-2">Speed</div>
+              <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#FFB800] mb-2">Speed</div>
               <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white leading-tight">Tech-stack</div>
             </div>
 
@@ -226,7 +226,7 @@ export function SpaceHero() {
               }}
               onMouseLeave={() => setHoveredCard(null)}
             >
-              <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#e8ea23] mb-2">Quality</div>
+              <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#FFB800] mb-2">Quality</div>
               <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white leading-tight">Patient Implementation</div>
             </div>
 
@@ -241,7 +241,7 @@ export function SpaceHero() {
               }}
               onMouseLeave={() => setHoveredCard(null)}
             >
-              <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#e8ea23] mb-2">Control</div>
+              <div className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#FFB800] mb-2">Control</div>
               <div className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-white leading-tight">Code-ownership</div>
             </div>
           </div>
@@ -269,10 +269,10 @@ export function SpaceHero() {
 
         {/* Email Signup Form */}
         {success ? (
-          <div className="glass-panel rounded-xl p-8 w-full max-w-lg border border-[#e8ea23]/30">
+          <div className="glass-panel rounded-xl p-8 w-full max-w-lg border border-[#FFB800]/30">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-[#e8ea23]/20 flex items-center justify-center">
-                <span className="text-[#e8ea23] text-4xl">✓</span>
+              <div className="w-16 h-16 rounded-full bg-[#FFB800]/20 flex items-center justify-center">
+                <span className="text-[#FFB800] text-4xl">✓</span>
               </div>
             </div>
             <h3 className="text-2xl font-bold mb-4 text-white text-center">Check Your Inbox!</h3>
@@ -281,7 +281,7 @@ export function SpaceHero() {
                 <strong className="text-white">Please check your inbox and spam folder</strong> for an email from:
               </p>
               <div className="bg-[#080c25] border border-white/10 rounded-lg px-4 py-3 text-center">
-                <code className="text-[#e8ea23] font-mono">hello@weblaunchacademy.com</code>
+                <code className="text-[#FFB800] font-mono">hello@weblaunchacademy.com</code>
               </div>
               <p className="text-center">
                 <strong className="text-white">Reply to that email</strong> and I'll get back to you ASAP. I read and respond to all emails personally.
@@ -312,7 +312,7 @@ export function SpaceHero() {
               <button
                 type="submit"
                 disabled={isSubmitting || !email || !captchaToken}
-                className="bg-[#e8ea23] text-[#1c1d00] px-8 py-4 rounded-lg text-xs font-bold uppercase tracking-wider gold-glow hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-[#FFB800] text-[#271900] px-8 py-4 rounded-lg text-xs font-bold uppercase tracking-wider gold-glow hover:brightness-110 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 LEARN MORE
               </button>
@@ -325,7 +325,7 @@ export function SpaceHero() {
                 id="wantsOwnership"
                 checked={wantsOwnership}
                 onChange={(e) => setWantsOwnership(e.target.checked)}
-                className="w-5 h-5 rounded border-white/20 bg-[#080c25] text-[#e8ea23] focus:ring-[#e8ea23] focus:ring-offset-0 cursor-pointer"
+                className="w-5 h-5 rounded border-white/20 bg-[#080c25] text-[#FFB800] focus:ring-[#FFB800] focus:ring-offset-0 cursor-pointer"
               />
               <label htmlFor="wantsOwnership" className="text-sm text-[#c4c7c8] cursor-pointer">
                 Yes, I want to own the code for my website!

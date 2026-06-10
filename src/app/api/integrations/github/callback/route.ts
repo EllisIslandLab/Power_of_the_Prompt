@@ -40,24 +40,31 @@ export async function GET(request: NextRequest) {
   )
 
   // Get user from session
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
 
   console.log('[GitHub Callback] User authenticated:', !!user)
+  console.log('[GitHub Callback] User error:', userError)
 
+  // If no user session, check cookie and preserve installation ID
   if (!user) {
     console.log('[GitHub Callback] No user session, checking cookie...')
     const userId = cookieStore.get('github_install_user_id')?.value
+
     if (!userId) {
       console.log('[GitHub Callback] No cookie either, redirecting to signin')
-      return NextResponse.redirect(
-        new URL('/signin?error=session_expired', origin)
-      )
+      // Preserve installation_id in redirect if available
+      const redirectUrl = installationId
+        ? `/signin?error=session_expired&redirect=/portal/projects/new?step=select_repo&installation_id=${installationId}`
+        : '/signin?error=session_expired'
+      return NextResponse.redirect(new URL(redirectUrl, origin))
     }
-    // User ID from cookie - but still need to re-authenticate
-    console.log('[GitHub Callback] Cookie found, redirecting to signin with redirect')
-    return NextResponse.redirect(
-      new URL('/signin?redirect=/portal/projects/new', origin)
-    )
+
+    // User ID from cookie - preserve installation ID and redirect to continue flow
+    console.log('[GitHub Callback] Cookie found, redirecting to signin with preserved installation')
+    const redirectUrl = installationId
+      ? `/signin?redirect=/portal/projects/new?step=select_repo&installation_id=${installationId}`
+      : '/signin?redirect=/portal/projects/new'
+    return NextResponse.redirect(new URL(redirectUrl, origin))
   }
 
   // Handle installation flow (both new installs and updates)
@@ -83,6 +90,65 @@ export async function GET(request: NextRequest) {
 
       // Get list of repositories from this installation
       const repos = await listRepositories(parseInt(installationId))
+      const accountLogin = repos[0]?.owner || 'unknown'
+
+      // CLEANUP: Delete old installations for this account (user reinstalled)
+      // This happens when users uninstall/reinstall - GitHub creates new installation_id
+      console.log('[Callback] Cleaning up old installations for account:', accountLogin)
+      const { data: oldInstallations } = await supabase
+        .from('github_installations')
+        .select('installation_id, id')
+        .eq('user_id', user.id)
+        .eq('account_login', accountLogin)
+        .neq('installation_id', parseInt(installationId))
+
+      if (oldInstallations && oldInstallations.length > 0) {
+        console.log('[Callback] Found old installations to clean up:', oldInstallations.map(i => i.installation_id))
+
+        // Get repositories from old installations
+        const { data: oldRepos } = await supabase
+          .from('github_repositories')
+          .select('id, full_name, installation_id')
+          .in('installation_id', oldInstallations.map(i => i.installation_id))
+
+        console.log('[Callback] Old repos to migrate:', oldRepos?.map(r => r.full_name))
+
+        // For each old repo, find matching new repo and update projects
+        if (oldRepos) {
+          for (const oldRepo of oldRepos) {
+            // Find matching repo in new installation
+            const matchingNewRepo = repos.find(r => r.full_name === oldRepo.full_name)
+
+            if (matchingNewRepo) {
+              // Get the new repo ID from DB (we'll insert it below)
+              console.log('[Callback] Will migrate projects from', oldRepo.full_name, 'to new installation')
+
+              // Store for later migration (after we insert new repos)
+              if (!('_migrateQueue' in globalThis)) {
+                (globalThis as any)._migrateQueue = []
+              }
+              (globalThis as any)._migrateQueue.push({
+                oldRepoId: oldRepo.id,
+                newRepoFullName: matchingNewRepo.full_name
+              })
+            }
+          }
+        }
+
+        // Delete old repositories
+        await supabase
+          .from('github_repositories')
+          .delete()
+          .in('installation_id', oldInstallations.map(i => i.installation_id))
+
+        // Delete old installations
+        await supabase
+          .from('github_installations')
+          .delete()
+          .in('installation_id', oldInstallations.map(i => i.installation_id))
+
+        console.log('[Callback] Cleaned up old installations')
+      }
 
       // Store installation in database
       const { error: installError } = await supabase
@@ -91,7 +157,7 @@ export async function GET(request: NextRequest) {
           user_id: user.id,
           installation_id: parseInt(installationId),
           account_type: repos[0]?.owner ? 'user' : 'organization',
-          account_login: repos[0]?.owner || 'unknown',
+          account_login: accountLogin,
           suspended_at: null,
           updated_at: new Date().toISOString()
         })
@@ -119,6 +185,38 @@ export async function GET(request: NextRequest) {
             language: repo.language,
             updated_at: new Date().toISOString()
           })
+      }
+
+      // Migrate projects from old repos to new repos
+      const migrateQueue = (globalThis as any)._migrateQueue || []
+      if (migrateQueue.length > 0) {
+        console.log('[Callback] Migrating projects to new installation...')
+
+        for (const migration of migrateQueue) {
+          // Get the new repo ID
+          const { data: newRepo } = await supabase
+            .from('github_repositories')
+            .select('id')
+            .eq('full_name', migration.newRepoFullName)
+            .eq('installation_id', parseInt(installationId))
+            .single()
+
+          if (newRepo) {
+            // Update all projects that were linked to the old repo
+            const { data: updatedProjects } = await supabase
+              .from('client_projects')
+              .update({ github_repository_id: newRepo.id })
+              .eq('github_repository_id', migration.oldRepoId)
+              .select('project_name')
+
+            if (updatedProjects && updatedProjects.length > 0) {
+              console.log('[Callback] Migrated projects:', updatedProjects.map(p => p.project_name))
+            }
+          }
+        }
+
+        // Clear the queue
+        delete (globalThis as any)._migrateQueue
       }
 
       // Check if there's a custom redirect URL

@@ -10,6 +10,7 @@ import Sidebar from './Sidebar'
 import WelcomeMessage from './WelcomeMessage'
 import DraggableChat from './DraggableChat'
 import FileDropZone from './FileDropZone'
+import FileViewer from './FileViewer'
 
 interface PendingDiff {
   changeId: string
@@ -63,6 +64,13 @@ export default function PortalLayout({
   const [isLoading, setIsLoading] = useState(false)
   const [outputFontSize, setOutputFontSize] = useState(9)
   const [attachedFiles, setAttachedFiles] = useState<File[]>([])
+  const [sidebarPanelOpen, setSidebarPanelOpen] = useState(false)
+  const [openFiles, setOpenFiles] = useState<Array<{ path: string; name: string; content: string }>>([])
+  const [activeFileIndex, setActiveFileIndex] = useState(0)
+  const [explorerOpen, setExplorerOpen] = useState(false)
+
+  // Show preview only when no files are open
+  const showPreview = openFiles.length === 0
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -91,6 +99,38 @@ export default function PortalLayout({
       loadPreferences()
     }
   }, [user?.id])
+
+  // Fetch preview URL from Vercel or use localhost
+  useEffect(() => {
+    const fetchPreviewUrl = async () => {
+      if (!activeProject) {
+        setPreviewUrl(null)
+        return
+      }
+
+      try {
+        const response = await fetch('/api/portal/preview')
+        if (response.ok) {
+          const data = await response.json()
+          if (data.previewUrl) {
+            console.log('[PortalLayout] Preview URL loaded:', data.previewUrl)
+            setPreviewUrl(data.previewUrl)
+          } else {
+            // Fallback to localhost for local development
+            console.log('[PortalLayout] Using localhost preview (run npm run dev in project)')
+            setPreviewUrl('http://localhost:3000')
+          }
+        } else {
+          setPreviewUrl('http://localhost:3000')
+        }
+      } catch (error) {
+        console.error('[PortalLayout] Failed to fetch preview URL:', error)
+        setPreviewUrl('http://localhost:3000')
+      }
+    }
+
+    fetchPreviewUrl()
+  }, [activeProject?.id])
 
   const handleMessagesChange = (newMessages: ChatMessage[], loading: boolean) => {
     setMessages(newMessages)
@@ -129,6 +169,80 @@ export default function PortalLayout({
   const handleClearAttachedFiles = () => {
     setAttachedFiles([])
   }
+
+  const handleFileOpen = (file: { path: string; name: string; content: string }) => {
+    console.log('[PortalLayout] Opening file:', file.name, 'Content length:', file.content.length)
+    console.log('[PortalLayout] Current layout:', chatLayout)
+    // Check if file is already open
+    const existingIndex = openFiles.findIndex(f => f.path === file.path)
+    if (existingIndex >= 0) {
+      console.log('[PortalLayout] File already open at index:', existingIndex)
+      setActiveFileIndex(existingIndex)
+    } else {
+      console.log('[PortalLayout] Adding new file, will be at index:', openFiles.length)
+      setOpenFiles([...openFiles, file])
+      setActiveFileIndex(openFiles.length)
+    }
+
+    // If in floating mode, switch to bottom mode to show preview panel
+    if (chatLayout === 'floating') {
+      console.log('[PortalLayout] Switching from floating to bottom layout to show file')
+      setChatLayout('bottom')
+    }
+  }
+
+  const handleFileClose = (index: number) => {
+    const newFiles = openFiles.filter((_, i) => i !== index)
+    setOpenFiles(newFiles)
+    if (activeFileIndex >= newFiles.length) {
+      setActiveFileIndex(Math.max(0, newFiles.length - 1))
+    }
+  }
+
+  const handleFileDetach = (index: number) => {
+    const file = openFiles[index]
+    // Open in new window
+    const newWindow = window.open('', '_blank', 'width=800,height=600')
+    if (newWindow) {
+      newWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>${file.name}</title>
+            <style>
+              body {
+                margin: 0;
+                padding: 20px;
+                font-family: monospace;
+                background: #1e1e1e;
+                color: #d4d4d4;
+              }
+              pre {
+                margin: 0;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+              }
+              .header {
+                padding: 10px;
+                background: #2d2d2d;
+                border-bottom: 1px solid #3e3e3e;
+                margin-bottom: 20px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div style="font-size: 12px; color: #888;">${file.path}</div>
+              <div style="font-size: 16px; margin-top: 5px;">${file.name}</div>
+            </div>
+            <pre>${file.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+          </body>
+        </html>
+      `)
+      newWindow.document.close()
+    }
+  }
+
 
   const handleFilesSaved = async (files: File[], folderPath: string) => {
     // TODO: Implement file saving to staging area
@@ -188,7 +302,7 @@ export default function PortalLayout({
       onFilesAttached={handleFilesAttached}
       onFilesSaved={handleFilesSaved}
     >
-      <div className="h-screen flex flex-col bg-background">
+      <div className="h-screen flex flex-col bg-[#050714]">
         {/* Welcome Message */}
         <WelcomeMessage userName={firstName} hasProject={hasProject} />
 
@@ -200,6 +314,9 @@ export default function PortalLayout({
           user={user}
           clientAccount={clientAccount}
           onLayoutChange={handleLayoutChange}
+          onPanelOpenChange={setSidebarPanelOpen}
+          onFileOpen={handleFileOpen}
+          onExplorerStateChange={setExplorerOpen}
           modifiedFiles={pendingDiffs.map(diff => ({
             path: diff.filePath,
             type: diff.type === 'file_preview' ? 'created' as const : 'modified' as const
@@ -208,7 +325,11 @@ export default function PortalLayout({
       )}
 
       {/* Main content with left padding for sidebar (remove padding when sidebar is hidden) */}
-      <div className={`h-full flex flex-col ${chatLayout !== 'left' && chatLayout !== 'right' ? 'pl-12' : ''}`}>
+      <div className={`h-full flex flex-col transition-all duration-300 ease-in-out ${
+        chatLayout !== 'left' && chatLayout !== 'right'
+          ? sidebarPanelOpen ? 'pl-[304px]' : 'pl-12'
+          : ''
+      }`}>
         {/* Token Budget Bar - Matches homepage scroll progress */}
         <TokenBudgetBar
           used={tokenBudget.used}
@@ -234,6 +355,11 @@ export default function PortalLayout({
                   messages={messages}
                   isLoading={isLoading}
                   outputFontSize={outputFontSize}
+                  openFiles={openFiles}
+                  activeFileIndex={activeFileIndex}
+                  onFileSelect={setActiveFileIndex}
+                  onFileClose={handleFileClose}
+                  showPreview={showPreview}
                 />
               </div>
             </>
@@ -252,6 +378,11 @@ export default function PortalLayout({
                   messages={messages}
                   isLoading={isLoading}
                   outputFontSize={outputFontSize}
+                  openFiles={openFiles}
+                  activeFileIndex={activeFileIndex}
+                  onFileSelect={setActiveFileIndex}
+                  onFileClose={handleFileClose}
+                  showPreview={showPreview}
                 />
               </div>
               <div className="w-1/4 border-l border-border">
@@ -276,6 +407,11 @@ export default function PortalLayout({
                   messages={messages}
                   isLoading={isLoading}
                   outputFontSize={outputFontSize}
+                  openFiles={openFiles}
+                  activeFileIndex={activeFileIndex}
+                  onFileSelect={setActiveFileIndex}
+                  onFileClose={handleFileClose}
+                  showPreview={showPreview}
                 />
               </div>
             </>
@@ -294,6 +430,11 @@ export default function PortalLayout({
                   messages={messages}
                   isLoading={isLoading}
                   outputFontSize={outputFontSize}
+                  openFiles={openFiles}
+                  activeFileIndex={activeFileIndex}
+                  onFileSelect={setActiveFileIndex}
+                  onFileClose={handleFileClose}
+                  showPreview={showPreview}
                 />
               </div>
               <div className="border-t border-border flex-shrink-0 max-h-[40vh] flex flex-col">

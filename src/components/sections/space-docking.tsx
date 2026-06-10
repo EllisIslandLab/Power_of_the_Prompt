@@ -12,7 +12,7 @@ export function SpaceDocking() {
           The bay doors are open for the next wave of recruits. Initialize your sequence to begin the final phase of your career evolution.
         </p>
 
-        <button className="bg-[#e8ea23] text-[#1c1d00] px-12 py-5 rounded-lg text-xs font-bold uppercase tracking-wider gold-glow hover:scale-105 transition-all flex items-center gap-3">
+        <button className="bg-[#FFB800] text-[#271900] px-12 py-5 rounded-lg text-xs font-bold uppercase tracking-wider gold-glow hover:scale-105 transition-all flex items-center gap-3">
           INITIALIZE SEQUENCE →
         </button>
 

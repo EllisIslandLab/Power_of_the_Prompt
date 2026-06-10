@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,8 +9,9 @@ import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 import { createBrowserClient } from '@supabase/ssr'
 
-export default function SigninPage() {
+function SigninContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -19,6 +20,21 @@ export default function SigninPage() {
   const [error, setError] = useState('')
   const [verificationMessage, setVerificationMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [redirectTo, setRedirectTo] = useState<string | null>(null)
+
+  // Get redirect parameter from URL
+  useEffect(() => {
+    const redirect = searchParams.get('redirect')
+    if (redirect) {
+      setRedirectTo(redirect)
+    }
+
+    // Check for error parameter
+    const errorParam = searchParams.get('error')
+    if (errorParam === 'session_expired') {
+      setError('Your session expired. Please sign in again to continue.')
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -55,9 +71,8 @@ export default function SigninPage() {
         throw new Error(data.error || 'Sign-in failed')
       }
 
-      // Simple: All users go to portal after signin
-      // Admins can manually go to /admin
-      router.push('/portal')
+      // Redirect to specified page or default to portal
+      router.push(redirectTo || '/portal')
     } catch (err) {
       console.error('Auth error:', err)
       setError(err instanceof Error ? err.message : 'An error occurred during sign-in')
@@ -86,7 +101,7 @@ export default function SigninPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/api/auth/callback?next=/portal`
+          redirectTo: `${window.location.origin}/api/auth/callback?next=${redirectTo || '/portal'}`
         }
       })
 
@@ -99,22 +114,30 @@ export default function SigninPage() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">
-            Welcome Back
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Sign in to your Web Launch Academy account
-          </p>
-        </div>
+    <>
+      <div className="starfield"></div>
+      <div className="nebula-glow" style={{ top: '20%', left: '15%' }}></div>
+      <div className="nebula-glow" style={{ bottom: '20%', right: '15%' }}></div>
+      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-[#050714] pt-24">
+        <div className="w-full max-w-md space-y-8 relative z-10">
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span className="flex h-3 w-3 rounded-full bg-[#b1c6f9] pulse-blue"></span>
+              <span className="text-[10px] font-bold tracking-[0.2em] text-[#b1c6f9] uppercase">Mission Control Access</span>
+            </div>
+            <h1 className="text-4xl font-bold text-white">
+              Welcome Back
+            </h1>
+            <p className="text-base text-[#c4c7c8]">
+              Sign in to your Web Launch Academy account
+            </p>
+          </div>
 
-        <div className="bg-card rounded-lg border border-border p-8 shadow-sm">
+          <div className="glass-panel rounded-xl border-t-8 border-white p-8 relative">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-foreground">
+                <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-[#c4c7c8]">
                   Email Address
                 </Label>
                 <Input
@@ -124,13 +147,13 @@ export default function SigninPage() {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="h-11"
-                  placeholder="Enter your email"
+                  className="h-11 bg-[#080c25] border-white/10 text-white placeholder:text-white/30 focus:border-white"
+                  placeholder="your.email@example.com"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">
+                <Label htmlFor="password" className="text-[10px] font-bold uppercase tracking-widest text-[#c4c7c8]">
                   Password
                 </Label>
                 <div className="relative">
@@ -141,13 +164,13 @@ export default function SigninPage() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="h-11 pr-10"
+                    className="h-11 pr-10 bg-[#080c25] border-white/10 text-white placeholder:text-white/30 focus:border-white"
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c4c7c8] hover:text-white"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -186,14 +209,14 @@ export default function SigninPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-11 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold"
+              className="w-full h-11 bg-[#FFB800] hover:brightness-110 text-[#271900] font-bold uppercase tracking-wider text-xs transition-all disabled:opacity-50"
               size="lg"
             >
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? 'Initializing...' : 'Access Portal'}
             </Button>
 
             <div className="text-center">
-              <Link href="/forgot-password" className="text-sm text-primary hover:text-primary/80">
+              <Link href="/forgot-password" className="text-sm text-[#b1c6f9] hover:text-white transition-colors">
                 Create New Password
               </Link>
             </div>
@@ -202,10 +225,10 @@ export default function SigninPage() {
           {/* OAuth Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
+              <div className="w-full blue-glow-line"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-card text-muted-foreground">Or continue with</span>
+              <span className="px-4 bg-[#050714] text-[#c4c7c8] text-[10px] font-bold uppercase tracking-widest">Or continue with</span>
             </div>
           </div>
 
@@ -215,7 +238,7 @@ export default function SigninPage() {
             onClick={handleGitHubSignIn}
             disabled={loading}
             variant="outline"
-            className="w-full h-11 font-semibold"
+            className="w-full h-11 font-semibold bg-white/5 border-white/20 text-white hover:bg-white/10"
             size="lg"
           >
             <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
@@ -224,7 +247,16 @@ export default function SigninPage() {
             {loading ? 'Signing In...' : 'Sign in with GitHub'}
           </Button>
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
+    </>
+  )
+}
+
+export default function SigninPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SigninContent />
+    </Suspense>
   )
 }

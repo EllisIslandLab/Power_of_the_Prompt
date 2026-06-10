@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Preview Panel — Launch Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --accent: oklch(0.55 0.19 268);
+    --accent-soft: oklch(0.55 0.19 268 / 0.12);
+    --accent-ink: oklch(0.98 0.01 268);
+    --radius: 11px;
+    --cb-h: 56px;
+  }
+  /* ---------- Light theme ---------- */
+  html[data-theme="light"] {
+    --bg: oklch(0.97 0.004 264);
+    --bg-2: oklch(0.945 0.005 264);
+    --surface: oklch(0.995 0.001 264);
+    --surface-2: oklch(0.975 0.003 264);
+    --border: oklch(0.9 0.005 264);
+    --border-strong: oklch(0.84 0.006 264);
+    --text: oklch(0.27 0.012 266);
+    --text-muted: oklch(0.53 0.012 266);
+    --text-faint: oklch(0.66 0.01 266);
+    --shadow: 0 1px 2px rgba(20,22,30,0.04), 0 12px 32px -16px rgba(20,22,30,0.18);
+    --phone-shadow: 0 2px 8px rgba(0,0,0,0.18), 0 40px 80px -40px rgba(0,0,0,0.45);
+  }
+  /* ---------- Dark theme ---------- */
+  html[data-theme="dark"] {
+    --bg: oklch(0.185 0.006 266);
+    --bg-2: oklch(0.155 0.006 266);
+    --surface: oklch(0.225 0.007 266);
+    --surface-2: oklch(0.26 0.008 266);
+    --border: oklch(0.31 0.009 266);
+    --border-strong: oklch(0.38 0.01 266);
+    --text: oklch(0.96 0.003 266);
+    --text-muted: oklch(0.72 0.01 266);
+    --text-faint: oklch(0.58 0.01 266);
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 16px 40px -18px rgba(0,0,0,0.6);
+    --phone-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 50px 90px -40px rgba(0,0,0,0.8);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body, #root { height: 100%; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+
+  .portal {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    background: var(--bg);
+  }
+
+  /* ---------- Portal header ---------- */
+  .portal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 22px; height: 52px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .ph-left { display: flex; align-items: center; gap: 16px; }
+  .logo { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+  .logo b { font-weight: 700; }
+  .logo-mark { width: 20px; height: 20px; border-radius: 6px; background: var(--accent);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18); }
+  .crumb { font-size: 12px; color: var(--text-faint); letter-spacing: 0.02em; }
+  .ph-right { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: oklch(0.7 0.16 150);
+    box-shadow: 0 0 0 3px oklch(0.7 0.16 150 / 0.18); }
+
+  /* ---------- Control bar ---------- */
+  .controlbar {
+    display: flex; align-items: center; justify-content: space-between;
+    height: var(--cb-h); padding: 0 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .cb-left { display: flex; align-items: center; gap: 14px; }
+  .cb-right { display: flex; align-items: center; gap: 6px; }
+
+  .seg {
+    display: flex; background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 3px; gap: 2px;
+  }
+  .seg button {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 500; color: var(--text-muted);
+    padding: 7px 14px; border-radius: 7px;
+  }
+  .seg button svg { opacity: 0.85; }
+  .seg button:hover { color: var(--text); }
+  .seg button.active {
+    background: var(--surface); color: var(--accent);
+    box-shadow: var(--shadow); font-weight: 600;
+  }
+  html[data-theme="dark"] .seg button.active { color: oklch(0.82 0.13 268); background: var(--surface-2); }
+  .dims { font-size: 12px; color: var(--text-faint); letter-spacing: 0.02em; }
+
+  .iconbtn {
+    width: 34px; height: 34px; border-radius: 9px;
+    display: grid; place-items: center; color: var(--text-muted);
+    border: 1px solid transparent;
+    transition: background .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .iconbtn:hover { background: var(--bg-2); color: var(--text); border-color: var(--border); }
+  .iconbtn.spinning svg { animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .divider { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+
+  /* ---------- Preview area ---------- */
+  .preview-area {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(120% 80% at 50% 0%, var(--bg-2) 0%, var(--bg) 70%);
+  }
+  .mode-layer { position: absolute; inset: 0; display: none; }
+  .mode-layer.visible { display: block; animation: layer-in .3s ease both; }
+  @keyframes layer-in {
+    from { opacity: 0.55; transform: scale(0.992); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .stage {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; padding: 18px;
+  }
+
+  /* ---------- Phone frame ---------- */
+  .phone-fit { transform-origin: center center; }
+  .phone {
+    width: 416px; height: 858px;
+    background: linear-gradient(158deg, #303034 0%, #161618 60%, #0d0d0f 100%);
+    border-radius: 58px;
+    padding: 13px;
+    box-shadow: var(--phone-shadow), inset 0 0 0 1.5px rgba(255,255,255,0.07), inset 0 0 0 7px #000;
+    position: relative;
+  }
+  .screen {
+    position: relative;
+    width: 390px; height: 832px;
+    background: #fff;
+    border-radius: 46px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .statusbar {
+    position: relative; z-index: 4;
+    height: 50px; flex: 0 0 50px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 30px 0 32px;
+  }
+  .sb-time { font-weight: 600; font-size: 15px; color: #000; letter-spacing: 0.01em; font-feature-settings: "tnum"; }
+  .sb-icons { display: flex; align-items: center; gap: 7px; color: #000; }
+
+  .notch {
+    position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+    width: 124px; height: 33px; background: #000; border-radius: 22px; z-index: 6;
+  }
+  .pf-iframe { flex: 1 1 auto; width: 100%; border: none; background: #fff; }
+  .home-indicator {
+    position: absolute; bottom: 9px; left: 50%; transform: translateX(-50%);
+    width: 134px; height: 5px; border-radius: 999px; background: #000; opacity: 0.32; z-index: 5;
+  }
+
+  /* ---------- Desktop frame ---------- */
+  .desktop-window {
+    width: 100%; height: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .dw-bar {
+    height: 44px; flex: 0 0 44px;
+    display: flex; align-items: center; gap: 14px;
+    padding: 0 14px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .dw-dots { display: flex; gap: 7px; }
+  .dw-dots i { width: 11px; height: 11px; border-radius: 50%; background: var(--border-strong); }
+  .dw-dots i:nth-child(1) { background: #f0625a; }
+  .dw-dots i:nth-child(2) { background: #f5bf4f; }
+  .dw-dots i:nth-child(3) { background: #61c554; }
+  .dw-url {
+    flex: 1; max-width: 520px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    height: 28px; padding: 0 14px;
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 8px; font-size: 12.5px; color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .dw-url svg { color: var(--text-faint); }
+  .dw-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft); padding: 4px 9px; border-radius: 6px;
+  }
+  html[data-theme="dark"] .dw-tag { color: oklch(0.82 0.13 268); }
+  .dw-iframe { flex: 1 1 auto; width: 100%; border: none; background: #fff; }
+
+  /* ---------- Loading & toast ---------- */
+  .loading {
+    position: absolute; inset: 0; z-index: 20;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    background: color-mix(in oklch, var(--bg) 72%, transparent);
+    backdrop-filter: blur(2px);
+    font-size: 12.5px; color: var(--text-muted); letter-spacing: 0.03em;
+  }
+  .spinner {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2.5px solid var(--border-strong); border-top-color: var(--accent);
+    animation: spin 0.7s linear infinite;
+  }
+  .toast {
+    position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+    z-index: 30;
+    display: flex; align-items: center; gap: 9px;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow);
+    padding: 10px 16px 10px 12px; border-radius: 11px;
+    font-size: 13px; font-weight: 500;
+    animation: toast-in .28s cubic-bezier(.2,.9,.3,1.2);
+  }
+  .toast-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: oklch(0.7 0.16 150); color: #fff;
+    display: grid; place-items: center;
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+
+  @media (max-width: 560px) {
+    .crumb, .dims, .ph-right { display: none; }
+    .controlbar { padding: 0 12px; }
+    .seg button { padding: 7px 11px; }
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="components/preview-panel.jsx"></script>
+  <script type="text/babel">
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<PreviewPanel />);
+  </script>
+</body>
+</html>

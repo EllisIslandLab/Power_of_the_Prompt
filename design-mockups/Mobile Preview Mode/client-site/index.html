@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Driftwood Coffee Roasters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #f6f0e6;
+    --cream-2: #efe6d6;
+    --paper: #fffdf8;
+    --espresso: #2b211a;
+    --bark: #4a3a2c;
+    --muted: #8a7a68;
+    --terra: #b5653f;
+    --terra-dark: #984f2e;
+    --line: #e3d8c6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Work Sans', system-ui, sans-serif;
+    color: var(--espresso);
+    background: var(--cream);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 600; line-height: 1.08; letter-spacing: -0.01em; }
+  a { color: inherit; text-decoration: none; }
+  img, svg { display: block; }
+
+  .ph {
+    position: relative;
+    background:
+      repeating-linear-gradient(45deg, rgba(74,58,44,0.06) 0 10px, rgba(74,58,44,0.02) 10px 20px),
+      var(--cream-2);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .ph span {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--muted); background: rgba(255,253,248,0.7);
+    padding: 4px 9px; border-radius: 999px; border: 1px solid var(--line);
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(246,240,230,0.86);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand .mark { width: 30px; height: 30px; border-radius: 50%; background: var(--espresso); color: var(--cream); display: grid; place-items: center; font-size: 15px; font-weight: 600; }
+  .nav-links { display: flex; gap: 28px; font-size: 14.5px; font-weight: 500; color: var(--bark); }
+  .nav-links a:hover { color: var(--terra); }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .cart { font-size: 13px; font-weight: 600; border: 1px solid var(--espresso); color: var(--espresso); padding: 8px 16px; border-radius: 999px; }
+  .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .burger i { width: 22px; height: 2px; background: var(--espresso); display: block; }
+
+  /* Hero */
+  .hero { padding: 64px 0 72px; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; }
+  .eyebrow { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--terra); margin-bottom: 18px; }
+  .hero h1 { font-size: clamp(38px, 6vw, 62px); }
+  .hero p.lead { font-size: 18px; color: var(--bark); margin: 22px 0 30px; max-width: 30em; }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn { font-weight: 600; font-size: 15px; padding: 13px 26px; border-radius: 999px; cursor: pointer; transition: transform .15s ease, background .15s ease; }
+  .btn-primary { background: var(--terra); color: #fff; border: 1px solid var(--terra); }
+  .btn-primary:hover { background: var(--terra-dark); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--espresso); border: 1px solid var(--espresso); }
+  .btn-ghost:hover { background: var(--espresso); color: var(--cream); }
+  .hero-media { aspect-ratio: 4/5; border-radius: 18px; }
+
+  /* Trust strip */
+  .strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--paper); }
+  .strip .wrap { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 20px; padding-bottom: 20px; flex-wrap: wrap; }
+  .strip span.lbl { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .strip .marks { display: flex; gap: 30px; flex-wrap: wrap; }
+  .strip .marks b { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--bark); opacity: 0.7; font-style: italic; }
+
+  /* Section */
+  section.block { padding: 72px 0; }
+  .head { max-width: 36em; margin-bottom: 40px; }
+  .head .eyebrow { margin-bottom: 12px; }
+  .head h2 { font-size: clamp(28px, 4vw, 40px); }
+  .head p { color: var(--bark); margin-top: 14px; font-size: 16.5px; }
+
+  .products { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform .18s ease, box-shadow .18s ease; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px -24px rgba(43,33,26,0.4); }
+  .card .pmedia { aspect-ratio: 1/1; }
+  .card .pbody { padding: 18px 18px 22px; }
+  .card .roast { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--terra); }
+  .card h3 { font-size: 21px; margin: 8px 0 6px; }
+  .card p.notes { font-size: 14px; color: var(--muted); min-height: 2.6em; }
+  .card .prow { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+  .card .price { font-weight: 600; font-size: 17px; }
+  .card .add { font-size: 13px; font-weight: 600; color: var(--terra); border: 1px solid var(--terra); padding: 8px 14px; border-radius: 999px; }
+
+  /* Story */
+  .story-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 48px; align-items: center; }
+  .story-media { aspect-ratio: 5/4; border-radius: 18px; }
+  .story h2 { font-size: clamp(28px, 4vw, 42px); }
+  .story p { color: var(--bark); font-size: 16.5px; margin-top: 18px; }
+  .story .sig { font-family: 'Playfair Display', serif; font-style: italic; font-size: 22px; margin-top: 24px; color: var(--espresso); }
+
+  /* Subscribe band */
+  .band { background: var(--espresso); color: var(--cream); }
+  .band .wrap { padding: 64px 24px; text-align: center; }
+  .band .eyebrow { color: #d99a72; }
+  .band h2 { font-size: clamp(28px, 4.5vw, 44px); color: #fff; }
+  .band p { color: #d8c9b6; max-width: 32em; margin: 16px auto 28px; font-size: 16.5px; }
+  .band .btn-primary { background: var(--terra); border-color: var(--terra); }
+
+  /* Footer */
+  footer { background: var(--cream-2); border-top: 1px solid var(--line); }
+  .foot { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; padding: 56px 0 40px; }
+  .foot .brand { margin-bottom: 14px; }
+  .foot p.blurb { color: var(--muted); font-size: 14px; max-width: 24em; }
+  .foot h4 { font-family: 'Work Sans', sans-serif; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .foot ul { list-style: none; display: grid; gap: 10px; font-size: 14.5px; color: var(--bark); }
+  .foot ul a:hover { color: var(--terra); }
+  .legal { border-top: 1px solid var(--line); padding: 20px 0; font-size: 12.5px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.03em; }
+
+  /* ---- Responsive: tablet ---- */
+  @media (max-width: 1024px) {
+    .hero-grid { gap: 36px; }
+    .products { grid-template-columns: repeat(2, 1fr); }
+    .foot { grid-template-columns: 1.4fr 1fr 1fr; }
+    .foot .col-last { display: none; }
+  }
+  /* ---- Responsive: mobile ---- */
+  @media (max-width: 680px) {
+    .nav-links { display: none; }
+    .cart { display: none; }
+    .burger { display: flex; }
+    .hero { padding: 36px 0 44px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 30px; }
+    .hero-media { order: -1; aspect-ratio: 16/11; }
+    .cta-row .btn { flex: 1; text-align: center; }
+    .strip .wrap { justify-content: center; text-align: center; }
+    .strip .marks { gap: 18px; justify-content: center; }
+    section.block { padding: 48px 0; }
+    .products { grid-template-columns: 1fr; }
+    .story-grid { grid-template-columns: 1fr; gap: 28px; }
+    .story-media { order: -1; aspect-ratio: 16/11; }
+    .foot { grid-template-columns: 1fr 1fr; gap: 28px; padding: 40px 0 28px; }
+    .foot .col-brand { grid-column: 1 / -1; }
+    .foot .col-last { display: block; }
+    .band .wrap { padding: 48px 24px; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <div class="brand"><span class="mark">D</span> Driftwood</div>
+      <nav class="nav-links">
+        <a href="#shop">Shop</a>
+        <a href="#story">Our Story</a>
+        <a href="#cafes">Cafés</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="nav-right">
+        <a class="cart" href="#cart">Cart · 2</a>
+        <div class="burger"><i></i><i></i><i></i></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Small-batch · Pacific Northwest</div>
+          <h1>Coffee roasted the morning it ships.</h1>
+          <p class="lead">We source single-origin beans from growers we know by name, roast in micro-batches, and get them to your door within 48 hours of the roast.</p>
+          <div class="cta-row">
+            <button class="btn btn-primary">Shop the roasts</button>
+            <button class="btn btn-ghost">Start a subscription</button>
+          </div>
+        </div>
+        <div class="ph hero-media"><span>hero photo · 4:5</span></div>
+      </div>
+    </section>
+
+    <div class="strip">
+      <div class="wrap">
+        <span class="lbl">As featured in</span>
+        <div class="marks">
+          <b>The Daily Grind</b>
+          <b>Roast Mag</b>
+          <b>Cascade Eats</b>
+          <b>Bean &amp; Barrel</b>
+        </div>
+      </div>
+    </div>
+
+    <section class="block" id="shop">
+      <div class="wrap">
+        <div class="head">
+          <div class="eyebrow">This week's lineup</div>
+          <h2>Fresh roasts, ready to brew</h2>
+          <p>Rotating single origins and our house blends, roasted Tuesdays and Fridays.</p>
+        </div>
+        <div class="products">
+          <article class="card">
+            <div class="ph pmedia"><span>bag · 1:1</span></div>
+            <div class="pbody">
+              <div class="roast">Light roast</div>
+              <h3>Yirgacheffe</h3>
+              <p class="notes">Jasmine, bergamot, stone fruit.</p>
+              <div class="prow"><span class="price">$21</span><span class="add">Add to cart</span></div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="ph pmedia"><span>bag · 1:1</span></div>
+            <div class="pbody">
+              <div class="roast">Medium roast</div>
+              <h3>Driftwood Blend</h3>
+              <p class="notes">Cocoa, toasted almond, caramel.</p>
+              <div class="prow"><span class="price">$19</span><span class="add">Add to cart</span></div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="ph pmedia"><span>bag · 1:1</span></div>
+            <div class="pbody">
+              <div class="roast">Dark roast</div>
+              <h3>Cape Foulweather</h3>
+              <p class="notes">Dark chocolate, molasses, smoke.</p>
+              <div class="prow"><span class="price">$20</span><span class="add">Add to cart</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="block story" id="story">
+      <div class="wrap story-grid">
+        <div class="ph story-media"><span>roastery photo · 5:4</span></div>
+        <div>
+          <div class="eyebrow">Our story</div>
+          <h2>From a beach cottage to your cup</h2>
+          <p>Driftwood started in 2014 with a secondhand roaster on the Oregon coast and a stubborn belief that great coffee shouldn't sit on a shelf for months.</p>
+          <p>Today we roast for thousands of homes and a handful of cafés we love — but the rule hasn't changed: roast small, ship fast, taste everything.</p>
+          <div class="sig">— Mara &amp; Eli, founders</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="cafes">
+      <div class="wrap">
+        <div class="eyebrow">Subscribe &amp; save 15%</div>
+        <h2>Never run out of good mornings</h2>
+        <p>Choose your beans, pick a cadence, and we'll roast to order and deliver on schedule. Pause or cancel anytime.</p>
+        <button class="btn btn-primary">Build your subscription</button>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <div class="wrap foot">
+      <div class="col-brand">
+        <div class="brand"><span class="mark">D</span> Driftwood</div>
+        <p class="blurb">Small-batch coffee roasted on the Oregon coast and shipped within 48 hours.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#">Single origin</a></li>
+          <li><a href="#">House blends</a></li>
+          <li><a href="#">Subscriptions</a></li>
+          <li><a href="#">Gift cards</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">Our story</a></li>
+          <li><a href="#">Sourcing</a></li>
+          <li><a href="#">Cafés</a></li>
+          <li><a href="#">Wholesale</a></li>
+        </ul>
+      </div>
+      <div class="col-last">
+        <h4>Visit</h4>
+        <ul>
+          <li>1842 Shoreline Dr</li>
+          <li>Newport, OR</li>
+          <li>Daily · 7–4</li>
+        </ul>
+      </div>
+    </div>
+    <div class="wrap legal">
+      <span>© 2026 Driftwood Coffee Roasters</span>
+      <span>Privacy · Terms · Accessibility</span>
+    </div>
+  </footer>
+</body>
+</html>

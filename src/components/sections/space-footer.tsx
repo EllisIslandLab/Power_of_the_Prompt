@@ -43,7 +43,7 @@ export function SpaceFooter() {
               <li><Link href="/#hero" className="text-[13px] font-medium tracking-[0.05em] text-[#c4c7c8] hover:text-white transition-colors">Home</Link></li>
               <li><Link href="/#showcase" className="text-[13px] font-medium tracking-[0.05em] text-[#c4c7c8] hover:text-white transition-colors">Showcase</Link></li>
               <li><Link href="/#testimonials" className="text-[13px] font-medium tracking-[0.05em] text-[#c4c7c8] hover:text-white transition-colors">Reviews</Link></li>
-              <li><Link href="/signin" className="text-[13px] font-medium tracking-[0.05em] text-[#e8ea23] hover:text-white transition-colors">Mission Control</Link></li>
+              <li><Link href="/signin" className="text-[13px] font-medium tracking-[0.05em] text-[#FFB800] hover:text-white transition-colors">Mission Control</Link></li>
             </ul>
           </div>
 

@@ -1,4 +1,5 @@
 // Build enhanced system prompt with project context
+import { loadUserSkills, formatSkillsForPrompt } from './skills-loader'
 
 interface ProjectContext {
   repoUrl?: string
@@ -9,9 +10,10 @@ interface ProjectContext {
   connectedServices?: Record<string, any>
   userContext?: string
   userInstructions?: string
+  userId?: string
 }
 
-export function buildSystemPrompt(context: ProjectContext, userMessage: string): string {
+export async function buildSystemPrompt(context: ProjectContext, userMessage: string): Promise<string> {
   let prompt = `You are an AI assistant helping a client make changes to their website.
 
 **Your Role:**
@@ -188,6 +190,45 @@ The user will see a diff preview for every change and must approve before it's c
     if (availableConfigs.length > 0) {
       prompt += `**Config Files Available:**\n${availableConfigs.map(f => `- ${f}`).join('\n')}\n\n`
     }
+  }
+
+  // Load and add user skills if available (filtered by connected services and tech stack)
+  try {
+    const connectedServices = context.connectedServices ? Object.keys(context.connectedServices) : []
+
+    // Extract tech stack from project files
+    const techStack: string[] = []
+    if (context.projectFiles['package.json']) {
+      try {
+        const pkg = JSON.parse(context.projectFiles['package.json'])
+        const allDeps = { ...pkg.dependencies, ...pkg.devDependencies }
+
+        // Add common framework names
+        if (allDeps['next']) techStack.push('nextjs', 'react')
+        if (allDeps['react']) techStack.push('react')
+        if (allDeps['typescript']) techStack.push('typescript')
+        if (allDeps['tailwindcss']) techStack.push('tailwind')
+        if (allDeps['@supabase/supabase-js']) techStack.push('supabase')
+        if (allDeps['stripe']) techStack.push('stripe')
+        if (allDeps['resend']) techStack.push('resend')
+        if (allDeps['airtable']) techStack.push('airtable')
+      } catch (e) {
+        // Invalid JSON, skip
+      }
+    }
+
+    const skills = await loadUserSkills(context.userId, {
+      connectedServices,
+      techStack,
+      userMessage
+    })
+
+    if (skills.length > 0) {
+      prompt += formatSkillsForPrompt(skills)
+      console.log(`[Context Builder] Added ${skills.length} relevant skills to prompt`)
+    }
+  } catch (error) {
+    console.error('[Context Builder] Failed to load skills:', error)
   }
 
   prompt += `\n**Current Request:**\n${userMessage}\n`

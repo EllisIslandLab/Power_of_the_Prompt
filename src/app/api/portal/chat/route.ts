@@ -83,6 +83,20 @@ export async function POST(request: Request) {
       throw new Error('Client account not found')
     }
 
+    // Check if account has balance
+    if (clientAccount.account_balance <= 0) {
+      return new Response(
+        JSON.stringify({
+          role: 'assistant',
+          content: "Your account balance is $0. Please add funds to continue. Click the Account Balance icon at the bottom of the sidebar to add funds and view billing options.",
+          lowBalance: true
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
     // Fetch project details
     let project: any = null
     let projectFiles: { [key: string]: string } = {}
@@ -340,7 +354,7 @@ export async function POST(request: Request) {
     }
 
     // Build enhanced system prompt with project context
-    const systemPrompt = buildSystemPrompt(
+    const systemPrompt = await buildSystemPrompt(
       {
         repoUrl,
         branch: project?.github_default_branch || 'main',
@@ -350,6 +364,7 @@ export async function POST(request: Request) {
         connectedServices: serviceContext,
         userContext: userSettings?.claude_context || undefined,
         userInstructions: userSettings?.claude_instructions || undefined,
+        userId: clientAccount.user_id,
       },
       message
     )

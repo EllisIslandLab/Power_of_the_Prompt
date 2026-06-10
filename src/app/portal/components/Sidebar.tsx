@@ -506,7 +506,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
       )}
 
       {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-12 bg-[#080c25]/80 backdrop-blur-md border-r border-white/10 flex flex-col items-center py-4 z-30">
+      <div className="fixed left-0 top-0 h-full w-12 bg-[#080c25] backdrop-blur-md border-r border-white/20 flex flex-col items-center py-4 z-30 shadow-lg shadow-black/50">
         {/* Main Tools */}
         <div className="flex flex-col items-center">
           {mainTools.map(tool => (
@@ -576,7 +576,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
       {activeTool && activeTool !== 'layout' && activeTool !== 'settings' && (
         <>
           {/* Panel */}
-          <div className="fixed left-12 top-0 h-full w-64 bg-card/95 backdrop-blur-sm border-r border-border z-30 shadow-lg">
+          <div className="fixed left-12 top-0 h-full w-64 bg-[#0a0e27] backdrop-blur-sm border-r border-white/20 z-30 shadow-2xl shadow-black/60">
             <div className="p-4 h-full flex flex-col">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
@@ -656,7 +656,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                      className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="w-full px-3 py-2 text-sm border-2 border-white/30 rounded-lg bg-[#080c25] text-white focus:outline-none focus:border-[#b1c6f9]/50 transition-all shadow-md"
                     />
                     <button
                       onClick={handleSearch}

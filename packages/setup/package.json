@@ -1,0 +1,24 @@
+{
+  "name": "@weblaunchacademy/setup",
+  "version": "1.0.0",
+  "description": "One-command setup for Web Launch Academy environment sync",
+  "main": "src/index.js",
+  "bin": {
+    "wla-setup": "src/index.js"
+  },
+  "scripts": {},
+  "keywords": [
+    "weblaunchacademy",
+    "setup",
+    "env",
+    "environment"
+  ],
+  "author": "Web Launch Academy",
+  "license": "MIT",
+  "files": [
+    "src/"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

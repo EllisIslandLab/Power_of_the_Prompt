@@ -25,7 +25,7 @@ export function FleetShowcase() {
             className="group relative block cursor-pointer"
           >
             <div className="mb-4">
-              <span className="text-xs font-bold tracking-[0.1em] text-[#e8ea23] mb-2 block uppercase">
+              <span className="text-xs font-bold tracking-[0.1em] text-[#FFB800] mb-2 block uppercase">
                 VESSEL_0{index + 1}: {index === 0 ? 'ENGINE CORE' : 'UI HUB'}
               </span>
               <p className="text-[#c4c7c8] text-sm">{sample.description}</p>

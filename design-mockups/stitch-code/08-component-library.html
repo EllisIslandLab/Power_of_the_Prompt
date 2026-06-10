@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Component Library | Web Launch Academy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #111415;
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .orbital-ring {
+            border: 1px solid rgba(0, 162, 253, 0.3);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .glow-line {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00a2fd, transparent);
+            box-shadow: 0 0 8px #00a2fd;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-dim": "#111415",
+                      "tertiary-container": "#c6c3cf",
+                      "on-secondary-fixed": "#001d33",
+                      "outline-variant": "#514532",
+                      "error": "#ffb4ab",
+                      "on-primary-container": "#6b4c00",
+                      "on-primary-fixed-variant": "#5e4200",
+                      "surface": "#111415",
+                      "surface-bright": "#373a3b",
+                      "on-tertiary": "#303038",
+                      "tertiary-fixed-dim": "#c7c5d0",
+                      "surface-container-lowest": "#0c0f10",
+                      "outline": "#9e8f78",
+                      "primary-container": "#ffb800",
+                      "on-error-container": "#ffdad6",
+                      "secondary-container": "#00a2fd",
+                      "surface-container-high": "#282a2b",
+                      "primary": "#ffdca1",
+                      "on-secondary-fixed-variant": "#004a77",
+                      "on-tertiary-fixed": "#1b1b23",
+                      "on-primary": "#412d00",
+                      "on-secondary-container": "#003558",
+                      "background": "#111415",
+                      "on-surface-variant": "#d5c4ab",
+                      "on-tertiary-fixed-variant": "#46464f",
+                      "on-error": "#690005",
+                      "primary-fixed": "#ffdea8",
+                      "tertiary-fixed": "#e4e1ed",
+                      "surface-variant": "#323536",
+                      "surface-tint": "#ffba20",
+                      "inverse-primary": "#7c5800",
+                      "on-background": "#e1e3e4",
+                      "on-secondary": "#003354",
+                      "inverse-surface": "#e1e3e4",
+                      "inverse-on-surface": "#2e3132",
+                      "on-tertiary-container": "#51505a",
+                      "error-container": "#93000a",
+                      "on-primary-fixed": "#271900",
+                      "surface-container-highest": "#323536",
+                      "surface-container": "#1d2021",
+                      "secondary": "#98cbff",
+                      "tertiary": "#e2dfeb",
+                      "surface-container-low": "#191c1d",
+                      "on-surface": "#e1e3e4",
+                      "primary-fixed-dim": "#ffba20",
+                      "secondary-fixed": "#cfe5ff",
+                      "secondary-fixed-dim": "#98cbff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "unit": "4px",
+                      "gutter": "16px",
+                      "container-padding": "24px",
+                      "margin-desktop": "40px"
+              },
+              "fontFamily": {
+                      "headline-display": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "body-md": ["Inter"],
+                      "technical-data": ["Inter"],
+                      "label-caps": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-display": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "900"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "900"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                      "technical-data": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.2em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="text-on-surface font-body-md min-h-screen">
+<!-- Global Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full w-[240px] border-r border-white/20 bg-surface/80 backdrop-blur-xl z-50 hidden md:flex flex-col py-container-padding shadow-[0_0_12px_rgba(0,162,253,0.1)]">
+<div class="px-6 mb-10">
+<h1 class="font-headline-lg text-headline-lg text-primary">[ACADEMY].v01</h1>
+<p class="font-technical-data text-technical-data text-on-surface-variant">Cadet 742-Bravo</p>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="px-6 py-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-technical-data text-technical-data">Dashboard</span>
+</a>
+<a class="px-6 py-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+<span class="font-technical-data text-technical-data">Missions</span>
+</a>
+<a class="px-6 py-3 flex items-center gap-3 text-primary border-l-4 border-primary bg-primary/10 font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="font-technical-data text-technical-data">Library</span>
+</a>
+<a class="px-6 py-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-technical-data text-technical-data">Telemetry</span>
+</a>
+<a class="px-6 py-3 flex items-center gap-3 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-technical-data text-technical-data">Settings</span>
+</a>
+</nav>
+<button class="mx-6 mb-8 py-3 bg-primary-container text-on-primary-container font-bold rounded-lg active:scale-95 transition-all">
+            LAUNCH MISSION
+        </button>
+<footer class="px-6 flex flex-col gap-2 mt-auto">
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-on-surface transition-all text-xs" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="help">help</span> Help
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-on-surface transition-all text-xs" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="logout">logout</span> Logout
+            </a>
+</footer>
+</aside>
+<header class="fixed top-0 right-0 w-full md:w-[calc(100%-240px)] h-16 border-b border-white/20 z-40 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 md:px-margin-desktop shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+<div class="flex items-center gap-4">
+<span class="font-headline-lg-mobile text-headline-lg-mobile md:text-headline-lg text-primary-fixed uppercase tracking-wider">COMPONENT_SPEC.v1</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="notifications">notifications</span>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border border-primary/30">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2unQ7n9TVKn65YPfGKvAYrSb3BIt6Mb2AwMgXXOBfi4nbJALhzPPn-10NQxfvrWxrLI41tcQcj4y1KTPzdtotlOylFx63hGav3B9da08csQfi8iEcEoK6dGzi8tDQH6h3JnTtnLbUSfmN9Y8PY8EOMsuk8rrarly-KaNb2HmCBckuZkHFdOqVsBdN5KewgX7FqYu8nIBpbZQPGRMVroytLX_HJptoWO7P8KtOGxM1ywY5ABUCWTFlg8Bh5SZJfc2Gzpbl02KTQGc"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-20 px-6 md:ml-[240px] md:px-margin-desktop max-w-7xl">
+<!-- Introduction -->
+<div class="mb-12">
+<p class="font-technical-data text-secondary-container uppercase tracking-[0.2em] mb-2">SYSTEM ARCHITECTURE</p>
+<h2 class="font-headline-display text-headline-display mb-4">Celestial Design System</h2>
+<div class="glow-line w-full md:w-1/2"></div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- BUTTONS SECTION -->
+<section class="glass-panel p-container-padding relative group overflow-hidden">
+<div class="absolute top-0 left-0 p-2 border-b border-r border-white/10 font-label-caps text-on-surface-variant bg-white/5">
+                    [BUTTONS].v01
+                </div>
+<div class="mt-8 flex flex-wrap gap-4">
+<button class="px-8 py-3 bg-[#FFB800] text-[#111415] font-bold rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(255,184,0,0.3)]">
+                        PRIMARY_COMMAND
+                    </button>
+<button class="px-8 py-3 border border-secondary-container text-secondary-container font-bold rounded-lg hover:bg-secondary-container/10 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,162,253,0.2)]">
+                        SECONDARY_LINK
+                    </button>
+<button class="px-8 py-3 bg-error-container text-on-error-container font-bold rounded-lg hover:bg-error/20 active:scale-95 transition-all">
+                        ABORT_MISSION
+                    </button>
+<button class="p-3 border border-white/20 text-on-surface rounded-full hover:bg-white/5 active:scale-90 transition-all flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+</button>
+</div>
+<p class="mt-6 text-on-surface-variant text-sm font-technical-data">Interactive states for mission control operations.</p>
+</section>
+<!-- FORM INPUTS SECTION -->
+<section class="glass-panel p-container-padding relative">
+<div class="absolute top-0 left-0 p-2 border-b border-r border-white/10 font-label-caps text-on-surface-variant bg-white/5">
+                    [INPUT_FIELDS].v01
+                </div>
+<div class="mt-8 space-y-6">
+<div class="relative group">
+<label class="font-label-caps text-secondary text-[10px] mb-1 block">ENTRY_COORDINATES</label>
+<input class="w-full bg-surface-container-low border-b-2 border-secondary-container/30 border-t-0 border-x-0 p-3 focus:ring-0 focus:border-secondary-container transition-all outline-none text-on-surface placeholder-on-surface-variant/40 font-technical-data" placeholder="0.000, 0.000" type="text"/>
+<span class="absolute bottom-2 right-2 text-[8px] text-secondary/40 font-technical-data">L-24</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex items-center gap-3 bg-white/5 p-3 rounded">
+<input class="w-4 h-4 rounded border-white/20 bg-transparent text-primary-container focus:ring-primary-container" id="check1" type="checkbox"/>
+<label class="font-technical-data text-sm" for="check1">AUTOPILOT_ACTIVE</label>
+</div>
+<div class="flex items-center gap-3 bg-white/5 p-3 rounded">
+<input class="w-4 h-4 border-white/20 bg-transparent text-secondary-container focus:ring-secondary-container" id="rad1" name="opt" type="radio"/>
+<label class="font-technical-data text-sm" for="rad1">MANUAL_OVERRIDE</label>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 bg-white/5 rounded">
+<span class="font-technical-data text-sm">ENGINE_THRUST_LOCK</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary-container"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- TYPOGRAPHY SECTION -->
+<section class="glass-panel p-container-padding relative lg:col-span-2">
+<div class="absolute top-0 left-0 p-2 border-b border-r border-white/10 font-label-caps text-on-surface-variant bg-white/5">
+                    [TYPOGRAPHY_MANIFESTO].v01
+                </div>
+<div class="mt-8 space-y-8">
+<div>
+<span class="font-label-caps text-secondary/60 block mb-2">HEADLINE_DISPLAY</span>
+<h1 class="font-headline-display text-headline-display">THE COSMOS IS OPEN</h1>
+</div>
+<div class="grid md:grid-cols-2 gap-8">
+<div>
+<span class="font-label-caps text-secondary/60 block mb-2">HEADLINE_LG</span>
+<h2 class="font-headline-lg text-headline-lg">Mission Parameters Set</h2>
+</div>
+<div>
+<span class="font-label-caps text-secondary/60 block mb-2">TECHNICAL_DATA</span>
+<p class="font-technical-data text-technical-data leading-relaxed">System diagnostics confirm all modules operational. Atmospheric density: 1.225 kg/m³. Velocity: 7.8 km/s.</p>
+</div>
+</div>
+<div>
+<span class="font-label-caps text-secondary/60 block mb-2">BODY_MD</span>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">This interface uses Inter as the primary typeface, optimized for legibility at high resolutions and under extreme cockpit lighting conditions. Tracking is increased on labels to ensure clarity during high-G maneuvers.</p>
+</div>
+</div>
+</section>
+<!-- CARDS & CONTAINERS SECTION -->
+<section class="glass-panel p-container-padding relative h-[400px] flex items-center justify-center overflow-hidden">
+<div class="absolute top-0 left-0 p-2 border-b border-r border-white/10 font-label-caps text-on-surface-variant bg-white/5">
+                    [CONTAINMENT_FIELDS].v01
+                </div>
+<!-- Orbital Ring Example -->
+<div class="relative w-64 h-64 flex items-center justify-center">
+<div class="orbital-ring w-64 h-64 border-dashed opacity-40"></div>
+<div class="orbital-ring w-48 h-48" style="animation-duration: 12s; animation-direction: reverse;"></div>
+<div class="orbital-ring w-40 h-40 border-primary/20" style="animation-duration: 8s;"></div>
+<div class="z-10 w-32 h-32 rounded-full overflow-hidden border-2 border-secondary shadow-[0_0_20px_rgba(0,162,253,0.4)]">
+<img alt="Planetoid" class="w-full h-full object-cover" data-alt="A detailed digital rendering of a sleek, futuristic spacecraft orbiting a bioluminescent planet with visible atmospheric rings. The aesthetic is high-fidelity sci-fi with deep blue and cyan lighting accents. The background features a crisp starfield and distant nebulae in shades of violet and deep space black." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnYrv24impQ1OL6M5Y9tv6cvxK3urbDvv3Y523eFtMobvSs78rFPQ1lrhz1OKZVUZvCgwEwqG028VkZiY4n774AKo-SJk4ZMuWeUXmrftYxcOnG4lBqkoF4MYkjI0cYLk2kQJU7I0mHG10e9-pfiWzB3YTV3fggqPYsRWB5H5Z6TkcovY-UZo3iZvrWO8QGDgstXsLwn9q_CSVidF6-_7Y3eQmjqCXTHox1Dil1dcH3oWo9cYnuyGQ_-ZxUT8b3bErFMAsYGSoXx0"/>
+</div>
+</div>
+</section>
+<!-- BADGES & LABELS -->
+<section class="glass-panel p-container-padding relative">
+<div class="absolute top-0 left-0 p-2 border-b border-r border-white/10 font-label-caps text-on-surface-variant bg-white/5">
+                    [STATUS_INDICATORS].v01
+                </div>
+<div class="mt-8 grid grid-cols-2 gap-6">
+<div class="space-y-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#00a2fd] animate-pulse"></span>
+<span class="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-bold rounded-full border border-secondary/30 uppercase tracking-widest">System_Online</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#ffb800]"></span>
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full border border-primary/30 uppercase tracking-widest">Pre_Flight</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error shadow-[0_0_8px_#ffb4ab]"></span>
+<span class="px-3 py-1 bg-error/10 text-error text-[10px] font-bold rounded-full border border-error/30 uppercase tracking-widest">Breach_Warning</span>
+</div>
+</div>
+<div class="space-y-4 flex flex-col items-end">
+<div class="relative">
+<span class="material-symbols-outlined text-3xl" data-icon="mail">mail</span>
+<span class="absolute -top-1 -right-1 bg-primary-container text-on-primary-container text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-surface">24</span>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined text-3xl" data-icon="notifications">notifications</span>
+<span class="absolute -top-1 -right-1 bg-error text-on-error text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-surface">09</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SPECIAL ELEMENTS -->
+<section class="glass-panel p-container-padding relative lg:col-span-2">
+<div class="absolute top-0 left-0 p-2 border-b border-r border-white/10 font-label-caps text-on-surface-variant bg-white/5">
+                    [VISUAL_FX].v01
+                </div>
+<div class="mt-8 space-y-10">
+<div>
+<p class="font-label-caps text-xs text-on-surface-variant mb-4">ATMOSPHERIC_GLOW_LINES</p>
+<div class="space-y-4">
+<div class="glow-line w-full"></div>
+<div class="glow-line w-3/4 opacity-70"></div>
+<div class="glow-line w-1/2 opacity-40"></div>
+</div>
+</div>
+<div class="grid md:grid-cols-2 gap-8">
+<div>
+<p class="font-label-caps text-xs text-on-surface-variant mb-4">TEXTURE_PREVIEW: STARFIELD_DEPTH</p>
+<div class="h-40 w-full rounded border border-white/10 relative overflow-hidden" style="background: #111415; background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.15) 1px, transparent 0); background-size: 20px 20px;">
+<div class="absolute inset-0 bg-gradient-to-tr from-secondary-container/5 via-transparent to-primary/5"></div>
+<div class="absolute bottom-4 left-4 p-2 bg-black/40 backdrop-blur-md rounded text-[10px] font-technical-data border border-white/10">
+                                    BG_TOKEN: L_DARK_01
+                                </div>
+</div>
+</div>
+<div>
+<p class="font-label-caps text-xs text-on-surface-variant mb-4">INSTRUMENTATION_PANEL</p>
+<div class="h-40 w-full glass-panel rounded p-4 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="text-[8px] font-label-caps opacity-50">HEART_RATE</span>
+<span class="text-xl font-headline-lg text-primary">72 BPM</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="monitor_heart">monitor_heart</span>
+</div>
+<div class="h-12 w-full flex items-end gap-1">
+<div class="bg-secondary/40 w-full h-1/2"></div>
+<div class="bg-secondary/60 w-full h-3/4"></div>
+<div class="bg-secondary/40 w-full h-2/3"></div>
+<div class="bg-secondary/80 w-full h-full"></div>
+<div class="bg-secondary/40 w-full h-1/3"></div>
+<div class="bg-secondary/50 w-full h-1/2"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<footer class="mt-20 border-t border-white/10 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex flex-col">
+<span class="font-headline-lg text-primary-fixed-dim text-lg uppercase tracking-widest">[L-PORTAL].v02</span>
+<span class="font-technical-data text-[10px] text-on-surface-variant">SECURE ACADEMY ENDPOINT // ENCRYPTION AES-256</span>
+</div>
+<div class="flex gap-8">
+<a class="font-label-caps text-[10px] hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="font-label-caps text-[10px] hover:text-primary transition-colors" href="#">API Reference</a>
+<a class="font-label-caps text-[10px] hover:text-primary transition-colors" href="#">Safety Protocols</a>
+</div>
+</footer>
+</main>
+<!-- Mobile Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-xl border-t border-white/10 px-6 py-4 flex justify-between items-center z-50">
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-technical-data">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+<span class="text-[10px] font-technical-data">Missions</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" data-icon="grid_view" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="text-[10px] font-technical-data">Library</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-technical-data">Admin</span>
+</button>
+</nav>
+<script>
+        // Micro-interactions for UI feedback
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.add('scale-95');
+                setTimeout(() => this.classList.remove('scale-95'), 100);
+            });
+        });
+
+        // Simulating telemetry data bars
+        const bars = document.querySelectorAll('.h-12 div');
+        setInterval(() => {
+            bars.forEach(bar => {
+                const height = Math.floor(Math.random() * 100) + '%';
+                bar.style.height = height;
+                bar.style.transition = 'height 0.4s ease-in-out';
+            });
+        }, 800);
+    </script>
+</body></html>

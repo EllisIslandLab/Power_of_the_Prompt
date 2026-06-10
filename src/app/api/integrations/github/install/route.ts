@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
+    path: '/',
     maxAge: 600 // 10 minutes
   })
 
@@ -50,9 +51,12 @@ export async function GET(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
+      path: '/',
       maxAge: 600 // 10 minutes
     })
   }
+
+  console.log('[GitHub Install] Set cookies for user:', user.id)
 
   return response
 }

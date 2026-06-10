@@ -78,7 +78,7 @@ export default function RootLayout({
         {/* Material Symbols Icons */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         />
 
         <script
@@ -113,9 +113,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <DarkModeProvider>
-          {/* Connection lines background - subtle animation in dark mode */}
-          <AnimatedBackground />
-
           <Providers>
             <SpaceNavigation />
             {children}
@@ -123,7 +120,7 @@ export default function RootLayout({
             <SpeedInsights />
           </Providers>
         </DarkModeProvider>
-        
+
       </body>
     </html>
   );

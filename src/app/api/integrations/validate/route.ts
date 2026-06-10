@@ -602,22 +602,49 @@ async function validateAirtablePlain(credentials: any): Promise<ValidationResult
       throw new Error('Airtable API key is required')
     }
 
-    // Test connection by fetching bases or tables
-    // Note: When testing with a base_id, we need to list tables using the meta API
-    const url = base_id
-      ? `https://api.airtable.com/v0/meta/bases/${base_id}/tables`
-      : 'https://api.airtable.com/v0/meta/bases'
-
-    console.log('[Airtable Validation] Testing connection to:', url)
+    // First, test token validity by listing bases (simpler endpoint)
+    console.log('[Airtable Validation] Testing token with bases endpoint...')
     console.log('[Airtable Validation] API key format:', api_key?.substring(0, 10) + '...')
 
-    const response = await fetch(url, {
+    const basesResponse = await fetch('https://api.airtable.com/v0/meta/bases', {
       headers: {
-        'Authorization': `Bearer ${api_key}`,
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${api_key}`
       }
     })
 
+    console.log('[Airtable Validation] Bases endpoint status:', basesResponse.status)
+
+    if (!basesResponse.ok) {
+      const errorText = await basesResponse.text()
+      console.error('[Airtable Validation] Bases endpoint error:', errorText)
+
+      let errorData: any = {}
+      try {
+        errorData = JSON.parse(errorText)
+      } catch (e) {
+        // ignore
+      }
+
+      const errorMessage = errorData.error?.message || errorData.error?.type || `Token validation failed: ${basesResponse.status}`
+      throw new Error(errorMessage)
+    }
+
+    console.log('[Airtable Validation] Token is valid!')
+
+    // If base_id provided, verify it exists
+    if (base_id) {
+      const basesData = await basesResponse.json()
+      const baseExists = basesData.bases?.some((b: any) => b.id === base_id)
+
+      if (!baseExists) {
+        console.log('[Airtable Validation] Base ID not found in account')
+        throw new Error(`Base ${base_id} not found in your Airtable account`)
+      }
+
+      console.log('[Airtable Validation] Base ID verified!')
+    }
+
+    const response = basesResponse
     console.log('[Airtable Validation] Response status:', response.status)
 
     if (!response.ok) {

@@ -53,7 +53,9 @@ export default function Home() {
         onClose={() => setShowExpiredModal(false)}
       />
       <div className="starfield"></div>
-      <main className="scroll-smooth bg-[#0d112a] min-h-screen relative">
+      <div className="nebula-glow" style={{ top: '10%', left: '10%' }}></div>
+      <div className="nebula-glow" style={{ bottom: '10%', right: '10%' }}></div>
+      <main className="scroll-smooth bg-[#050714] min-h-screen relative">
         {/* Space-themed homepage */}
         <SpaceHero />
         <FleetShowcase />

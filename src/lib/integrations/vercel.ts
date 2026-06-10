@@ -201,6 +201,38 @@ export async function createVercelDeployment(
 }
 
 /**
+ * List deployments for a project
+ */
+export async function listVercelDeployments(
+  accessToken: string,
+  projectId: string,
+  teamId?: string,
+  limit: number = 10
+): Promise<VercelDeployment[]> {
+  const url = new URL(`https://api.vercel.com/v6/deployments`)
+  url.searchParams.set('projectId', projectId)
+  url.searchParams.set('limit', limit.toString())
+  if (teamId) {
+    url.searchParams.set('teamId', teamId)
+  }
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    console.error('Failed to fetch deployments:', response.status, error)
+    throw new Error(`Failed to fetch deployments: ${response.status}`)
+  }
+
+  const data = await response.json()
+  return data.deployments || []
+}
+
+/**
  * Get deployment details
  */
 export async function getVercelDeployment(

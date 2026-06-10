@@ -74,8 +74,19 @@ export async function GET(request: NextRequest) {
 
     console.log('[GitHub Repositories] Found repositories:', repositories?.length || 0)
 
+    // Add repository counts to installations
+    const installationsWithCounts = installations.map(inst => {
+      const repoCount = repositories?.filter(
+        r => r.installation_id === inst.installation_id
+      ).length || 0
+      return {
+        ...inst,
+        repository_count: repoCount
+      }
+    })
+
     return NextResponse.json({
-      installations,
+      installations: installationsWithCounts,
       repositories: repositories || []
     })
   } catch (error) {

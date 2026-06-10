@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Web Launch Academy | Celestial Command</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1c1d00",
+                        "surface-tint": "#c6c6c7",
+                        "on-secondary-fixed": "#001945",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-secondary-container": "#9bb7ff",
+                        "on-primary-container": "#636565",
+                        "secondary-container": "#274788",
+                        "background": "#0d112a",
+                        "surface-container-low": "#161a33",
+                        "secondary-fixed-dim": "#b0c6ff",
+                        "inverse-primary": "#5d5f5f",
+                        "on-surface": "#dee0ff",
+                        "surface-variant": "#2f334e",
+                        "tertiary": "#ffffff",
+                        "on-background": "#dee0ff",
+                        "error-container": "#93000a",
+                        "inverse-on-surface": "#2b2f49",
+                        "tertiary-fixed-dim": "#cccd00",
+                        "primary-container": "#e2e2e2",
+                        "on-tertiary-container": "#676800",
+                        "surface-container-high": "#242842",
+                        "secondary": "#b0c6ff",
+                        "surface-container-lowest": "#080c25",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-primary-fixed": "#1a1c1c",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#2f334e",
+                        "primary-fixed": "#e2e2e2",
+                        "on-tertiary": "#323200",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#032d6e",
+                        "surface-dim": "#0d112a",
+                        "on-secondary-fixed-variant": "#244485",
+                        "surface": "#0d112a",
+                        "on-primary-fixed-variant": "#454747",
+                        "on-error": "#690005",
+                        "tertiary-fixed": "#e8ea23",
+                        "secondary-fixed": "#d9e2ff",
+                        "tertiary-container": "#e8ea23",
+                        "outline": "#8e9192",
+                        "surface-container": "#1a1e37",
+                        "surface-bright": "#343752",
+                        "outline-variant": "#444748",
+                        "primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#494900",
+                        "on-primary": "#2f3131",
+                        "inverse-surface": "#dee0ff",
+                        "gold": "#FFB800",
+                        "accent-blue": "#90CDF4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "margin-desktop": "64px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "mono-label": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "rank-indicator": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "rank-indicator": ["10px", {"lineHeight": "12px", "letterSpacing": "0.15em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .viewport-glass {
+            background: rgba(22, 26, 51, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .star-field {
+            background-color: #0d112a;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.1) 1px, transparent 40px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+        }
+        .gold-glow {
+            box-shadow: 0 0 15px rgba(255, 184, 0, 0.4);
+        }
+        .blue-glow {
+            box-shadow: 0 0 8px #90CDF4;
+        }
+        .structural-border {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-surface star-field min-h-screen overflow-x-hidden selection:bg-gold selection:text-background">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 z-50 w-full bg-surface-container-lowest/40 backdrop-blur-md border-b border-white/10">
+<div class="flex justify-between items-center w-full px-margin-mobile py-4 max-w-container-max mx-auto">
+<div class="font-headline-lg-mobile text-primary tracking-tighter uppercase font-black">
+            Web Launch Academy
+        </div>
+<button class="material-symbols-outlined text-primary" data-icon="menu">menu</button>
+</div>
+</header>
+<main class="relative pt-24 pb-32 space-y-12">
+<!-- Hero Section -->
+<section class="px-margin-mobile">
+<div class="viewport-glass structural-border relative overflow-hidden">
+<div class="bg-surface-container-highest w-full py-2 px-4 flex justify-center border-b border-white/10">
+<span class="font-rank-indicator text-gold text-rank-indicator uppercase tracking-[0.2em]">Primary Module</span>
+</div>
+<div class="p-8 text-center flex flex-col items-center">
+<h1 class="font-headline-xl text-white mb-4">
+                    Build Once, Own Forever
+                </h1>
+<p class="text-on-surface-variant font-body-md mb-8 max-w-sm">
+                    Master the high-tech stack of the future and launch your career into the stars.
+                </p>
+<form class="w-full space-y-4 max-w-xs">
+<div class="relative">
+<input class="w-full bg-surface-container border-white/20 focus:border-gold focus:ring-0 text-white placeholder:text-white/30 font-rank-indicator py-4 px-4 uppercase text-xs rounded-none" placeholder="OPERATOR EMAIL" type="email"/>
+<div class="absolute right-0 top-0 h-full w-1 bg-accent-blue"></div>
+</div>
+<button class="w-full bg-gold text-background font-rank-indicator text-[12px] py-4 uppercase tracking-[0.2em] font-bold gold-glow active:scale-95 transition-transform">
+                        Launch Career
+                    </button>
+</form>
+<div class="mt-8 flex items-center gap-3">
+<span class="w-2 h-2 bg-accent-blue blue-glow rounded-full animate-pulse"></span>
+<span class="font-rank-indicator text-[10px] text-accent-blue tracking-widest">SYSTEMS READY</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Fleet Showcase -->
+<section class="px-margin-mobile space-y-gutter">
+<div class="flex items-center gap-4 mb-4">
+<div class="h-[1px] w-8 bg-accent-blue"></div>
+<h2 class="font-label-caps text-accent-blue uppercase tracking-widest">Fleet Showcase</h2>
+</div>
+<!-- Showcase Card 1 -->
+<div class="viewport-glass structural-border overflow-hidden">
+<div class="bg-surface-container-highest flex items-center px-4 py-2 justify-between border-b border-white/10">
+<span class="font-rank-indicator text-white/60 text-rank-indicator uppercase tracking-widest">Vessel_01: Engine Core</span>
+<span class="material-symbols-outlined text-accent-blue text-sm" data-icon="settings_input_component">settings_input_component</span>
+</div>
+<div class="p-6">
+<div class="relative mb-6">
+<img class="w-full aspect-video object-cover grayscale-[30%] contrast-125" data-alt="A macro close-up of a futuristic reactor core with pulsing blue light and intricate mechanical components." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXjbRO_NLxvgyB9zup1Co-ldQOmlpp0mTT-aKZ55gyD3JPVCN6wPgJIWY4DhZrNX_ArF9bpyxl30trUsNF1xCpFMVrgHuPO5OHnk4GgpOLe_blCMFm2mh2eCPUTFq-X_yRMFH5LSPJJNTO85pOmD3iiHdNfGijF0WYIpo5mku5RsEWM99Z_v-m27fl9P6u5pZAnqduLpuapqJYk0UDK3klNubTPMLof-KlEbCHwKt8gFCMTsypG-bRJtQav-HyiGFqhro7ydNxsNQ"/>
+<div class="absolute bottom-0 left-0 w-1 h-full bg-accent-blue"></div>
+</div>
+<h3 class="font-headline-lg-mobile text-white mb-2">The Backend Singularity</h3>
+<p class="text-on-surface-variant font-body-md text-sm leading-relaxed">Advanced node architecture designed for interstellar data transmission and heavy compute loads.</p>
+</div>
+</div>
+<!-- Showcase Card 2 -->
+<div class="viewport-glass structural-border overflow-hidden">
+<div class="bg-surface-container-highest flex items-center px-4 py-2 justify-between border-b border-white/10">
+<span class="font-rank-indicator text-white/60 text-rank-indicator uppercase tracking-widest">Vessel_02: UI Hub</span>
+<span class="material-symbols-outlined text-accent-blue text-sm" data-icon="monitoring">monitoring</span>
+</div>
+<div class="p-6">
+<div class="relative mb-6">
+<img class="w-full aspect-video object-cover grayscale-[30%] brightness-90" data-alt="A sophisticated cockpit control panel with multiple transparent glass displays." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDey1Zl_f15Vzru5eVL38RFL1Qxy_aR9kKV5kJhKVUp9P9qj3aPuQ7XS3NM6aoL6mVwBZG4M_E3XX-_tMNLlkmuOh9c0l9wOWIY-NBDk3Xy9WUt7F8LG_VYZ5JdrcMwbGrt5_6RqX2rW6Q3WkueF9P7_ruT__x6f0fLFGz_hG92nPcpB5ScTrBr6W_WZvrGeuuzEcSUt_igoEf8alnSPiI12enV_Q0UIpwcYLbdjIilkjBkQm3zCE2IPJeID9s8Pr4UZqqBePoPg3s"/>
+<div class="absolute bottom-0 left-0 w-1 h-full bg-accent-blue"></div>
+</div>
+<h3 class="font-headline-lg-mobile text-white mb-2">Glassmorphic Viewports</h3>
+<p class="text-on-surface-variant font-body-md text-sm leading-relaxed">Ultra-high-definition interfaces that bridge the gap between pilot and vessel telemetry.</p>
+</div>
+</div>
+</section>
+<!-- Testimonials Section -->
+<section class="px-margin-mobile">
+<div class="flex flex-col items-center mb-8">
+<div class="font-rank-indicator text-accent-blue text-rank-indicator mb-1 tracking-widest">COMM_FEED: ENCRYPTED</div>
+<h2 class="font-headline-lg-mobile text-white uppercase tracking-tighter">Pilot Logs</h2>
+</div>
+<div class="space-y-4">
+<!-- Log 1 -->
+<div class="viewport-glass structural-border p-6 relative">
+<div class="absolute top-0 left-0 w-[2px] h-full bg-gold"></div>
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 border border-white/10 p-1 bg-background">
+<img class="w-full h-full object-cover grayscale" data-alt="Cdr. Marcus Thorne" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2SsyEXrN773dQbaAE9uJYWCkZkIGZ4Xy5ledeuChABxA2jk2MNmabk72d8SoTCCZ139Bt97OaJvMXBmfYbnrWHWENiUG076sGAMVXLcvNxjjQ8H1UAovy1Ub2Xy2lOu6E84Bw9lVEtXnln98RoolriE1V9uJOc-jO9342tQta1xn6YNhu-0YCfKheLQkXUe74BG3g_Ng54lgM5uDRVFHnbPIrgk_saqkZnPj2qcd3ewDUdOSJk_drncJ5lXc19k4IC7hjohOYF6Q"/>
+</div>
+<div>
+<div class="font-rank-indicator text-white/40 text-[9px] uppercase tracking-widest">PILOT_ID: 9942</div>
+<div class="font-headline-lg-mobile text-gold text-sm uppercase font-bold">Cdr. Marcus Thorne</div>
+</div>
+</div>
+<p class="text-on-surface italic font-body-md text-sm leading-relaxed opacity-80">
+                    "The curriculum at Web Launch Academy isn't just about code; it's about structural integrity. I built my agency once, and it's been running on autopilot ever since."
+                </p>
+</div>
+<!-- Log 2 -->
+<div class="viewport-glass structural-border p-6 relative">
+<div class="absolute top-0 left-0 w-[2px] h-full bg-accent-blue"></div>
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 border border-white/10 p-1 bg-background">
+<img class="w-full h-full object-cover grayscale" data-alt="Lt. Elena Vance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATsvFUDHuVUQpT-HXeLDbsnmdt2r96YxqoV3fE4mQx_sTYXL8W_EkTLplwNhQ_YRjXZtSh6MCx21fkXYmflRIbsy3h08EggKHLeb6ncSK4a0KdrKi72olp5pya3aluXB_26p8YL55rKJpvMqKo-NCIFLAhZNi_L2FeKaKCuSz44PR-l5W_VgRbX5HQZbY2ThYLx908AONngnrTqNIspXCQC3ui5D4Ocw8Xi72g5CGfCwWDnZ85HSgClZxbVR1s5Iyf5c7GNA7gWNU"/>
+</div>
+<div>
+<div class="font-rank-indicator text-white/40 text-[9px] uppercase tracking-widest">PILOT_ID: 4410</div>
+<div class="font-headline-lg-mobile text-accent-blue text-sm uppercase font-bold">Lt. Elena Vance</div>
+</div>
+</div>
+<p class="text-on-surface italic font-body-md text-sm leading-relaxed opacity-80">
+                    "The command module structure allowed me to scale my SaaS to 50k users without a single system failure. Truly built for the void."
+                </p>
+</div>
+</div>
+</section>
+<!-- Final CTA Section -->
+<section class="px-margin-mobile">
+<div class="viewport-glass structural-border relative overflow-hidden">
+<div class="bg-surface-container-highest w-full py-2 px-4 flex justify-end border-b border-white/10">
+<span class="font-rank-indicator text-white/20 text-[8px] uppercase tracking-widest">WLA_DOCKING_PORT_7</span>
+</div>
+<div class="p-8">
+<h2 class="font-headline-xl text-white mb-4">Request Docking</h2>
+<p class="text-on-surface-variant mb-8 font-body-md">Join the academy today and receive the full fleet-commander starter pack.</p>
+<button class="flex items-center justify-between w-full bg-gold text-background py-5 px-6 group gold-glow active:scale-95 transition-all">
+<span class="font-rank-indicator text-sm font-bold uppercase tracking-[0.2em]">Initialize Sequence</span>
+<span class="material-symbols-outlined text-background font-bold group-hover:translate-x-1 transition-transform" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 w-full h-[4px] bg-gold"></div>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="bg-surface-container-low/80 backdrop-blur-xl border-t border-white/10 pt-16 pb-12">
+<div class="px-margin-mobile max-w-container-max mx-auto text-center space-y-10">
+<div class="font-headline-lg text-primary font-black tracking-tighter uppercase">
+            WEB LAUNCH ACADEMY
+        </div>
+<div class="flex flex-col gap-4 items-center">
+<div class="flex flex-wrap justify-center gap-x-6 gap-y-3">
+<a class="font-rank-indicator text-[10px] text-on-surface-variant hover:text-gold transition-colors uppercase tracking-widest" href="#">Terms</a>
+<a class="font-rank-indicator text-[10px] text-on-surface-variant hover:text-gold transition-colors uppercase tracking-widest" href="#">Privacy</a>
+<a class="font-rank-indicator text-[10px] text-on-surface-variant hover:text-gold transition-colors uppercase tracking-widest" href="#">Discord</a>
+<a class="font-rank-indicator text-[10px] text-on-surface-variant hover:text-gold transition-colors uppercase tracking-widest" href="#">Contact</a>
+</div>
+<div class="h-[1px] w-12 bg-white/10"></div>
+<p class="font-body-md text-on-surface-variant text-[11px] opacity-40 uppercase tracking-widest">
+                © 2024 Web Launch Academy. Build Once, Own Forever.
+            </p>
+</div>
+</div>
+</footer>
+<!-- Scanner Line Effect -->
+<div class="fixed top-0 left-0 w-full h-[1px] bg-accent-blue/20 pointer-events-none z-[100] translate-y-[-100%]" id="scanner-line"></div>
+<script>
+    // Scanner animation
+    const scanner = document.getElementById('scanner-line');
+    function moveScanner() {
+        let pos = -10;
+        const animate = () => {
+            pos += 1.5;
+            if (pos > window.innerHeight) pos = -10;
+            scanner.style.transform = `translateY(${pos}px)`;
+            requestAnimationFrame(animate);
+        };
+        animate();
+    }
+    moveScanner();
+
+    // Subtle parallax for stars on scroll
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        document.body.style.backgroundPosition = `0 ${scrolled * 0.05}px, 40px ${60 + scrolled * 0.1}px, 130px ${270 + scrolled * 0.15}px`;
+    });
+</script>
+</body></html>

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -97,17 +98,17 @@
   --color-jonquil-800: #685300;
   --color-jonquil-900: #342a00;
 
-  /* Space theme colors - Celestial Command */
-  --color-space-bg: #0d112a;
-  --color-space-surface: #0d112a;
-  --color-on-surface: #dee0ff;
+  /* Space theme colors - Celestial Command (Stitch Design) */
+  --color-space-bg: #050714;
+  --color-space-surface: #050714;
+  --color-on-surface: #e5e7eb;
   --color-on-surface-variant: #c4c7c8;
-  --color-logo-blue: #b0c6ff;
-  --color-secondary-blue: #b0c6ff;
+  --color-logo-blue: #b1c6f9;
+  --color-secondary-blue: #b1c6f9;
   --color-secondary-container: #274788;
-  --color-gold: #e8ea23;
-  --color-gold-foreground: #1c1d00;
-  --color-surface-container: #1a1e37;
+  --color-gold: #FFB800;
+  --color-gold-foreground: #271900;
+  --color-surface-container: #0a0e27;
   --color-surface-container-low: #161a33;
   --color-surface-container-lowest: #080c25;
   --color-outline: #8e9192;
@@ -163,39 +164,39 @@
   --destructive-foreground: #f1f5f9;
 }
 
-/* Celestial Command Space theme */
+/* Celestial Command Space theme (Stitch Design) */
 [data-theme="space"] {
-  --background: #0d112a;
-  --foreground: #dee0ff;
+  --background: #050714;
+  --foreground: #e5e7eb;
   --primary: #ffffff;
   --primary-foreground: #2f3131;
   --primary-hover: #f0f0f0;
-  --secondary: #b0c6ff;
+  --secondary: #9ca3af;
   --secondary-foreground: #001945;
-  --accent: #e8ea23;
-  --accent-foreground: #1c1d00;
+  --accent: #FFB800;
+  --accent-foreground: #271900;
   --muted: rgba(255, 255, 255, 0.05);
   --muted-foreground: #c4c7c8;
-  --border: rgba(255, 255, 255, 0.1);
+  --border: rgba(255, 255, 255, 0.2);
   --input: #080c25;
-  --ring: #b0c6ff;
+  --ring: #b1c6f9;
   --card: rgba(255, 255, 255, 0.05);
-  --card-foreground: #dee0ff;
+  --card-foreground: #e5e7eb;
   --destructive: #ffb4ab;
   --destructive-foreground: #690005;
 
   /* Additional space theme colors */
-  --surface: #0d112a;
-  --on-surface: #dee0ff;
+  --surface: #050714;
+  --on-surface: #e5e7eb;
   --on-surface-variant: #c4c7c8;
-  --primary-container: #e2e2e2;
-  --on-primary-container: #636565;
-  --surface-container: #1a1e37;
-  --surface-container-low: #161a33;
+  --primary-container: #FFB800;
+  --on-primary-container: #271900;
+  --surface-container: #0a0e27;
+  --surface-container-low: rgba(255, 255, 255, 0.05);
   --surface-container-lowest: #080c25;
-  --outline: #8e9192;
+  --outline: rgba(255, 255, 255, 0.2);
   --outline-variant: #444748;
-  --logo-blue: #b0c6ff;
+  --logo-blue: #b1c6f9;
   --secondary-container: #274788;
 }
 
@@ -309,23 +310,138 @@ a:hover:not(.no-hover) {
   animation: slide-in 0.3s ease-out;
 }
 
-/* Custom scrollbar for chat messages */
+/* Custom scrollbar for chat messages - left side, hidden until hover */
+.chat-scroll {
+  direction: rtl; /* Flip direction to move scrollbar to left */
+}
+
+.chat-scroll > * {
+  direction: ltr; /* Reset content direction */
+}
+
 .chat-scroll::-webkit-scrollbar {
   width: 8px;
 }
 
 .chat-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: transparent;
 }
 
 .chat-scroll::-webkit-scrollbar-thumb {
-  background: #888;
+  background: transparent;
   border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.chat-scroll.group:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .chat-scroll::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox */
+.chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.chat-scroll.group:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* Custom scrollbar for panels */
+.panel-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.panel-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Horizontal scrollbar (for tabs) - hidden until hover */
+.tabs-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tabs-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tabs-scroll::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.tabs-scroll.group:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.tabs-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox */
+.tabs-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.tabs-scroll.group:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* File content scrollbar - left side, hidden until hover (like chat) */
+.file-content-scroll {
+  direction: rtl; /* Flip direction to move scrollbar to left */
+}
+
+.file-content-scroll > * {
+  direction: ltr; /* Reset content direction */
+}
+
+.file-content-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.file-content-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.file-content-scroll::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.file-content-scroll.group:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.file-content-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Firefox */
+.file-content-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.file-content-scroll.group:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
 /* Smooth transitions for budget bar */
@@ -450,20 +566,36 @@ a:focus-visible {
   left: 0;
   width: 100%;
   height: 100%;
+  z-index: -2;
+  background: radial-gradient(circle at center, #0a0e27 0%, #050714 100%);
   background-image:
-    radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1.5px 1.5px at 100px 100px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 150px 150px, #ffffff, rgba(0,0,0,0));
-  background-size: 200px 200px;
+    radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+    radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+    radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px);
+  background-size: 550px 550px, 350px 350px, 250px 250px;
+}
+
+.nebula-glow {
+  position: fixed;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(177, 198, 249, 0.05) 0%, rgba(13, 17, 42, 0) 70%);
+  filter: blur(80px);
   z-index: -1;
-  opacity: 0.3;
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .laser-line-blue {
   height: 1px;
-  background: linear-gradient(90deg, transparent, #b0c6ff, transparent);
-  box-shadow: 0 0 8px #b0c6ff;
+  background: linear-gradient(90deg, transparent, #b1c6f9, transparent);
+  box-shadow: 0 0 10px rgba(177, 198, 249, 0.5);
+}
+
+.blue-glow-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #b1c6f9, transparent);
+  box-shadow: 0 0 10px rgba(177, 198, 249, 0.5);
 }
 
 .glass-panel {
@@ -472,8 +604,70 @@ a:focus-visible {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.glass-container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 8px solid rgba(255, 255, 255, 0.9);
+  position: relative;
+  overflow: hidden;
+}
+
+.container-header {
+  background: #000000;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #ffffff;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.laser-border-gold {
+  box-shadow: 0 0 20px rgba(255, 184, 0, 0.1);
+}
+
+.orbital-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(177, 198, 249, 0.2);
+  pointer-events: none;
+}
+
+.circular-frame {
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+}
+
+.animate-orbit {
+  animation: orbit-rotation 120s linear infinite;
+}
+
+@keyframes orbit-rotation {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .gold-glow {
   box-shadow: 0 0 15px rgba(232, 234, 35, 0.4);
+}
+
+.glow-blue {
+  box-shadow: 0 0 15px rgba(177, 198, 249, 0.4);
+  border-color: #b1c6f9;
+}
+
+.glow-lime {
+  box-shadow: 0 0 15px rgba(216, 218, 0, 0.4);
 }
 
 .pulse-blue {

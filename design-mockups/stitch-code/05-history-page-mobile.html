@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#cccd00",
+                        "on-secondary-container": "#9bb7ff",
+                        "on-tertiary-fixed": "#1c1d00",
+                        "surface-container": "#1a1e37",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-tertiary-container": "#676800",
+                        "on-primary-container": "#636565",
+                        "surface-container-lowest": "#080c25",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#494900",
+                        "inverse-surface": "#dee0ff",
+                        "on-secondary-fixed-variant": "#244485",
+                        "secondary-fixed": "#d9e2ff",
+                        "on-primary": "#2f3131",
+                        "surface-dim": "#0d112a",
+                        "error": "#ffb4ab",
+                        "inverse-on-surface": "#2b2f49",
+                        "background": "#0d112a",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed": "#001945",
+                        "secondary-fixed-dim": "#b0c6ff",
+                        "surface-container-highest": "#2f334e",
+                        "surface-tint": "#c6c6c7",
+                        "secondary": "#b0c6ff",
+                        "on-surface-variant": "#c4c7c8",
+                        "on-background": "#dee0ff",
+                        "surface-container-low": "#161a33",
+                        "surface-bright": "#343752",
+                        "outline-variant": "#444748",
+                        "primary-container": "#e2e2e2",
+                        "outline": "#8e9192",
+                        "on-primary-fixed": "#1a1c1c",
+                        "tertiary-fixed": "#e8ea23",
+                        "primary": "#ffffff",
+                        "inverse-primary": "#5d5f5f",
+                        "primary-fixed": "#e2e2e2",
+                        "on-error": "#690005",
+                        "tertiary": "#ffffff",
+                        "on-surface": "#dee0ff",
+                        "on-secondary": "#032d6e",
+                        "surface": "#0d112a",
+                        "on-primary-fixed-variant": "#454747",
+                        "tertiary-container": "#e8ea23",
+                        "surface-container-high": "#242842",
+                        "secondary-container": "#274788",
+                        "on-tertiary": "#323200",
+                        "surface-variant": "#2f334e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "8",
+                        "margin-desktop": "64",
+                        "container-max": "1440",
+                        "gutter": "24",
+                        "margin-mobile": "20"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "mono-label": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .laser-top {
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 -2px 10px rgba(255, 255, 255, 0.1);
+        }
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(216, 218, 0, 0.4);
+        }
+        .starfield {
+            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px);
+            background-size: 550px 550px;
+            background-position: 0 0;
+            opacity: 0.1;
+        }
+        .view-transition {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hidden-left { transform: translateX(-100%); }
+        .hidden-right { transform: translateX(100%); }
+        .active-view { transform: translateX(0); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface font-body-md overflow-hidden h-screen">
+<!-- Background Layer -->
+<div class="fixed inset-0 starfield pointer-events-none"></div>
+<div class="fixed inset-0 bg-gradient-to-b from-transparent via-[#0d112a]/50 to-[#0d112a] pointer-events-none"></div>
+<!-- Main Mobile Canvas -->
+<main class="relative h-full flex flex-col max-w-md mx-auto overflow-hidden">
+<!-- App Bar / Top Header -->
+<header class="z-50 px-5 pt-8 pb-4 flex flex-col gap-2">
+<div class="flex items-center gap-2 text-on-surface-variant/60 font-label-caps text-label-caps tracking-widest uppercase">
+<span>Portal</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span class="text-primary">History</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-black tracking-tighter text-primary">CONVERSATION HISTORY</h1>
+</header>
+<!-- Search & Filter Bar -->
+<div class="px-5 mb-4 flex gap-2">
+<div class="flex-1 relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40">search</span>
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg py-2 pl-10 pr-4 text-mono-label font-mono-label focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all" placeholder="SEARCH LOGS..." type="text"/>
+</div>
+<button class="bg-surface-container-low border border-white/10 p-2 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">filter_list</span>
+</button>
+</div>
+<!-- Scrollable List View (Master) -->
+<section class="view-transition active-view flex-1 overflow-y-auto px-5 pb-32 space-y-4" id="listView">
+<!-- Card 1 -->
+<div class="glass-panel laser-top rounded-xl p-4 flex flex-col gap-3 active:scale-[0.98] transition-transform" onclick="openDetail('LOG.8821')">
+<div class="flex justify-between items-start">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-mono-label text-[10px] px-2 py-0.5 rounded-full tracking-tighter">ACTIVE_LINK</span>
+<span class="text-on-surface-variant/40 font-mono-label text-[11px]">T-MINUS 2M</span>
+</div>
+<div>
+<h3 class="text-primary font-headline-lg-mobile text-[18px] font-bold leading-tight">Quantum Entanglement Theory</h3>
+<p class="text-on-surface-variant text-[14px] line-clamp-1 mt-1">Analyzing the non-local correlation between particle states...</p>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-2 pt-3 border-t border-white/5">
+<div class="flex flex-col">
+<span class="text-on-surface-variant/40 font-label-caps text-[10px]">MSGS</span>
+<span class="text-primary font-mono-label">14</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant/40 font-label-caps text-[10px]">TOKENS</span>
+<span class="text-primary font-mono-label">2.4K</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant/40 font-label-caps text-[10px]">COST</span>
+<span class="text-tertiary-fixed font-mono-label">$0.12</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="glass-panel laser-top rounded-xl p-4 flex flex-col gap-3 active:scale-[0.98] transition-transform opacity-90" onclick="openDetail('LOG.4402')">
+<div class="flex justify-between items-start">
+<span class="bg-surface-container-highest text-on-surface-variant font-mono-label text-[10px] px-2 py-0.5 rounded-full tracking-tighter uppercase">Archived</span>
+<span class="text-on-surface-variant/40 font-mono-label text-[11px]">OCT 22, 2154</span>
+</div>
+<div>
+<h3 class="text-primary font-headline-lg-mobile text-[18px] font-bold leading-tight">Hyper-drive Cooling Systems</h3>
+<p class="text-on-surface-variant text-[14px] line-clamp-1 mt-1">Maintenance protocols for liquid nitrogen coolant loops...</p>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-2 pt-3 border-t border-white/5">
+<div class="flex flex-col">
+<span class="text-on-surface-variant/40 font-label-caps text-[10px]">MSGS</span>
+<span class="text-primary font-mono-label">32</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant/40 font-label-caps text-[10px]">TOKENS</span>
+<span class="text-primary font-mono-label">8.1K</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant/40 font-label-caps text-[10px]">COST</span>
+<span class="text-tertiary-fixed font-mono-label">$0.45</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="glass-panel laser-top rounded-xl p-4 flex flex-col gap-3 active:scale-[0.98] transition-transform opacity-80" onclick="openDetail('LOG.1105')">
+<div class="flex justify-between items-start">
+<span class="bg-surface-container-highest text-on-surface-variant font-mono-label text-[10px] px-2 py-0.5 rounded-full tracking-tighter uppercase">Archived</span>
+<span class="text-on-surface-variant/40 font-mono-label text-[11px]">OCT 18, 2154</span>
+</div>
+<div>
+<h3 class="text-primary font-headline-lg-mobile text-[18px] font-bold leading-tight">Neural Link Calibration</h3>
+<p class="text-on-surface-variant text-[14px] line-clamp-1 mt-1">Optimizing synaptical response latency for pilots...</p>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-2 pt-3 border-t border-white/5">
+<div class="flex flex-col">
+<span class="text-on-surface-variant/40 font-label-caps text-[10px]">MSGS</span>
+<span class="text-primary font-mono-label">8</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant/40 font-label-caps text-[10px]">TOKENS</span>
+<span class="text-primary font-mono-label">1.2K</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface-variant/40 font-label-caps text-[10px]">COST</span>
+<span class="text-tertiary-fixed font-mono-label">$0.06</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Detail View Overlay (Hidden Initially) -->
+<section class="view-transition fixed inset-0 bg-surface-container-lowest z-[60] hidden-right flex flex-col" id="detailView">
+<div class="fixed inset-0 starfield pointer-events-none opacity-20"></div>
+<header class="pt-12 px-5 pb-4 flex items-center gap-4 relative z-10">
+<button class="w-10 h-10 rounded-full glass-panel flex items-center justify-center" onclick="closeDetail()">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<span class="text-tertiary-fixed font-mono-label text-[12px] tracking-widest" id="detailLogId">LOG.ID.0000</span>
+<h2 class="text-primary font-headline-lg-mobile text-[20px] font-bold tracking-tight">TRANSMISSION DATA</h2>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto px-5 space-y-6 relative z-10 pt-4">
+<div class="glass-panel laser-top rounded-xl p-6 text-center">
+<span class="material-symbols-outlined text-tertiary-fixed text-[48px] mb-2">terminal</span>
+<p class="text-on-surface font-body-md">Displaying encrypted conversation logs for the selected mission module. Protocol v.1 established.</p>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col items-start gap-2">
+<div class="glass-panel p-3 rounded-tr-xl rounded-br-xl rounded-bl-xl max-w-[85%] border-l-2 border-primary">
+<p class="text-on-surface text-[14px]">Commander, we are seeing fluctuations in the dark matter shielding. Recommendation?</p>
+<span class="text-on-surface-variant/40 font-mono-label text-[10px] mt-2 block">14:22:01</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<div class="bg-primary/90 text-on-primary p-3 rounded-tl-xl rounded-bl-xl rounded-br-xl max-w-[85%] shadow-lg">
+<p class="text-[14px] font-medium">Initiate secondary coolant flush and recalibrate phase arrays to 0.44Hz. Maintain orbit.</p>
+<span class="text-on-primary/60 font-mono-label text-[10px] mt-2 block">14:22:15</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-5 relative z-10">
+<div class="glass-panel rounded-full flex items-center px-4 py-2 gap-3">
+<input class="flex-1 bg-transparent border-none text-primary font-mono-label text-[13px] focus:ring-0 placeholder-on-surface-variant/30" placeholder="RESUME LOG..." type="text"/>
+<button class="text-tertiary-fixed">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Floating Footer Action -->
+<footer class="fixed bottom-0 left-0 right-0 p-6 z-40 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/90 to-transparent">
+<button class="w-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps py-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all glow-gold">
+<span class="material-symbols-outlined">add_comment</span>
+                NEW CONVERSATION
+            </button>
+</footer>
+</main>
+<script>
+        function openDetail(logId) {
+            const detailView = document.getElementById('detailView');
+            const logSpan = document.getElementById('detailLogId');
+            logSpan.textContent = logId;
+            
+            detailView.classList.remove('hidden-right');
+            detailView.classList.add('active-view');
+            
+            // Haptic feedback simulation
+            if (window.navigator.vibrate) {
+                window.navigator.vibrate(10);
+            }
+        }
+
+        function closeDetail() {
+            const detailView = document.getElementById('detailView');
+            detailView.classList.add('hidden-right');
+            detailView.classList.remove('active-view');
+        }
+
+        // Simple atmospheric stars pulse
+        setInterval(() => {
+            const starfield = document.querySelector('.starfield');
+            starfield.style.opacity = (0.05 + Math.random() * 0.08).toString();
+        }, 2000);
+    </script>
+</body></html>
