@@ -168,7 +168,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const services = Array.from(detectedServices).map(serviceName => ({
+    type DetectedService = {
+      name: string
+      confidence: 'high' | 'medium' | 'low'
+      detected: boolean
+      requiredCredentials: string[]
+      optionalCredentials: string[]
+    }
+
+    const services: DetectedService[] = Array.from(detectedServices).map(serviceName => ({
       name: serviceName,
       confidence: 'high' as const,
       detected: true,
