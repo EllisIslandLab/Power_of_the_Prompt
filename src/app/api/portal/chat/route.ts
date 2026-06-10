@@ -619,7 +619,7 @@ export async function POST(request: Request) {
         const { data: airtableCreds } = await supabase
           .from('client_service_credentials')
           .select('api_key_encrypted, metadata')
-          .eq('user_id', user.id)
+          .eq('user_id', clientAccount.user_id)
           .eq('project_id', project.id)
           .eq('service_name', 'airtable')
           .eq('is_valid', true)
