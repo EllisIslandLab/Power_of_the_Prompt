@@ -554,23 +554,18 @@ export default function SettingsInterface({
                             <button
                               onClick={() => {
                                 // Clear stale GitHub data and reconnect
-                                if (confirm('This will clear your stale GitHub connection from the database.\n\nNext steps:\n1. Uninstall old app on GitHub (if present)\n2. Install fresh\n\nContinue?')) {
+                                if (confirm('This will clear your stale GitHub connection.\n\nYou\'ll be redirected to GitHub to install fresh.\nGitHub will redirect you back here when done.\n\nContinue?')) {
                                   fetch('/api/integrations/github/disconnect', { method: 'POST' })
                                     .then(() => {
-                                      // Show confirmation and redirect to fresh install
-                                      if (confirm('✓ Stale data cleared!\n\nRecommended: First uninstall the old app on GitHub to avoid conflicts.\n\nClick OK to go directly to fresh install\nClick Cancel to manage installations first')) {
-                                        // Go straight to install
+                                      // Short delay to show success, then redirect to install
+                                      alert('✓ Stale data cleared!\n\nYou\'ll now be redirected to GitHub.\nSelect your repositories, then you\'ll return here automatically.')
+                                      setTimeout(() => {
                                         window.location.href = '/api/integrations/github/install?redirect_to=/portal/settings'
-                                      } else {
-                                        // Open GitHub settings in new tab
-                                        window.open('https://github.com/settings/installations', '_blank', 'noopener,noreferrer')
-                                        // Reload current page so they see Connect button
-                                        setTimeout(() => window.location.reload(), 500)
-                                      }
+                                      }, 1000)
                                     })
                                     .catch(err => {
                                       console.error('Failed to clear GitHub data:', err)
-                                      alert('Error clearing data. Try manually: Click "Manage on GitHub →" to uninstall, then use "Connect" button.')
+                                      alert('Error clearing data. Try manually:\n1. Click "Manage on GitHub →" (opens new tab)\n2. Uninstall old app\n3. Refresh this page\n4. Click "Connect"')
                                     })
                                 }
                               }}
@@ -583,7 +578,7 @@ export default function SettingsInterface({
                                 window.open('https://github.com/settings/installations', '_blank', 'noopener,noreferrer')
                               }}
                               className="px-4 py-2 rounded-lg text-sm border border-border hover:bg-muted/50 transition-colors"
-                              title="Opens GitHub settings in new tab to uninstall/manage the app"
+                              title="Opens GitHub settings in new tab to manage app installations"
                             >
                               Manage on GitHub →
                             </button>
