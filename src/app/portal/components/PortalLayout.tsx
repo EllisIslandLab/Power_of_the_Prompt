@@ -117,14 +117,20 @@ export default function PortalLayout({
             setPreviewUrl(data.previewUrl)
           } else {
             // Fallback to localhost for local development
-            console.log('[PortalLayout] Using localhost preview (run npm run dev in project)')
+            console.log('[PortalLayout] No Vercel preview yet, using localhost')
             setPreviewUrl('http://localhost:3000')
           }
+        } else if (response.status === 404) {
+          // No active project yet - this is expected during setup
+          console.log('[PortalLayout] No active project yet, using localhost for preview')
+          setPreviewUrl('http://localhost:3000')
         } else {
+          console.log('[PortalLayout] Preview API unavailable, using localhost')
           setPreviewUrl('http://localhost:3000')
         }
       } catch (error) {
-        console.error('[PortalLayout] Failed to fetch preview URL:', error)
+        // Network error or API issue - fall back silently
+        console.log('[PortalLayout] Using localhost for preview')
         setPreviewUrl('http://localhost:3000')
       }
     }

@@ -45,6 +45,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
   const [fileContentCache, setFileContentCache] = useState<Map<string, string>>(new Map())
   const [folderCache, setFolderCache] = useState<Map<string, FileNode[]>>(new Map())
   const [fileLoadError, setFileLoadError] = useState<string | null>(null)
+  const [showReconnectHelp, setShowReconnectHelp] = useState(false)
 
   // Force space theme for portal
   useEffect(() => {
@@ -643,24 +644,68 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
                   ) : loadingFiles ? (
                     <p className="text-muted-foreground">Loading files...</p>
                   ) : fileLoadError ? (
-                    <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-                      <div className="flex items-start gap-2 mb-3">
-                        <svg className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                        </svg>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-destructive mb-1">Connection Error</p>
-                          <p className="text-xs text-destructive/90 mb-3">{fileLoadError}</p>
+                    <div className="space-y-3">
+                      <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                        <div className="flex items-start gap-2 mb-3">
+                          <svg className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                          </svg>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-destructive mb-1">Connection Error</p>
+                            <p className="text-xs text-destructive/90">{fileLoadError}</p>
+                          </div>
                         </div>
+
+                        {/* Help Toggle */}
+                        <button
+                          onClick={() => setShowReconnectHelp(!showReconnectHelp)}
+                          className="w-full px-3 py-2 text-xs bg-muted/50 text-foreground rounded-lg hover:bg-muted transition-colors font-medium mb-2 flex items-center justify-between"
+                        >
+                          <span>How to Fix This</span>
+                          <svg className={`w-4 h-4 transition-transform ${showReconnectHelp ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+
+                        {/* Expandable Help */}
+                        {showReconnectHelp && (
+                          <div className="bg-muted/30 rounded-lg p-3 mb-3 text-xs space-y-2">
+                            <div className="flex items-start gap-2">
+                              <span className="text-primary font-bold flex-shrink-0">1.</span>
+                              <span className="text-muted-foreground">Go to <span className="text-foreground font-semibold">Settings</span> (bottom left sidebar)</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <span className="text-primary font-bold flex-shrink-0">2.</span>
+                              <span className="text-muted-foreground">Click <span className="text-foreground font-semibold">Connected Services</span> tab</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <span className="text-primary font-bold flex-shrink-0">3.</span>
+                              <span className="text-muted-foreground">Find <span className="text-foreground font-semibold">GitHub</span> → click <span className="text-destructive font-semibold">Disconnect</span></span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <span className="text-primary font-bold flex-shrink-0">4.</span>
+                              <span className="text-muted-foreground">Click <span className="text-primary font-semibold">Connect GitHub</span> button</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <span className="text-primary font-bold flex-shrink-0">5.</span>
+                              <span className="text-muted-foreground">Authorize the app and select your repositories</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <span className="text-green-500 font-bold flex-shrink-0">✓</span>
+                              <span className="text-muted-foreground">Come back here and click Explorer again!</span>
+                            </div>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={() => {
+                            window.location.href = '/portal/settings'
+                          }}
+                          className="w-full px-3 py-2 text-xs bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-semibold"
+                        >
+                          Go to Settings
+                        </button>
                       </div>
-                      <button
-                        onClick={() => {
-                          window.location.href = '/portal/settings'
-                        }}
-                        className="w-full px-3 py-2 text-xs bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors font-semibold"
-                      >
-                        Go to Settings → Reconnect GitHub
-                      </button>
                     </div>
                   ) : fileTree.length > 0 ? (
                     renderFileTree(fileTree)
