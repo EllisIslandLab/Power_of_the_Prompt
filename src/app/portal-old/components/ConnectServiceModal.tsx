@@ -205,8 +205,26 @@ export default function ConnectServiceModal({
     )
   }
 
+  const clearOAuthCache = () => {
+    // Clear OAuth-related cache to prevent stale state issues
+    try {
+      // Clear any OAuth state stored in localStorage/sessionStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('oauth') || key.includes('pkce') || key.startsWith('sb-')) {
+          localStorage.removeItem(key)
+        }
+      })
+      sessionStorage.clear()
+      console.log(`Cleared OAuth cache for ${serviceName} connection`)
+    } catch (err) {
+      console.error('Failed to clear OAuth cache:', err)
+    }
+  }
+
   const handleOAuthConnect = () => {
     if (config.oauthUrl) {
+      // Clear any stale OAuth state before redirecting to prevent cache issues
+      clearOAuthCache()
       window.location.href = config.oauthUrl(window.location.origin)
     }
   }
