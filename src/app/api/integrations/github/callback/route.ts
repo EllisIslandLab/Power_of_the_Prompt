@@ -13,20 +13,29 @@ export async function GET(request: NextRequest) {
   const setupAction = searchParams.get('setup_action')
   const code = searchParams.get('code') // OAuth code
 
-  // Get the correct origin (handles ngrok, localhost, production)
+  const cookieStore = await cookies()
+
+  // Get the original origin from cookie (set during install)
+  // This ensures we redirect back to localhost if that's where install started
+  const storedOrigin = cookieStore.get('github_install_origin')?.value
+
+  // Fallback to current request origin if no cookie
   const host = request.headers.get('host') || request.nextUrl.host
   const protocol = request.headers.get('x-forwarded-proto') || request.nextUrl.protocol.replace(':', '')
-  const origin = `${protocol}://${host}`
+  const currentOrigin = `${protocol}://${host}`
+
+  const origin = storedOrigin || currentOrigin
 
   console.log('[GitHub Callback] Received params:', {
     installationId,
     setupAction,
     hasCode: !!code,
     allParams: Object.fromEntries(searchParams.entries()),
+    storedOrigin,
+    currentOrigin,
     origin
   })
 
-  const cookieStore = await cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -233,6 +242,7 @@ export async function GET(request: NextRequest) {
       const response = NextResponse.redirect(redirectUrl)
       response.cookies.delete('github_install_user_id')
       response.cookies.delete('github_install_redirect')
+      response.cookies.delete('github_install_origin')
 
       return response
     } catch (error) {
@@ -275,6 +285,7 @@ export async function GET(request: NextRequest) {
 
       const response = NextResponse.redirect(redirectUrl)
       response.cookies.delete('github_install_redirect')
+      response.cookies.delete('github_install_origin')
 
       return response
     } catch (error) {

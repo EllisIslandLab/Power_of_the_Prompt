@@ -31,6 +31,11 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const redirectTo = searchParams.get('redirect_to')
 
+  // Capture the original origin (localhost vs production)
+  const host = request.headers.get('host') || request.nextUrl.host
+  const protocol = request.headers.get('x-forwarded-proto') || request.nextUrl.protocol.replace(':', '')
+  const origin = `${protocol}://${host}`
+
   // Store user ID in session for callback
   const response = NextResponse.redirect(
     `https://github.com/apps/${process.env.GITHUB_APP_SLUG}/installations/new`
@@ -38,6 +43,15 @@ export async function GET(request: NextRequest) {
 
   // Set a temporary cookie to identify the user after redirect
   response.cookies.set('github_install_user_id', user.id, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 600 // 10 minutes
+  })
+
+  // Store the original origin (so callback knows where to redirect back to)
+  response.cookies.set('github_install_origin', origin, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',

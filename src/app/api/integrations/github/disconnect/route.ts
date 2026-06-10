@@ -43,12 +43,23 @@ export async function POST(request: NextRequest) {
       console.error('[GitHub Disconnect] Failed to clear credentials:', credsError)
     }
 
-    // Clear GitHub installation data from github_repositories
-    // (This doesn't delete the repositories, just disconnects them from projects)
-    const { error: repoError } = await supabase
-      .from('github_repositories')
-      .delete()
+    // Get user's installation IDs first
+    const { data: installations } = await supabase
+      .from('github_installations')
+      .select('installation_id')
       .eq('user_id', user.id)
+
+    // Clear GitHub installation data from github_repositories
+    // (github_repositories doesn't have user_id, links via installation_id)
+    let repoError = null
+    if (installations && installations.length > 0) {
+      const installationIds = installations.map(i => i.installation_id)
+      const result = await supabase
+        .from('github_repositories')
+        .delete()
+        .in('installation_id', installationIds)
+      repoError = result.error
+    }
 
     if (repoError) {
       console.error('[GitHub Disconnect] Failed to clear repositories:', repoError)
