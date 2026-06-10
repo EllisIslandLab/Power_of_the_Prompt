@@ -170,6 +170,7 @@ export default function PreferencesInterface({
             )}
           </div>
         </div>
+        </div>
 
         {/* Account Info */}
         <div className="bg-white rounded-lg shadow p-6 mt-6">
