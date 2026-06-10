@@ -2,7 +2,7 @@
 -- This updates client_accounts with the initial_balance from their invite_token
 
 UPDATE client_accounts ca
-SET account_balance = COALESCE(it.initial_balance, 0),
+SET account_balance = COALESCE(it.initial_balance::NUMERIC(10,2), 0.00),
     updated_at = NOW()
 FROM auth.users u
 LEFT JOIN invite_tokens it ON LOWER(u.email) = LOWER(it.email)
