@@ -146,11 +146,16 @@ const SERVICE_CONFIGS: Record<string, ServiceConfig> = {
       }
     ],
     docsUrl: 'https://airtable.com/developers/web/guides/personal-access-tokens',
-    getKeysInstructions: `1. Go to Airtable Account Settings → Developer Hub → Personal Access Tokens
+    getKeysInstructions: `A Personal Access Token is required. If you don't already have one:
+
+1. Go to Airtable Account Settings → Developer Hub → Personal Access Tokens
 2. Click "Create new token"
 3. Give it a name (e.g., "Web Launch Academy")
-4. IMPORTANT: Add ALL scopes - Click "Add a scope" and select all available scopes
-   (data.records:read, data.records:write, schema.bases:read, schema.bases:write, etc.)
+4. IMPORTANT: Add these 4 scopes:
+   • data.records:read
+   • data.records:write
+   • schema.bases:read
+   • schema.bases:write
 5. Add access to your bases
 6. Click "Create token" and copy it immediately
 
