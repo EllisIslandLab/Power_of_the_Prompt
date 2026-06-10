@@ -86,6 +86,7 @@ export default function SettingsInterface({
     const params = new URLSearchParams(window.location.search)
     const selectRepo = params.get('select_repo')
     const installationId = params.get('installation_id')
+    const vercelConnected = params.get('step') === 'vercel_connected'
 
     if (selectRepo === 'true' && installationId) {
       setInstallationIdForRepoSelect(installationId)
@@ -104,7 +105,74 @@ export default function SettingsInterface({
           console.error('Failed to fetch repositories:', err)
         })
     }
+
+    // Auto-sync env vars when Vercel connects (Vercel-first approach)
+    if (vercelConnected) {
+      setActiveTab('connectors')
+
+      // Trigger env sync automatically
+      syncVercelEnvVars()
+    }
   }, [])
+
+  const syncVercelEnvVars = async () => {
+    try {
+      console.log('[Settings] Syncing env vars from Vercel...')
+
+      // Get Vercel credentials
+      const { data: vercelCreds } = await supabase
+        .from('client_service_credentials')
+        .select('access_token_encrypted, metadata')
+        .eq('user_id', user.id)
+        .eq('service_name', 'vercel')
+        .single()
+
+      if (!vercelCreds) {
+        console.log('[Settings] No Vercel credentials found')
+        return
+      }
+
+      // Get active project with Vercel project ID
+      const { data: project } = await supabase
+        .from('client_projects')
+        .select('id, vercel_project_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single()
+
+      if (!project?.vercel_project_id) {
+        console.log('[Settings] No Vercel project linked yet - will sync after first deployment')
+        return
+      }
+
+      // Decrypt token (we'll need to call the API with encrypted token, API will decrypt)
+      const response = await fetch('/api/integrations/vercel/sync-env', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id: project.vercel_project_id,
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('[Settings] ✓ Synced env vars:', data.connected_services)
+
+        // Refresh connected services to show new connections
+        const servicesRes = await fetch('/api/portal/services')
+        const servicesData = await servicesRes.json()
+        setConnectedServices(servicesData.services || [])
+
+        // Show success notification
+        alert(`✓ Connected ${data.connected_services.length} services from Vercel:\n${data.connected_services.join(', ')}`)
+      } else {
+        console.log('[Settings] Env sync will happen after first deployment')
+      }
+    } catch (error) {
+      console.error('[Settings] Failed to sync env vars:', error)
+      // Don't show error to user - this will happen automatically via webhook
+    }
+  }
 
   const handleSaveSettings = async () => {
     setIsSaving(true)

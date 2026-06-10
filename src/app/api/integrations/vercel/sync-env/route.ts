@@ -21,24 +21,46 @@ export async function POST(request: NextRequest) {
     }
   )
 
+  // Get user from auth session or from request body (for webhook calls)
   const { data: { user } } = await supabase.auth.getUser()
+  const { project_id, user_id } = await request.json()
 
-  if (!user) {
+  // Use user from session or from request
+  const effectiveUserId = user?.id || user_id
+
+  if (!effectiveUserId) {
     return NextResponse.json(
-      { error: 'Unauthorized' },
+      { error: 'Unauthorized - no user_id provided' },
       { status: 401 }
     )
   }
 
   try {
-    const { project_id, vercel_token } = await request.json()
-
-    if (!project_id || !vercel_token) {
+    if (!project_id) {
       return NextResponse.json(
-        { error: 'Missing project_id or vercel_token' },
+        { error: 'Missing project_id' },
         { status: 400 }
       )
     }
+
+    // Get Vercel access token from database
+    const { data: vercelCreds, error: credsError } = await supabase
+      .from('client_service_credentials')
+      .select('access_token_encrypted')
+      .eq('user_id', effectiveUserId)
+      .eq('service_name', 'vercel')
+      .single()
+
+    if (credsError || !vercelCreds) {
+      return NextResponse.json(
+        { error: 'Vercel not connected' },
+        { status: 404 }
+      )
+    }
+
+    // Decrypt the token
+    const { decrypt } = await import('@/lib/encryption')
+    const vercel_token = decrypt(vercelCreds.access_token_encrypted)
 
     console.log('[Vercel Sync] Fetching env vars for project:', project_id)
 
@@ -122,7 +144,7 @@ export async function POST(request: NextRequest) {
         const { error } = await supabase
           .from('client_service_credentials')
           .upsert({
-            user_id: user.id,
+            user_id: effectiveUserId,
             service_name: service.service_name,
             is_valid: true,
             ...(service.api_key && {
