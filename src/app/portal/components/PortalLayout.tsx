@@ -143,7 +143,10 @@ export default function PortalLayout({
 
   const handlePendingDiffsChange = (diffs: PendingDiff[], index: number) => {
     setPendingDiffs(diffs)
-    setCurrentDiffIndex(index)
+    // Only update index if it's explicitly changing or if current index is out of bounds
+    if (index !== currentDiffIndex || currentDiffIndex >= diffs.length) {
+      setCurrentDiffIndex(Math.min(index, diffs.length - 1))
+    }
   }
 
   const handleNextDiff = () => {

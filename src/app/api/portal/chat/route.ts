@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import Anthropic from '@anthropic-ai/sdk'
 import { shouldWaiveCost, calculateRevisionCost } from '@/app/portal/utils/trial'
 import { fetchKeyProjectFiles } from '../lib/github'
+import { apiCache } from '@/lib/cache'
 import { buildSystemPrompt } from '../lib/context-builder'
 
 const anthropic = new Anthropic({
@@ -815,25 +816,43 @@ export async function POST(request: Request) {
           console.log('[Tool] read_file:', toolInput.path)
 
           try {
-            const content = await getFileContents(
-              project.github_installation_id,
-              repo.owner,
-              repo.repository_name,
-              toolInput.path,
-              repo.default_branch
-            )
-            console.log('[Tool] read_file success:', toolInput.path, `(${content.length} chars)`)
+            // Check cache first (5 min TTL)
+            const cacheKey = `file:${repo.id}:${repo.default_branch}:${toolInput.path}`
+            let content = apiCache.get<string>(cacheKey)
+
+            if (!content) {
+              content = await getFileContents(
+                project.github_installation_id,
+                repo.owner,
+                repo.repository_name,
+                toolInput.path,
+                repo.default_branch
+              )
+              apiCache.set(cacheKey, content)
+              console.log('[Tool] read_file success (fetched):', toolInput.path, `(${content.length} chars)`)
+            } else {
+              console.log('[Tool] read_file success (cached):', toolInput.path, `(${content.length} chars)`)
+            }
 
             // Truncate very large files to reduce token usage and avoid rate limits
-            const MAX_FILE_SIZE = 8000
+            const MAX_FILE_SIZE = 20000
             if (content.length > MAX_FILE_SIZE) {
-              const truncated = content.slice(0, MAX_FILE_SIZE)
+              // Smart truncation: show first 12KB and last 8KB with separator
+              const FIRST_CHUNK = 12000
+              const LAST_CHUNK = 8000
+              const separator = '\n\n... [middle section truncated] ...\n\n'
+
+              const truncated =
+                content.slice(0, FIRST_CHUNK) +
+                separator +
+                content.slice(-LAST_CHUNK)
+
               return {
                 content: truncated,
                 path: toolInput.path,
                 truncated: true,
                 original_size: content.length,
-                note: `⚠️ File truncated to ${MAX_FILE_SIZE} chars (original: ${content.length} chars). This shows enough to understand the structure. Focus on the visible portion.`
+                note: `⚠️ File truncated (showing first ${FIRST_CHUNK} and last ${LAST_CHUNK} chars of ${content.length} total). You can see the beginning and end structure.`
               }
             }
 
