@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     // Store the API token in user metadata or a separate table
     // For now, we'll return a session token that the client can use
 
-    // Get user's current session token
+    // Get user to retrieve email
     const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(setupCode.user_id)
 
     if (userError || !user) {
@@ -67,11 +67,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create a long-lived session (7 days)
-    const { data: sessionData, error: sessionError } = await supabaseAdmin.auth.admin.createSession(setupCode.user_id)
+    // Generate a magic link token (valid auth token)
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'magiclink',
+      email: user.email!
+    })
 
-    if (sessionError) {
-      console.error('[Setup] Failed to create session:', sessionError)
+    if (linkError || !linkData) {
+      console.error('[Setup] Failed to generate token:', linkError)
       return NextResponse.json(
         { error: 'Failed to create auth token' },
         { status: 500 }
@@ -84,11 +87,11 @@ export async function POST(request: NextRequest) {
       .update({ used_at: new Date().toISOString() })
       .eq('id', setupCode.id)
 
-    // Return the access token
+    // Return the access token from the magic link
     return NextResponse.json({
       success: true,
-      token: sessionData.session.access_token,
-      expiresAt: sessionData.session.expires_at
+      token: linkData.properties.hashed_token,
+      expiresAt: linkData.properties.expires_at
     })
   } catch (error: any) {
     console.error('[Setup] Exchange error:', error)
