@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     // Find the client project by Vercel project ID
     const { data: clientProject, error: findError } = await supabaseAdmin
       .from('client_projects')
-      .select('id, project_name, vercel_project_id, user_id')
+      .select('id, project_name, vercel_project_id, user_id, vercel_production_url')
       .eq('vercel_project_id', project.id)
       .single()
 
