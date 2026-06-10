@@ -672,7 +672,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
                           <div className="bg-muted/30 rounded-lg p-3 mb-3 text-xs space-y-2">
                             <div className="flex items-start gap-2">
                               <span className="text-primary font-bold flex-shrink-0">1.</span>
-                              <span className="text-muted-foreground">Go to <span className="text-foreground font-semibold">Settings</span> (bottom left sidebar)</span>
+                              <span className="text-muted-foreground">Go to <span className="text-foreground font-semibold">Settings</span> (gear icon, bottom left sidebar)</span>
                             </div>
                             <div className="flex items-start gap-2">
                               <span className="text-primary font-bold flex-shrink-0">2.</span>
@@ -680,11 +680,11 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
                             </div>
                             <div className="flex items-start gap-2">
                               <span className="text-primary font-bold flex-shrink-0">3.</span>
-                              <span className="text-muted-foreground">Find <span className="text-foreground font-semibold">GitHub</span> → click <span className="text-destructive font-semibold">Disconnect</span></span>
+                              <span className="text-muted-foreground">Find <span className="text-foreground font-semibold">GitHub</span> → click <span className="text-primary font-semibold">Reconnect GitHub</span></span>
                             </div>
                             <div className="flex items-start gap-2">
                               <span className="text-primary font-bold flex-shrink-0">4.</span>
-                              <span className="text-muted-foreground">Click <span className="text-primary font-semibold">Connect GitHub</span> button</span>
+                              <span className="text-muted-foreground">Confirm clearing stale data</span>
                             </div>
                             <div className="flex items-start gap-2">
                               <span className="text-primary font-bold flex-shrink-0">5.</span>
