@@ -99,6 +99,89 @@ export async function POST(request: NextRequest) {
 
     console.log('[Vercel Webhook] ✅ Updated preview URL:', previewUrl)
 
+    // Auto-detect production URL if not set
+    if (!clientProject.vercel_production_url) {
+      console.log('[Vercel Webhook] No production URL set - auto-detecting from Vercel API...')
+
+      try {
+        // Get Vercel access token from database
+        const { data: vercelCreds } = await supabaseAdmin
+          .from('client_service_credentials')
+          .select('access_token_encrypted')
+          .eq('user_id', clientProject.user_id)
+          .eq('service_name', 'vercel')
+          .single()
+
+        if (vercelCreds?.access_token_encrypted) {
+          // Decrypt token
+          const { decrypt } = await import('@/lib/encryption')
+          const vercelToken = decrypt(vercelCreds.access_token_encrypted)
+
+          // Fetch project details from Vercel API
+          const projectResponse = await fetch(
+            `https://api.vercel.com/v9/projects/${project.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${vercelToken}`,
+              },
+            }
+          )
+
+          if (projectResponse.ok) {
+            const projectData = await projectResponse.json()
+
+            // Priority 1: Custom domain (user's actual site)
+            let productionUrl = null
+
+            if (projectData.alias && projectData.alias.length > 0) {
+              // Prefer domain with 'www' prefix
+              const wwwDomain = projectData.alias.find((a: any) =>
+                a.domain?.startsWith('www.') || (typeof a === 'string' && a.startsWith('www.'))
+              )
+              const anyCustomDomain = projectData.alias[0]
+
+              const customDomain = wwwDomain || anyCustomDomain
+              productionUrl = typeof customDomain === 'string'
+                ? `https://${customDomain}`
+                : `https://${customDomain.domain}`
+
+              console.log('[Vercel Webhook] ✓ Found custom domain:', productionUrl)
+            }
+
+            // Priority 2: Fallback to .vercel.app domain
+            if (!productionUrl && projectData.targets?.production) {
+              const vercelDomain = projectData.targets.production.url || projectData.targets.production.domain
+              if (vercelDomain) {
+                productionUrl = `https://${vercelDomain}`
+                console.log('[Vercel Webhook] ✓ Using Vercel domain:', productionUrl)
+              }
+            }
+
+            // Priority 3: Use project name as fallback
+            if (!productionUrl) {
+              productionUrl = `https://${projectData.name}.vercel.app`
+              console.log('[Vercel Webhook] ✓ Using project name fallback:', productionUrl)
+            }
+
+            // Update production URL in database
+            if (productionUrl) {
+              await supabaseAdmin
+                .from('client_projects')
+                .update({ vercel_production_url: productionUrl })
+                .eq('id', clientProject.id)
+
+              console.log('[Vercel Webhook] ✅ Auto-detected production URL:', productionUrl)
+            }
+          } else {
+            console.log('[Vercel Webhook] Failed to fetch project details:', projectResponse.status)
+          }
+        }
+      } catch (error) {
+        console.error('[Vercel Webhook] Error auto-detecting production URL:', error)
+        // Don't fail webhook - production URL is optional
+      }
+    }
+
     // Vercel-First Auto-Connection: Sync env vars on first deployment
     // Check if this is the first deployment (no services connected yet)
     const { data: existingServices } = await supabaseAdmin
