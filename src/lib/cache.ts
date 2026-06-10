@@ -52,5 +52,35 @@ export const apiCache = new SimpleCache()
 // Export as 'cache' for backwards compatibility
 export const cache = apiCache
 
-// Export CacheKeys type if needed by other files
-export type CacheKeys = string
+/**
+ * Cache key builders for consistency
+ */
+export const CacheKeys = {
+  // Services
+  services: {
+    all: () => 'services:all',
+    byId: (id: string) => `services:${id}`,
+    byCategory: (category: string) => `services:category:${category}`,
+  },
+
+  // Users
+  users: {
+    byId: (id: string) => `users:${id}`,
+    byEmail: (email: string) => `users:email:${email}`,
+    byTier: (tier: string) => `users:tier:${tier}`,
+  },
+
+  // Leads
+  leads: {
+    byEmail: (email: string) => `leads:email:${email}`,
+    byStatus: (status: string) => `leads:status:${status}`,
+    recent: (days: number) => `leads:recent:${days}`,
+  },
+
+  // Stripe
+  stripe: {
+    products: () => 'stripe:products',
+    product: (id: string) => `stripe:product:${id}`,
+    customer: (id: string) => `stripe:customer:${id}`,
+  },
+}
