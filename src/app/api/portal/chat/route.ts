@@ -615,15 +615,34 @@ export async function POST(request: Request) {
     async function executeTool(toolName: string, toolInput: any) {
       // Airtable tools (don't require GitHub repo)
       if (toolName.startsWith('airtable_')) {
-        // Get Airtable credentials
-        const { data: airtableCreds } = await supabase
+        // Get Airtable credentials (try project-level first, then user-level)
+        let airtableCreds = null
+
+        // Try project-specific credentials first
+        const { data: projectCreds } = await supabase
           .from('client_service_credentials')
           .select('api_key_encrypted, metadata')
           .eq('user_id', clientAccount.user_id)
           .eq('project_id', project.id)
           .eq('service_name', 'airtable')
           .eq('is_valid', true)
-          .single()
+          .maybeSingle()
+
+        if (projectCreds) {
+          airtableCreds = projectCreds
+        } else {
+          // Fall back to user-level credentials
+          const { data: userCreds } = await supabase
+            .from('client_service_credentials')
+            .select('api_key_encrypted, metadata')
+            .eq('user_id', clientAccount.user_id)
+            .is('project_id', null)
+            .eq('service_name', 'airtable')
+            .eq('is_valid', true)
+            .maybeSingle()
+
+          airtableCreds = userCreds
+        }
 
         if (!airtableCreds) {
           return { error: 'Airtable not connected. Please connect Airtable in Settings first.' }
