@@ -88,10 +88,13 @@ export async function POST(request: NextRequest) {
       .eq('id', setupCode.id)
 
     // Return the access token from the magic link
+    // Magic links typically expire in 1 hour
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString()
+
     return NextResponse.json({
       success: true,
       token: linkData.properties.hashed_token,
-      expiresAt: linkData.properties.expires_at
+      expiresAt
     })
   } catch (error: any) {
     console.error('[Setup] Exchange error:', error)
