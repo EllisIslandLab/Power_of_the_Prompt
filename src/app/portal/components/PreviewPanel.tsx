@@ -393,30 +393,82 @@ export default function PreviewPanel({
               viewMode === 'mobile' ? (
                 <MobilePhoneFrame>
                   <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#050714] to-[#0a0e27]">
-                    <div className="text-center px-8">
-                      <div className="text-6xl mb-4">📱</div>
-                      <p className="text-white/90 font-semibold mb-2">Local Preview</p>
-                      <p className="text-white/60 text-sm mb-4">Run your project locally to see it here</p>
-                      <div className="text-left bg-black/30 rounded-lg p-3 text-xs text-white/70 font-mono space-y-1">
-                        <div>1. Download .env (button above)</div>
-                        <div>2. Place in project root</div>
-                        <div>3. Run: npm run dev</div>
-                        <div>4. Preview shows at localhost:3000</div>
+                    <div className="text-center px-6">
+                      <div className="text-5xl mb-3">🚀</div>
+                      <p className="text-white/90 font-semibold mb-2 text-sm">How to See Your Preview</p>
+                      <p className="text-white/50 text-xs mb-3">Ask Claude to make changes and they'll appear here!</p>
+                      <div className="text-left bg-black/30 rounded-lg p-2.5 text-[10px] leading-relaxed text-white/70 space-y-1.5">
+                        <div className="flex items-start gap-1.5">
+                          <span className="text-green-400 flex-shrink-0">✓</span>
+                          <span>Ask Claude to make changes in chat</span>
+                        </div>
+                        <div className="flex items-start gap-1.5">
+                          <span className="text-green-400 flex-shrink-0">✓</span>
+                          <span>Claude creates a new branch</span>
+                        </div>
+                        <div className="flex items-start gap-1.5">
+                          <span className="text-green-400 flex-shrink-0">✓</span>
+                          <span>Claude commits & pushes to GitHub</span>
+                        </div>
+                        <div className="flex items-start gap-1.5">
+                          <span className="text-blue-400 flex-shrink-0">→</span>
+                          <span>Claude creates Pull Request</span>
+                        </div>
+                        <div className="flex items-start gap-1.5">
+                          <span className="text-blue-400 flex-shrink-0">→</span>
+                          <span>Vercel deploys preview</span>
+                        </div>
+                        <div className="flex items-start gap-1.5">
+                          <span className="text-blue-400 flex-shrink-0">→</span>
+                          <span>Webhook sends preview URL</span>
+                        </div>
+                        <div className="flex items-start gap-1.5">
+                          <span className="text-yellow-400 flex-shrink-0">★</span>
+                          <span className="font-semibold text-white/90">Preview appears here!</span>
+                        </div>
                       </div>
+                      <p className="text-white/40 text-[9px] mt-2">Usually takes 1-2 minutes after requesting changes</p>
                     </div>
                   </div>
                 </MobilePhoneFrame>
               ) : (
-                <DesktopBrowserFrame url="localhost:3000">
+                <DesktopBrowserFrame url="waiting-for-deployment.vercel.app">
                   <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#050714] to-[#0a0e27]">
                     <div className="text-center px-8">
-                      <div className="text-6xl mb-4">🖥️</div>
-                      <p className="text-white/90 font-semibold mb-2">Local Preview</p>
-                      <p className="text-white/60 text-sm mb-4">Run your project locally to see it here</p>
-                      <div className="text-left bg-black/30 rounded-lg p-3 text-xs text-white/70 font-mono space-y-1 max-w-xs mx-auto">
-                        <div>1. Download .env (button above)</div>
-                        <div>2. Place in project root</div>
-                        <div>3. Run: npm run dev</div>
+                      <div className="text-6xl mb-4">🚀</div>
+                      <p className="text-white/90 font-semibold mb-2">How to See Your Preview</p>
+                      <p className="text-white/60 text-sm mb-4">Ask Claude to make changes and they'll appear here!</p>
+                      <div className="text-left bg-black/30 rounded-lg p-4 text-xs text-white/70 space-y-2 max-w-md mx-auto">
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-400 flex-shrink-0 font-bold">✓</span>
+                          <span>Ask Claude to make changes in chat</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-400 flex-shrink-0 font-bold">✓</span>
+                          <span>Claude creates a new branch</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-400 flex-shrink-0 font-bold">✓</span>
+                          <span>Claude commits & pushes to GitHub</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-blue-400 flex-shrink-0 font-bold">→</span>
+                          <span>Claude creates Pull Request (triggers Vercel preview)</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-blue-400 flex-shrink-0 font-bold">→</span>
+                          <span>Vercel deploys preview deployment</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-blue-400 flex-shrink-0 font-bold">→</span>
+                          <span>Webhook sends preview URL to portal</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-yellow-400 flex-shrink-0 font-bold text-base">★</span>
+                          <span className="font-semibold text-white/90">Preview appears here - Success!</span>
+                        </div>
+                      </div>
+                      <p className="text-white/50 text-xs mt-3">Usually takes 1-2 minutes after requesting changes</p>
                         <div>4. Preview shows at localhost:3000</div>
                       </div>
                     </div>
