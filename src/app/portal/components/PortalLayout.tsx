@@ -12,6 +12,7 @@ import DraggableChat from './DraggableChat'
 import FileDropZone from './FileDropZone'
 import FileViewer from './FileViewer'
 import SourceControlPanel from './SourceControlPanel'
+import StatusBar from './StatusBar'
 
 interface PendingDiff {
   changeId: string
@@ -526,6 +527,13 @@ export default function PortalLayout({
 
         {/* Toast Notifications - Top Right */}
         <DeploymentNotifications userId={user?.id} />
+
+        {/* Status Bar - Bottom */}
+        <StatusBar
+          unsavedChangesCount={pendingDiffs.length}
+          currentFile={openFiles.length > 0 ? openFiles[activeFileIndex]?.name : sourceControlOpen ? 'Source Control' : null}
+          fileSize={openFiles.length > 0 ? openFiles[activeFileIndex]?.content.length : 0}
+        />
       </div>
     </div>
     </FileDropZone>

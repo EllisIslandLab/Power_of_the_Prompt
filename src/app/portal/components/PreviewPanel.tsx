@@ -5,6 +5,7 @@ import DiffOverlay from './DiffOverlay'
 import MobilePhoneFrame from './MobilePhoneFrame'
 import DesktopBrowserFrame from './DesktopBrowserFrame'
 import SourceControlPanel from './SourceControlPanel'
+import Breadcrumb from './Breadcrumb'
 
 interface PendingDiff {
   changeId: string
@@ -408,10 +409,23 @@ export default function PreviewPanel({
                 </MobilePhoneFrame>
             )
           ) : openFiles[activeFileIndex] ? (
-            <div className="absolute inset-0 overflow-auto pt-14 pr-[calc(33.333%+2rem)] pl-4 pb-4 bg-[#1e1e1e] group file-content-scroll">
-              <pre className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap break-words max-w-full">
-                <code>{openFiles[activeFileIndex].content}</code>
-              </pre>
+            <div className="absolute inset-0 flex flex-col bg-[#1e1e1e]">
+              {/* Breadcrumb Navigation */}
+              <Breadcrumb
+                filePath={openFiles[activeFileIndex].path}
+                fileName={openFiles[activeFileIndex].name}
+                onNavigate={(path) => {
+                  // TODO: Navigate to folder in Explorer
+                  console.log('Navigate to:', path)
+                }}
+              />
+
+              {/* File Content */}
+              <div className="flex-1 overflow-auto pr-[calc(33.333%+2rem)] pl-4 pb-4 group file-content-scroll">
+                <pre className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap break-words max-w-full">
+                  <code>{openFiles[activeFileIndex].content}</code>
+                </pre>
+              </div>
             </div>
           ) : null}
 
