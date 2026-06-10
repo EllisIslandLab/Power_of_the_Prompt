@@ -44,6 +44,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
   const [selectedInstallationId, setSelectedInstallationId] = useState<number | null>(null)
   const [fileContentCache, setFileContentCache] = useState<Map<string, string>>(new Map())
   const [folderCache, setFolderCache] = useState<Map<string, FileNode[]>>(new Map())
+  const [fileLoadError, setFileLoadError] = useState<string | null>(null)
 
   // Force space theme for portal
   useEffect(() => {
@@ -147,35 +148,41 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
 
   const loadFileTree = async (path: string = '') => {
     setLoadingFiles(true)
+    setFileLoadError(null)
     try {
       const installationParam = selectedInstallationId
         ? `&installation_id=${selectedInstallationId}`
         : ''
       const response = await fetch(`/api/portal/files?path=${path}${installationParam}`)
-      if (response.ok) {
-        const data = await response.json()
-        const files = data.files || []
-        setFileTree(files)
 
-        // Cache root level
-        setFolderCache(prev => new Map(prev).set(path, files))
-
-        // Prefetch root-level subdirectories
-        const subfolders = files.filter((f: FileNode) => f.type === 'dir')
-        subfolders.forEach((folder: FileNode) => {
-          prefetchFolder(folder.path)
-        })
-
-        // Prefetch small files at root
-        const smallFiles = files.filter((f: FileNode) =>
-          f.type === 'file' && f.size < 100000
-        )
-        smallFiles.forEach((file: FileNode) => {
-          prefetchFileContent(file.path)
-        })
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to fetch files' }))
+        throw new Error(errorData.error || `HTTP ${response.status}`)
       }
-    } catch (error) {
+
+      const data = await response.json()
+      const files = data.files || []
+      setFileTree(files)
+
+      // Cache root level
+      setFolderCache(prev => new Map(prev).set(path, files))
+
+      // Prefetch root-level subdirectories
+      const subfolders = files.filter((f: FileNode) => f.type === 'dir')
+      subfolders.forEach((folder: FileNode) => {
+        prefetchFolder(folder.path)
+      })
+
+      // Prefetch small files at root
+      const smallFiles = files.filter((f: FileNode) =>
+        f.type === 'file' && f.size < 100000
+      )
+      smallFiles.forEach((file: FileNode) => {
+        prefetchFileContent(file.path)
+      })
+    } catch (error: any) {
       console.error('Failed to load files:', error)
+      setFileLoadError(error.message || 'Failed to load files')
     } finally {
       setLoadingFiles(false)
     }
@@ -635,6 +642,26 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
                     </div>
                   ) : loadingFiles ? (
                     <p className="text-muted-foreground">Loading files...</p>
+                  ) : fileLoadError ? (
+                    <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                      <div className="flex items-start gap-2 mb-3">
+                        <svg className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-destructive mb-1">Connection Error</p>
+                          <p className="text-xs text-destructive/90 mb-3">{fileLoadError}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          window.location.href = '/portal/settings'
+                        }}
+                        className="w-full px-3 py-2 text-xs bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors font-semibold"
+                      >
+                        Go to Settings → Reconnect GitHub
+                      </button>
+                    </div>
                   ) : fileTree.length > 0 ? (
                     renderFileTree(fileTree)
                   ) : (
