@@ -863,6 +863,14 @@ export async function POST(request: Request) {
           } catch (error: any) {
             console.error('[Tool] read_file failed:', toolInput.path, error.message)
 
+            // If it's an auth error, return it directly with reconnect suggestion
+            if (error.message.includes('reconnect') || error.message.includes('authentication')) {
+              return {
+                error: error.message,
+                suggestion: 'Go to Settings → Connected Services → GitHub to reconnect your account.'
+              }
+            }
+
             // Check if it's a directory by trying to list it
             try {
               const files = await listDirectory(
@@ -886,17 +894,27 @@ export async function POST(request: Request) {
           const dirPath = toolInput.path || ''
           console.log('[Tool] list_directory:', dirPath || '(root)')
 
-          const files = await listDirectory(
-            project.github_installation_id,
-            repo.owner,
-            repo.repository_name,
-            dirPath,
-            repo.default_branch
-          )
-          console.log('[Tool] list_directory success:', dirPath || '(root)', `(${files.length} items)`)
-          return {
-            path: dirPath || '(root)',
-            files: files.map(f => ({ name: f.name, path: f.path, type: f.type }))
+          try {
+            const files = await listDirectory(
+              project.github_installation_id,
+              repo.owner,
+              repo.repository_name,
+              dirPath,
+              repo.default_branch
+            )
+            console.log('[Tool] list_directory success:', dirPath || '(root)', `(${files.length} items)`)
+            return {
+              path: dirPath || '(root)',
+              files: files.map(f => ({ name: f.name, path: f.path, type: f.type }))
+            }
+          } catch (error: any) {
+            console.error('[Tool] list_directory failed:', error.message)
+            return {
+              error: error.message,
+              suggestion: error.message.includes('reconnect')
+                ? 'Go to Settings → Connected Services → GitHub to reconnect your account.'
+                : undefined
+            }
           }
         } else if (toolName === 'search_files') {
           const pattern = toolInput.pattern.toLowerCase()

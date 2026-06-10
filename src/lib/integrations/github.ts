@@ -62,6 +62,26 @@ export interface GitHubInstallation {
 }
 
 /**
+ * Validate that an installation is still accessible
+ * Returns true if valid, false if revoked/expired
+ */
+export async function validateInstallation(installationId: number): Promise<boolean> {
+  try {
+    // Try to get a token - this will fail if installation is revoked
+    await getInstallationToken(installationId)
+    return true
+  } catch (error: any) {
+    console.error('[GitHub] Installation validation failed:', error.message)
+    // Check if it's an auth error vs other error
+    if (error.status === 401 || error.status === 403 || error.status === 404) {
+      return false // Installation is invalid
+    }
+    // Other errors might be temporary, so return true to avoid false negatives
+    return true
+  }
+}
+
+/**
  * List all installations for this GitHub App
  */
 export async function listInstallations(): Promise<GitHubInstallation[]> {
@@ -189,9 +209,9 @@ export async function getFileContents(
   path: string,
   ref?: string
 ): Promise<string> {
-  const octokit = await getInstallationOctokit(installationId)
-
   try {
+    const octokit = await getInstallationOctokit(installationId)
+
     const { data } = await octokit.repos.getContent({
       owner,
       repo,
@@ -205,11 +225,19 @@ export async function getFileContents(
 
     return Buffer.from(data.content, 'base64').toString('utf-8')
   } catch (error: any) {
+    // Specific error handling with helpful messages
     if (error.status === 404) {
       throw new Error(`File not found: ${path}`)
+    } else if (error.status === 401 || error.status === 403) {
+      console.error('[GitHub] Authentication failed - installation may be revoked or expired:', error.message)
+      throw new Error('GitHub authentication failed. Please reconnect your GitHub account in Settings.')
+    } else if (error.message?.includes('installation')) {
+      console.error('[GitHub] Installation error:', error.message)
+      throw new Error('GitHub App installation issue. Please reconnect GitHub in Settings.')
     }
+
     console.error('Failed to get file contents:', error)
-    throw new Error('Failed to read file')
+    throw new Error(`Failed to read file: ${error.message || 'Unknown error'}`)
   }
 }
 
@@ -248,9 +276,9 @@ export async function listDirectory(
   path: string = '',
   ref?: string
 ): Promise<GitHubFile[]> {
-  const octokit = await getInstallationOctokit(installationId)
-
   try {
+    const octokit = await getInstallationOctokit(installationId)
+
     const { data } = await octokit.repos.getContent({
       owner,
       repo,
@@ -270,11 +298,19 @@ export async function listDirectory(
       type: item.type as 'file' | 'dir'
     }))
   } catch (error: any) {
+    // Specific error handling with helpful messages
     if (error.status === 404) {
-      throw new Error(`Directory not found: ${path}`)
+      throw new Error(`Directory not found: ${path || '(root)'}`)
+    } else if (error.status === 401 || error.status === 403) {
+      console.error('[GitHub] Authentication failed - installation may be revoked or expired:', error.message)
+      throw new Error('GitHub authentication failed. Please reconnect your GitHub account in Settings.')
+    } else if (error.message?.includes('installation')) {
+      console.error('[GitHub] Installation error:', error.message)
+      throw new Error('GitHub App installation issue. Please reconnect GitHub in Settings.')
     }
+
     console.error('Failed to list directory:', error)
-    throw new Error('Failed to read directory')
+    throw new Error(`Failed to read directory: ${error.message || 'Unknown error'}`)
   }
 }
 
