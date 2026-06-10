@@ -544,7 +544,7 @@ function ConnectProjectContent() {
             </div>
 
             <div className="space-y-4 mb-8">
-              {analysis.services.filter(s => s.confidence === 'high').map((service) => {
+              {analysis.services.filter(s => s.confidence === 'high' || s.confidence === 'medium').map((service) => {
                 const isConnected = connectedServices.has(service.name)
 
                 return (

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { getInstallationAccessToken } from '@/lib/integrations/github'
 
 /**
- * Detect services used in a repository
- * Returns common services that clients typically need to connect
+ * Detect services used in a repository by reading .env.example
+ * Parses environment variables to determine which services the project needs
  */
 export async function POST(request: NextRequest) {
   const cookieStore = await cookies()
@@ -53,6 +54,69 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Get installation access token to fetch files
+    const installationToken = await getInstallationAccessToken(repo.installation_id)
+
+    // Try to fetch .env.example or .env.local.example
+    let envContent = ''
+    const envFiles = ['.env.example', '.env.local.example', '.env.template']
+
+    for (const envFile of envFiles) {
+      try {
+        const response = await fetch(
+          `https://api.github.com/repos/${repo.full_name}/contents/${envFile}?ref=${repo.default_branch}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${installationToken}`,
+              'Accept': 'application/vnd.github.v3.raw',
+              'User-Agent': 'Web-Launch-Academy'
+            }
+          }
+        )
+
+        if (response.ok) {
+          envContent = await response.text()
+          console.log(`[Detect Services] Found ${envFile}`)
+          break
+        }
+      } catch (err) {
+        console.log(`[Detect Services] ${envFile} not found, trying next...`)
+      }
+    }
+
+    // Parse env vars to detect services
+    const detectedServices = new Set<string>()
+    const envVarsNeeded: string[] = []
+
+    if (envContent) {
+      const lines = envContent.split('\n')
+      for (const line of lines) {
+        const trimmed = line.trim()
+
+        // Skip comments and empty lines
+        if (!trimmed || trimmed.startsWith('#')) continue
+
+        // Extract variable name
+        const match = trimmed.match(/^([A-Z_][A-Z0-9_]*)=?/)
+        if (match) {
+          const varName = match[1]
+          envVarsNeeded.push(varName)
+
+          // Detect services from env var patterns
+          if (varName.includes('AIRTABLE')) detectedServices.add('airtable')
+          if (varName.includes('SUPABASE')) detectedServices.add('supabase')
+          if (varName.includes('VERCEL')) detectedServices.add('vercel')
+          if (varName.includes('STRIPE')) detectedServices.add('stripe')
+          if (varName.includes('RESEND')) detectedServices.add('resend')
+          if (varName.includes('CLERK')) detectedServices.add('clerk')
+          if (varName.includes('OPENAI')) detectedServices.add('openai')
+          if (varName.includes('ANTHROPIC') || varName.includes('CLAUDE')) detectedServices.add('anthropic')
+        }
+      }
+    }
+
+    console.log('[Detect Services] Detected from env:', Array.from(detectedServices))
+
     // Detect framework based on language
     let framework = {
       name: 'Unknown',
@@ -68,42 +132,76 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Return common services that clients typically need
-    // All marked as high confidence so they show in onboarding
-    const services = [
-      {
-        name: 'airtable',
-        confidence: 'high' as const,
-        detected: true,
-        requiredCredentials: ['api_key', 'base_id'],
-        optionalCredentials: []
+    // Build services array with credentials mapping
+    const serviceCredentials: Record<string, { required: string[], optional: string[] }> = {
+      airtable: {
+        required: ['api_key', 'base_id'],
+        optional: []
       },
-      {
-        name: 'supabase',
-        confidence: 'high' as const,
-        detected: true,
-        requiredCredentials: ['url', 'anon_key', 'service_role_key'],
-        optionalCredentials: []
+      supabase: {
+        required: ['url', 'anon_key', 'service_role_key'],
+        optional: []
       },
-      {
-        name: 'vercel',
-        confidence: 'high' as const,
-        detected: true,
-        requiredCredentials: ['access_token'],
-        optionalCredentials: ['team_id']
+      vercel: {
+        required: ['access_token'],
+        optional: ['team_id']
+      },
+      stripe: {
+        required: ['secret_key', 'publishable_key'],
+        optional: ['webhook_secret']
+      },
+      resend: {
+        required: ['api_key'],
+        optional: []
+      },
+      clerk: {
+        required: ['publishable_key', 'secret_key'],
+        optional: []
+      },
+      openai: {
+        required: ['api_key'],
+        optional: ['organization_id']
+      },
+      anthropic: {
+        required: ['api_key'],
+        optional: []
       }
-    ]
+    }
+
+    const services = Array.from(detectedServices).map(serviceName => ({
+      name: serviceName,
+      confidence: 'high' as const,
+      detected: true,
+      requiredCredentials: serviceCredentials[serviceName]?.required || [],
+      optionalCredentials: serviceCredentials[serviceName]?.optional || []
+    }))
+
+    // If no services detected, provide common defaults
+    if (services.length === 0) {
+      services.push(
+        {
+          name: 'airtable',
+          confidence: 'medium' as const,
+          detected: false,
+          requiredCredentials: ['api_key', 'base_id'],
+          optionalCredentials: []
+        },
+        {
+          name: 'supabase',
+          confidence: 'medium' as const,
+          detected: false,
+          requiredCredentials: ['url', 'anon_key', 'service_role_key'],
+          optionalCredentials: []
+        }
+      )
+    }
 
     const analysis = {
       framework,
       services,
       packageManager: 'npm',
-      envVarsNeeded: [],
-      recommendations: [
-        'Connect Airtable for data management',
-        'Connect Supabase for authentication and database',
-        'Connect Vercel for deployment previews'
-      ]
+      envVarsNeeded,
+      recommendations: services.map(s => `Connect ${s.name} for your project`)
     }
 
     return NextResponse.json({
