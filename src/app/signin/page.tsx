@@ -29,10 +29,12 @@ function SigninContent() {
       setRedirectTo(redirect)
     }
 
-    // Check for error parameter
+    // Check for error parameter with user-friendly messages
     const errorParam = searchParams.get('error')
     if (errorParam === 'session_expired') {
       setError('Your session expired. Please sign in again to continue.')
+    } else if (errorParam === 'no_code' || errorParam === 'auth_failed' || errorParam === 'callback_failed') {
+      setError('oauth_cache_issue')
     }
   }, [searchParams])
 
@@ -88,11 +90,33 @@ function SigninContent() {
     }))
   }
 
+  const clearAuthCache = () => {
+    // Clear all Supabase-related storage
+    try {
+      // Clear localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-') || key.includes('supabase')) {
+          localStorage.removeItem(key)
+        }
+      })
+
+      // Clear sessionStorage
+      sessionStorage.clear()
+
+      console.log('Auth cache cleared')
+    } catch (err) {
+      console.error('Failed to clear auth cache:', err)
+    }
+  }
+
   const handleGitHubSignIn = async () => {
     setError('')
     setLoading(true)
 
     try {
+      // Clear any stale auth state before OAuth to prevent cache issues
+      clearAuthCache()
+
       const supabase = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -111,6 +135,13 @@ function SigninContent() {
       setError(err instanceof Error ? err.message : 'Failed to sign in with GitHub')
       setLoading(false)
     }
+  }
+
+  const handleClearCacheAndRetry = () => {
+    clearAuthCache()
+    setError('')
+    // Clear error from URL
+    router.replace('/signin')
   }
 
   return (
@@ -178,7 +209,29 @@ function SigninContent() {
               </div>
             </div>
 
-            {error && (
+            {error && error === 'oauth_cache_issue' ? (
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-md p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-amber-500 mb-1">Sign-in interrupted</p>
+                    <p className="text-sm text-amber-400/90 mb-3">
+                      This can happen if you have cached login data from a previous session. Click below to clear it and try again.
+                    </p>
+                    <Button
+                      type="button"
+                      onClick={handleClearCacheAndRetry}
+                      className="h-9 bg-amber-500 hover:bg-amber-600 text-black font-semibold text-xs"
+                      size="sm"
+                    >
+                      Clear Cache & Try Again
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : error ? (
               <div className="bg-destructive/10 border border-destructive/20 rounded-md p-4">
                 <div className="flex items-center gap-2">
                   <svg className="h-4 w-4 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +240,7 @@ function SigninContent() {
                   <p className="text-sm text-destructive">{error}</p>
                 </div>
               </div>
-            )}
+            ) : null}
 
             {verificationMessage && (
               <div className="bg-blue-50 border border-blue-200 rounded-md p-4">

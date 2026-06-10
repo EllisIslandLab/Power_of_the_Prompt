@@ -6,10 +6,25 @@ import { createClient } from '@supabase/supabase-js'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const error = searchParams.get('error')
+  const errorDescription = searchParams.get('error_description')
   const next = searchParams.get('next') || '/portal'
 
+  // Check if OAuth provider returned an error
+  if (error) {
+    console.error('OAuth provider error:', error, errorDescription)
+
+    // Handle specific OAuth errors with user-friendly messages
+    if (error === 'server_error' || errorDescription?.includes('user profile')) {
+      // This is the cached state issue
+      return NextResponse.redirect(new URL('/signin?error=no_code', origin))
+    }
+
+    return NextResponse.redirect(new URL(`/signin?error=${error}`, origin))
+  }
+
   if (!code) {
-    return NextResponse.redirect(new URL('/signin?error=no_code', request.url))
+    return NextResponse.redirect(new URL('/signin?error=no_code', origin))
   }
 
   const cookieStore = await cookies()
