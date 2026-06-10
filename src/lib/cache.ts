@@ -48,3 +48,9 @@ class SimpleCache {
 }
 
 export const apiCache = new SimpleCache()
+
+// Export as 'cache' for backwards compatibility
+export const cache = apiCache
+
+// Export CacheKeys type if needed by other files
+export type CacheKeys = string
