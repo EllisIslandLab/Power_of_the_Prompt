@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { getInstallationAccessToken } from '@/lib/integrations/github'
+import { getInstallationToken } from '@/lib/integrations/github'
 
 /**
  * Detect services used in a repository by reading .env.example
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get installation access token to fetch files
-    const installationToken = await getInstallationAccessToken(repo.installation_id)
+    const installationToken = await getInstallationToken(repo.installation_id)
 
     // Try to fetch .env.example or .env.local.example
     let envContent = ''
