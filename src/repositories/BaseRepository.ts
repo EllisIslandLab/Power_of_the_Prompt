@@ -64,8 +64,8 @@ export abstract class BaseRepository<T> {
     const cacheKey = this.getCacheKey(id)
 
     try {
-      // Try cache first
-      const cached = await cache.get<T>(cacheKey)
+      // Try cache first (convert cacheTTL from seconds to milliseconds)
+      const cached = await cache.get<T>(cacheKey, this.cacheTTL * 1000)
       if (cached) {
         const duration = Date.now() - startTime
         logger.debug(
@@ -94,7 +94,7 @@ export abstract class BaseRepository<T> {
 
       // Set cache for next time
       if (data) {
-        await cache.set(cacheKey, data as T, this.cacheTTL)
+        await cache.set(cacheKey, data as T)
       }
 
       logger.debug(
@@ -225,7 +225,7 @@ export abstract class BaseRepository<T> {
       }
 
       // Invalidate cache for this table (new record affects queries)
-      await cache.invalidate(this.getCachePattern())
+      await cache.clear(this.getCachePattern())
 
       logger.info(
         { type: 'database', table: this.tableName, operation: 'create', duration },
@@ -268,7 +268,7 @@ export abstract class BaseRepository<T> {
       }
 
       // Invalidate cache for this specific record
-      await cache.delete(this.getCacheKey(id))
+      await cache.clear(this.getCacheKey(id))
 
       logger.info(
         { type: 'database', table: this.tableName, operation: 'update', id, duration },
@@ -309,8 +309,8 @@ export abstract class BaseRepository<T> {
       }
 
       // Invalidate cache for this specific record and table queries
-      await cache.delete(this.getCacheKey(id))
-      await cache.invalidate(this.getCachePattern())
+      await cache.clear(this.getCacheKey(id))
+      await cache.clear(this.getCachePattern())
 
       logger.info(
         { type: 'database', table: this.tableName, operation: 'delete', id, duration },

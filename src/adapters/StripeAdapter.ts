@@ -265,7 +265,7 @@ export class StripeAdapter extends BaseAdapter {
 
       // Cache default product list for 5 minutes
       if (!params) {
-        await cache.set(cacheKey, products, 300)
+        await cache.set(cacheKey, products)
       }
 
       const duration = Date.now() - startTime

@@ -299,7 +299,7 @@ export class BatchProcessor {
       // Cache successful GET requests
       if (request.method === 'GET' && response.ok && this.config.useCache) {
         const cacheKey = this.generateCacheKey(request)
-        await cache.set(cacheKey, data, 300) // 5 minute TTL
+        await cache.set(cacheKey, data) // Uses default 5 minute TTL
       }
 
       return {
