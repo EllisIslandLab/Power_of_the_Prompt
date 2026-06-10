@@ -552,17 +552,32 @@ export default function SettingsInterface({
                         {githubConnected ? (
                           <>
                             <button
-                              onClick={() => setConnectingService('github')}
-                              className="px-4 py-2 rounded-lg text-sm border border-border hover:bg-muted/50 transition-colors"
+                              onClick={() => {
+                                // Clear stale GitHub data and reconnect
+                                if (confirm('This will clear your current GitHub connection and start fresh. Continue?')) {
+                                  fetch('/api/integrations/github/disconnect', { method: 'POST' })
+                                    .then(() => {
+                                      window.location.href = '/api/integrations/github/install?redirect_to=/portal/settings'
+                                    })
+                                    .catch(err => {
+                                      console.error('Failed to clear GitHub data:', err)
+                                      // Try reconnecting anyway
+                                      window.location.href = '/api/integrations/github/install?redirect_to=/portal/settings'
+                                    })
+                                }
+                              }}
+                              className="px-4 py-2 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                             >
-                              Reconnect
+                              Reconnect GitHub
                             </button>
                             <button
-                              disabled
-                              className="px-4 py-2 rounded-lg text-sm bg-muted text-muted-foreground cursor-not-allowed"
-                              title="GitHub disconnection requires uninstalling the app from GitHub settings"
+                              onClick={() => {
+                                window.open('https://github.com/settings/installations', '_blank')
+                              }}
+                              className="px-4 py-2 rounded-lg text-sm border border-border hover:bg-muted/50 transition-colors text-xs"
+                              title="Opens GitHub settings to manage app installations"
                             >
-                              Disconnect
+                              Manage on GitHub →
                             </button>
                           </>
                         ) : (
