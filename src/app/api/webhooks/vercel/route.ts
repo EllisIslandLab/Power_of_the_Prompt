@@ -14,7 +14,7 @@ const supabaseAdmin = createClient(
  *
  * Events:
  * - deployment.created: New deployment started
- * - deployment.ready: Deployment is live and accessible
+ * - deployment.ready: Deployment is live and accessible (PRIMARY EVENT)
  * - deployment.error: Deployment failed
  */
 export async function POST(request: NextRequest) {
