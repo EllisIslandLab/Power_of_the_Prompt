@@ -371,6 +371,8 @@ export default function PortalLayout({
           onFileOpen={handleFileOpen}
           onExplorerStateChange={setExplorerOpen}
           onSourceControlOpen={handleSourceControlOpen}
+          sourceControlOpen={sourceControlOpen}
+          onSourceControlClose={handleSourceControlClose}
           modifiedFiles={pendingDiffs.map(diff => ({
             path: diff.filePath,
             type: diff.type === 'file_preview' ? 'created' as const : 'modified' as const
