@@ -108,6 +108,9 @@ export default function PortalLayout({
         return
       }
 
+      // Detect if we're on localhost or production
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+
       try {
         const response = await fetch('/api/portal/preview')
         if (response.ok) {
@@ -116,22 +119,42 @@ export default function PortalLayout({
             console.log('[PortalLayout] Preview URL loaded:', data.previewUrl)
             setPreviewUrl(data.previewUrl)
           } else {
-            // Fallback to localhost for local development
-            console.log('[PortalLayout] No Vercel preview yet, using localhost')
-            setPreviewUrl('http://localhost:3000')
+            // Fallback based on environment
+            if (isLocalhost) {
+              console.log('[PortalLayout] No Vercel preview yet, using localhost')
+              setPreviewUrl('http://localhost:3000')
+            } else {
+              console.log('[PortalLayout] No preview URL available yet')
+              setPreviewUrl(null)
+            }
           }
         } else if (response.status === 404) {
-          // No active project yet - this is expected during setup
-          console.log('[PortalLayout] No active project yet, using localhost for preview')
-          setPreviewUrl('http://localhost:3000')
+          // No preview API response - use environment-appropriate fallback
+          if (isLocalhost) {
+            console.log('[PortalLayout] Using localhost for preview')
+            setPreviewUrl('http://localhost:3000')
+          } else {
+            console.log('[PortalLayout] No preview available yet (waiting for deployment)')
+            setPreviewUrl(null)
+          }
         } else {
-          console.log('[PortalLayout] Preview API unavailable, using localhost')
-          setPreviewUrl('http://localhost:3000')
+          // Fallback based on environment
+          if (isLocalhost) {
+            console.log('[PortalLayout] Preview API unavailable, using localhost')
+            setPreviewUrl('http://localhost:3000')
+          } else {
+            setPreviewUrl(null)
+          }
         }
       } catch (error) {
-        // Network error or API issue - fall back silently
-        console.log('[PortalLayout] Using localhost for preview')
-        setPreviewUrl('http://localhost:3000')
+        // Network error - use environment-appropriate fallback
+        if (isLocalhost) {
+          console.log('[PortalLayout] Using localhost for preview')
+          setPreviewUrl('http://localhost:3000')
+        } else {
+          console.log('[PortalLayout] Preview unavailable')
+          setPreviewUrl(null)
+        }
       }
     }
 
