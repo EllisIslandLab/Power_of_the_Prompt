@@ -501,7 +501,7 @@ export default function PreviewPanel({
         {showPreview && (
         <div className="bg-muted/30 border-t border-border px-4 py-2 flex items-center justify-between">
           <p className="text-xs text-muted-foreground flex-1">
-            Preview: <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            Preview: <a href={previewUrl || undefined} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
               {previewUrl}
             </a>
           </p>
