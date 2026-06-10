@@ -155,8 +155,8 @@ const nextConfig: NextConfig = {
               "font-src 'self' data: https://fonts.gstatic.com",
               // Connect: Allow API calls to Supabase, Stripe, Jitsi, Sentry, Vercel Analytics, hCaptcha
               "connect-src 'self' https://*.supabase.co https://qaaautcjhztvjhizklxr.supabase.co wss://qaaautcjhztvjhizklxr.supabase.co https://api.stripe.com https://*.jitsi.net wss://*.jitsi.net https://8x8.vc wss://8x8.vc https://*.sentry.io https://va.vercel-scripts.com https://vitals.vercel-insights.com https://*.hcaptcha.com",
-              // Frames: Allow Stripe checkout, Jitsi video, and hCaptcha
-              "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.jitsi.net https://8x8.vc https://*.hcaptcha.com",
+              // Frames: Allow Stripe checkout, Jitsi video, hCaptcha, and Vercel previews
+              "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.jitsi.net https://8x8.vc https://*.hcaptcha.com https://*.vercel.app https://www.moneywillo.com https://*.moneywillo.com",
               // Media: Allow Jitsi for video/audio
               "media-src 'self' https://*.jitsi.net https://8x8.vc",
               // Objects: Disallow plugins
