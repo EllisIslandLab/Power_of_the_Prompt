@@ -131,9 +131,9 @@ const SERVICE_CONFIGS: Record<string, ServiceConfig> = {
     fields: [
       {
         name: 'api_key',
-        label: 'API Key',
+        label: 'Personal Access Token',
         type: 'password',
-        placeholder: 'keyxxxxxxxxxxxxx',
+        placeholder: 'patxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         required: true
       },
       {
@@ -145,8 +145,16 @@ const SERVICE_CONFIGS: Record<string, ServiceConfig> = {
         helpText: 'Optional: Default base to use'
       }
     ],
-    docsUrl: 'https://support.airtable.com/docs/how-do-i-get-my-api-key',
-    getKeysInstructions: 'Go to Airtable Account → Generate API key'
+    docsUrl: 'https://airtable.com/developers/web/guides/personal-access-tokens',
+    getKeysInstructions: `1. Go to Airtable Account Settings → Developer Hub → Personal Access Tokens
+2. Click "Create new token"
+3. Give it a name (e.g., "Web Launch Academy")
+4. IMPORTANT: Add ALL scopes - Click "Add a scope" and select all available scopes
+   (data.records:read, data.records:write, schema.bases:read, schema.bases:write, etc.)
+5. Add access to your bases
+6. Click "Create token" and copy it immediately
+
+⚠️ Note: These instructions are provided by Web Launch Academy. Please refer to the official Airtable documentation (link below) for the most up-to-date information, as Airtable may update their process.`
   },
   resend: {
     displayName: 'Resend',
