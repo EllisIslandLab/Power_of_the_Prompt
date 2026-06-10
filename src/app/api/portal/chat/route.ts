@@ -6,6 +6,9 @@ import { fetchKeyProjectFiles } from '../lib/github'
 import { apiCache } from '@/lib/cache'
 import { buildSystemPrompt } from '../lib/context-builder'
 
+// Increase timeout for long-running AI operations (5 minutes)
+export const maxDuration = 300
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
