@@ -554,21 +554,29 @@ export default function SettingsInterface({
                             <button
                               onClick={() => {
                                 // Clear stale GitHub data and reconnect
-                                if (confirm('This will clear your stale GitHub connection.\n\nNext steps:\n1. If the app is still installed on GitHub, uninstall it first\n2. Click "Manage on GitHub →" to uninstall\n3. Then come back and reconnect\n\nContinue?')) {
+                                if (confirm('This will clear your stale GitHub connection from the database.\n\nNext steps:\n1. Uninstall old app on GitHub (if present)\n2. Install fresh\n\nContinue?')) {
                                   fetch('/api/integrations/github/disconnect', { method: 'POST' })
                                     .then(() => {
-                                      alert('✓ Stale data cleared!\n\nNext:\n1. Click "Manage on GitHub →" (opens in new tab)\n2. Uninstall the old app if listed\n3. Come back here and refresh this page\n4. Click "Connect" to install fresh')
-                                      window.location.reload()
+                                      // Show confirmation and redirect to fresh install
+                                      if (confirm('✓ Stale data cleared!\n\nRecommended: First uninstall the old app on GitHub to avoid conflicts.\n\nClick OK to go directly to fresh install\nClick Cancel to manage installations first')) {
+                                        // Go straight to install
+                                        window.location.href = '/api/integrations/github/install?redirect_to=/portal/settings'
+                                      } else {
+                                        // Open GitHub settings in new tab
+                                        window.open('https://github.com/settings/installations', '_blank', 'noopener,noreferrer')
+                                        // Reload current page so they see Connect button
+                                        setTimeout(() => window.location.reload(), 500)
+                                      }
                                     })
                                     .catch(err => {
                                       console.error('Failed to clear GitHub data:', err)
-                                      alert('Error clearing data. Try manually: Click "Manage on GitHub →" to uninstall, then reconnect.')
+                                      alert('Error clearing data. Try manually: Click "Manage on GitHub →" to uninstall, then use "Connect" button.')
                                     })
                                 }
                               }}
                               className="px-4 py-2 rounded-lg text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                             >
-                              Clear Stale Connection
+                              Reconnect GitHub
                             </button>
                             <button
                               onClick={() => {

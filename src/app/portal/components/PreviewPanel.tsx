@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import DiffOverlay from './DiffOverlay'
 import MobilePhoneFrame from './MobilePhoneFrame'
+import DesktopBrowserFrame from './DesktopBrowserFrame'
 
 interface PendingDiff {
   changeId: string
@@ -307,14 +308,27 @@ export default function PreviewPanel({
             null  // Don't render iframe when showing diff
           ) : showPreview ? (
             previewUrl ? (
-              <MobilePhoneFrame>
-                <iframe
-                  src={previewUrl}
-                  className="absolute inset-0 w-full h-full border-0"
-                  title="Website Preview (Mobile)"
-                  sandbox="allow-same-origin allow-scripts allow-forms"
-                />
-              </MobilePhoneFrame>
+              isFullscreenLayout ? (
+                // Desktop View - Full screen browser
+                <DesktopBrowserFrame url={previewUrl}>
+                  <iframe
+                    src={previewUrl}
+                    className="absolute inset-0 w-full h-full border-0"
+                    title="Website Preview (Desktop)"
+                    sandbox="allow-same-origin allow-scripts allow-forms"
+                  />
+                </DesktopBrowserFrame>
+              ) : (
+                // Mobile-First Preview - Phone frame
+                <MobilePhoneFrame>
+                  <iframe
+                    src={previewUrl}
+                    className="absolute inset-0 w-full h-full border-0"
+                    title="Website Preview (Mobile)"
+                    sandbox="allow-same-origin allow-scripts allow-forms"
+                  />
+                </MobilePhoneFrame>
+              )
             ) : (
               // Show placeholder when no preview URL
               <MobilePhoneFrame>

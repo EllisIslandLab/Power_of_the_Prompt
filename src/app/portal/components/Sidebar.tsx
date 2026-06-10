@@ -680,23 +680,19 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
                             </div>
                             <div className="flex items-start gap-2">
                               <span className="text-primary font-bold flex-shrink-0">3.</span>
-                              <span className="text-muted-foreground">Click <span className="text-primary font-semibold">Clear Stale Connection</span> → confirm</span>
+                              <span className="text-muted-foreground">Click <span className="text-primary font-semibold">Reconnect GitHub</span> → confirm</span>
                             </div>
                             <div className="flex items-start gap-2">
                               <span className="text-primary font-bold flex-shrink-0">4.</span>
-                              <span className="text-muted-foreground">Click <span className="text-foreground font-semibold">Manage on GitHub →</span> (opens new tab)</span>
+                              <span className="text-muted-foreground">Choose: <span className="text-foreground font-semibold">Install Fresh</span> (OK) or <span className="text-foreground font-semibold">Uninstall Old First</span> (Cancel)</span>
                             </div>
                             <div className="flex items-start gap-2">
                               <span className="text-primary font-bold flex-shrink-0">5.</span>
-                              <span className="text-muted-foreground">Uninstall old app from that list if present</span>
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <span className="text-primary font-bold flex-shrink-0">6.</span>
-                              <span className="text-muted-foreground">Return here, refresh, click <span className="text-primary font-semibold">Connect</span></span>
+                              <span className="text-muted-foreground">If uninstalling: remove old app, then click <span className="text-primary font-semibold">Connect</span></span>
                             </div>
                             <div className="flex items-start gap-2">
                               <span className="text-green-500 font-bold flex-shrink-0">✓</span>
-                              <span className="text-muted-foreground">Authorize app, select repos, then try Explorer!</span>
+                              <span className="text-muted-foreground">Authorize app, select repos, come back & try Explorer!</span>
                             </div>
                           </div>
                         )}
