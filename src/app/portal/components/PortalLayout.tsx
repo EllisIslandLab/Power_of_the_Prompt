@@ -11,6 +11,7 @@ import WelcomeMessage from './WelcomeMessage'
 import DraggableChat from './DraggableChat'
 import FileDropZone from './FileDropZone'
 import FileViewer from './FileViewer'
+import SourceControlPanel from './SourceControlPanel'
 
 interface PendingDiff {
   changeId: string
@@ -68,9 +69,10 @@ export default function PortalLayout({
   const [openFiles, setOpenFiles] = useState<Array<{ path: string; name: string; content: string }>>([])
   const [activeFileIndex, setActiveFileIndex] = useState(0)
   const [explorerOpen, setExplorerOpen] = useState(false)
+  const [sourceControlOpen, setSourceControlOpen] = useState(false)
 
-  // Show preview only when no files are open
-  const showPreview = openFiles.length === 0
+  // Show preview only when no files are open AND source control is not open
+  const showPreview = openFiles.length === 0 && !sourceControlOpen
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -231,6 +233,24 @@ export default function PortalLayout({
     }
   }
 
+  const handleSourceControlOpen = () => {
+    console.log('[PortalLayout] Opening Source Control')
+    // Close all open files
+    setOpenFiles([])
+    // Open source control
+    setSourceControlOpen(true)
+
+    // If in floating mode, switch to bottom mode to show source control panel
+    if (chatLayout === 'floating') {
+      console.log('[PortalLayout] Switching from floating to bottom layout to show source control')
+      setChatLayout('bottom')
+    }
+  }
+
+  const handleSourceControlClose = () => {
+    setSourceControlOpen(false)
+  }
+
   const handleFileDetach = (index: number) => {
     const file = openFiles[index]
     // Open in new window
@@ -349,6 +369,7 @@ export default function PortalLayout({
           onPanelOpenChange={setSidebarPanelOpen}
           onFileOpen={handleFileOpen}
           onExplorerStateChange={setExplorerOpen}
+          onSourceControlOpen={handleSourceControlOpen}
           modifiedFiles={pendingDiffs.map(diff => ({
             path: diff.filePath,
             type: diff.type === 'file_preview' ? 'created' as const : 'modified' as const
@@ -392,6 +413,8 @@ export default function PortalLayout({
                   onFileSelect={setActiveFileIndex}
                   onFileClose={handleFileClose}
                   showPreview={showPreview}
+                  sourceControlOpen={sourceControlOpen}
+                  onSourceControlClose={handleSourceControlClose}
                 />
               </div>
             </>
@@ -415,6 +438,8 @@ export default function PortalLayout({
                   onFileSelect={setActiveFileIndex}
                   onFileClose={handleFileClose}
                   showPreview={showPreview}
+                  sourceControlOpen={sourceControlOpen}
+                  onSourceControlClose={handleSourceControlClose}
                 />
               </div>
               <div className="w-1/4 border-l border-border">
@@ -444,6 +469,8 @@ export default function PortalLayout({
                   onFileSelect={setActiveFileIndex}
                   onFileClose={handleFileClose}
                   showPreview={showPreview}
+                  sourceControlOpen={sourceControlOpen}
+                  onSourceControlClose={handleSourceControlClose}
                 />
               </div>
             </>
@@ -467,6 +494,8 @@ export default function PortalLayout({
                   onFileSelect={setActiveFileIndex}
                   onFileClose={handleFileClose}
                   showPreview={showPreview}
+                  sourceControlOpen={sourceControlOpen}
+                  onSourceControlClose={handleSourceControlClose}
                 />
               </div>
               <div className="border-t border-border flex-shrink-0 max-h-[40vh] flex flex-col">

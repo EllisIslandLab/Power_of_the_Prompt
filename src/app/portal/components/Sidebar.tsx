@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import GitHubAccountSelector from './GitHubAccountSelector'
 import HelpAssistant from './HelpAssistant'
+import SourceControlPanel from './SourceControlPanel'
 
 interface SidebarProps {
   onModeChange?: (mode: 'builder' | 'chat') => void
@@ -14,6 +15,7 @@ interface SidebarProps {
   onPanelOpenChange?: (isOpen: boolean) => void
   onFileOpen?: (file: { path: string; name: string; content: string }) => void
   onExplorerStateChange?: (isOpen: boolean) => void
+  onSourceControlOpen?: () => void
 }
 
 type SidebarTool = 'explorer' | 'search' | 'source-control' | 'balance' | 'settings' | 'help' | 'layout'
@@ -29,7 +31,7 @@ interface FileNode {
   loading?: boolean
 }
 
-export default function Sidebar({ onModeChange, initialTheme = 'dark', user, clientAccount, onLayoutChange, modifiedFiles = [], onPanelOpenChange, onFileOpen, onExplorerStateChange }: SidebarProps) {
+export default function Sidebar({ onModeChange, initialTheme = 'dark', user, clientAccount, onLayoutChange, modifiedFiles = [], onPanelOpenChange, onFileOpen, onExplorerStateChange, onSourceControlOpen }: SidebarProps) {
   const [activeTool, setActiveTool] = useState<SidebarTool | null>(null)
   const [currentMode, setCurrentMode] = useState<'builder' | 'chat'>('builder')
   const [chatLayout, setChatLayout] = useState<'left' | 'right' | 'top' | 'bottom' | 'floating'>('bottom')
@@ -47,6 +49,8 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
   const [fileLoadError, setFileLoadError] = useState<string | null>(null)
   const [showReconnectHelp, setShowReconnectHelp] = useState(false)
   const [projectName, setProjectName] = useState<string | null>(null)
+  const [gitStatus, setGitStatus] = useState<Map<string, { status: string; additions: number; deletions: number }>>(new Map())
+  const [loadingGitStatus, setLoadingGitStatus] = useState(false)
 
   // Force space theme for portal
   useEffect(() => {
@@ -121,6 +125,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
           )
           if (stillExists) {
             loadFileTree()
+            fetchGitStatus()
             return
           }
         }
@@ -131,6 +136,7 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
         setSelectedInstallationId(installations[0].installation_id)
         localStorage.setItem('selected_github_installation', installations[0].installation_id.toString())
         loadFileTree()
+        fetchGitStatus()
       }
     } catch (error) {
       console.error('Failed to check GitHub connection:', error)
@@ -146,6 +152,33 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
     setFileContentCache(new Map())
     setFolderCache(new Map())
     loadFileTree()
+    fetchGitStatus()
+  }
+
+  const fetchGitStatus = async () => {
+    setLoadingGitStatus(true)
+    try {
+      const response = await fetch('/api/portal/git-status')
+      if (response.ok) {
+        const data = await response.json()
+        const statusMap = new Map()
+
+        // Convert array to map for fast lookup
+        data.files?.forEach((file: any) => {
+          statusMap.set(file.path, {
+            status: file.status,
+            additions: file.additions || 0,
+            deletions: file.deletions || 0,
+          })
+        })
+
+        setGitStatus(statusMap)
+      }
+    } catch (error) {
+      console.error('Failed to fetch git status:', error)
+    } finally {
+      setLoadingGitStatus(false)
+    }
   }
 
   const loadFileTree = async (path: string = '') => {
@@ -484,32 +517,82 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
   }
 
   const renderFileTree = (files: FileNode[], depth: number = 0) => {
-    return files.map((file) => (
-      <div key={file.path}>
-        <div
-          className="flex items-center gap-2 px-2 py-1 hover:bg-muted/50 cursor-pointer text-xs group"
-          style={{ paddingLeft: `${depth * 12 + 8}px` }}
-          onClick={() => file.type === 'dir' ? handleFolderClick(file.path) : handleFileClick(file)}
-        >
-          {file.type === 'dir' ? (
-            <>
-              <span className="text-muted-foreground text-xs">
-                {file.expanded ? '▼' : '▶'}
-              </span>
-              <span>📁</span>
-            </>
-          ) : (
-            <>
-              <span className="w-3"></span>
-              <span>📄</span>
-            </>
-          )}
-          <span className="text-foreground flex-1 truncate">{file.name}</span>
-          {file.loading && <span className="text-xs text-muted-foreground">...</span>}
+    return files.map((file) => {
+      // Get git status for this file
+      const status = gitStatus.get(file.path)
+
+      // Status badge styling (VS Code pattern)
+      const getStatusBadge = () => {
+        if (!status) return null
+
+        switch (status.status) {
+          case 'modified':
+            return <span className="text-[10px] font-semibold text-blue-400" title="Modified">M</span>
+          case 'added':
+            return <span className="text-[10px] font-semibold text-green-400" title="Added">+</span>
+          case 'deleted':
+            return <span className="text-[10px] font-semibold text-red-400" title="Deleted">D</span>
+          case 'renamed':
+            return <span className="text-[10px] font-semibold text-purple-400" title="Renamed">R</span>
+          default:
+            return null
+        }
+      }
+
+      return (
+        <div key={file.path}>
+          <div
+            className="flex items-center gap-2 px-2 py-1 hover:bg-muted/50 cursor-pointer text-xs group relative"
+            style={{ paddingLeft: `${depth * 12 + 8}px` }}
+            onClick={() => file.type === 'dir' ? handleFolderClick(file.path) : handleFileClick(file)}
+          >
+            {file.type === 'dir' ? (
+              <>
+                <span className="text-muted-foreground text-xs">
+                  {file.expanded ? '▼' : '▶'}
+                </span>
+                <span>📁</span>
+              </>
+            ) : (
+              <>
+                <span className="w-3"></span>
+                <span>📄</span>
+              </>
+            )}
+            <span className={`flex-1 truncate ${status?.status === 'deleted' ? 'line-through text-red-400' : 'text-foreground'}`}>
+              {file.name}
+            </span>
+
+            {/* Git status badge (VS Code style) */}
+            {getStatusBadge()}
+
+            {file.loading && <span className="text-xs text-muted-foreground">...</span>}
+
+            {/* Quick actions menu (appears on hover) */}
+            {file.type === 'file' && (
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    // TODO: Show context menu
+                    console.log('Show menu for:', file.name)
+                  }}
+                  className="p-1 hover:bg-muted/70 rounded"
+                  title="More actions"
+                >
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="5" r="2" />
+                    <circle cx="12" cy="12" r="2" />
+                    <circle cx="12" cy="19" r="2" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+          {file.type === 'dir' && file.expanded && file.children && renderFileTree(file.children, depth + 1)}
         </div>
-        {file.type === 'dir' && file.expanded && file.children && renderFileTree(file.children, depth + 1)}
-      </div>
-    ))
+      )
+    })
   }
 
   return (
@@ -538,6 +621,10 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
               onClick={() => {
                 if (tool.action) {
                   tool.action()
+                } else if (tool.id === 'source-control') {
+                  // Open Source Control in content area (not sidebar panel)
+                  onSourceControlOpen?.()
+                  setActiveTool(null) // Close sidebar panel
                 } else {
                   // VS Code style: toggle off if clicking active tool
                   setActiveTool(activeTool === tool.id ? null : tool.id)
