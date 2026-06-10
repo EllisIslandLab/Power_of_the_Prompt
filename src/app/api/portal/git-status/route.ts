@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { getInstallationToken } from '@/lib/github-token-manager'
 
 /**
  * Get git status for the current repository
@@ -59,23 +60,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'GitHub installation not found' }, { status: 404 })
     }
 
-    // Get installation token
-    const tokenResponse = await fetch(
-      `https://api.github.com/app/installations/${installation.installation_id}/access_tokens`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${generateJWT()}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
-      }
-    )
-
-    if (!tokenResponse.ok) {
-      return NextResponse.json({ error: 'Failed to get installation token' }, { status: 500 })
-    }
-
-    const { token } = await tokenResponse.json()
+    // Get installation token (with automatic caching and refresh)
+    const token = await getInstallationToken(installation.installation_id)
 
     // Get repository info
     const { data: repo } = await supabase
@@ -188,19 +174,3 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/**
- * Generate JWT for GitHub App authentication
- */
-function generateJWT() {
-  const jwt = require('jsonwebtoken')
-  const privateKey = process.env.GITHUB_PRIVATE_KEY?.replace(/\\n/g, '\n') || ''
-  const appId = process.env.GITHUB_APP_ID || ''
-
-  const payload = {
-    iat: Math.floor(Date.now() / 1000) - 60,
-    exp: Math.floor(Date.now() / 1000) + 10 * 60,
-    iss: appId,
-  }
-
-  return jwt.sign(payload, privateKey, { algorithm: 'RS256' })
-}
