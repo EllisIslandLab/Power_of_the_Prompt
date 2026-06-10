@@ -511,6 +511,90 @@ export async function POST(request: Request) {
           required: ['title', 'description'],
         },
       },
+      {
+        name: 'airtable_list_tables',
+        description: 'List all tables (bases) in the connected Airtable base. Use this to discover what tables are available.',
+        input_schema: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      {
+        name: 'airtable_get_records',
+        description: 'Get records from an Airtable table. Returns up to 100 records by default.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            table_name: {
+              type: 'string',
+              description: 'The name of the table to get records from (e.g., "Bookings", "Clients")',
+            },
+            max_records: {
+              type: 'number',
+              description: 'Maximum number of records to return (default: 100, max: 100)',
+            },
+            filter_by_formula: {
+              type: 'string',
+              description: 'Optional Airtable formula to filter records (e.g., "{Status} = \'Active\'")',
+            },
+          },
+          required: ['table_name'],
+        },
+      },
+      {
+        name: 'airtable_create_records',
+        description: 'Create new records in an Airtable table. Can create multiple records at once.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            table_name: {
+              type: 'string',
+              description: 'The name of the table to create records in',
+            },
+            records: {
+              type: 'array',
+              description: 'Array of records to create. Each record should be an object with field names as keys.',
+              items: {
+                type: 'object',
+              },
+            },
+          },
+          required: ['table_name', 'records'],
+        },
+      },
+      {
+        name: 'airtable_update_records',
+        description: 'Update existing records in an Airtable table. Requires record IDs.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            table_name: {
+              type: 'string',
+              description: 'The name of the table containing the records to update',
+            },
+            records: {
+              type: 'array',
+              description: 'Array of records to update. Each must have an "id" field and the fields to update.',
+              items: {
+                type: 'object',
+                properties: {
+                  id: {
+                    type: 'string',
+                    description: 'The Airtable record ID',
+                  },
+                  fields: {
+                    type: 'object',
+                    description: 'Object with field names as keys and new values',
+                  },
+                },
+                required: ['id', 'fields'],
+              },
+            },
+          },
+          required: ['table_name', 'records'],
+        },
+      },
     ]
 
     // Track working branch for this conversation
@@ -529,6 +613,162 @@ export async function POST(request: Request) {
 
     // Helper function to execute tools
     async function executeTool(toolName: string, toolInput: any) {
+      // Airtable tools (don't require GitHub repo)
+      if (toolName.startsWith('airtable_')) {
+        // Get Airtable credentials
+        const { data: airtableCreds } = await supabase
+          .from('client_service_credentials')
+          .select('api_key_encrypted, metadata')
+          .eq('user_id', user.id)
+          .eq('project_id', project.id)
+          .eq('service_name', 'airtable')
+          .eq('is_valid', true)
+          .single()
+
+        if (!airtableCreds) {
+          return { error: 'Airtable not connected. Please connect Airtable in Settings first.' }
+        }
+
+        const { decrypt } = await import('@/lib/encryption')
+        const apiKey = decrypt(airtableCreds.api_key_encrypted)
+        const baseId = airtableCreds.metadata?.baseId
+
+        if (!baseId) {
+          return { error: 'Airtable Base ID not configured' }
+        }
+
+        try {
+          if (toolName === 'airtable_list_tables') {
+            console.log('[Tool] airtable_list_tables')
+
+            const response = await fetch(`https://api.airtable.com/v0/meta/bases/${baseId}/tables`, {
+              headers: {
+                'Authorization': `Bearer ${apiKey}`,
+              },
+            })
+
+            if (!response.ok) {
+              const error = await response.text()
+              return { error: `Airtable API error: ${response.statusText} - ${error}` }
+            }
+
+            const data = await response.json()
+            return {
+              tables: data.tables.map((t: any) => ({
+                id: t.id,
+                name: t.name,
+                description: t.description,
+                fields: t.fields.map((f: any) => ({
+                  id: f.id,
+                  name: f.name,
+                  type: f.type,
+                })),
+              })),
+            }
+          } else if (toolName === 'airtable_get_records') {
+            const { table_name, max_records = 100, filter_by_formula } = toolInput
+            console.log('[Tool] airtable_get_records:', table_name)
+
+            const params = new URLSearchParams({
+              maxRecords: String(Math.min(max_records, 100)),
+            })
+
+            if (filter_by_formula) {
+              params.append('filterByFormula', filter_by_formula)
+            }
+
+            const response = await fetch(
+              `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table_name)}?${params}`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${apiKey}`,
+                },
+              }
+            )
+
+            if (!response.ok) {
+              const error = await response.text()
+              return { error: `Airtable API error: ${response.statusText} - ${error}` }
+            }
+
+            const data = await response.json()
+            return {
+              records: data.records.map((r: any) => ({
+                id: r.id,
+                fields: r.fields,
+                createdTime: r.createdTime,
+              })),
+            }
+          } else if (toolName === 'airtable_create_records') {
+            const { table_name, records } = toolInput
+            console.log('[Tool] airtable_create_records:', table_name, `(${records.length} records)`)
+
+            const response = await fetch(
+              `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table_name)}`,
+              {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${apiKey}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  records: records.map((r: any) => ({ fields: r })),
+                }),
+              }
+            )
+
+            if (!response.ok) {
+              const error = await response.text()
+              return { error: `Airtable API error: ${response.statusText} - ${error}` }
+            }
+
+            const data = await response.json()
+            return {
+              success: true,
+              created: data.records.length,
+              records: data.records.map((r: any) => ({
+                id: r.id,
+                fields: r.fields,
+              })),
+            }
+          } else if (toolName === 'airtable_update_records') {
+            const { table_name, records } = toolInput
+            console.log('[Tool] airtable_update_records:', table_name, `(${records.length} records)`)
+
+            const response = await fetch(
+              `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table_name)}`,
+              {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': `Bearer ${apiKey}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ records }),
+              }
+            )
+
+            if (!response.ok) {
+              const error = await response.text()
+              return { error: `Airtable API error: ${response.statusText} - ${error}` }
+            }
+
+            const data = await response.json()
+            return {
+              success: true,
+              updated: data.records.length,
+              records: data.records.map((r: any) => ({
+                id: r.id,
+                fields: r.fields,
+              })),
+            }
+          }
+        } catch (error: any) {
+          console.error('[Tool] Airtable error:', error.message)
+          return { error: error.message || 'Airtable operation failed' }
+        }
+      }
+
+      // GitHub tools (require repository)
       if (!project?.github_repository_id) {
         return { error: 'No repository connected to this project' }
       }

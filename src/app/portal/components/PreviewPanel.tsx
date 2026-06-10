@@ -469,8 +469,6 @@ export default function PreviewPanel({
                         </div>
                       </div>
                       <p className="text-white/50 text-xs mt-3">Usually takes 1-2 minutes after requesting changes</p>
-                        <div>4. Preview shows at localhost:3000</div>
-                      </div>
                     </div>
                   </div>
                 </DesktopBrowserFrame>
