@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import DiffOverlay from './DiffOverlay'
 import MobilePhoneFrame from './MobilePhoneFrame'
-import DesktopBrowserFrame from './DesktopBrowserFrame'
 
 interface PendingDiff {
   changeId: string
@@ -67,7 +66,6 @@ export default function PreviewPanel({
   const [currentIndex, setCurrentIndex] = useState(0)
   const [changedElements, setChangedElements] = useState<string[]>([])
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [viewMode, setViewMode] = useState<'mobile' | 'desktop'>('mobile')
   const [showEnvInstructions, setShowEnvInstructions] = useState(false)
   const [setupCommand, setSetupCommand] = useState<string | null>(null)
   const [generatingSetup, setGeneratingSetup] = useState(false)
@@ -302,66 +300,6 @@ export default function PreviewPanel({
           </div>
         )}
 
-        {/* Preview Controls - Mobile/Desktop Toggle */}
-        {showPreview && !shouldShowDiff && (
-          <div className="bg-[#0a0e27] border-b-2 border-white/20 px-4 py-2 flex items-center justify-between shadow-md">
-            <div className="flex items-center gap-3">
-              {/* Mobile/Desktop Toggle */}
-              <div className="flex bg-[#080c25] border-2 border-white/30 rounded-lg p-1 gap-1">
-                <button
-                  onClick={() => setViewMode('mobile')}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                    viewMode === 'mobile'
-                      ? 'bg-[#0a0e27] text-[#b1c6f9] shadow-md'
-                      : 'text-white/70 hover:text-white'
-                  }`}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="7" y="2.5" width="10" height="19" rx="2.4" />
-                    <line x1="11" y1="18.3" x2="13" y2="18.3" />
-                  </svg>
-                  Mobile
-                </button>
-                <button
-                  onClick={() => setViewMode('desktop')}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                    viewMode === 'desktop'
-                      ? 'bg-[#0a0e27] text-[#b1c6f9] shadow-md'
-                      : 'text-white/70 hover:text-white'
-                  }`}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="2.5" y="4" width="19" height="13" rx="2" />
-                    <line x1="8.5" y1="20.5" x2="15.5" y2="20.5" />
-                    <line x1="12" y1="17" x2="12" y2="20.5" />
-                  </svg>
-                  Desktop
-                </button>
-              </div>
-              <span className="text-xs text-white/50 font-mono tracking-wide">
-                {viewMode === 'mobile' ? '390 × 844' : 'responsive'}
-              </span>
-            </div>
-
-            {/* Download .env.local button */}
-            <a
-              href="/api/portal/env"
-              download=".env.local"
-              onClick={(e) => {
-                // Show instructions after download starts
-                setTimeout(() => setShowEnvInstructions(true), 100)
-              }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold bg-[#080c25] border-2 border-white/30 text-white/70 hover:text-white hover:bg-[#0a0e27] transition-all"
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              Download .env
-            </a>
-          </div>
-        )}
 
         {/* Preview iframe or File Content */}
         <div className="flex-1 relative">
@@ -369,29 +307,17 @@ export default function PreviewPanel({
             null  // Don't render iframe when showing diff
           ) : showPreview ? (
             previewUrl ? (
-              viewMode === 'mobile' ? (
-                <MobilePhoneFrame>
-                  <iframe
-                    src={previewUrl}
-                    className="absolute inset-0 w-full h-full border-0"
-                    title="Website Preview (Mobile)"
-                    sandbox="allow-same-origin allow-scripts allow-forms"
-                  />
-                </MobilePhoneFrame>
-              ) : (
-                <DesktopBrowserFrame url={previewUrl.replace(/^https?:\/\//, '')}>
-                  <iframe
-                    src={previewUrl}
-                    className="absolute inset-0 w-full h-full border-0"
-                    title="Website Preview (Desktop)"
-                    sandbox="allow-same-origin allow-scripts allow-forms"
-                  />
-                </DesktopBrowserFrame>
-              )
+              <MobilePhoneFrame>
+                <iframe
+                  src={previewUrl}
+                  className="absolute inset-0 w-full h-full border-0"
+                  title="Website Preview (Mobile)"
+                  sandbox="allow-same-origin allow-scripts allow-forms"
+                />
+              </MobilePhoneFrame>
             ) : (
               // Show placeholder when no preview URL
-              viewMode === 'mobile' ? (
-                <MobilePhoneFrame>
+              <MobilePhoneFrame>
                   <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#050714] to-[#0a0e27]">
                     <div className="text-center px-6">
                       <div className="text-5xl mb-3">🚀</div>
@@ -431,48 +357,6 @@ export default function PreviewPanel({
                     </div>
                   </div>
                 </MobilePhoneFrame>
-              ) : (
-                <DesktopBrowserFrame url="waiting-for-deployment.vercel.app">
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#050714] to-[#0a0e27]">
-                    <div className="text-center px-8">
-                      <div className="text-6xl mb-4">🚀</div>
-                      <p className="text-white/90 font-semibold mb-2">How to See Your Preview</p>
-                      <p className="text-white/60 text-sm mb-4">Ask Claude to make changes and they'll appear here!</p>
-                      <div className="text-left bg-black/30 rounded-lg p-4 text-xs text-white/70 space-y-2 max-w-md mx-auto">
-                        <div className="flex items-start gap-2">
-                          <span className="text-green-400 flex-shrink-0 font-bold">✓</span>
-                          <span>Ask Claude to make changes in chat</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <span className="text-green-400 flex-shrink-0 font-bold">✓</span>
-                          <span>Claude creates a new branch</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <span className="text-green-400 flex-shrink-0 font-bold">✓</span>
-                          <span>Claude commits & pushes to GitHub</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <span className="text-blue-400 flex-shrink-0 font-bold">→</span>
-                          <span>Claude creates Pull Request (triggers Vercel preview)</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <span className="text-blue-400 flex-shrink-0 font-bold">→</span>
-                          <span>Vercel deploys preview deployment</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <span className="text-blue-400 flex-shrink-0 font-bold">→</span>
-                          <span>Webhook sends preview URL to portal</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <span className="text-yellow-400 flex-shrink-0 font-bold text-base">★</span>
-                          <span className="font-semibold text-white/90">Preview appears here - Success!</span>
-                        </div>
-                      </div>
-                      <p className="text-white/50 text-xs mt-3">Usually takes 1-2 minutes after requesting changes</p>
-                    </div>
-                  </div>
-                </DesktopBrowserFrame>
-              )
             )
           ) : openFiles[activeFileIndex] ? (
             <div className="absolute inset-0 overflow-auto pt-14 pr-[calc(33.333%+2rem)] pl-4 pb-4 bg-[#1e1e1e] group file-content-scroll">
@@ -547,28 +431,6 @@ export default function PreviewPanel({
           )}
         </div>
 
-        {/* Preview Controls at Bottom - Only show in preview mode */}
-        {showPreview && (
-        <div className="bg-muted/30 border-t border-border px-4 py-2 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground flex-1">
-            Preview: <a href={previewUrl || undefined} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-              {previewUrl}
-            </a>
-          </p>
-
-          {/* Fullscreen Toggle Button */}
-          <button
-            onClick={() => setIsFullscreen(true)}
-            className="ml-4 px-3 py-2 flex items-center gap-2 hover:bg-muted/50 rounded-lg transition-colors text-sm border border-border"
-            title="Enter Fullscreen Mode"
-          >
-            <svg className="w-4 h-4 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-            </svg>
-            <span className="text-foreground">Fullscreen</span>
-          </button>
-        </div>
-        )}
       </div>
 
       {/* Environment Setup Instructions Modal */}

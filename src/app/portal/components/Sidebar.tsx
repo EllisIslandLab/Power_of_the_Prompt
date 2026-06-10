@@ -207,13 +207,22 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
   const mainTools = [
     {
       id: 'layout' as const,
-      label: chatLayout === 'bottom' ? 'Switch to Fullscreen Preview' : 'Switch to Conversation Mode',
+      label: chatLayout === 'bottom' ? 'Desktop View' : 'Mobile-First Preview',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {chatLayout === 'bottom' ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            // Desktop monitor icon
+            <>
+              <rect x="3" y="4" width="18" height="12" rx="2" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+              <line x1="9" y1="20" x2="15" y2="20" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+              <line x1="12" y1="16" x2="12" y2="20" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+            </>
           ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+            // Mobile phone icon
+            <>
+              <rect x="8" y="3" width="8" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+              <line x1="11" y1="18" x2="13" y2="18" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+            </>
           )}
         </svg>
       ),
