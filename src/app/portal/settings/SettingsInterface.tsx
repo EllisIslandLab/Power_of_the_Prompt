@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { loadStripe } from '@stripe/stripe-js'
 import ConnectServiceModal from '../components/ConnectServiceModal'
+import AccountLinking from './AccountLinking'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -465,6 +466,9 @@ export default function SettingsInterface({
                 </div>
               </div>
             </div>
+
+            {/* Account Linking */}
+            <AccountLinking user={user} />
 
             {/* Security & Actions */}
             <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
