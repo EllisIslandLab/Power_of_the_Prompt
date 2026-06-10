@@ -2,6 +2,7 @@ import { DarkModeProvider } from "@/contexts/DarkModeContext";
 import { Providers } from "@/components/providers";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeScript } from "./ThemeScript";
+import { Suspense } from "react";
 
 export default function PortalLayout({
   children,
@@ -26,9 +27,11 @@ export default function PortalLayout({
 
         <Providers>
           {/* No Navigation component here - portal has its own navigation */}
-          <div style={{ minHeight: '100vh', backgroundColor: '#050714' }}>
-            {children}
-          </div>
+          <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: '#050714' }} />}>
+            <div style={{ minHeight: '100vh', backgroundColor: '#050714' }}>
+              {children}
+            </div>
+          </Suspense>
           <Analytics />
         </Providers>
       </DarkModeProvider>
