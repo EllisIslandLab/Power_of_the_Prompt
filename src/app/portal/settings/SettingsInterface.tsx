@@ -57,6 +57,13 @@ export default function SettingsInterface({
   const [customAmount, setCustomAmount] = useState('')
   const [isAddingFunds, setIsAddingFunds] = useState(false)
 
+  // Repository selection state
+  const [showRepoSelector, setShowRepoSelector] = useState(false)
+  const [availableRepos, setAvailableRepos] = useState<any[]>([])
+  const [selectedRepoId, setSelectedRepoId] = useState<string | null>(null)
+  const [isLinkingRepo, setIsLinkingRepo] = useState(false)
+  const [installationIdForRepoSelect, setInstallationIdForRepoSelect] = useState<string | null>(null)
+
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -73,6 +80,31 @@ export default function SettingsInterface({
       }
     }
   }, [settings.theme])
+
+  // Check for repo selection query param (from GitHub callback)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const selectRepo = params.get('select_repo')
+    const installationId = params.get('installation_id')
+
+    if (selectRepo === 'true' && installationId) {
+      setInstallationIdForRepoSelect(installationId)
+      setActiveTab('connectors')
+
+      // Fetch available repositories
+      fetch(`/api/integrations/github/repositories?installation_id=${installationId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.repositories) {
+            setAvailableRepos(data.repositories)
+            setShowRepoSelector(true)
+          }
+        })
+        .catch(err => {
+          console.error('Failed to fetch repositories:', err)
+        })
+    }
+  }, [])
 
   const handleSaveSettings = async () => {
     setIsSaving(true)
@@ -174,6 +206,54 @@ export default function SettingsInterface({
     { id: 'context' as const, label: 'Context & Instructions' },
     { id: 'preferences' as const, label: 'Preferences' },
   ]
+
+  const handleLinkRepository = async (repoId: string) => {
+    if (!installationIdForRepoSelect) return
+
+    setIsLinkingRepo(true)
+    try {
+      const repo = availableRepos.find(r => r.id === repoId)
+      if (!repo) {
+        throw new Error('Repository not found')
+      }
+
+      const response = await fetch('/api/portal/link-repository', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          installation_id: installationIdForRepoSelect,
+          repository_id: repo.repository_id,
+          repository_name: repo.repository_name,
+          owner: repo.owner,
+          default_branch: repo.default_branch
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to link repository')
+      }
+
+      // Success! Hide selector and reload services
+      setShowRepoSelector(false)
+      setIsLoadingServices(true)
+
+      // Refresh connected services
+      const servicesRes = await fetch('/api/portal/services')
+      const servicesData = await servicesRes.json()
+      setConnectedServices(servicesData.services || [])
+      setIsLoadingServices(false)
+
+      // Clear query params
+      window.history.replaceState({}, '', '/portal/settings')
+
+      alert('✓ Repository linked successfully!')
+    } catch (error: any) {
+      console.error('Failed to link repository:', error)
+      alert(`Failed to link repository: ${error.message}`)
+    } finally {
+      setIsLinkingRepo(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#050714]">
@@ -533,6 +613,56 @@ export default function SettingsInterface({
               <p className="text-sm text-muted-foreground mb-4">
                 Connect your services to enable Claude to manage databases, deployments, and more.
               </p>
+
+              {/* Repository Selector Banner */}
+              {showRepoSelector && availableRepos.length > 0 && (
+                <div className="bg-blue-500/10 border-2 border-blue-500/50 rounded-lg p-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="text-2xl">🔗</div>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold text-foreground mb-2">Select Repository to Link</h3>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        GitHub reconnected successfully! Select which repository to link to your project:
+                      </p>
+                      <div className="space-y-2">
+                        {availableRepos.map(repo => (
+                          <button
+                            key={repo.id}
+                            onClick={() => handleLinkRepository(repo.id)}
+                            disabled={isLinkingRepo}
+                            className="w-full text-left px-3 py-2 rounded-lg border border-border hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-sm font-medium text-foreground">{repo.full_name}</div>
+                                {repo.description && (
+                                  <div className="text-xs text-muted-foreground mt-0.5">{repo.description}</div>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {repo.private ? '🔒 Private' : '🌐 Public'}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                      {isLinkingRepo && (
+                        <div className="mt-3 text-xs text-muted-foreground">
+                          Linking repository...
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => setShowRepoSelector(false)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-3">
                 {/* GitHub */}

@@ -65,15 +65,17 @@ export async function POST(request: NextRequest) {
       console.error('[GitHub Disconnect] Failed to clear repositories:', repoError)
     }
 
-    // Clear GitHub installation ID from projects
+    // Clear GitHub installation/repository IDs from projects
+    // BUT preserve github_owner and github_repo_name for auto-relinking
     const { error: projectError } = await supabase
       .from('client_projects')
       .update({
         github_installation_id: null,
         github_repository_id: null,
-        github_owner: null,
-        github_repo_name: null,
-        github_default_branch: null
+        // Keep these for auto-relink:
+        // github_owner: <preserved>
+        // github_repo_name: <preserved>
+        // github_default_branch: <preserved>
       })
       .eq('user_id', user.id)
 
@@ -81,7 +83,7 @@ export async function POST(request: NextRequest) {
       console.error('[GitHub Disconnect] Failed to clear project GitHub data:', projectError)
     }
 
-    console.log('[GitHub Disconnect] Successfully cleared GitHub data')
+    console.log('[GitHub Disconnect] Successfully cleared installation IDs (preserved repo names for auto-relink)')
 
     return NextResponse.json({
       success: true,

@@ -196,6 +196,49 @@ export async function GET(request: NextRequest) {
           })
       }
 
+      // AUTO-RELINK: Find projects that have repo names but no repository_id (after disconnect)
+      console.log('[Callback] Checking for projects to auto-relink...')
+      const { data: projectsToRelink } = await supabase
+        .from('client_projects')
+        .select('id, project_name, github_owner, github_repo_name')
+        .eq('user_id', user.id)
+        .is('github_repository_id', null)
+        .not('github_repo_name', 'is', null)
+
+      if (projectsToRelink && projectsToRelink.length > 0) {
+        console.log('[Callback] Found projects to auto-relink:', projectsToRelink.map(p => p.project_name))
+
+        for (const project of projectsToRelink) {
+          // Find matching repository by name
+          const { data: matchingRepo } = await supabase
+            .from('github_repositories')
+            .select('id, repository_id')
+            .eq('installation_id', parseInt(installationId))
+            .eq('repository_name', project.github_repo_name)
+            .eq('owner', project.github_owner)
+            .single()
+
+          if (matchingRepo) {
+            // Auto-relink!
+            const { error: relinkError } = await supabase
+              .from('client_projects')
+              .update({
+                github_installation_id: parseInt(installationId),
+                github_repository_id: matchingRepo.id
+              })
+              .eq('id', project.id)
+
+            if (relinkError) {
+              console.error('[Callback] Failed to auto-relink project:', project.project_name, relinkError)
+            } else {
+              console.log('[Callback] ✓ Auto-relinked project:', project.project_name)
+            }
+          } else {
+            console.log('[Callback] ⚠ Could not find matching repo for project:', project.project_name, `(${project.github_owner}/${project.github_repo_name})`)
+          }
+        }
+      }
+
       // Migrate projects from old repos to new repos
       const migrateQueue = (globalThis as any)._migrateQueue || []
       if (migrateQueue.length > 0) {
@@ -228,13 +271,26 @@ export async function GET(request: NextRequest) {
         delete (globalThis as any)._migrateQueue
       }
 
-      // Check if there's a custom redirect URL
+      // Check if there are still unlinked projects (auto-relink failed)
+      const { data: stillUnlinked } = await supabase
+        .from('client_projects')
+        .select('id, project_name')
+        .eq('user_id', user.id)
+        .is('github_repository_id', null)
+        .not('github_repo_name', 'is', null)
+
+      // Determine redirect URL
       const redirectTo = cookieStore.get('github_install_redirect')?.value
       let redirectUrl: URL
 
-      if (redirectTo) {
-        // If redirectTo is a full URL (starts with http), use it directly
-        // Otherwise treat as relative path and construct with current origin
+      if (stillUnlinked && stillUnlinked.length > 0) {
+        // Auto-relink failed - redirect to repo selection
+        console.log('[Callback] Auto-relink failed for:', stillUnlinked.map(p => p.project_name))
+        console.log('[Callback] Redirecting to repo selection...')
+        redirectUrl = new URL(`/portal/settings?select_repo=true&installation_id=${installationId}`, origin)
+      } else if (redirectTo) {
+        // Auto-relink succeeded or no projects - use custom redirect
+        console.log('[Callback] All projects linked successfully!')
         if (redirectTo.startsWith('http://') || redirectTo.startsWith('https://')) {
           redirectUrl = new URL(redirectTo)
         } else {
