@@ -45,6 +45,12 @@ export default function HelpAssistant() {
           question: 'How do I connect a service like Stripe or Airtable?',
           answer: 'Click the Settings icon (gear) at the bottom of the sidebar, then go to the Connectors tab to manage your service connections.',
           timestamp: new Date()
+        },
+        {
+          id: '3',
+          question: 'Why am I having sign-in issues with GitHub?',
+          answer: '⚠️ IMPORTANT: Keep your emails consistent! If you sign in with email A but your GitHub account uses email B, the system creates TWO separate accounts. This causes: missing projects, connection errors, and data inconsistencies. FIX: Go to GitHub → Settings → Emails → Make sure your primary email matches the email you use to sign in here. Then use Account Linking in Settings to merge accounts, or always sign in with GitHub.',
+          timestamp: new Date()
         }
       ])
     }
