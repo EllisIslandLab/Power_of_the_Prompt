@@ -5,6 +5,8 @@ import { createBrowserClient } from '@supabase/ssr'
 import { loadStripe } from '@stripe/stripe-js'
 import ConnectServiceModal from '../components/ConnectServiceModal'
 import AccountLinking from './AccountLinking'
+import AdminOnboardingReset from './AdminOnboardingReset'
+import { isAdmin } from '@/lib/admin-utils'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -61,6 +63,9 @@ export default function SettingsInterface({
   // Repository selection state
   const [showRepoSelector, setShowRepoSelector] = useState(false)
   const [availableRepos, setAvailableRepos] = useState<any[]>([])
+
+  // Admin check
+  const userIsAdmin = isAdmin(authEmail)
   const [selectedRepoId, setSelectedRepoId] = useState<string | null>(null)
   const [isLinkingRepo, setIsLinkingRepo] = useState(false)
   const [installationIdForRepoSelect, setInstallationIdForRepoSelect] = useState<string | null>(null)
@@ -469,6 +474,9 @@ export default function SettingsInterface({
 
             {/* Account Linking */}
             <AccountLinking user={user} />
+
+            {/* Admin Onboarding Reset */}
+            <AdminOnboardingReset user={user} isAdmin={userIsAdmin} />
 
             {/* Security & Actions */}
             <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur rounded-lg border border-white/10 p-4">
