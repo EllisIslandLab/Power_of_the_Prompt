@@ -77,6 +77,13 @@ export async function POST(request: Request) {
       }
     )
 
+    // Get authenticated user
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+
     // Fetch client account to get user_id and other info
     const { data: clientAccount } = await supabase
       .from('client_accounts')
