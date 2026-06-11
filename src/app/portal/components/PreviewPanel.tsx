@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import DiffOverlay from './DiffOverlay'
 import MobilePhoneFrame from './MobilePhoneFrame'
 import DesktopBrowserFrame from './DesktopBrowserFrame'
-import SourceControlPanel from './SourceControlPanel'
 import Breadcrumb from './Breadcrumb'
 
 interface PendingDiff {
@@ -47,8 +46,6 @@ interface PreviewPanelProps {
   onFileSelect?: (index: number) => void
   onFileClose?: (index: number) => void
   showPreview?: boolean
-  sourceControlOpen?: boolean
-  onSourceControlClose?: () => void
 }
 
 export default function PreviewPanel({
@@ -67,8 +64,6 @@ export default function PreviewPanel({
   onFileSelect,
   onFileClose,
   showPreview = true,
-  sourceControlOpen = false,
-  onSourceControlClose,
 }: PreviewPanelProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [changedElements, setChangedElements] = useState<string[]>([])
@@ -250,33 +245,8 @@ export default function PreviewPanel({
     <>
       {/* Normal Mode */}
       <div className="h-full flex flex-col relative">
-        {/* Source Control Tab - Show when source control is open */}
-        {sourceControlOpen && (
-          <div className="absolute top-2 left-2 right-[calc(33.333%+1rem)] z-30 flex items-center gap-2">
-            <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-[#1e1e1e]/95 backdrop-blur-sm">
-              <div className="flex items-center gap-2 px-3 py-1 text-xs bg-blue-600 text-white rounded">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-                <span>Source Control</span>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onSourceControlClose?.()
-                  }}
-                  className="hover:text-red-300 cursor-pointer ml-1"
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Floating File Tabs - Only show when viewing files */}
-        {!showPreview && !sourceControlOpen && openFiles.length > 0 && (
+        {!showPreview && openFiles.length > 0 && (
           <div className="absolute top-2 left-2 right-[calc(33.333%+1rem)] z-30 flex items-center gap-2 overflow-x-auto group tabs-scroll">
             <div className="flex items-center gap-2 px-2 py-1 rounded-lg bg-[#1e1e1e]/0 group-hover:bg-[#1e1e1e]/95 transition-all duration-200 backdrop-blur-sm">
               {/* File Tabs */}
@@ -333,14 +303,9 @@ export default function PreviewPanel({
         )}
 
 
-        {/* Preview iframe or File Content or Source Control */}
+        {/* Preview iframe or File Content */}
         <div className="flex-1 relative">
-          {sourceControlOpen ? (
-            // Source Control Panel
-            <div className="absolute inset-0 overflow-auto pt-14 pr-[calc(33.333%+2rem)] pl-0 pb-0 bg-[#0a0e27]">
-              <SourceControlPanel />
-            </div>
-          ) : shouldShowDiff ? (
+          {shouldShowDiff ? (
             null  // Don't render iframe when showing diff
           ) : showPreview ? (
             previewUrl ? (

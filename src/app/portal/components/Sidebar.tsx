@@ -15,9 +15,6 @@ interface SidebarProps {
   onPanelOpenChange?: (isOpen: boolean) => void
   onFileOpen?: (file: { path: string; name: string; content: string }) => void
   onExplorerStateChange?: (isOpen: boolean) => void
-  onSourceControlOpen?: () => void
-  sourceControlOpen?: boolean
-  onSourceControlClose?: () => void
 }
 
 type SidebarTool = 'explorer' | 'search' | 'source-control' | 'balance' | 'settings' | 'help' | 'layout'
@@ -33,7 +30,7 @@ interface FileNode {
   loading?: boolean
 }
 
-export default function Sidebar({ onModeChange, initialTheme = 'dark', user, clientAccount, onLayoutChange, modifiedFiles = [], onPanelOpenChange, onFileOpen, onExplorerStateChange, onSourceControlOpen, sourceControlOpen = false, onSourceControlClose }: SidebarProps) {
+export default function Sidebar({ onModeChange, initialTheme = 'dark', user, clientAccount, onLayoutChange, modifiedFiles = [], onPanelOpenChange, onFileOpen, onExplorerStateChange }: SidebarProps) {
   const [activeTool, setActiveTool] = useState<SidebarTool | null>(null)
   const [currentMode, setCurrentMode] = useState<'builder' | 'chat'>('builder')
   const [chatLayout, setChatLayout] = useState<'left' | 'right' | 'top' | 'bottom' | 'floating'>('bottom')
@@ -623,23 +620,13 @@ export default function Sidebar({ onModeChange, initialTheme = 'dark', user, cli
               onClick={() => {
                 if (tool.action) {
                   tool.action()
-                } else if (tool.id === 'source-control') {
-                  // Toggle Source Control in content area
-                  if (sourceControlOpen) {
-                    onSourceControlClose?.()
-                  } else {
-                    onSourceControlOpen?.()
-                  }
-                  setActiveTool(null) // Don't show sidebar panel for source control
                 } else {
                   // VS Code style: toggle off if clicking active tool
                   setActiveTool(activeTool === tool.id ? null : tool.id)
                 }
               }}
               className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors mb-2 relative ${
-                tool.id === 'source-control' && sourceControlOpen
-                  ? 'bg-primary text-primary-foreground'
-                  : activeTool === tool.id
+                activeTool === tool.id
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
               }`}
