@@ -373,8 +373,11 @@ export default function PreviewPanel({
                   </div>
                 </MobilePhoneFrame>
             )
-          ) : openFiles[activeFileIndex] ? (
-            <div className="absolute inset-0 flex flex-col bg-[#1e1e1e]">
+          ) : null}
+
+          {/* File Viewer - Shows on left, preview stays visible on right */}
+          {openFiles[activeFileIndex] && !isFullscreenLayout && (
+            <div className="absolute left-4 top-4 bottom-4 w-[45%] bg-[#1e1e1e] border-2 border-white/20 rounded-lg shadow-2xl flex flex-col z-10">
               {/* Breadcrumb Navigation */}
               <Breadcrumb
                 filePath={openFiles[activeFileIndex].path}
@@ -386,13 +389,13 @@ export default function PreviewPanel({
               />
 
               {/* File Content */}
-              <div className="flex-1 overflow-auto pr-[calc(33.333%+2rem)] pl-4 pb-4 group file-content-scroll">
+              <div className="flex-1 overflow-auto px-4 pb-4 group file-content-scroll">
                 <pre className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap break-words max-w-full">
                   <code>{openFiles[activeFileIndex].content}</code>
                 </pre>
               </div>
             </div>
-          ) : null}
+          )}
 
           {/* Diff Overlay */}
           {shouldShowDiff && currentDiff && (
