@@ -4,6 +4,7 @@ import { validateRequest } from '@/lib/validation'
 import { signUpSchema } from '@/lib/schemas'
 import { logger, logSecurity } from '@/lib/logger'
 import { rateLimiter, RateLimitConfigs } from '@/lib/rate-limiter'
+import { getInitialBalance } from '@/lib/admin-utils'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -343,7 +344,8 @@ export async function POST(request: NextRequest) {
 
     // Create or update client_accounts with initial balance from invite
     try {
-      const initialBalance = invite.initial_balance || 0
+      // Admin gets $100, regular users get invite balance or default
+      const initialBalance = invite.initial_balance || getInitialBalance(email)
 
       // Check if client account exists
       const { data: existingAccount } = await supabase

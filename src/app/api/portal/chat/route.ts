@@ -5,6 +5,7 @@ import { shouldWaiveCost, calculateRevisionCost } from '@/app/portal/utils/trial
 import { fetchKeyProjectFiles } from '../lib/github'
 import { apiCache } from '@/lib/cache'
 import { buildSystemPrompt } from '../lib/context-builder'
+import { checkAdminAutoRefill } from '@/lib/admin-utils'
 
 // Increase timeout for long-running AI operations (5 minutes)
 export const maxDuration = 300
@@ -85,6 +86,19 @@ export async function POST(request: Request) {
 
     if (!clientAccount) {
       throw new Error('Client account not found')
+    }
+
+    // Admin auto-refill: Check if admin needs balance refill
+    const refillAmount = await checkAdminAutoRefill(
+      user.email,
+      clientAccount.account_balance,
+      supabase,
+      user.id
+    )
+
+    // Update local balance if refilled
+    if (refillAmount !== null) {
+      clientAccount.account_balance = refillAmount
     }
 
     // Check if account has balance

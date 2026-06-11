@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import Anthropic from '@anthropic-ai/sdk'
 import { calculateRevisionCost } from '@/app/portal/utils/trial'
+import { checkAdminAutoRefill } from '@/lib/admin-utils'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -40,6 +41,19 @@ export async function POST(request: NextRequest) {
 
     if (!clientAccount) {
       return NextResponse.json({ error: 'Account not found' }, { status: 404 })
+    }
+
+    // Admin auto-refill: Check if admin needs balance refill
+    const refillAmount = await checkAdminAutoRefill(
+      user.email,
+      clientAccount.account_balance,
+      supabase,
+      user.id
+    )
+
+    // Update local balance if refilled
+    if (refillAmount !== null) {
+      clientAccount.account_balance = refillAmount
     }
 
     // Check if account has balance

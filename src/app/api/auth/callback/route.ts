@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
+import { getInitialBalance } from '@/lib/admin-utils'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -96,7 +97,8 @@ export async function GET(request: NextRequest) {
                           'User'
 
           const tier = invite?.tier || 'basic'
-          const initialBalance = invite?.initial_balance || 0
+          // Admin gets $100, regular users get invite balance or default
+          const initialBalance = invite?.initial_balance || getInitialBalance(data.user.email)
 
           console.log('OAuth signup settings:', { fullName, tier, initialBalance, hasInvite: !!invite })
 
